@@ -12,13 +12,13 @@ namespace AzureExtension;
 [ComVisible(true)]
 [Guid("23c9363b-1ade-4017-afa7-f57f0351bca1")]
 [ComDefaultInterface(typeof(IExtension))]
-public sealed partial class SampleExtension : IExtension, IDisposable
+public sealed partial class AzureExtension : IExtension, IDisposable
 {
     private readonly ManualResetEvent _extensionDisposedEvent;
 
     private readonly AzureExtensionActionsProvider _provider = new();
 
-    public SampleExtension(ManualResetEvent extensionDisposedEvent)
+    public AzureExtension(ManualResetEvent extensionDisposedEvent)
     {
         this._extensionDisposedEvent = extensionDisposedEvent;
     }

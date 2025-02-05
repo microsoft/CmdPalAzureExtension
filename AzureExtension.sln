@@ -5,6 +5,11 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureExtension", "AzureExtension\AzureExtension.csproj", "{7B778B31-9A2B-459C-9278-DB0936757929}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6222099F-5E2B-4D26-873C-5175E774624A}"
+	ProjectSection(SolutionItems) = preProject
+		Common.Dotnet.CsWinRT.props = Common.Dotnet.CsWinRT.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
