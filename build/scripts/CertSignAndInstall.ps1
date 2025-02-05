@@ -9,7 +9,7 @@ function Invoke-SignPackage([string]$Path) {
         return
     }
 
-    $certName = "Microsoft.CmdPal.GitHubExtension"
+    $certName = "Microsoft.CmdPal.AzureExtension"
     $cert = Get-ChildItem 'Cert:\CurrentUser\My' | Where-Object {$_.FriendlyName -match $certName} | Select-Object -First 1
 
     if ($cert) {
@@ -39,7 +39,7 @@ function Invoke-SignPackage([string]$Path) {
     }
 }
 
-function Remove-GitHubExtensionCertificates() {
-    Get-ChildItem 'Cert:\CurrentUser\My' | Where-Object {$_.FriendlyName -match 'Microsoft.CmdPal.GitHubExtension'} | Remove-Item
-    Get-ChildItem 'Cert:\LocalMachine\TrustedPeople' | Where-Object {$_.FriendlyName -match 'Microsoft.CmdPal.GitHubExtension'} | Remove-Item
+function Remove-AzureExtensionCertificates() {
+    Get-ChildItem 'Cert:\CurrentUser\My' | Where-Object {$_.FriendlyName -match 'Microsoft.CmdPal.AzureExtension'} | Remove-Item
+    Get-ChildItem 'Cert:\LocalMachine\TrustedPeople' | Where-Object {$_.FriendlyName -match 'Microsoft.CmdPal.AzureExtension'} | Remove-Item
 }

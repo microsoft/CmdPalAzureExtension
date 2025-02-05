@@ -17,7 +17,7 @@ parameters:
 
 variables:
   MSIXVersion: '0.1800'
-  solution: '**/GitHubExtension.sln'
+  solution: '**/AzureExtension.sln'
   appxPackageDir: 'AppxPackages'
 
 resources:
@@ -38,11 +38,6 @@ stages:
         - ${{ each platform in parameters.Platforms }}:
           - job: Build_${{ platform }}_${{ configuration }}
             steps:
-            - task: PowerShell@2
-              displayName: Running script to update OAuth secrets
-              inputs:
-                filePath: './build/scripts/OAuthSecrets.ps1'
-                arguments: -ClientId $(GitHubOAuthClientId) -ClientSecret $(GitHubOAuthClientSecret)
             - task: MSBuild@1
               displayName: Restoring packages
               inputs:
@@ -55,7 +50,7 @@ stages:
             - task: MsixPackaging@1
               displayName: Building MSIX
               inputs:
-                outputPath: 'BuildOutput\GitHubExtension_${{ configuration }}_${{ platform }}.msix'
+                outputPath: 'BuildOutput\AzureExtension_${{ configuration }}_${{ platform }}.msix'
                 solution: '$(solution)'
                 clean: false
                 generateBundle: false
