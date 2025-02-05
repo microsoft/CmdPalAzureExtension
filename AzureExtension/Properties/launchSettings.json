@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "AzureExtension (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "AzureExtension (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
