@@ -17,7 +17,7 @@ public class Program
         {
             using ExtensionServer server = new();
             var extensionDisposedEvent = new ManualResetEvent(false);
-            var extensionInstance = new SampleExtension(extensionDisposedEvent);
+            var extensionInstance = new AzureExtension(extensionDisposedEvent);
 
             // We are instantiating an extension instance once above, and returning it every time the callback in RegisterExtension below is called.
             // This makes sure that only one instance of SampleExtension is alive, which is returned every time the host asks for the IExtension object.
