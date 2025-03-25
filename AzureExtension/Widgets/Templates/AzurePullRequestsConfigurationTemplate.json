@@ -1,0 +1,119 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "Input.ChoiceSet",
+          "id": "account",
+          "placeholder": "%Widget_Template/ChooseAccountPlaceholder%",
+          "value": "${selectedDevId}",
+          "choices": [
+            {
+              "$data": "${accounts}",
+              "title": "${devid}",
+              "value": "${devid}"
+            }
+          ]
+        },
+        {
+          "type": "Input.Text",
+          "placeholder": "%Widget_Template/EnterURLPlaceholder%",
+          "id": "query",
+          "value": "${url}",
+          "label": "%Widget_Template/RepositoryURLLabel%",
+          "style": "Url",
+          "isRequired": true,
+          "errorMessage": "%Widget_Template_ErrorMessage/RepositoryURL%"
+        },
+        {
+          "type": "Input.Text",
+          "placeholder": "%Widget_Template/WidgetTitlePlaceholder%",
+          "id": "widgetTitle",
+          "label": "%Widget_Template/WidgetTitleLabel%",
+          "value": "${widgetTitle}"
+        },
+        {
+          "type": "Input.ChoiceSet",
+          "choices": [
+            {
+              "title": "%Widget_Template/PRMine%",
+              "value": "Mine"
+            },
+            {
+              "title": "%Widget_Template/PRAssigned%",
+              "value": "Assigned"
+            },
+            {
+              "title": "%Widget_Template/PRAll%",
+              "value": "All"
+            }
+          ],
+          "label": "%Widget_Template/PRDefaultView%",
+          "value": "${selectedView}",
+          "id": "view",
+          "isRequired": true
+        },
+        {
+          "type": "Container",
+          "$when": "${message != null}",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "${message}",
+              "wrap": true,
+              "size": "Small"
+            }
+          ],
+          "style": "warning"
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Medium",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch"
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "Container",
+                  "items": [
+                    {
+                      "type": "ActionSet",
+                      "actions": [
+                        {
+                          "type": "Action.Execute",
+                          "title": "%Widget_Template_Button/Save%",
+                          "verb": "Save",
+                          "role": "Button",
+                          "associatedInputs": "auto"
+                        },
+                        {
+                          "type": "Action.Execute",
+                          "title": "%Widget_Template_Button/Cancel%",
+                          "verb": "Cancel",
+                          "isEnabled": "${$root.pinned}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
