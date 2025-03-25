@@ -1,14 +1,15 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System.Globalization;
 using System.Reflection;
 using System.Text;
-using DevHomeAzureExtension.Helpers;
+using AzureExtension.Helpers;
 using Microsoft.Data.Sqlite;
 using Serilog;
 
-namespace DevHomeAzureExtension.DataModel;
+namespace AzureExtension.DataModel;
 
 public class DataStore : IDisposable
 {

@@ -1,16 +1,18 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System.Security.Authentication;
-using DevHomeAzureExtension.Client;
-using DevHomeAzureExtension.DeveloperId;
+using AzureExtension.Client;
+using AzureExtension.DataModel;
+using AzureExtension.DeveloperId;
+using AzureExtension.Helpers;
 using DevHomeAzureExtension.Helpers;
 using Microsoft.Identity.Client;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.WebApi;
-using Microsoft.Windows.DevHome.SDK;
 using Serilog;
 using Windows.Foundation;
 using Windows.Storage.Streams;
@@ -18,9 +20,9 @@ using Windows.Storage.Streams;
 // In the past, an organization was known as an account.  Typedef to organization to make the code easier to read.
 using Organization = Microsoft.VisualStudio.Services.Account.Account;
 
-namespace DevHomeAzureExtension.Providers;
+namespace AzureExtension.Providers;
 
-public class RepositoryProvider : IRepositoryProvider2
+public class RepositoryProvider : IRepositoryProvider2, IDisposable
 {
     private readonly ILogger _log = Log.ForContext("SourceContext", nameof(RepositoryProvider));
 

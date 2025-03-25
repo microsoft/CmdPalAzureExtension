@@ -1,18 +1,17 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System.Text;
 using System.Text.Json.Nodes;
-using DevHomeAzureExtension.Client;
-using DevHomeAzureExtension.DataManager;
-using DevHomeAzureExtension.DeveloperId;
+using AzureExtension.Client;
+using AzureExtension.DataManager;
+using AzureExtension.DeveloperId;
+using AzureExtension.Widgets.Enums;
 using DevHomeAzureExtension.Helpers;
-using DevHomeAzureExtension.Widgets.Enums;
-using Microsoft.Windows.DevHome.SDK;
 using Microsoft.Windows.Widgets.Providers;
-using Serilog;
 
-namespace DevHomeAzureExtension.Widgets;
+namespace AzureExtension.Widgets;
 
 public abstract class AzureWidget : WidgetImpl
 {

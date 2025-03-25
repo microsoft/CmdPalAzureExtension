@@ -1,17 +1,15 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
-using System.Text.Json;
 using System.Text.Json.Nodes;
-using DevHomeAzureExtension.Client;
-using DevHomeAzureExtension.DataManager;
-using DevHomeAzureExtension.DataModel;
-using DevHomeAzureExtension.DeveloperId;
+using AzureExtension.DataManager;
+using AzureExtension.Helpers;
 using DevHomeAzureExtension.Helpers;
 using Microsoft.Windows.Widgets.Providers;
 using Newtonsoft.Json;
 
-namespace DevHomeAzureExtension.Widgets;
+namespace AzureExtension.Widgets;
 
 internal sealed class AzurePullRequestsDeveloperWidget : AzurePullRequestsBaseWidget
 {

@@ -1,18 +1,19 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using DevHomeAzureExtension.Helpers;
 using Serilog;
 
 // This is to resolve ambiguity between DataModel WorkItemType and
 // TeamFoundation WorkItemType. We'll Rename the TeamFoundation one.
 using TeamWorkItemType = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItemType;
 
-namespace DevHomeAzureExtension.DataModel;
+namespace AzureExtension.DataModel;
 
 [Table("WorkItemType")]
 public class WorkItemType

@@ -1,10 +1,11 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using Microsoft.Identity.Client;
 using Microsoft.UI;
 
-namespace DevHomeAzureExtension.DeveloperId;
+namespace AzureExtension.DeveloperId;
 
 public interface IAuthenticationHelper
 {

@@ -1,10 +1,11 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using Microsoft.IdentityModel.Abstractions;
 using Serilog;
 
-namespace DevHomeAzureExtension.DeveloperId;
+namespace AzureExtension.DeveloperId;
 
 // The below class is used in MSAL.NET logging for better diagnosability of issues (see more here: https://learn.microsoft.com/en-us/entra/msal/dotnet/advanced/exceptions/msal-logging)
 public class MSALLogger(EventLogLevel minLogLevel = EventLogLevel.LogAlways) : IIdentityLogger

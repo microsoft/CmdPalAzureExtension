@@ -1,9 +1,10 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using Serilog;
 
-namespace DevHomeAzureExtension.Client;
+namespace AzureExtension.Client;
 
 // This class is using lazy initialization to extract data from the Uri exactly once and only
 // if needed. It uses Lazy<T> with the function initializer, which is also thread-safe.

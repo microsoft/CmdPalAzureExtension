@@ -1,5 +1,6 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System.Globalization;
 using Microsoft.Identity.Client;
@@ -9,7 +10,7 @@ using Microsoft.IdentityModel.Abstractions;
 using Microsoft.UI;
 using Serilog;
 
-namespace DevHomeAzureExtension.DeveloperId;
+namespace AzureExtension.DeveloperId;
 
 public class AuthenticationHelper : IAuthenticationHelper
 {
@@ -72,7 +73,7 @@ public class AuthenticationHelper : IAuthenticationHelper
             PublicClientApplicationBuilder.WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows)
             {
                 MsaPassthrough = true,
-                Title = "DevHomeAzureExtension",
+                Title = "AzureExtension",
             });
 
             PublicClientApplication = PublicClientApplicationBuilder.Build();

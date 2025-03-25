@@ -1,11 +1,12 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System.Runtime.InteropServices;
 using Microsoft.Windows.Widgets.Providers;
 using Serilog;
 
-namespace DevHomeAzureExtension.Widgets;
+namespace AzureExtension.Widgets;
 
 [ComVisible(true)]
 [ClassInterface(ClassInterfaceType.None)]
@@ -24,7 +25,6 @@ public sealed class WidgetProvider : IWidgetProvider, IWidgetProvider2
     {
         _log.Debug("Provider Constructed");
         _widgetDefinitionRegistry.Add("Azure_QueryList", new WidgetImplFactory<AzureQueryListWidget>());
-        _widgetDefinitionRegistry.Add("Azure_QueryTiles", new WidgetImplFactory<AzureQueryTilesWidget>());
         _widgetDefinitionRegistry.Add("Azure_PullRequests", new WidgetImplFactory<AzurePullRequestsRepositoryWidget>());
         _widgetDefinitionRegistry.Add("Azure_MyPRs", new WidgetImplFactory<AzurePullRequestsDeveloperWidget>());
         RecoverRunningWidgets();

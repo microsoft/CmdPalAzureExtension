@@ -1,12 +1,13 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System.Runtime.InteropServices;
-using DevHomeAzureExtension.Widgets.COM;
+using AzureExtension.Widgets.COM;
 using Microsoft.Windows.Widgets.Providers;
 using WinRT;
 
-namespace DevHomeAzureExtension.Widgets;
+namespace AzureExtension.Widgets;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1649:File name should match first type name", Justification = "Templated class")]
 public class WidgetProviderFactory<T> : IClassFactory

@@ -1,17 +1,20 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using DevHomeAzureExtension.DataManager;
+using AzureExtension.DataManager;
+using AzureExtension.DataModel;
+using AzureExtension.Helpers;
+using AzureExtension.Pages;
 using DevHomeAzureExtension.Helpers;
-using Microsoft.Windows.DevHome.SDK;
 using Serilog;
 using Windows.Foundation;
 
-namespace DevHomeAzureExtension.Providers;
+namespace AzureExtension.Providers;
 
 internal sealed class SettingsUIController() : IExtensionAdaptiveCardSession
 {
@@ -157,5 +160,10 @@ internal sealed class SettingsUIController() : IExtensionAdaptiveCardSession
         [
             "Settings_ViewLogs",
         ];
+    }
+
+    public Task<ProviderOperationResult> OnActionAsync(string action, string inputs)
+    {
+        throw new NotImplementedException();
     }
 }

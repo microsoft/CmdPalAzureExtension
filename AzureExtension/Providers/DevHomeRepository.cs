@@ -1,12 +1,14 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
-using DevHomeAzureExtension.Client;
+using AzureExtension.Client;
+using AzureExtension.DataModel;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 
-namespace DevHomeAzureExtension.Providers;
+namespace AzureExtension.Providers;
 
-public class DevHomeRepository : Microsoft.Windows.DevHome.SDK.IRepository
+public class DevHomeRepository : IRepository
 {
     private readonly string _name;
 
@@ -16,7 +18,7 @@ public class DevHomeRepository : Microsoft.Windows.DevHome.SDK.IRepository
 
     private readonly DateTimeOffset _lastUpdated;
 
-    string Microsoft.Windows.DevHome.SDK.IRepository.DisplayName => _name;
+    string IRepository.DisplayName => _name;
 
     public string OwningAccountName => _owningAccountName;
 
@@ -27,6 +29,8 @@ public class DevHomeRepository : Microsoft.Windows.DevHome.SDK.IRepository
     public DateTimeOffset LastUpdated => _lastUpdated;
 
     public Uri RepoUri => _cloneUrl;
+
+    DateTime IRepository.LastUpdated => throw new NotImplementedException();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DevHomeRepository"/> class.

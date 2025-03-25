@@ -1,7 +1,8 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
-using DevHomeAzureExtension.Client;
+using AzureExtension.Client;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.VisualStudio.Services.Account.Client;
 using Microsoft.VisualStudio.Services.WebApi;
@@ -10,7 +11,7 @@ using Serilog;
 // In the past, an organization was known as an account.  Typedef to organization to make the code easier to read.
 using Organization = Microsoft.VisualStudio.Services.Account.Account;
 
-namespace DevHomeAzureExtension.Helpers;
+namespace AzureExtension.Helpers;
 
 /// <summary>
 /// Handles the hierarchy between organizations and projects.  Handles querying for both as well.

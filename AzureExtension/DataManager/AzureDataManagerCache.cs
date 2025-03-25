@@ -1,11 +1,12 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System.Dynamic;
-using DevHomeAzureExtension.Client;
-using DevHomeAzureExtension.DataManager;
-using DevHomeAzureExtension.DataModel;
-using DevHomeAzureExtension.DeveloperId;
+using AzureExtension.Client;
+using AzureExtension.DataManager;
+using AzureExtension.DataModel;
+using AzureExtension.DeveloperId;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.Account;
@@ -14,7 +15,7 @@ using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using Serilog;
 
-namespace DevHomeAzureExtension;
+namespace AzureExtension;
 
 public partial class AzureDataManager
 {

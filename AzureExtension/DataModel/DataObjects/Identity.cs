@@ -1,18 +1,19 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AzureExtension.DeveloperId;
+using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using DevHomeAzureExtension.DeveloperId;
-using DevHomeAzureExtension.Helpers;
 using Microsoft.VisualStudio.Services.Profile;
 using Microsoft.VisualStudio.Services.Profile.Client;
 using Microsoft.VisualStudio.Services.WebApi;
 using Serilog;
 
-namespace DevHomeAzureExtension.DataModel;
+namespace AzureExtension.DataModel;
 
 // This represents an Azure DevOps Identity or IdentityRef.
 [Table("Identity")]

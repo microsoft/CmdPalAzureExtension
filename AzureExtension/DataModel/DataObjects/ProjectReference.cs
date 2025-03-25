@@ -1,11 +1,12 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Serilog;
 
-namespace DevHomeAzureExtension.DataModel;
+namespace AzureExtension.DataModel;
 
 // This table represents direct references to a repository, such as a pull request count
 // or a widget, or clone being created for that repository. This is a reference that the

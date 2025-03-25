@@ -1,9 +1,10 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-
-namespace DevHomeAzureExtension.Contracts;
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using Windows.ApplicationModel;
+
+namespace AzureExtension.Contracts;
 
 public interface IPackagesService
 {

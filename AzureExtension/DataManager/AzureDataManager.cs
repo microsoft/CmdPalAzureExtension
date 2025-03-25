@@ -1,27 +1,27 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System.Collections.Concurrent;
 using System.Dynamic;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using DevHomeAzureExtension.Client;
-using DevHomeAzureExtension.DataManager;
-using DevHomeAzureExtension.DataModel;
-using DevHomeAzureExtension.DeveloperId;
-using DevHomeAzureExtension.Helpers;
+using AzureExtension.Client;
+using AzureExtension.DataManager;
+using AzureExtension.DataModel;
+using AzureExtension.DeveloperId;
+using AzureExtension.Helpers;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
-using Microsoft.Windows.DevHome.SDK;
 using Serilog;
 using Windows.Storage;
 using TFModels = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
-namespace DevHomeAzureExtension;
+namespace AzureExtension;
 
 public partial class AzureDataManager : IAzureDataManager, IDisposable
 {

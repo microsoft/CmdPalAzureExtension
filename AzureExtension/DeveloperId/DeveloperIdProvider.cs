@@ -1,15 +1,17 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+﻿// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
+using AzureExtension.DataModel;
+using AzureExtension.Pages;
 using Microsoft.Identity.Client;
 using Microsoft.UI;
-using Microsoft.Windows.DevHome.SDK;
 using Serilog;
 using Windows.Foundation;
 
-namespace DevHomeAzureExtension.DeveloperId;
+namespace AzureExtension.DeveloperId;
 
-public class DeveloperIdProvider : IDeveloperIdProvider
+public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
 {
     // Locks to control access to Singleton class members.
     private static readonly object _developerIdsLock = new();
@@ -326,4 +328,29 @@ public class DeveloperIdProvider : IDeveloperIdProvider
     }
 
     public AdaptiveCardSessionResult GetLoginAdaptiveCardSession() => throw new NotImplementedException();
+
+    IEnumerable<IDeveloperId> IDeveloperIdProvider.GetLoggedInDeveloperIdsInternal()
+    {
+        return GetLoggedInDeveloperIdsInternal();
+    }
+
+    IDeveloperId IDeveloperIdProvider.GetDeveloperIdInternal(IDeveloperId devId)
+    {
+        return GetDeveloperIdInternal(devId);
+    }
+
+    public IAsyncOperation<IDeveloperId> LoginNewDeveloperIdAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    bool IDeveloperIdProvider.LogoutDeveloperId(IDeveloperId developerId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void HandleOauthRedirection(Uri authorizationResponse)
+    {
+        throw new NotImplementedException();
+    }
 }
