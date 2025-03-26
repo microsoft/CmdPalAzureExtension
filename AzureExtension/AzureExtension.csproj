@@ -63,11 +63,19 @@
         <PackageReference Include="System.Text.Json" Version="9.0.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Update="appsettings.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
+    <ItemGroup>
+        <Content Include="Controls\Templates\*">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Compile Remove="Data\**" />
+        <EmbeddedResource Remove="Data\**" />
+        <None Remove="Data\**" />
+        <Page Remove="Data\**" />
+        <Compile Remove="D:\ghext\\codeAnalysis\GlobalSuppressions.cs" />
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
 	<!--
     Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
@@ -83,6 +91,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Data\" />
+		<Folder Include="Controls\Templates\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" />
@@ -99,4 +108,5 @@
 	<ItemGroup>
 	  <PRIResource Remove="Services\**" />
 	</ItemGroup>
+	<ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 </Project>

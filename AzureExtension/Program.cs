@@ -106,7 +106,7 @@ public sealed class Program
         await using global::Shmuelie.WinRTServer.ComServer server = new();
         var extensionDisposedEvent = new ManualResetEvent(false);
 
-        var commandProvider = new AzureExtensionActionsProvider();
+        var commandProvider = new AzureExtensionCommandProvider();
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 

@@ -15,7 +15,7 @@ using Microsoft.Windows.Widgets.Providers;
 using Newtonsoft.Json;
 using Serilog;
 
-namespace AzureExtension;
+namespace AzureExtension.Controls.Pages;
 
 public partial class AzureExtensionPage : ListPage
 {
@@ -80,7 +80,7 @@ public partial class AzureExtensionPage : ListPage
     {
         RequestContentData();
 
-        var contentDataObject = JsonObject.Parse(ContentData);
+        var contentDataObject = JsonNode.Parse(ContentData);
         var listItems = new List<ListItem>();
         if (contentDataObject != null && contentDataObject["items"] is JsonArray itemsArray)
         {
@@ -123,7 +123,7 @@ public partial class AzureExtensionPage : ListPage
     protected bool ValidateConfiguration(WidgetActionInvokedArgs args)
     {
         var data = args.Data;
-        var dataObject = JsonObject.Parse(data);
+        var dataObject = JsonNode.Parse(data);
         _message = null;
 
         if (dataObject != null && dataObject["account"] != null && dataObject["query"] != null)
@@ -233,7 +233,7 @@ public partial class AzureExtensionPage : ListPage
 
     protected void ResetDataFromState(string data)
     {
-        var dataObject = JsonObject.Parse(data);
+        var dataObject = JsonNode.Parse(data);
 
         if (dataObject == null)
         {
@@ -321,7 +321,7 @@ public partial class AzureExtensionPage : ListPage
 
             foreach (var element in queryResults!)
             {
-                var workItem = JsonObject.Parse(element.Value.ToStringInvariant());
+                var workItem = JsonNode.Parse(element.Value.ToStringInvariant());
 
                 if (workItem != null)
                 {

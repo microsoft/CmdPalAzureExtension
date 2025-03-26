@@ -2,8 +2,8 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Controls.Pages;
 using AzureExtension.DataModel;
-using AzureExtension.Pages;
 using Microsoft.Identity.Client;
 using Microsoft.UI;
 using Serilog;
@@ -39,6 +39,8 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     private readonly AuthenticationExperienceKind _authenticationExperienceForAzureExtension = AuthenticationExperienceKind.CustomProvider;
 
     public string DisplayName => "Azure";
+
+    public event EventHandler<Exception?>? OAuthRedirected;
 
     // Private constructor for Singleton class.
     private DeveloperIdProvider(IAuthenticationHelper authenticationHelper)
@@ -351,6 +353,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
 
     public void HandleOauthRedirection(Uri authorizationResponse)
     {
+        OAuthRedirected?.Invoke(this, null);
         throw new NotImplementedException();
     }
 }

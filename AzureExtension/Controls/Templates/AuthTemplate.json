@@ -1,0 +1,58 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.6",
+  "body": [
+    {
+      "type": "Container",
+      "spacing": "none",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "{{AuthTitle}}",
+          "wrap": true,
+          "horizontalAlignment": "center",
+          "height": "stretch",
+          "size": "medium",
+          "weight": "bolder"
+        },
+        {
+          "type": "Image",
+          "url": "{{AuthIcon}}",
+          "horizontalAlignment": "center",
+          "size": "large"
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch"
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "ActionSet",
+                  "actions": [
+                    {
+                      "title": "{{AuthButtonTitle}}",
+                      "tooltip": "{{AuthButtonTooltip}}",
+                      "type": "Action.Submit",
+                      "isEnabled": {{ButtonIsEnabled}}
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

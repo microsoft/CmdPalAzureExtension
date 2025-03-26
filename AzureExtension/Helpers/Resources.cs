@@ -122,4 +122,9 @@ public static class Resources
             "Widget_Template/ContentLoading",
         ];
     }
+
+    public interface IResources
+    {
+        string GetResource(string identifier, ILogger? log = null);
+    }
 }
