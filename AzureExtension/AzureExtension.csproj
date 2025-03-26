@@ -25,6 +25,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Services\**" />
+	  <EmbeddedResource Remove="Services\**" />
+	  <None Remove="Services\**" />
+	  <Page Remove="Services\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
 
@@ -76,7 +83,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Data\" />
-		<Folder Include="Services\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" />
@@ -90,4 +96,7 @@
 	<PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
 		<HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
 	</PropertyGroup>
+	<ItemGroup>
+	  <PRIResource Remove="Services\**" />
+	</ItemGroup>
 </Project>

@@ -4,21 +4,21 @@
 
 using System.Runtime.InteropServices;
 using Microsoft.CommandPalette.Extensions;
+using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension;
 
-[ComVisible(true)]
 [Guid("23c9363b-1ade-4017-afa7-f57f0351bca1")]
-[ComDefaultInterface(typeof(IExtension))]
-public sealed partial class AzureExtension : IExtension, IDisposable
+public sealed partial class AzureExtension : IExtension
 {
     private readonly ManualResetEvent _extensionDisposedEvent;
 
-    private readonly AzureExtensionActionsProvider _provider = new();
+    private readonly CommandProvider _provider;
 
-    public AzureExtension(ManualResetEvent extensionDisposedEvent)
+    public AzureExtension(ManualResetEvent extensionDisposedEvent, CommandProvider commandProvider)
     {
-        this._extensionDisposedEvent = extensionDisposedEvent;
+        _extensionDisposedEvent = extensionDisposedEvent;
+        _provider = commandProvider;
     }
 
     public object GetProvider(ProviderType providerType)
