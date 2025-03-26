@@ -4,12 +4,11 @@
 
 using AzureExtension.DataModel;
 
-namespace AzureExtension.Pages
-{
-    public interface IExtensionAdaptiveCardSession : IDisposable
-    {
-        ProviderOperationResult Initialize(IExtensionAdaptiveCard extensionUI);
+namespace AzureExtension.Pages;
 
-        Task<ProviderOperationResult> OnActionAsync(string action, string inputs);
-    }
+public interface IExtensionAdaptiveCardSession : IDisposable
+{
+    ProviderOperationResult Initialize(IExtensionAdaptiveCard extensionUI);
+
+    Task<ProviderOperationResult> OnActionAsync(string action, string inputs);
 }

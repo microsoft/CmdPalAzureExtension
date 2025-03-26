@@ -63,10 +63,10 @@ public partial class AzureDataManager
             tx.Commit();
         }
 
-        IEnumerable<DeveloperId.DeveloperId>? developerIds;
+        IEnumerable<IDeveloperId>? developerIds;
         try
         {
-            developerIds = DeveloperIdProvider.GetInstance().GetLoggedInDeveloperIdsInternal();
+            developerIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal();
         }
         catch (Exception ex)
         {
@@ -162,7 +162,7 @@ public partial class AzureDataManager
         return context;
     }
 
-    private void UpdateOrganization(Account account, DeveloperId.DeveloperId developerId, VssConnection connection, CancellationToken cancellationToken)
+    private void UpdateOrganization(Account account, IDeveloperId developerId, VssConnection connection, CancellationToken cancellationToken)
     {
         // Update account identity information:
         var identity = Identity.GetOrCreateIdentity(DataStore, connection.AuthorizedIdentity, connection, developerId.LoginId);
@@ -207,7 +207,7 @@ public partial class AzureDataManager
         organization.SetSynced();
     }
 
-    private List<Account> GetAccounts(DeveloperId.DeveloperId developerId, CancellationToken cancellationToken = default)
+    private List<Account> GetAccounts(IDeveloperId developerId, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -258,7 +258,7 @@ public partial class AzureDataManager
         return [];
     }
 
-    private List<GitPullRequest> GetPullRequestsForProject(TeamProjectReference project, VssConnection connection, DeveloperId.DeveloperId developerId, CancellationToken cancellationToken = default)
+    private List<GitPullRequest> GetPullRequestsForProject(TeamProjectReference project, VssConnection connection, IDeveloperId developerId, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -288,7 +288,7 @@ public partial class AzureDataManager
         return [];
     }
 
-    private List<GitPullRequest> GetPullRequestsForRepository(GitRepository repository, VssConnection connection, DeveloperId.DeveloperId developerId, CancellationToken cancellationToken = default)
+    private List<GitPullRequest> GetPullRequestsForRepository(GitRepository repository, VssConnection connection, IDeveloperId developerId, CancellationToken cancellationToken = default)
     {
         try
         {

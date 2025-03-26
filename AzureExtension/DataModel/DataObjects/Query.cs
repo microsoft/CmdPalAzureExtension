@@ -53,10 +53,6 @@ public class Query
 
     [Write(false)]
     [Computed]
-    public DevId.DeveloperId? DeveloperId => DevId.DeveloperIdProvider.GetInstance().GetDeveloperIdFromAccountIdentifier(DeveloperLogin);
-
-    [Write(false)]
-    [Computed]
     public DateTime UpdatedAt => TimeUpdated.ToDateTime();
 
     private static Query Create(string queryId, long projectId, string developerLogin, string displayName, string queryResults, long queryResultCount)

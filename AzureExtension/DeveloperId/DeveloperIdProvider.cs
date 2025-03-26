@@ -24,13 +24,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
         get; set;
     }
 
-    private IAuthenticationHelper DeveloperIdAuthenticationHelper
-    {
-        get; set;
-    }
-
-    // DeveloperIdProvider uses singleton pattern.
-    private static DeveloperIdProvider? _singletonDeveloperIdProvider;
+    private readonly IAuthenticationHelper _developerIdAuthenticationHelper;
 
     private readonly ILogger _log = Log.ForContext("SourceContext", nameof(DeveloperIdProvider));
 
@@ -40,8 +34,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
 
     public string DisplayName => "Azure";
 
-    // Private constructor for Singleton class.
-    private DeveloperIdProvider(IAuthenticationHelper authenticationHelper)
+    public DeveloperIdProvider(IAuthenticationHelper authenticationHelper)
     {
         _log.Debug($"Creating DeveloperIdProvider singleton instance");
 
@@ -49,16 +42,16 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
         {
             DeveloperIds ??= new List<DeveloperId>();
 
-            DeveloperIdAuthenticationHelper = authenticationHelper;
+            _developerIdAuthenticationHelper = authenticationHelper;
 
             // Retrieve and populate Logged in DeveloperIds from previous launch.
-            RestoreDeveloperIds(DeveloperIdAuthenticationHelper.GetAllStoredLoginIdsAsync());
+            RestoreDeveloperIds(_developerIdAuthenticationHelper.GetAllStoredLoginIdsAsync());
         }
     }
 
     public void EnableSSOForAzureExtensionAsync()
     {
-        var account = DeveloperIdAuthenticationHelper.AcquireWindowsAccountTokenSilently(DeveloperIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
+        var account = _developerIdAuthenticationHelper.AcquireWindowsAccountTokenSilently(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
         if (account.Result != null)
         {
             _ = CreateOrUpdateDeveloperId(account.Result);
@@ -70,8 +63,8 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     // CommandPalette can use this information to inform and prompt user of next steps
     public DeveloperIdsResult DetermineAccountRemediationForAzureExtensionAsync()
     {
-        var developerIds = new List<DeveloperId>();
-        var resultForAccountsToFix = DeveloperIdAuthenticationHelper.AcquireAllDeveloperAccountTokens(DeveloperIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
+        var developerIds = new List<IDeveloperId>();
+        var resultForAccountsToFix = _developerIdAuthenticationHelper.AcquireAllDeveloperAccountTokens(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
         var accountsToFix = resultForAccountsToFix.Result;
         if (accountsToFix.Any())
         {
@@ -94,18 +87,6 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
         return new DeveloperIdsResult(null, "No account remediation required");
     }
 
-    public static DeveloperIdProvider GetInstance(IAuthenticationHelper? authenticationHelper = null)
-    {
-        authenticationHelper ??= new AuthenticationHelper();
-
-        lock (_authenticationProviderLock)
-        {
-            _singletonDeveloperIdProvider ??= new DeveloperIdProvider(authenticationHelper);
-        }
-
-        return _singletonDeveloperIdProvider;
-    }
-
     public DeveloperIdsResult GetLoggedInDeveloperIds()
     {
         List<IDeveloperId> iDeveloperIds = new();
@@ -123,8 +104,8 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     {
         return Task.Run(async () =>
         {
-            await DeveloperIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(windowHandle);
-            var account = DeveloperIdAuthenticationHelper.LoginDeveloperAccount(DeveloperIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
+            await _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(windowHandle);
+            var account = _developerIdAuthenticationHelper.LoginDeveloperAccount(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
 
             if (account.Result == null)
             {
@@ -151,7 +132,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
                 return new ProviderOperationResult(ProviderOperationStatus.Failure, new ArgumentNullException(nameof(developerId)), "The developer account to log out does not exist", "Unable to find DeveloperId to logout");
             }
 
-            var result = DeveloperIdAuthenticationHelper.SignOutDeveloperIdAsync(developerIdToLogout.LoginId).GetAwaiter();
+            var result = _developerIdAuthenticationHelper.SignOutDeveloperIdAsync(developerIdToLogout.LoginId).GetAwaiter();
             DeveloperIds?.Remove(developerIdToLogout);
         }
 
@@ -181,15 +162,15 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     // Convert devID to internal devID.
     public DeveloperId GetDeveloperIdInternal(IDeveloperId devId)
     {
-        var devIds = GetInstance().GetLoggedInDeveloperIdsInternal();
+        var devIds = GetLoggedInDeveloperIdsInternal();
         var devIdInternal = devIds.Where(i => i.LoginId.Equals(devId.LoginId, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
         return devIdInternal ?? throw new ArgumentException(devId.LoginId);
     }
 
-    public DeveloperId? GetDeveloperIdFromAccountIdentifier(string loginId)
+    public IDeveloperId? GetDeveloperIdFromAccountIdentifier(string loginId)
     {
-        var devIds = GetInstance().GetLoggedInDeveloperIdsInternal();
+        var devIds = GetLoggedInDeveloperIdsInternal();
         var devIdInternal = devIds.Where(i => i.LoginId.Equals(loginId, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
         return devIdInternal;
@@ -199,7 +180,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     private DeveloperId CreateOrUpdateDeveloperId(IAccount account)
     {
         // Query necessary data and populate Developer Id.
-        DeveloperId newDeveloperId = new(account.Username, account.Username, account.Username, string.Empty);
+        DeveloperId newDeveloperId = new(account.Username, account.Username, account.Username, string.Empty, this);
 
         var duplicateDeveloperIds = DeveloperIds.Where(d => d.LoginId.Equals(newDeveloperId.LoginId, StringComparison.OrdinalIgnoreCase));
 
@@ -248,7 +229,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
         var loginIds = task.Result;
         foreach (var loginId in loginIds)
         {
-            DeveloperId developerId = new(loginId, loginId, loginId, string.Empty);
+            DeveloperId developerId = new(loginId, loginId, loginId, string.Empty, this);
 
             lock (_developerIdsLock)
             {
@@ -297,7 +278,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     {
         try
         {
-            var taskResult = DeveloperIdAuthenticationHelper.ObtainTokenForLoggedInDeveloperAccount(DeveloperIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray, developerId.LoginId);
+            var taskResult = _developerIdAuthenticationHelper.ObtainTokenForLoggedInDeveloperAccount(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray, developerId.LoginId);
             if (taskResult.Result != null)
             {
                 return taskResult.Result;

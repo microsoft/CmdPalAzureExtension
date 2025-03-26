@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.DeveloperId;
 using Microsoft.Identity.Client;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
@@ -15,7 +16,7 @@ public class AzureClientProvider
 
     private static readonly ILogger _log = _logger.Value;
 
-    private static VssConnection? CreateConnection(Uri uri, DeveloperId.DeveloperId developerId)
+    private static VssConnection? CreateConnection(Uri uri, IDeveloperId developerId)
     {
         var azureUri = new AzureUri(uri);
         if (!azureUri.IsValid)
@@ -79,7 +80,7 @@ public class AzureClientProvider
         return null;
     }
 
-    public static ConnectionResult CreateVssConnection(Uri uri, DeveloperId.DeveloperId developerId)
+    public static ConnectionResult CreateVssConnection(Uri uri, IDeveloperId developerId)
     {
         var azureUri = new AzureUri(uri);
         if (!azureUri.IsValid)
@@ -160,7 +161,7 @@ public class AzureClientProvider
     /// <exception cref="ArgumentException">If the azure uri is not valid.</exception>
     /// <exception cref="ArgumentNullException">If developerId is null.</exception>
     /// <exception cref="AzureClientException">If a connection can't be made.</exception>
-    public static VssConnection GetConnectionForLoggedInDeveloper(Uri uri, DeveloperId.DeveloperId developerId)
+    public static VssConnection GetConnectionForLoggedInDeveloper(Uri uri, IDeveloperId developerId)
     {
         var azureUri = new AzureUri(uri);
         if (!azureUri.IsValid)

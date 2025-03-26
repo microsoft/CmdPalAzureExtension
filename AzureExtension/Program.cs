@@ -106,36 +106,40 @@ public sealed class Program
         await using global::Shmuelie.WinRTServer.ComServer server = new();
         var extensionDisposedEvent = new ManualResetEvent(false);
 
+        // We may have received an event on previous launch that the datastore should be recreated.
+        // It should be recreated now before anything else tries to use it.
+
+        // In the case that this is the first launch we will try to automatically connect the default Windows account
+        var authenticationHelper = new AuthenticationHelper();
+        var devIdProvider = new DeveloperIdProvider(authenticationHelper);
+        devIdProvider.EnableSSOForAzureExtensionAsync();
+
+        RecreateDataStoreIfNecessary(devIdProvider);
+
+        using var azureDataManager = new AzureDataManager("MainInstance", devIdProvider);
+
+        // Cache manager updates account data.
+        using var cacheManager = new CacheManager(azureDataManager, devIdProvider);
+        cacheManager.Start();
+
+        // Set up the data updater. This will schedule updating the Developer Pull Requests.
+        using var dataUpdater = new DataUpdater(azureDataManager.Update);
+        _ = dataUpdater.Start();
+
+        // Add an update whenever CacheManager is updated.
+        cacheManager.OnUpdate += HandleCacheUpdate;
+
+        // This will make the main thread wait until the event is signaled by the extension class.
+        // Since we have single instance of the extension object, we exit as soon as it is disposed.
+        extensionDisposedEvent.WaitOne();
+        Log.Information($"Extension is disposed.");
+
         var commandProvider = new AzureExtensionActionsProvider();
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 
         server.RegisterClass<AzureExtension, IExtension>(() => extensionInstance);
         server.Start();
-
-        // We may have received an event on previous launch that the datastore should be recreated.
-        // It should be recreated now before anything else tries to use it.
-        RecreateDataStoreIfNecessary();
-
-        // In the case that this is the first launch we will try to automatically connect the default Windows account
-        var devIdProvider = DeveloperIdProvider.GetInstance();
-        devIdProvider.EnableSSOForAzureExtensionAsync();
-
-        // Cache manager updates account data.
-        using var cacheManager = CacheManager.GetInstance();
-        cacheManager?.Start();
-
-        // Set up the data updater. This will schedule updating the Developer Pull Requests.
-        using var dataUpdater = new DataUpdater(AzureDataManager.Update);
-        _ = dataUpdater.Start();
-
-        // Add an update whenever CacheManager is updated.
-        CacheManager.GetInstance().OnUpdate += HandleCacheUpdate;
-
-        // This will make the main thread wait until the event is signaled by the extension class.
-        // Since we have single instance of the extension object, we exit as soon as it is disposed.
-        extensionDisposedEvent.WaitOne();
-        Log.Information($"Extension is disposed.");
     }
 
     private static void HandleCacheUpdate(object? source, CacheManagerUpdateEventArgs e)
@@ -143,7 +147,9 @@ public sealed class Program
         if (e.Kind == CacheManagerUpdateKind.Updated)
         {
             Log.Debug("Cache was updated, updating developer pull requests.");
-            _ = AzureDataManager.UpdateDeveloperPullRequests();
+
+            // _ = AzureDataManager.UpdateDeveloperPullRequests();
+            // TODO: THIS CODE SHOULD NOT BE HERE. FIX CYCLIC DEPENDENCY.
         }
     }
 
@@ -174,7 +180,7 @@ public sealed class Program
         }
     }
 
-    private static void RecreateDataStoreIfNecessary()
+    private static void RecreateDataStoreIfNecessary(IDeveloperIdProvider developerIdProvider)
     {
         try
         {
@@ -196,7 +202,7 @@ public sealed class Program
                         RecreateDataStore = true,
                     };
 
-                    using var dataManager = AzureDataManager.CreateInstance("RecreateDataStore", dataStoreOptions);
+                    using var dataManager = new AzureDataManager("RecreateDataStore", developerIdProvider, dataStoreOptions);
 
                     // After we get this key once, set it back to false.
                     localSettings.Values[AzureDataManager.RecreateDataStoreSettingsKey] = false;

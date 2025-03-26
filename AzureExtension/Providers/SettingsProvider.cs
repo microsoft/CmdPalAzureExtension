@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.DataManager;
 using AzureExtension.Pages;
 using CommandPaletteAzureExtension.Helpers;
 using Serilog;
@@ -16,10 +17,10 @@ public class SettingsProvider() : ISettingsProvider
 
     string ISettingsProvider.DisplayName => Resources.GetResource(@"SettingsProviderDisplayName", _log);
 
-    public AdaptiveCardSessionResult GetSettingsAdaptiveCardSession()
+    public AdaptiveCardSessionResult GetSettingsAdaptiveCardSession(CacheManager cacheManager)
     {
         _log.Information($"GetSettingsAdaptiveCardSession");
-        return new AdaptiveCardSessionResult(new SettingsUIController());
+        return new AdaptiveCardSessionResult(new SettingsUIController(cacheManager));
     }
 
     public void Dispose()

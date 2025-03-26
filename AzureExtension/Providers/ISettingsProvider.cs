@@ -2,14 +2,14 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.DataManager;
 using AzureExtension.Pages;
 
-namespace AzureExtension.Providers
-{
-    public interface ISettingsProvider : IDisposable
-    {
-        string DisplayName { get; }
+namespace AzureExtension.Providers;
 
-        AdaptiveCardSessionResult GetSettingsAdaptiveCardSession();
-    }
+public interface ISettingsProvider : IDisposable
+{
+    string DisplayName { get; }
+
+    AdaptiveCardSessionResult GetSettingsAdaptiveCardSession(CacheManager cacheManager);
 }

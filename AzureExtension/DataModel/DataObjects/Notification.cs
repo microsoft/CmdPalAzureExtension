@@ -3,9 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Helpers;
+using CommandPaletteAzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using CommandPaletteAzureExtension.Helpers;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
 using Serilog;
