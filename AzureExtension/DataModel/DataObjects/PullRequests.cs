@@ -57,10 +57,6 @@ public class PullRequests
 
     [Write(false)]
     [Computed]
-    public DevId.DeveloperId? DeveloperId => DevId.DeveloperIdProvider.GetInstance().GetDeveloperIdFromAccountIdentifier(DeveloperLogin);
-
-    [Write(false)]
-    [Computed]
     public DateTime UpdatedAt => TimeUpdated.ToDateTime();
 
     private static PullRequests Create(long repositoryId, long projectId, string developerLogin, PullRequestView view, string pullRequests)

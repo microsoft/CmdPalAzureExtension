@@ -26,12 +26,7 @@ public class RepositoryProvider : IRepositoryProvider2, IDisposable
 {
     private readonly ILogger _log = Log.ForContext("SourceContext", nameof(RepositoryProvider));
 
-    /// <summary>
-    /// Used for singleton instance.
-    /// </summary>
-    private static readonly object _constructorLock = new();
-
-    private static RepositoryProvider? _repositoryProvider;
+    private readonly IDeveloperIdProvider _developerIdProvider;
 
     private AzureRepositoryHierarchy? _azureHierarchy;
 
@@ -60,23 +55,17 @@ public class RepositoryProvider : IRepositoryProvider2, IDisposable
 
     public bool IsSearchingSupported => true;
 
-    public RepositoryProvider(IRandomAccessStreamReference icon)
+    private RepositoryProvider(IRandomAccessStreamReference icon, IDeveloperIdProvider developerIdProvider)
     {
         Icon = icon;
+        _developerIdProvider = developerIdProvider;
     }
 
-    public RepositoryProvider()
-        : this(RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///AzureExtension/Assets/AzureExtensionDark.png")))
+    public RepositoryProvider(IDeveloperIdProvider developerIdProvider)
+        : this(
+            RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///AzureExtension/Assets/AzureExtensionDark.png")),
+            developerIdProvider)
     {
-    }
-
-    public static RepositoryProvider GetInstance()
-    {
-        lock (_constructorLock)
-        {
-            _repositoryProvider ??= new RepositoryProvider();
-            return _repositoryProvider;
-        }
     }
 
     public IAsyncOperation<RepositoryUriSupportResult> IsUriSupportedAsync(Uri uri)
@@ -217,7 +206,7 @@ public class RepositoryProvider : IRepositoryProvider2, IDisposable
 
             try
             {
-                var authResult = DeveloperIdProvider.GetInstance().GetAuthenticationResultForDeveloperId(azureDeveloperId);
+                var authResult = _developerIdProvider.GetAuthenticationResultForDeveloperId(azureDeveloperId);
                 if (authResult == null)
                 {
                     var exception = new AuthenticationException($"Could not get authentication for user {developerId.LoginId}");
@@ -287,7 +276,7 @@ public class RepositoryProvider : IRepositoryProvider2, IDisposable
             AuthenticationResult? authResult;
             try
             {
-                authResult = DeveloperIdProvider.GetInstance().GetAuthenticationResultForDeveloperId(azureDeveloperId);
+                authResult = _developerIdProvider.GetAuthenticationResultForDeveloperId(azureDeveloperId);
                 if (authResult == null)
                 {
                     var exception = new NotImplementedException("Could not get authentication from developer id.");
@@ -306,10 +295,10 @@ public class RepositoryProvider : IRepositoryProvider2, IDisposable
 
             if (developerId != null)
             {
-                DeveloperId.DeveloperId loggedInDeveloperId;
+                IDeveloperId loggedInDeveloperId;
                 try
                 {
-                    loggedInDeveloperId = DeveloperId.DeveloperIdProvider.GetInstance().GetDeveloperIdInternal(developerId);
+                    loggedInDeveloperId = _developerIdProvider.GetDeveloperIdInternal(developerId);
                 }
                 catch (Exception e)
                 {

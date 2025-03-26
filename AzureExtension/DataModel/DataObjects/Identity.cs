@@ -61,22 +61,6 @@ public class Identity
     [JsonIgnore]
     public bool IsLoggedInDeveloper => !string.IsNullOrEmpty(DeveloperLoginId);
 
-    [Write(false)]
-    [Computed]
-    public DeveloperId.DeveloperId? DeveloperId
-    {
-        get
-        {
-            if (!IsLoggedInDeveloper)
-            {
-                return null;
-            }
-
-            var devIdProvider = DeveloperIdProvider.GetInstance();
-            return devIdProvider.GetDeveloperIdFromAccountIdentifier(DeveloperLoginId!);
-        }
-    }
-
     public string ToJson() => JsonSerializer.Serialize(this);
 
     public override string ToString() => Name;

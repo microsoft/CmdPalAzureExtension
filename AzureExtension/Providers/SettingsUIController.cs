@@ -16,11 +16,13 @@ using Windows.Foundation;
 
 namespace AzureExtension.Providers;
 
-internal sealed class SettingsUIController() : IExtensionAdaptiveCardSession
+internal sealed class SettingsUIController : IExtensionAdaptiveCardSession
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", nameof(SettingsUIController)));
 
     private static readonly ILogger _log = _logger.Value;
+
+    private readonly CacheManager _cacheManager;
 
     private static readonly string _notificationsEnabledString = "NotificationsEnabled";
 
@@ -34,11 +36,16 @@ internal sealed class SettingsUIController() : IExtensionAdaptiveCardSession
         _settingsUI?.Update(null, null, null);
     }
 
+    public SettingsUIController(CacheManager cacheManager)
+    {
+        _cacheManager = cacheManager;
+    }
+
     public ProviderOperationResult Initialize(IExtensionAdaptiveCard extensionUI)
     {
         _log.Debug($"Initialize");
-        CacheManager.GetInstance().OnUpdate += HandleCacheUpdate;
         _settingsUI = extensionUI;
+        _cacheManager.OnUpdate += HandleCacheUpdate;
         return UpdateCard();
     }
 
@@ -69,7 +76,7 @@ internal sealed class SettingsUIController() : IExtensionAdaptiveCardSession
 
                     case "UpdateData":
                         _log.Information($"Refreshing data for organizations.");
-                        _ = CacheManager.GetInstance().Refresh();
+                        _ = _cacheManager.Refresh();
                         break;
 
                     case "OpenLogs":
@@ -98,7 +105,7 @@ internal sealed class SettingsUIController() : IExtensionAdaptiveCardSession
             var notificationsEnabled = LocalSettings.ReadSettingAsync<string>(_notificationsEnabledString).Result ?? "true";
             var notificationsEnabledString = (notificationsEnabled == "true") ? Resources.GetResource("Settings_NotificationsEnabled", _log) : Resources.GetResource("Settings_NotificationsDisabled", _log);
 
-            var lastUpdated = CacheManager.GetInstance().LastUpdated;
+            var lastUpdated = _cacheManager.LastUpdated;
             var lastUpdatedString = $"Last updated: {lastUpdated.ToString(CultureInfo.InvariantCulture)}";
             if (lastUpdated == DateTime.MinValue)
             {
@@ -106,7 +113,7 @@ internal sealed class SettingsUIController() : IExtensionAdaptiveCardSession
             }
 
             var updateAzureDataString = Resources.GetResource("Settings_UpdateData", _log);
-            if (CacheManager.GetInstance().UpdateInProgress)
+            if (_cacheManager.UpdateInProgress)
             {
                 updateAzureDataString = "Update in progress";
             }

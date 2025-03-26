@@ -65,9 +65,11 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
     private static readonly ConcurrentDictionary<string, Guid> _instances = new();
 
     // Connections are a pairing of DeveloperId and a Uri.
-    private static readonly ConcurrentDictionary<Tuple<Uri, DeveloperId.DeveloperId>, VssConnection> _connections = new();
+    private static readonly ConcurrentDictionary<Tuple<Uri, IDeveloperId>, VssConnection> _connections = new();
 
     private readonly ILogger _log;
+
+    private readonly IDeveloperIdProvider _developerIdProvider;
 
     private Guid UniqueName { get; } = Guid.NewGuid();
 
@@ -77,24 +79,11 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
 
     public DataStoreOptions DataStoreOptions { get; private set; }
 
-    public static IAzureDataManager? CreateInstance(string identifier, DataStoreOptions? options = null)
+    public AzureDataManager(string identifier, IDeveloperIdProvider developerIdProvider, DataStoreOptions? dataStoreOptions = null)
     {
-        options ??= DefaultOptions;
+        dataStoreOptions ??= DefaultOptions;
+        _developerIdProvider = developerIdProvider;
 
-        try
-        {
-            return new AzureDataManager(identifier, options);
-        }
-        catch (Exception e)
-        {
-            var log = Log.ForContext("SourceContext", _name);
-            log.Error(e, $"Failed creating AzureDataManager for {identifier}");
-            return null;
-        }
-    }
-
-    public AzureDataManager(string identifier, DataStoreOptions dataStoreOptions)
-    {
         if (dataStoreOptions.DataStoreSchema == null)
         {
             throw new ArgumentNullException(nameof(dataStoreOptions), "DataStoreSchema cannot be null.");
@@ -116,7 +105,7 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
             // created, that is not enough to warrant failing the Data Manager creation. Worst-case
             // we will not function with DeveloperId change events, which are not critical for
             // the data manager to do its job.
-            DeveloperIdProvider.GetInstance().Changed += HandleDeveloperIdChange;
+            _developerIdProvider.Changed += HandleDeveloperIdChange;
         }
         catch (Exception ex)
         {
@@ -144,7 +133,7 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
     {
         try
         {
-            DeveloperIdProvider.GetInstance().Changed -= HandleDeveloperIdChange;
+            _developerIdProvider.Changed -= HandleDeveloperIdChange;
         }
         catch
         {
@@ -176,7 +165,7 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
         {
             Uris = queryUris,
             LoginId = developerLogin,
-            DeveloperId = DeveloperIdProvider.GetInstance().GetDeveloperIdFromAccountIdentifier(developerLogin),
+            DeveloperId = _developerIdProvider.GetDeveloperIdFromAccountIdentifier(developerLogin),
             RequestOptions = options ?? RequestOptions.RequestOptionsDefault(),
             OperationName = nameof(UpdateDataForQueriesAsync),
             Requestor = requestor ?? Guid.NewGuid(),
@@ -215,7 +204,7 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
         {
             Uris = new List<AzureUri> { repositoryUri },
             LoginId = developerLogin,
-            DeveloperId = DeveloperIdProvider.GetInstance().GetDeveloperIdFromAccountIdentifier(developerLogin),
+            DeveloperId = _developerIdProvider.GetDeveloperIdFromAccountIdentifier(developerLogin),
             PullRequestView = view,
             RequestOptions = options ?? RequestOptions.RequestOptionsDefault(),
             OperationName = nameof(UpdateDataForPullRequestsAsync),
@@ -679,7 +668,7 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
             var suboperationParameters = new DataStoreOperationParameters
             {
                 Uris = uris,
-                DeveloperId = repositoryRef.Developer.DeveloperId,
+                DeveloperId = _developerIdProvider.GetDeveloperIdFromAccountIdentifier(repositoryRef.Developer.DeveloperLoginId!),
                 RequestOptions = parameters.RequestOptions,
                 OperationName = nameof(UpdateDataForDeveloperPullRequestsAsync),
                 PullRequestView = PullRequestView.Mine,
@@ -917,7 +906,7 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
         return false;
     }
 
-    private TeamProject GetTeamProject(string projectName, DeveloperId.DeveloperId developerId, Uri connection)
+    private TeamProject GetTeamProject(string projectName, IDeveloperId developerId, Uri connection)
     {
         var result = GetConnection(connection, developerId);
         if (result.Result != ResultType.Success)
@@ -1012,7 +1001,7 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
     // Connections can go bad and throw VssUnauthorizedException after some time, even if
     // if HasAuthenticated is true. The forceNewConnection default parameter is set to true until
     // the bad connection issue can be reliably detected and solved.
-    public static ConnectionResult GetConnection(Uri connectionUri, DeveloperId.DeveloperId developerId, bool forceNewConnection = true)
+    public static ConnectionResult GetConnection(Uri connectionUri, IDeveloperId developerId, bool forceNewConnection = true)
     {
         var log = Log.ForContext("SourceContext", _name);
         VssConnection? connection;
@@ -1030,7 +1019,7 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
                 else
                 {
                     // Remove the bad connection.
-                    if (_connections.TryRemove(new KeyValuePair<Tuple<Uri, DeveloperId.DeveloperId>, VssConnection>(connectionKey, connection)))
+                    if (_connections.TryRemove(new KeyValuePair<Tuple<Uri, IDeveloperId>, VssConnection>(connectionKey, connection)))
                     {
                         log.Debug($"Removed bad connection to {connectionUri} with {developerId.LoginId}");
                     }
@@ -1123,7 +1112,7 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
 
     private void HandleDeveloperIdChange(IDeveloperIdProvider sender, IDeveloperId args)
     {
-        if (DeveloperIdProvider.GetInstance().GetDeveloperIdState(args) == AuthenticationState.LoggedOut)
+        if (_developerIdProvider.GetDeveloperIdState(args) == AuthenticationState.LoggedOut)
         {
             // If a DeveloperId change happens and it is a removal, then we should delete the datastore
             // and remove the data that will be useless and inaccessible to the user. Since the datastore

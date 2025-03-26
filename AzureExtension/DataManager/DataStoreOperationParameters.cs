@@ -17,7 +17,7 @@ public class DataStoreOperationParameters
 
     public Guid Requestor { get; set; }
 
-    public DeveloperId.DeveloperId? DeveloperId { get; set; }
+    public DeveloperId.IDeveloperId? DeveloperId { get; set; }
 
     public PullRequestView PullRequestView { get; set; } = PullRequestView.Unknown;
 

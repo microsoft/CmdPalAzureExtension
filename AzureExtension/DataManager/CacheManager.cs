@@ -23,9 +23,8 @@ public class CacheManager : IDisposable
 
     private readonly object _stateLock = new();
 
-    private static CacheManager? _singletonInstance;
-
     private readonly ILogger _log;
+    private readonly IDeveloperIdProvider _developerIdProvider;
 
     private CancellationTokenSource _cancelSource;
 
@@ -55,33 +54,19 @@ public class CacheManager : IDisposable
 
     private DateTime LastUpdateTime { get; set; } = DateTime.MinValue;
 
-    public static CacheManager GetInstance()
-    {
-        try
-        {
-            lock (_instanceLock)
-            {
-                _singletonInstance ??= new CacheManager();
-            }
-
-            return _singletonInstance;
-        }
-        catch (Exception e)
-        {
-            var log = Log.ForContext("SourceContext", nameof(CacheManager));
-            log.Error(e, $"Failed creating CacheManager.");
-            throw;
-        }
-    }
-
-    private CacheManager()
+    public CacheManager(IAzureDataManager azureDataManager, IDeveloperIdProvider developerIdProvider)
     {
         Id = Guid.NewGuid();
         _log = Log.ForContext("SourceContext", $"{nameof(CacheManager)}");
-        DataManager = AzureDataManager.CreateInstance("CacheManager") ?? throw new DataStoreInaccessibleException();
+
+        DataManager = azureDataManager;
+
+        _developerIdProvider = developerIdProvider;
+        _developerIdProvider.Changed += HandleDeveloperIdChange;
+
         DataUpdater = new DataUpdater(PeriodicUpdate);
         AzureDataManager.OnUpdate += HandleDataManagerUpdate;
-        DeveloperIdProvider.GetInstance().Changed += HandleDeveloperIdChange;
+
         _cancelSource = new CancellationTokenSource();
     }
 
@@ -277,7 +262,7 @@ public class CacheManager : IDisposable
         try
         {
             // Use switch here in case new states get added later to ensure we handle all cases.
-            switch (DeveloperIdProvider.GetInstance().GetDeveloperIdState(args))
+            switch (_developerIdProvider.GetDeveloperIdState(args))
             {
                 case AuthenticationState.LoggedIn:
                     // New developer logging in could change some of the data, so we will do a refresh.
@@ -334,7 +319,7 @@ public class CacheManager : IDisposable
                     DataManager.Dispose();
                     _cancelSource.Dispose();
                     AzureDataManager.OnUpdate -= HandleDataManagerUpdate;
-                    DeveloperIdProvider.GetInstance().Changed -= HandleDeveloperIdChange;
+                    _developerIdProvider.Changed -= HandleDeveloperIdChange;
                 }
                 catch (Exception e)
                 {

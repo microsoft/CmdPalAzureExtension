@@ -14,7 +14,7 @@ public partial class AzureDataManager
     private static readonly TimeSpan _updateInterval = TimeSpan.FromMinutes(5);
     private static DateTime _lastUpdateTime = DateTime.MinValue;
 
-    public static async Task Update()
+    public async Task Update()
     {
         // Only update per the update interval.
         // This is intended to be dynamic in the future.
@@ -35,20 +35,23 @@ public partial class AzureDataManager
         _lastUpdateTime = DateTime.UtcNow;
     }
 
-    public static async Task UpdateDeveloperPullRequests()
+    public async Task UpdateDeveloperPullRequests()
     {
         var log = Log.ForContext("SourceContext", $"UpdateDeveloperPullRequests");
         log.Debug($"Executing UpdateDeveloperPullRequests");
 
+        /*
+        ** Commenting this out as it is a SRP violation and introducts a cyclic dependency.
         var cacheManager = CacheManager.GetInstance();
         if (cacheManager.UpdateInProgress)
         {
             log.Information("Cache is being updated, skipping Developer Pull Request Update");
             return;
         }
+        */
 
         var identifier = Guid.NewGuid();
-        using var dataManager = CreateInstance(identifier.ToString()) ?? throw new DataStoreInaccessibleException();
+        using var dataManager = new AzureDataManager(identifier.ToString(), _developerIdProvider) ?? throw new DataStoreInaccessibleException();
         await dataManager.UpdatePullRequestsForLoggedInDeveloperIdsAsync(null, identifier);
 
         // Show any new notifications that were created from the pull request update.
