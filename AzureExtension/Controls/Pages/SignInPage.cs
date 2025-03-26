@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Controls.Forms;
+using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
@@ -42,5 +43,54 @@ public partial class SignInPage : ContentPage
     {
         ExtensionHost.HideStatus(_statusMessage);
         return [_signInForm];
+    }
+
+    protected virtual bool IsUserLoggedIn()
+    {
+        // User is not logged in if either there are zero DeveloperIds logged in, or the selected
+        // DeveloperId for this widget is not logged in.
+        var authProvider = DeveloperIdProvider.GetInstance();
+        if (!authProvider.GetLoggedInDeveloperIds().DeveloperIds.Any())
+        {
+            return false;
+        }
+
+        if (!DeveloperIdLoginRequired)
+        {
+            // At least one user is logged in, and this widget does not require a specific
+            // DeveloperId so we are in a good state.
+            return true;
+        }
+
+        if (string.IsNullOrEmpty(DeveloperLoginId))
+        {
+            // User has not yet chosen a DeveloperId, but there is at least one available, so the
+            // user has logged in and we are in a good state.
+            return true;
+        }
+
+        if (GetDevId(DeveloperLoginId) is not null)
+        {
+            // The selected DeveloperId is logged in so we are in a good state.
+            return true;
+        }
+
+        return false;
+    }
+
+    protected DeveloperId.DeveloperId? GetDevId(string login)
+    {
+        var devIdProvider = DeveloperIdProvider.GetInstance();
+        DeveloperId.DeveloperId? developerId = null;
+
+        foreach (var devId in devIdProvider.GetLoggedInDeveloperIds().DeveloperIds)
+        {
+            if (devId.LoginId == login)
+            {
+                developerId = (DeveloperId.DeveloperId)devId;
+            }
+        }
+
+        return developerId;
     }
 }
