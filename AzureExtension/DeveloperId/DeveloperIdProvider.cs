@@ -67,7 +67,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     }
 
     // Retrieve access tokens for all accounts silently to determine application state
-    // DevHome can use this information to inform and prompt user of next steps
+    // CommandPalette can use this information to inform and prompt user of next steps
     public DeveloperIdsResult DetermineAccountRemediationForAzureExtensionAsync()
     {
         var developerIds = new List<DeveloperId>();

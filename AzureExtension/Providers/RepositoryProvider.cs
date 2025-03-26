@@ -7,7 +7,7 @@ using AzureExtension.Client;
 using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
-using DevHomeAzureExtension.Helpers;
+using CommandPaletteAzureExtension.Helpers;
 using Microsoft.Identity.Client;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
@@ -126,7 +126,7 @@ public class RepositoryProvider : IRepositoryProvider2, IDisposable
                 {
                     if (shouldIgnorePRDate)
                     {
-                        reposToReturn.Add(new DevHomeRepository(repo));
+                        reposToReturn.Add(new CommandPaletteRepository(repo));
                     }
                     else
                     {
@@ -134,7 +134,7 @@ public class RepositoryProvider : IRepositoryProvider2, IDisposable
 
                         if (pullRequests.Count != 0)
                         {
-                            reposToReturn.Add(new DevHomeRepository(repo));
+                            reposToReturn.Add(new CommandPaletteRepository(repo));
                         }
                     }
                 }
@@ -247,7 +247,7 @@ public class RepositoryProvider : IRepositoryProvider2, IDisposable
                     return new RepositoryResult(exception, $"Something went wrong.  HResult: {exception.HResult}");
                 }
 
-                return new RepositoryResult(new DevHomeRepository(repo));
+                return new RepositoryResult(new CommandPaletteRepository(repo));
             }
             catch (Exception e)
             {

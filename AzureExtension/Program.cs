@@ -152,9 +152,9 @@ public sealed class Program
         var relatedPackageFamilyNames = new string[]
         {
               "MicrosoftWindows.Client.WebExperience_cw5n1h2txyewy",
-              "Microsoft.Windows.DevHome_8wekyb3d8bbwe",
-              "Microsoft.Windows.DevHomeAzureExtension_8wekyb3d8bbwe",
-              "Microsoft.Windows.DevHomeAzureExtension.Dev_8wekyb3d8bbwe",
+              "Microsoft.Windows.CommandPalette_8wekyb3d8bbwe",
+              "Microsoft.Windows.CommandPaletteAzureExtension_8wekyb3d8bbwe",
+              "Microsoft.Windows.CommandPaletteAzureExtension.Dev_8wekyb3d8bbwe",
         };
 
         try

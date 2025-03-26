@@ -33,7 +33,7 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
 
     public static readonly string SystemIdFieldName = "System.Id";
 
-    public static readonly string WorkItemHtmlUrlFieldName = "DevHome.AzureExtension.WorkItemHtmlUrl";
+    public static readonly string WorkItemHtmlUrlFieldName = "CommandPalette.AzureExtension.WorkItemHtmlUrl";
 
     public static readonly string WorkItemTypeFieldName = "System.WorkItemType";
 

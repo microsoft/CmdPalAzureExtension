@@ -129,18 +129,18 @@ public class CacheManager : IDisposable
 
     public IEnumerable<IRepository> GetRepositories()
     {
-        var devHomeRepositories = new List<IRepository>();
+        var commandPaletteRepositories = new List<IRepository>();
         var repositories = DataManager.GetRepositories();
         foreach (var repository in repositories)
         {
             // Convert data model repositories, which have datastore connections
             // and table lookups as part of the data model, to a static snapshot
-            // of the repository data. This will be sent to DevHome, so this is
+            // of the repository data. This will be sent to CommandPalette, so this is
             // needs to be detached data from our data store.
-            devHomeRepositories.Add(new DevHomeRepository(repository));
+            commandPaletteRepositories.Add(new CommandPaletteRepository(repository));
         }
 
-        return devHomeRepositories;
+        return commandPaletteRepositories;
     }
 
     private async Task PeriodicUpdate()

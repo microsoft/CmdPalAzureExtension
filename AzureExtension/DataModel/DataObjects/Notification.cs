@@ -5,7 +5,7 @@
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using DevHomeAzureExtension.Helpers;
+using CommandPaletteAzureExtension.Helpers;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
 using Serilog;

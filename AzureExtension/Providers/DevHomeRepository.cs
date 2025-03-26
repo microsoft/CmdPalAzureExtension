@@ -8,7 +8,7 @@ using Microsoft.TeamFoundation.SourceControl.WebApi;
 
 namespace AzureExtension.Providers;
 
-public class DevHomeRepository : IRepository
+public class CommandPaletteRepository : IRepository
 {
     private readonly string _name;
 
@@ -33,12 +33,12 @@ public class DevHomeRepository : IRepository
     DateTime IRepository.LastUpdated => throw new NotImplementedException();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DevHomeRepository"/> class.
+    /// Initializes a new instance of the <see cref="CommandPaletteRepository"/> class.
     /// </summary>
     /// <remarks>
     /// This can throw.
     /// </remarks>
-    public DevHomeRepository(GitRepository gitRepository)
+    public CommandPaletteRepository(GitRepository gitRepository)
     {
         _name = gitRepository.Name;
 
@@ -57,7 +57,7 @@ public class DevHomeRepository : IRepository
         _lastUpdated = DateTimeOffset.UtcNow;
     }
 
-    public DevHomeRepository(DataModel.Repository repository)
+    public CommandPaletteRepository(DataModel.Repository repository)
     {
         _name = repository.Name;
         _owningAccountName = Path.Join(repository.Clone.Connection.Host, repository.Clone.Organization, repository.Clone.Project);

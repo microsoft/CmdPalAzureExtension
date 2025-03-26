@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Pages;
-using DevHomeAzureExtension.Helpers;
+using CommandPaletteAzureExtension.Helpers;
 using Serilog;
 
 namespace AzureExtension.Providers;

@@ -8,7 +8,7 @@ namespace AzureExtension.Helpers;
 
 public static class LocalSettings
 {
-    private static readonly string _applicationDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DevHome/ApplicationData");
+    private static readonly string _applicationDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CommandPalette/ApplicationData");
     private static readonly string _localSettingsFile = "LocalSettings.json";
 
 #pragma warning disable CA1859 // Use concrete types when possible for improved performance

@@ -8,7 +8,7 @@ using Serilog;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 
-namespace DevHomeAzureExtension.Helpers;
+namespace CommandPaletteAzureExtension.Helpers;
 
 public static class Resources
 {

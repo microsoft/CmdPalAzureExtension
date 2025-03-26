@@ -10,7 +10,7 @@ using AzureExtension.DataManager;
 using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using AzureExtension.Pages;
-using DevHomeAzureExtension.Helpers;
+using CommandPaletteAzureExtension.Helpers;
 using Serilog;
 using Windows.Foundation;
 
