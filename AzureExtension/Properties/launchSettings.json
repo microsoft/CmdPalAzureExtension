@@ -1,7 +1,8 @@
 {
   "profiles": {
     "AzureExtension (Package)": {
-      "commandName": "MsixPackage"
+      "commandName": "MsixPackage",
+      "doNotLaunchApp": true
     },
     "AzureExtension (Unpackaged)": {
       "commandName": "Project"
