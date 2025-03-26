@@ -122,26 +122,4 @@ public static class Resources
             "Widget_Template/ContentLoading",
         ];
     }
-
-    /// <summary>
-    /// Gets a string or the absolute file path of an asset location within a package.
-    /// </summary>
-    /// <param name="resource">the ms-resource:// path to a resource in an app package's pri file.</param>
-    /// <param name="packageFullName">the package containing the resource.</param>
-    /// <returns>The retrieved string represented by the resource key.</returns>
-    public static unsafe string GetResourceFromPackage(string resource, string packageFullName)
-    {
-        var indirectPathToResource = "@{" + packageFullName + "?" + resource + "}";
-        Span<char> outputBuffer = new char[MaxBufferLength];
-
-        fixed (char* outBufferPointer = outputBuffer)
-        {
-            fixed (char* resourcePathPointer = indirectPathToResource)
-            {
-                // var res = PInvoke.SHLoadIndirectString(resourcePathPointer, new PWSTR(outBufferPointer), (uint)outputBuffer.Length);
-                // res.ThrowOnFailure();
-                return new string(outputBuffer.TrimEnd('\0'));
-            }
-        }
-    }
 }
