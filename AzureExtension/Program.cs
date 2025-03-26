@@ -2,18 +2,15 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Configuration;
 using AzureExtension.DataManager;
 using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using Microsoft.CommandPalette.Extensions;
-using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Windows.AppLifecycle;
 using Serilog;
 using Shmuelie.WinRTServer;
+using Shmuelie.WinRTServer.CsWinRT;
 using Windows.ApplicationModel.Activation;
 using Windows.Management.Deployment;
 using Windows.Storage;
@@ -210,28 +207,5 @@ public sealed class Program
         {
             Log.Error(ex, "Failed attempting to verify or perform database recreation.");
         }
-    }
-
-    private static IHost CreateHost()
-    {
-        var host = Host.
-            CreateDefaultBuilder().
-            UseContentRoot(AppContext.BaseDirectory).
-            UseDefaultServiceProvider((context, options) =>
-            {
-                options.ValidateOnBuild = true;
-            }).
-            ConfigureServices((context, services) =>
-            {
-                // Logging
-                services.AddLogging(builder => builder.AddSerilog(dispose: true));
-
-                // Settings
-                services.AddTransient<SettingsProvider>();
-            }).
-        Build();
-
-        Log.Information("Services Host creation successful");
-        return host;
     }
 }
