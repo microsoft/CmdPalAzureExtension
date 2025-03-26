@@ -21,35 +21,17 @@ public class DeveloperId : IDeveloperId
     public string Url { get; private set; }
 
     private readonly ILogger _log = Log.ForContext("SourceContext", nameof(DeveloperId));
-<<<<<<< HEAD
-
-    private Dictionary<Uri, VssConnection> Connections { get; } = new Dictionary<Uri, VssConnection>();
-
-    public DeveloperId()
-    {
-        LoginId = string.Empty;
-        DisplayName = string.Empty;
-        Email = string.Empty;
-        Url = string.Empty;
-    }
-
-    public DeveloperId(string loginId, string displayName, string email, string url)
-=======
     private readonly IDeveloperIdProvider _developerIdProvider;
 
     private Dictionary<Uri, VssConnection> Connections { get; } = new Dictionary<Uri, VssConnection>();
 
     public DeveloperId(string loginId, string displayName, string email, string url, IDeveloperIdProvider developerIdProvider)
->>>>>>> main
     {
         LoginId = loginId;
         DisplayName = displayName;
         Email = email;
         Url = url;
-<<<<<<< HEAD
-=======
         _developerIdProvider = developerIdProvider;
->>>>>>> main
     }
 
     ~DeveloperId()
@@ -66,11 +48,7 @@ public class DeveloperId : IDeveloperId
     {
         try
         {
-<<<<<<< HEAD
-            var authResult = DeveloperIdProvider.GetInstance().GetAuthenticationResultForDeveloperId(this) ?? throw new ArgumentException(this.LoginId);
-=======
             var authResult = _developerIdProvider.GetAuthenticationResultForDeveloperId(this) ?? throw new ArgumentException(this.LoginId);
->>>>>>> main
             if (authResult != null)
             {
                 return new VssAadCredential(new VssAadToken("Bearer", authResult.AccessToken));
