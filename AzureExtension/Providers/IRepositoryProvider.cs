@@ -7,30 +7,6 @@ using AzureExtension.DeveloperId;
 using Windows.Foundation;
 using Windows.Storage.Streams;
 
-<<<<<<< HEAD
-namespace AzureExtension.Providers
-{
-    public interface IRepositoryProvider
-    {
-        string DisplayName { get; }
-
-        IRandomAccessStreamReference Icon { get; }
-
-        IAsyncOperation<RepositoriesResult> GetRepositoriesAsync(IDeveloperId developerId);
-
-        IAsyncOperation<RepositoryUriSupportResult> IsUriSupportedAsync(Uri uri);
-
-        IAsyncOperation<RepositoryUriSupportResult> IsUriSupportedAsync(Uri uri, IDeveloperId developerId);
-
-        IAsyncOperation<RepositoryResult> GetRepositoryFromUriAsync(Uri uri);
-
-        IAsyncOperation<RepositoryResult> GetRepositoryFromUriAsync(Uri uri, IDeveloperId developerId);
-
-        IAsyncOperation<ProviderOperationResult> CloneRepositoryAsync(IRepository repository, string cloneDestination);
-
-        IAsyncOperation<ProviderOperationResult> CloneRepositoryAsync(IRepository repository, string cloneDestination, IDeveloperId developerId);
-    }
-=======
 namespace AzureExtension.Providers;
 
 public interface IRepositoryProvider
@@ -52,5 +28,4 @@ public interface IRepositoryProvider
     IAsyncOperation<ProviderOperationResult> CloneRepositoryAsync(IRepository repository, string cloneDestination);
 
     IAsyncOperation<ProviderOperationResult> CloneRepositoryAsync(IRepository repository, string cloneDestination, IDeveloperId developerId);
->>>>>>> main
 }

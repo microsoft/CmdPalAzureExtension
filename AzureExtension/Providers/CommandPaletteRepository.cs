@@ -18,11 +18,7 @@ public class CommandPaletteRepository : IRepository
 
     private readonly DateTimeOffset _lastUpdated;
 
-<<<<<<< HEAD
-    string IRepository.DisplayName => _name;
-=======
     public string DisplayName => _name;
->>>>>>> main
 
     public string OwningAccountName => _owningAccountName;
 

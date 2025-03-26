@@ -6,38 +6,24 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-<<<<<<< HEAD
-using AzureExtension.Controls.Pages;
-using AzureExtension.DataManager;
-using AzureExtension.DataModel;
-using AzureExtension.Helpers;
-=======
 using AzureExtension.DataManager;
 using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using AzureExtension.Pages;
->>>>>>> main
 using CommandPaletteAzureExtension.Helpers;
 using Serilog;
 using Windows.Foundation;
 
 namespace AzureExtension.Providers;
 
-<<<<<<< HEAD
-internal sealed class SettingsUIController() : IExtensionAdaptiveCardSession
-=======
 internal sealed class SettingsUIController : IExtensionAdaptiveCardSession
->>>>>>> main
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", nameof(SettingsUIController)));
 
     private static readonly ILogger _log = _logger.Value;
 
-<<<<<<< HEAD
-=======
     private readonly CacheManager _cacheManager;
 
->>>>>>> main
     private static readonly string _notificationsEnabledString = "NotificationsEnabled";
 
     private string? _template;
@@ -50,13 +36,6 @@ internal sealed class SettingsUIController : IExtensionAdaptiveCardSession
         _settingsUI?.Update(null, null, null);
     }
 
-<<<<<<< HEAD
-    public ProviderOperationResult Initialize(IExtensionAdaptiveCard extensionUI)
-    {
-        _log.Debug($"Initialize");
-        CacheManager.GetInstance().OnUpdate += HandleCacheUpdate;
-        _settingsUI = extensionUI;
-=======
     public SettingsUIController(CacheManager cacheManager)
     {
         _cacheManager = cacheManager;
@@ -67,7 +46,6 @@ internal sealed class SettingsUIController : IExtensionAdaptiveCardSession
         _log.Debug($"Initialize");
         _settingsUI = extensionUI;
         _cacheManager.OnUpdate += HandleCacheUpdate;
->>>>>>> main
         return UpdateCard();
     }
 
@@ -98,11 +76,7 @@ internal sealed class SettingsUIController : IExtensionAdaptiveCardSession
 
                     case "UpdateData":
                         _log.Information($"Refreshing data for organizations.");
-<<<<<<< HEAD
-                        _ = CacheManager.GetInstance().Refresh();
-=======
                         _ = _cacheManager.Refresh();
->>>>>>> main
                         break;
 
                     case "OpenLogs":
@@ -131,11 +105,7 @@ internal sealed class SettingsUIController : IExtensionAdaptiveCardSession
             var notificationsEnabled = LocalSettings.ReadSettingAsync<string>(_notificationsEnabledString).Result ?? "true";
             var notificationsEnabledString = (notificationsEnabled == "true") ? Resources.GetResource("Settings_NotificationsEnabled", _log) : Resources.GetResource("Settings_NotificationsDisabled", _log);
 
-<<<<<<< HEAD
-            var lastUpdated = CacheManager.GetInstance().LastUpdated;
-=======
             var lastUpdated = _cacheManager.LastUpdated;
->>>>>>> main
             var lastUpdatedString = $"Last updated: {lastUpdated.ToString(CultureInfo.InvariantCulture)}";
             if (lastUpdated == DateTime.MinValue)
             {
@@ -143,11 +113,7 @@ internal sealed class SettingsUIController : IExtensionAdaptiveCardSession
             }
 
             var updateAzureDataString = Resources.GetResource("Settings_UpdateData", _log);
-<<<<<<< HEAD
-            if (CacheManager.GetInstance().UpdateInProgress)
-=======
             if (_cacheManager.UpdateInProgress)
->>>>>>> main
             {
                 updateAzureDataString = "Update in progress";
             }
