@@ -6,6 +6,7 @@ using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using Windows.Foundation;
 
+<<<<<<< HEAD
 namespace AzureExtension.Providers
 {
     public interface IRepositoryProvider2 : IRepositoryProvider
@@ -20,4 +21,19 @@ namespace AzureExtension.Providers
 
         IAsyncOperation<RepositoriesSearchResult> GetRepositoriesAsync(IReadOnlyDictionary<string, string> fieldValues, IDeveloperId developerId);
     }
+=======
+namespace AzureExtension.Providers;
+
+public interface IRepositoryProvider2 : IRepositoryProvider
+{
+    string[] SearchFieldNames { get; }
+
+    bool IsSearchingSupported { get; }
+
+    string AskToSearchLabel { get; }
+
+    IAsyncOperation<IReadOnlyList<string>> GetValuesForSearchFieldAsync(IReadOnlyDictionary<string, string> fieldValues, string requestedSearchField, IDeveloperId developerId);
+
+    IAsyncOperation<RepositoriesSearchResult> GetRepositoriesAsync(IReadOnlyDictionary<string, string> fieldValues, IDeveloperId developerId);
+>>>>>>> main
 }

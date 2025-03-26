@@ -610,6 +610,7 @@
     <value>For more details, please refer to https://learn.microsoft.com/en-us/entra/msal/dotnet/advanced/exceptions/wam-errors</value>
     <comment>{Locked="https://learn.microsoft.com/en-us/entra/msal/dotnet/advanced/exceptions/wam-errors"} Redirect link to MS Learn page for additional info on WAM errors</comment>
   </data>
+<<<<<<< HEAD
   <data name="Commands_Copy" xml:space="preserve">
     <value>Copy</value>
     <comment>Title of Copy command, shown in pages menu options</comment>
@@ -850,4 +851,6 @@
     <value>updated</value>
     <comment>Indicates when something was updated</comment>
   </data>
+=======
+>>>>>>> main
 </root>
