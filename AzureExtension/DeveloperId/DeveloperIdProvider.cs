@@ -312,11 +312,6 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
 
     public AdaptiveCardSessionResult GetLoginAdaptiveCardSession() => throw new NotImplementedException();
 
-    IEnumerable<IDeveloperId> IDeveloperIdProvider.GetLoggedInDeveloperIdsInternal()
-    {
-        return GetLoggedInDeveloperIdsInternal();
-    }
-
     IDeveloperId IDeveloperIdProvider.GetDeveloperIdInternal(IDeveloperId devId)
     {
         return GetDeveloperIdInternal(devId);

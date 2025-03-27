@@ -61,10 +61,10 @@ public partial class SignInForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "{{AuthTitle}}", Resources.GetResource("Forms_Sign_In") },
-        { "{{AuthButtonTitle}}", Resources.GetResource("Forms_Sign_In") },
+        { "{{AuthTitle}}", "Sign into your ADO account" },
+        { "{{AuthButtonTitle}}", "Sign in" },
         { "{{AuthIcon}}", $"data:image/png;base64,{AzureIcon.GetBase64Icon("logo")}" },
-        { "{{AuthButtonTooltip}}", Resources.GetResource("Forms_Sign_In_Tooltip") },
+        { "{{AuthButtonTooltip}}", "tooltip" },
         { "{{ButtonIsEnabled}}", IsButtonEnabled },
     };
 
@@ -97,11 +97,9 @@ public partial class SignInForm : FormContent, IAzureForm
     {
         var numPreviousDevIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal().Count();
 
-        await _developerIdProvider.LoginNewDeveloperIdAsync();
+        await _developerIdProvider.ShowLogonSession();
 
         var numDevIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal().Count();
-
-        await _developerIdProvider.ShowLogonSession();
 
         return numDevIds > numPreviousDevIds;
     }
