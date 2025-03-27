@@ -30,4 +30,6 @@ public interface IDeveloperIdProvider
     IDeveloperId? GetDeveloperIdFromAccountIdentifier(string loginId);
 
     AuthenticationResult? GetAuthenticationResultForDeveloperId(DeveloperId developerId);
+
+    public IAsyncOperation<DeveloperIdResult> ShowLogonSession();
 }

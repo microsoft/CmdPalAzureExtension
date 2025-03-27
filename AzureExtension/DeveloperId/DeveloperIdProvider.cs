@@ -102,11 +102,11 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
         return developerIdsResult;
     }
 
-    public IAsyncOperation<DeveloperIdResult> ShowLogonSession(WindowId windowHandle)
+    public IAsyncOperation<DeveloperIdResult> ShowLogonSession()
     {
-        return Task.Run(async () =>
+        return Task.Run(() =>
         {
-            await _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(windowHandle);
+            _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsync();
             var account = _developerIdAuthenticationHelper.LoginDeveloperAccount(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
 
             if (account.Result == null)
