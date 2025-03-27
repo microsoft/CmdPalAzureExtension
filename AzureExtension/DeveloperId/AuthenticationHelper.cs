@@ -50,7 +50,7 @@ public class AuthenticationHelper : IAuthenticationHelper
 
         InitializePublicClientApplicationBuilder();
 
-        InitializePublicClientAppForWAMBrokerAsync();
+        // InitializePublicClientAppForWAMBrokerAsync();
     }
 
     public void InitializePublicClientApplicationBuilder()

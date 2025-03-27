@@ -30,8 +30,8 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     public override ICommandItem[] TopLevelCommands() => [new CommandItem(_signInPage)
     {
-        Title = Resources.GetResource("ExtensionTitle"),
-        Subtitle = Resources.GetResource("Forms_Sign_In"),
+        Title = "Please work",
+        Subtitle = "Pretty please",
         Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
     }
     ];

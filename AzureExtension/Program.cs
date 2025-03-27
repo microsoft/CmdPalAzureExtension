@@ -123,21 +123,15 @@ public sealed class Program
         using var azureDataManager = new AzureDataManager("MainInstance", devIdProvider);
 
         // Cache manager updates account data.
-        using var cacheManager = new CacheManager(azureDataManager, devIdProvider);
-        cacheManager.Start();
+        // using var cacheManager = new CacheManager(azureDataManager, devIdProvider);
+        // cacheManager.Start();
 
         // Set up the data updater. This will schedule updating the Developer Pull Requests.
-        using var dataUpdater = new DataUpdater(azureDataManager.Update);
-        _ = dataUpdater.Start();
+        // using var dataUpdater = new DataUpdater(azureDataManager.Update);
+        // _ = dataUpdater.Start();
 
         // Add an update whenever CacheManager is updated.
-        cacheManager.OnUpdate += HandleCacheUpdate;
-
-        // This will make the main thread wait until the event is signaled by the extension class.
-        // Since we have single instance of the extension object, we exit as soon as it is disposed.
-        extensionDisposedEvent.WaitOne();
-        Log.Information($"Extension is disposed.");
-
+        // cacheManager.OnUpdate += HandleCacheUpdate;
         var signInForm = new SignInForm(devIdProvider);
         var signInPage = new SignInPage(signInForm, new StatusMessage(), Resources.GetResource("Message_Sign_In_Success"), Resources.GetResource("Message_Sign_In_Fail"), devIdProvider);
 
@@ -147,6 +141,11 @@ public sealed class Program
 
         server.RegisterClass<AzureExtension, IExtension>(() => extensionInstance);
         server.Start();
+
+        // This will make the main thread wait until the event is signaled by the extension class.
+        // Since we have single instance of the extension object, we exit as soon as it is disposed.
+        extensionDisposedEvent.WaitOne();
+        Log.Information($"Extension is disposed.");
     }
 
     private static void HandleCacheUpdate(object? source, CacheManagerUpdateEventArgs e)
