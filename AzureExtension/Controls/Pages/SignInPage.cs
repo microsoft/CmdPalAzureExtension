@@ -13,13 +13,15 @@ namespace AzureExtension.Controls.Pages;
 
 public partial class SignInPage : ContentPage
 {
+    private readonly IDeveloperIdProvider _developerIdProvider;
     private readonly SignInForm _signInForm;
     private readonly StatusMessage _statusMessage;
     private readonly string _successMessage;
     private readonly string _errorMessage;
 
-    public SignInPage(SignInForm signInForm, StatusMessage statusMessage, string successMessage, string errorMessage)
+    public SignInPage(SignInForm signInForm, StatusMessage statusMessage, string successMessage, string errorMessage, IDeveloperIdProvider developerIdProvider)
     {
+        _developerIdProvider = developerIdProvider;
         _signInForm = signInForm;
         _statusMessage = statusMessage;
         _successMessage = successMessage;
@@ -49,12 +51,15 @@ public partial class SignInPage : ContentPage
     {
         // User is not logged in if either there are zero DeveloperIds logged in, or the selected
         // DeveloperId for this widget is not logged in.
-        var authProvider = DeveloperIdProvider.GetInstance();
+        var authProvider = _developerIdProvider;
         if (!authProvider.GetLoggedInDeveloperIds().DeveloperIds.Any())
         {
             return false;
         }
 
+        return true;
+
+        /*
         if (!DeveloperIdLoginRequired)
         {
             // At least one user is logged in, and this widget does not require a specific
@@ -76,18 +81,19 @@ public partial class SignInPage : ContentPage
         }
 
         return false;
+        */
     }
 
-    protected DeveloperId.DeveloperId? GetDevId(string login)
+    protected IDeveloperId? GetDevId(string login)
     {
-        var devIdProvider = DeveloperIdProvider.GetInstance();
-        DeveloperId.DeveloperId? developerId = null;
+        var devIdProvider = _developerIdProvider;
+        IDeveloperId? developerId = null;
 
         foreach (var devId in devIdProvider.GetLoggedInDeveloperIds().DeveloperIds)
         {
             if (devId.LoginId == login)
             {
-                developerId = (DeveloperId.DeveloperId)devId;
+                developerId = devId;
             }
         }
 

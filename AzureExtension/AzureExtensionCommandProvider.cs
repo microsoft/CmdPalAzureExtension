@@ -17,15 +17,15 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 {
     private readonly SignInPage _signInPage;
 
-    public AzureExtensionCommandProvider()
+    public AzureExtensionCommandProvider(SignInPage signInPage)
     {
+        _signInPage = signInPage;
         DisplayName = "Azure extension for cmdpal Commands";
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);
 
         var authenticationHelper = new AuthenticationHelper();
-        _signInPage = new SignInPage(new SignInForm(DeveloperIdProvider.GetInstance()), new StatusMessage(), Resources.GetResource("Message_Sign_In_Success"), Resources.GetResource("Message_Sign_In_Fail"));
     }
 
     public override ICommandItem[] TopLevelCommands() => [new CommandItem(_signInPage)

@@ -2,8 +2,8 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Controls.Pages;
 using AzureExtension.DataModel;
-using AzureExtension.Pages;
 using Microsoft.Identity.Client;
 using Microsoft.UI;
 using Serilog;
@@ -26,7 +26,6 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
 
     private readonly IAuthenticationHelper _developerIdAuthenticationHelper;
 
-
     private readonly ILogger _log = Log.ForContext("SourceContext", nameof(DeveloperIdProvider));
 
     public event TypedEventHandler<IDeveloperIdProvider, IDeveloperId>? Changed;
@@ -34,6 +33,8 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     private readonly AuthenticationExperienceKind _authenticationExperienceForAzureExtension = AuthenticationExperienceKind.CustomProvider;
 
     public string DisplayName => "Azure";
+
+    public event EventHandler<Exception?>? OAuthRedirected;
 
     public DeveloperIdProvider(IAuthenticationHelper authenticationHelper)
     {
@@ -108,7 +109,6 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
             await _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(windowHandle);
             var account = _developerIdAuthenticationHelper.LoginDeveloperAccount(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
 
-
             if (account.Result == null)
             {
                 _log.Error($"Invalid AuthRequest");
@@ -150,7 +150,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
         return new ProviderOperationResult(ProviderOperationStatus.Success, null, "The developer account has been logged out successfully", "LogoutDeveloperId succeeded");
     }
 
-    public IEnumerable<DeveloperId> GetLoggedInDeveloperIdsInternal()
+    public IEnumerable<IDeveloperId> GetLoggedInDeveloperIdsInternal()
     {
         List<DeveloperId> iDeveloperIds = new();
         lock (_developerIdsLock)
@@ -162,7 +162,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     }
 
     // Convert devID to internal devID.
-    public DeveloperId GetDeveloperIdInternal(IDeveloperId devId)
+    public IDeveloperId GetDeveloperIdInternal(IDeveloperId devId)
     {
         var devIds = GetLoggedInDeveloperIdsInternal();
         var devIdInternal = devIds.Where(i => i.LoginId.Equals(devId.LoginId, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
@@ -183,7 +183,6 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     {
         // Query necessary data and populate Developer Id.
         DeveloperId newDeveloperId = new(account.Username, account.Username, account.Username, string.Empty, this);
-
 
         var duplicateDeveloperIds = DeveloperIds.Where(d => d.LoginId.Equals(newDeveloperId.LoginId, StringComparison.OrdinalIgnoreCase));
 
@@ -233,7 +232,6 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
         foreach (var loginId in loginIds)
         {
             DeveloperId developerId = new(loginId, loginId, loginId, string.Empty, this);
-
 
             lock (_developerIdsLock)
             {

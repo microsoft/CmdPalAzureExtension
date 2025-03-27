@@ -21,6 +21,10 @@ public interface IDeveloperIdProvider
 
     void HandleOauthRedirection(Uri authorizationResponse);
 
+    event EventHandler<Exception?>? OAuthRedirected;
+
+    DeveloperIdsResult GetLoggedInDeveloperIds();
+
     AuthenticationState GetDeveloperIdState(IDeveloperId developerId);
 
     IDeveloperId? GetDeveloperIdFromAccountIdentifier(string loginId);

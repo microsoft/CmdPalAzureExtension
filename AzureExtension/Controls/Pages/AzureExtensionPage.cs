@@ -34,7 +34,7 @@ public partial class AzureExtensionPage : ListPage
 
     protected IAzureDataManager? DataManager { get; private set; }
 
-    private DateTime _lastUpdateRequest = DateTime.MinValue;
+    private readonly IDeveloperIdProvider _developerIdProvider;
 
     protected string DataErrorMessage { get; set; } = string.Empty;
 
@@ -69,8 +69,9 @@ public partial class AzureExtensionPage : ListPage
 
     protected DataUpdater? DataUpdater { get; private set; }
 
-    public AzureExtensionPage()
+    public AzureExtensionPage(IDeveloperIdProvider developerIdProvider)
     {
+        _developerIdProvider = developerIdProvider;
         Icon = new(string.Empty);
         Name = "Azure extension for cmdpal";
         _log = new(() => Serilog.Log.ForContext("SourceContext", nameof(AzureExtensionPage)));
@@ -145,7 +146,7 @@ public partial class AzureExtensionPage : ListPage
                 return false;
             }
 
-            var queryInfo = AzureClientHelpers.GetQueryInfo(_selectedQueryUrl, developerId);
+            var queryInfo = AzureClientHelpers.GetQueryInfo(new AzureUri(_selectedQueryUrl), developerId);
             _selectedQueryId = queryInfo.AzureUri.Query;   // This will be empty string if invalid query.
             if (queryInfo.Result != ResultType.Success)
             {
@@ -178,7 +179,7 @@ public partial class AzureExtensionPage : ListPage
         var azureOrg = new AzureUri(_selectedQueryUrl).Organization;
         if (!string.IsNullOrEmpty(azureOrg))
         {
-            var devIds = DeveloperIdProvider.GetInstance().GetLoggedInDeveloperIds().DeveloperIds;
+            var devIds = _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds;
             if (devIds is null)
             {
                 return;
@@ -265,7 +266,7 @@ public partial class AzureExtensionPage : ListPage
 
         var developerIdsData = new JsonArray();
 
-        var devIdProvider = DeveloperIdProvider.GetInstance();
+        var devIdProvider = _developerIdProvider;
 
         foreach (var developerId in devIdProvider.GetLoggedInDeveloperIds().DeveloperIds)
         {
@@ -362,9 +363,9 @@ public partial class AzureExtensionPage : ListPage
         }
     }
 
-    protected DeveloperId.DeveloperId? GetDevId(string login)
+    protected IDeveloperId? GetDevId(string login)
     {
-        var devIdProvider = DeveloperIdProvider.GetInstance();
+        var devIdProvider = _developerIdProvider;
         DeveloperId.DeveloperId? developerId = null;
 
         foreach (var devId in devIdProvider.GetLoggedInDeveloperIds().DeveloperIds)

@@ -2,10 +2,14 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Controls.Forms;
+using AzureExtension.Controls.Pages;
 using AzureExtension.DataManager;
 using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
+using CommandPaletteAzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
+using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Windows.AppLifecycle;
 using Serilog;
@@ -134,7 +138,10 @@ public sealed class Program
         extensionDisposedEvent.WaitOne();
         Log.Information($"Extension is disposed.");
 
-        var commandProvider = new AzureExtensionActionsProvider();
+        var signInForm = new SignInForm(devIdProvider);
+        var signInPage = new SignInPage(signInForm, new StatusMessage(), Resources.GetResource("Message_Sign_In_Success"), Resources.GetResource("Message_Sign_In_Fail"), devIdProvider);
+
+        var commandProvider = new AzureExtensionCommandProvider(signInPage);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 
