@@ -5,8 +5,6 @@
 using System.Globalization;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Serilog;
-using Windows.Win32;
-using Windows.Win32.Foundation;
 
 namespace CommandPaletteAzureExtension.Helpers;
 
@@ -22,7 +20,7 @@ public static class Resources
         {
             if (_resourceLoader == null)
             {
-                _resourceLoader = new ResourceLoader(ResourceLoader.GetDefaultResourceFilePath(), "AzureExtension/Resources");
+                _resourceLoader = new ResourceLoader(ResourceLoader.GetDefaultResourceFilePath());
             }
 
             return _resourceLoader.GetString(identifier);
@@ -121,5 +119,10 @@ public static class Resources
             "Widget_Template/NotShownItems",
             "Widget_Template/ContentLoading",
         ];
+    }
+
+    public interface IResources
+    {
+        string GetResource(string identifier, ILogger? log = null);
     }
 }

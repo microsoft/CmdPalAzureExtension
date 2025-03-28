@@ -2,10 +2,14 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Controls.Forms;
+using AzureExtension.Controls.Pages;
 using AzureExtension.DataManager;
 using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
+using CommandPaletteAzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
+using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Windows.AppLifecycle;
 using Serilog;
@@ -119,27 +123,29 @@ public sealed class Program
         using var azureDataManager = new AzureDataManager("MainInstance", devIdProvider);
 
         // Cache manager updates account data.
-        using var cacheManager = new CacheManager(azureDataManager, devIdProvider);
-        cacheManager.Start();
+        // using var cacheManager = new CacheManager(azureDataManager, devIdProvider);
+        // cacheManager.Start();
 
         // Set up the data updater. This will schedule updating the Developer Pull Requests.
-        using var dataUpdater = new DataUpdater(azureDataManager.Update);
-        _ = dataUpdater.Start();
+        // using var dataUpdater = new DataUpdater(azureDataManager.Update);
+        // _ = dataUpdater.Start();
 
         // Add an update whenever CacheManager is updated.
-        cacheManager.OnUpdate += HandleCacheUpdate;
+        // cacheManager.OnUpdate += HandleCacheUpdate;
+        var signInForm = new SignInForm(devIdProvider);
+        var signInPage = new SignInPage(signInForm, new StatusMessage(), Resources.GetResource("Message_Sign_In_Success"), Resources.GetResource("Message_Sign_In_Fail"), devIdProvider);
 
-        // This will make the main thread wait until the event is signaled by the extension class.
-        // Since we have single instance of the extension object, we exit as soon as it is disposed.
-        extensionDisposedEvent.WaitOne();
-        Log.Information($"Extension is disposed.");
-
-        var commandProvider = new AzureExtensionActionsProvider();
+        var commandProvider = new AzureExtensionCommandProvider(signInPage);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 
         server.RegisterClass<AzureExtension, IExtension>(() => extensionInstance);
         server.Start();
+
+        // This will make the main thread wait until the event is signaled by the extension class.
+        // Since we have single instance of the extension object, we exit as soon as it is disposed.
+        extensionDisposedEvent.WaitOne();
+        Log.Information($"Extension is disposed.");
     }
 
     private static void HandleCacheUpdate(object? source, CacheManagerUpdateEventArgs e)

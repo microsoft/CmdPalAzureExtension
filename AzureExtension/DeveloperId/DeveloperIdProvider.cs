@@ -2,8 +2,8 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Controls.Pages;
 using AzureExtension.DataModel;
-using AzureExtension.Pages;
 using Microsoft.Identity.Client;
 using Microsoft.UI;
 using Serilog;
@@ -33,6 +33,8 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     private readonly AuthenticationExperienceKind _authenticationExperienceForAzureExtension = AuthenticationExperienceKind.CustomProvider;
 
     public string DisplayName => "Azure";
+
+    public event EventHandler<Exception?>? OAuthRedirected;
 
     public DeveloperIdProvider(IAuthenticationHelper authenticationHelper)
     {
@@ -100,11 +102,11 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
         return developerIdsResult;
     }
 
-    public IAsyncOperation<DeveloperIdResult> ShowLogonSession(WindowId windowHandle)
+    public IAsyncOperation<DeveloperIdResult> ShowLogonSession()
     {
-        return Task.Run(async () =>
+        return Task.Run(() =>
         {
-            await _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(windowHandle);
+            _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsync();
             var account = _developerIdAuthenticationHelper.LoginDeveloperAccount(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
 
             if (account.Result == null)
@@ -148,7 +150,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
         return new ProviderOperationResult(ProviderOperationStatus.Success, null, "The developer account has been logged out successfully", "LogoutDeveloperId succeeded");
     }
 
-    public IEnumerable<DeveloperId> GetLoggedInDeveloperIdsInternal()
+    public IEnumerable<IDeveloperId> GetLoggedInDeveloperIdsInternal()
     {
         List<DeveloperId> iDeveloperIds = new();
         lock (_developerIdsLock)
@@ -160,7 +162,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     }
 
     // Convert devID to internal devID.
-    public DeveloperId GetDeveloperIdInternal(IDeveloperId devId)
+    public IDeveloperId GetDeveloperIdInternal(IDeveloperId devId)
     {
         var devIds = GetLoggedInDeveloperIdsInternal();
         var devIdInternal = devIds.Where(i => i.LoginId.Equals(devId.LoginId, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
@@ -310,11 +312,6 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
 
     public AdaptiveCardSessionResult GetLoginAdaptiveCardSession() => throw new NotImplementedException();
 
-    IEnumerable<IDeveloperId> IDeveloperIdProvider.GetLoggedInDeveloperIdsInternal()
-    {
-        return GetLoggedInDeveloperIdsInternal();
-    }
-
     IDeveloperId IDeveloperIdProvider.GetDeveloperIdInternal(IDeveloperId devId)
     {
         return GetDeveloperIdInternal(devId);
@@ -332,6 +329,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
 
     public void HandleOauthRedirection(Uri authorizationResponse)
     {
+        OAuthRedirected?.Invoke(this, null);
         throw new NotImplementedException();
     }
 }

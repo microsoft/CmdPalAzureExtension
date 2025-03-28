@@ -4,7 +4,7 @@
 
 using AzureExtension.DataModel;
 
-namespace AzureExtension.Pages
+namespace AzureExtension.Controls.Pages
 {
     public interface IExtensionAdaptiveCard
     {

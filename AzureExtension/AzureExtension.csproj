@@ -25,13 +25,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Services\**" />
-	  <EmbeddedResource Remove="Services\**" />
-	  <None Remove="Services\**" />
-	  <Page Remove="Services\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
 
@@ -63,11 +56,15 @@
         <PackageReference Include="System.Text.Json" Version="9.0.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Update="appsettings.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
+    <ItemGroup>
+        <Content Include="Controls\Templates\*">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Compile Remove="D:\azext\\codeAnalysis\GlobalSuppressions.cs" />
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
 	<!--
     Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
@@ -82,7 +79,7 @@
 		<PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.322" />
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="Data\" />
+		<Folder Include="Controls\Templates\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" />
@@ -98,5 +95,9 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <PRIResource Remove="Services\**" />
+	</ItemGroup>
+	<ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
+	<ItemGroup>
+	  <PRIResource Remove="Data\**" />
 	</ItemGroup>
 </Project>

@@ -610,4 +610,244 @@
     <value>For more details, please refer to https://learn.microsoft.com/en-us/entra/msal/dotnet/advanced/exceptions/wam-errors</value>
     <comment>{Locked="https://learn.microsoft.com/en-us/entra/msal/dotnet/advanced/exceptions/wam-errors"} Redirect link to MS Learn page for additional info on WAM errors</comment>
   </data>
+  <data name="Commands_Copy" xml:space="preserve">
+    <value>Copy</value>
+    <comment>Title of Copy command, shown in pages menu options</comment>
+  </data>
+  <data name="Commands_Copy_Checkout" xml:space="preserve">
+    <value>Copy checkout command</value>
+    <comment>Title for copy checkout command</comment>
+  </data>
+  <data name="Commands_Copy_Source_Branch" xml:space="preserve">
+    <value>Copy source branch</value>
+    <comment>Title for command to copy source branch of a pull request</comment>
+  </data>
+  <data name="Commands_Open_Link" xml:space="preserve">
+    <value>Open link</value>
+    <comment>Title for command to open an item in the browser</comment>
+  </data>
+  <data name="Commands_Remove_Saved_Search" xml:space="preserve">
+    <value>Remove</value>
+    <comment>Title for command to remove a saved query</comment>
+  </data>
+  <data name="CommandsProvider_AssignedToMeCommandName" xml:space="preserve">
+    <value>Assigned to Me</value>
+    <comment>Title for search "state:open assignee:{login} archived:false"</comment>
+  </data>
+  <data name="CommandsProvider_CreatedIssuesCommandName" xml:space="preserve">
+    <value>Created Issues</value>
+    <comment>Title for search "state:open is:pr review-requested:{login} archived:false"</comment>
+  </data>
+  <data name="CommandsProvider_DefaultCommands_Error" xml:space="preserve">
+    <value>Adding a query to the top level failed</value>
+    <comment>The error message displayed if adding the default commands to the top level fails</comment>
+  </data>
+  <data name="CommandsProvider_MentionsMeCommandName" xml:space="preserve">
+    <value>Mentions Me</value>
+    <comment>Title for search "state:open mentions:{login} archived:false"</comment>
+  </data>
+  <data name="CommandsProvider_MyPullRequestsCommandName" xml:space="preserve">
+    <value>My Pull Requests</value>
+    <comment>Title for search "state:open is:pr author:{login} archived:false"</comment>
+  </data>
+  <data name="CommandsProvider_ReviewRequestedCommandName" xml:space="preserve">
+    <value>Review Requested</value>
+    <comment>Title for search "state:open is:pr review-requested:{login} archived:false"</comment>
+  </data>
+  <data name="ExtensionPackageDescription" xml:space="preserve">
+    <value>The GitHub extension for Windows Command Palette.</value>
+    <comment>Description for extension package</comment>
+  </data>
+  <data name="ExtensionPackageTitle" xml:space="preserve">
+    <value>GitHub Extension for Command Palette</value>
+    <comment>Title for the extension package</comment>
+  </data>
+  <data name="ExtensionTitle" xml:space="preserve">
+    <value>GitHub Extension</value>
+    <comment>Title for the extension</comment>
+  </data>
+  <data name="Forms_Edit_Search" xml:space="preserve">
+    <value>Edit Query</value>
+    <comment>Shown in form button to edit a query</comment>
+  </data>
+  <data name="Forms_Save_Search" xml:space="preserve">
+    <value>Save Query</value>
+    <comment>Shown in form button to save a query</comment>
+  </data>
+  <data name="Forms_SaveSearchTemplateEnteredSearchError" xml:space="preserve">
+    <value>Query is required</value>
+    <comment>Shown if the user submits the form without entering a query</comment>
+  </data>
+  <data name="Forms_SaveSearchTemplateEnteredSearchLabel" xml:space="preserve">
+    <value>Query string or URL:</value>
+    <comment>Shown as the label for the input text box for the GitHub query</comment>
+  </data>
+  <data name="Forms_SaveSearchTemplateIsTopLevelTitle" xml:space="preserve">
+    <value>Pin query to top-level commands</value>
+    <comment>The label text for the checkbox that determines if the query should be pinned as a top level command</comment>
+  </data>
+  <data name="Forms_SaveSearchTemplateNameError" xml:space="preserve">
+    <value>A query name is required</value>
+    <comment>Shown if the user submits the SaveSearchForm without a name</comment>
+  </data>
+  <data name="Forms_SaveSearchTemplateNameLabel" xml:space="preserve">
+    <value>Name:</value>
+    <comment>Shown as the name for the saved query</comment>
+  </data>
+  <data name="Forms_SaveSearchTemplateSaveSearchActionTitle" xml:space="preserve">
+    <value>Save</value>
+    <comment>The title for the button that submits the form and saves the query</comment>
+  </data>
+  <data name="Forms_Sign_In" xml:space="preserve">
+    <value>Sign In</value>
+    <comment>Shown in sign in form as title and button title</comment>
+  </data>
+  <data name="Forms_Sign_In_Tooltip" xml:space="preserve">
+    <value>Sign in to GitHub</value>
+    <comment>Shown in form's sign in button tooltip</comment>
+  </data>
+  <data name="Forms_Sign_Out_Button_Title" xml:space="preserve">
+    <value>Sign out</value>
+    <comment>Title for sign out button title, shown in sign out form</comment>
+  </data>
+  <data name="Forms_Sign_Out_Title" xml:space="preserve">
+    <value>Are you sure you want to sign out?</value>
+    <comment>Title for sign out form page</comment>
+  </data>
+  <data name="Forms_Sign_Out_Tooltip" xml:space="preserve">
+    <value>Sign out from GitHub extension</value>
+    <comment>Tooltip for sign out button on sign out form</comment>
+  </data>
+  <data name="ListItems_AddSearch" xml:space="preserve">
+    <value>Add a query</value>
+    <comment>Title for Add query list item, shown in Add Queries page.</comment>
+  </data>
+  <data name="Message_Search_Saved" xml:space="preserve">
+    <value>Query saved successfully!</value>
+    <comment>Shown in a toast when query is saved</comment>
+  </data>
+  <data name="Message_Search_Saved_Error" xml:space="preserve">
+    <value>Error in saving query</value>
+    <comment>Shown in a toast when there is an error saving a query</comment>
+  </data>
+  <data name="Message_Sign_In_Fail" xml:space="preserve">
+    <value>Sign in failed</value>
+    <comment>Message shown in a toast when sign in proccess fails</comment>
+  </data>
+  <data name="Message_Sign_In_Success" xml:space="preserve">
+    <value>Sign in succeeded!</value>
+    <comment>Shown in a toast when sign in proccess succeeded</comment>
+  </data>
+  <data name="Message_Sign_Out_Fail" xml:space="preserve">
+    <value>Sign out failed</value>
+    <comment>Shown in a toast when sign out process fails</comment>
+  </data>
+  <data name="Message_Sign_Out_Success" xml:space="preserve">
+    <value>Sign out succeeded!</value>
+    <comment>Shown in a toast when sign out is succeeded</comment>
+  </data>
+  <data name="Pages_Edit" xml:space="preserve">
+    <value>Edit</value>
+    <comment>Name and title for edit search page</comment>
+  </data>
+  <data name="Pages_Error_Body" xml:space="preserve">
+    <value>No items found</value>
+    <comment>Body of error message when an error ocurred fetching items</comment>
+  </data>
+  <data name="Pages_Error_Title" xml:space="preserve">
+    <value>Error fetching items</value>
+    <comment>Shown in page when there is an error on a query request</comment>
+  </data>
+  <data name="Pages_Issue_Number" xml:space="preserve">
+    <value>issue number</value>
+    <comment>Tooltip for command to copy issue number</comment>
+  </data>
+  <data name="Pages_Issue_Title" xml:space="preserve">
+    <value>issue title</value>
+    <comment>Shown in command to copy issue title on pages</comment>
+  </data>
+  <data name="Pages_Item_Number" xml:space="preserve">
+    <value>item number</value>
+    <comment>Shown in command to copy the number of a issue or pull request on a page</comment>
+  </data>
+  <data name="Pages_Item_URL" xml:space="preserve">
+    <value>URL</value>
+    <comment>Tooltip for copying an issue or PR URL</comment>
+  </data>
+  <data name="Pages_Markdown_Issue" xml:space="preserve">
+    <value>View issue in Command Palette</value>
+    <comment>Name for the markdown page that show issue's details</comment>
+  </data>
+  <data name="Pages_Markdown_PullRequest" xml:space="preserve">
+    <value>View pull request in Command Palette</value>
+    <comment>Name of markdown page to show pull request details</comment>
+  </data>
+  <data name="Pages_No_Items_Found" xml:space="preserve">
+    <value>No items found</value>
+    <comment>Shown in list pages when there is no items found for a search query.</comment>
+  </data>
+  <data name="Pages_PullRequest_Checkout" xml:space="preserve">
+    <value>checkout command</value>
+    <comment>Tooltip for command to copy checkout command of a PR</comment>
+  </data>
+  <data name="Pages_PullRequest_Number" xml:space="preserve">
+    <value>pull request number</value>
+    <comment>Tooltip for command to copy pull request number</comment>
+  </data>
+  <data name="Pages_PullRequest_SourceBranch" xml:space="preserve">
+    <value>source branch</value>
+    <comment>Tooltip for copy source branch command</comment>
+  </data>
+  <data name="Pages_PullRequest_Title" xml:space="preserve">
+    <value>pull request title</value>
+    <comment>Shown in command to copy title of pull request on a page</comment>
+  </data>
+  <data name="Pages_Saved_Searches" xml:space="preserve">
+    <value>Saved GitHub Queries</value>
+    <comment>Name of page that shows list of saved github queries</comment>
+  </data>
+  <data name="Pages_Saved_Searches_Error" xml:space="preserve">
+    <value>Error in removing query: </value>
+    <comment>Shown in a toast when error happens when saving a query</comment>
+  </data>
+  <data name="Pages_Saved_Searches_Failure" xml:space="preserve">
+    <value>Failed to remove query.</value>
+    <comment>Shown when failed to remove a search from saved queries page</comment>
+  </data>
+  <data name="Pages_Search_Edited_Failed" xml:space="preserve">
+    <value>Error in editing query:</value>
+    <comment>Shown in a toast when there is an error editing a query</comment>
+  </data>
+  <data name="Pages_Search_Edited_Success" xml:space="preserve">
+    <value>Query edited successfully!</value>
+    <comment>Shown as a toast when a query is edited successfully</comment>
+  </data>
+  <data name="TimeDaysAgo" xml:space="preserve">
+    <value>{days, plural, =1{# day ago} other{# days ago}}</value>
+    <comment>Days ago format</comment>
+  </data>
+  <data name="TimeHoursAgo" xml:space="preserve">
+    <value>{hours, plural, =1{# hour ago} other{# hours ago}}</value>
+    <comment>Hours ago format</comment>
+  </data>
+  <data name="TimeMinutesAgo" xml:space="preserve">
+    <value>{minutes, plural, =1{# minute ago} other{# minutes ago}}</value>
+    <comment>Minutes ago format</comment>
+  </data>
+  <data name="TimeNow" xml:space="preserve">
+    <value>now</value>
+    <comment>Indicates something happened just now</comment>
+  </data>
+  <data name="TimeSecondsAgo" xml:space="preserve">
+    <value>{seconds, plural, =1{# second ago} other{# seconds ago}}</value>
+    <comment>Seconds ago format</comment>
+  </data>
+  <data name="TimeUnknown" xml:space="preserve">
+    <value>not known</value>
+    <comment>Indicates unknown time</comment>
+  </data>
+  <data name="TimeUpdated" xml:space="preserve">
+    <value>updated</value>
+    <comment>Indicates when something was updated</comment>
+  </data>
 </root>

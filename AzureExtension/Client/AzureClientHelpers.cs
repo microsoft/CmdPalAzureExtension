@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.DeveloperId;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
@@ -14,7 +15,7 @@ public class AzureClientHelpers
     // This validates the Query Uri authenticates and receives a response from the server.
     // It is used for validating an input Uri is actually valid to the server and adds information
     // about it from the server.
-    public static InfoResult GetQueryInfo(AzureUri azureUri, DeveloperId.DeveloperId devId)
+    public static InfoResult GetQueryInfo(AzureUri azureUri, IDeveloperId devId)
     {
         var log = Log.ForContext("SourceContext", nameof(InfoResult));
         if (devId == null)

@@ -2,10 +2,12 @@
   "profiles": {
     "AzureExtension (Package)": {
       "commandName": "MsixPackage",
-      "doNotLaunchApp": true
+      "doNotLaunchApp": true,
+      "nativeDebugging": true
     },
     "AzureExtension (Unpackaged)": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "nativeDebugging": true
     }
   }
 }
