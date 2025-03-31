@@ -64,10 +64,10 @@ public class AuthenticationSettings
     {
         Authority = "https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47";
         ClientId = "ec33db7f-5b7e-4061-b729-8dab727cc764";
-        TenantId = "72f988bf-86f1-41af-91ab-2d7cd011db47";
+        TenantId = string.Empty;
         RedirectURI = "devhome://oauth_redirect_uri/";
         CacheFileName = "msal_cache";
         CacheDir = ApplicationData.Current != null ? ApplicationData.Current.LocalFolder.Path : _cacheFolderPathDefault;
-        Scopes = "499b84ac-1321-427f-aa17-267ca6975798/.default";
+        Scopes = "https://graph.microsoft.com/User.Read";
     }
 }

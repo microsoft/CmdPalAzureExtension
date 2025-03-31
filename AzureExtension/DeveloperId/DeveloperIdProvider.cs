@@ -2,10 +2,13 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Azure.Core;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using AzureExtension.Controls.Pages;
 using AzureExtension.DataModel;
 using Microsoft.Identity.Client;
-using Microsoft.UI;
+using Microsoft.Identity.Client.AppConfig;
 using Serilog;
 using Windows.Foundation;
 
@@ -119,7 +122,6 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
             }
 
             _log.Information($"New DeveloperId logged in");
-            */
 
             var pca = PublicClientApplicationBuilder.Create(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ClientId)
                 .WithAuthority("https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47")
@@ -132,6 +134,52 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
 
             var devId = CreateOrUpdateDeveloperId(account.Account);
             return new DeveloperIdResult(devId);
+            */
+
+            string storageAccountName = "YOUR_STORAGE_ACCOUNT_NAME";
+            string containerName = "CONTAINER_NAME";
+
+            string appClientId = "YOUR_APP_CLIENT_ID";
+            string resourceTenantId = "YOUR_RESOURCE_TENANT_ID";
+            Uri authorityUri = new($"https://login.microsoftonline.com/{resourceTenantId}");
+            string miClientId = "YOUR_MI_CLIENT_ID";
+            string audience = "api://AzureADTokenExchange";
+
+            // Get mi token to use as assertion
+            var miAssertionProvider = async (AssertionRequestOptions _) =>
+            {
+                var miApplication = ManagedIdentityApplicationBuilder
+                    .Create(ManagedIdentityId.WithUserAssignedClientId(miClientId))
+                    .Build();
+
+                var miResult = await miApplication.AcquireTokenForManagedIdentity(audience)
+                    .ExecuteAsync()
+                    .ConfigureAwait(false);
+                return miResult.AccessToken;
+            };
+
+            // Create a confidential client application with the assertion.
+            IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(appClientId)
+              .WithAuthority(authorityUri, false)
+              .WithClientAssertion(miAssertionProvider)
+              .WithCacheOptions(CacheOptions.EnableSharedCacheOptions)
+              .Build();
+
+            // Get the federated app token for the storage account
+            string[] scopes = [$"https://{storageAccountName}.blob.core.windows.net/.default"];
+            AuthenticationResult result = await app.AcquireTokenForClient(scopes).ExecuteAsync().ConfigureAwait(false);
+
+            TokenCredential tokenCredential = new AccessTokenCredential(result.AccessToken);
+            var client = new BlobContainerClient(
+                new Uri($"https://{storageAccountName}.blob.core.windows.net/{containerName}"),
+                tokenCredential);
+
+            await foreach (BlobItem blob in containerClient.GetBlobsAsync())
+            {
+                // TODO: perform operations with the blobs
+                BlobClient blobClient = containerClient.GetBlobClient(blob.Name);
+                Console.WriteLine($"Blob name: {blobClient.Name}, URI: {blobClient.Uri}");
+            }
         }).AsAsyncOperation();
     }
 
