@@ -104,9 +104,11 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
 
     public IAsyncOperation<DeveloperIdResult> ShowLogonSession()
     {
-        return Task.Run(() =>
+        return Task.Run(async () =>
         {
-            _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsync();
+            /*
+            var windowPtr = GetConsoleOrTerminalWindow();
+            await _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(windowPtr);
             var account = _developerIdAuthenticationHelper.LoginDeveloperAccount(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
 
             if (account.Result == null)
@@ -116,8 +118,19 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
                 return new DeveloperIdResult(exception, "An issue has occurred with the authentication request");
             }
 
-            var devId = CreateOrUpdateDeveloperId(account.Result);
             _log.Information($"New DeveloperId logged in");
+            */
+
+            var pca = PublicClientApplicationBuilder.Create(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ClientId)
+                .WithAuthority("https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47")
+                .WithRedirectUri("http://localhost")
+                .Build();
+
+            var account = await pca.AcquireTokenInteractive(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray)
+                .WithUseEmbeddedWebView(false)
+                .ExecuteAsync();
+
+            var devId = CreateOrUpdateDeveloperId(account.Account);
             return new DeveloperIdResult(devId);
         }).AsAsyncOperation();
     }
