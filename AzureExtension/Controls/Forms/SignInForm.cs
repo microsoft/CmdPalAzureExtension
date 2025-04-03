@@ -26,11 +26,19 @@ public partial class SignInForm : FormContent, IAzureForm
     private string IsButtonEnabled =>
         _isButtonEnabled.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture);
 
+    private Page? page;
+
     public SignInForm(IDeveloperIdProvider developerIdProvider)
     {
         _developerIdProvider = developerIdProvider;
         _developerIdProvider.OAuthRedirected += DeveloperIdProvider_OAuthRedirected;
         SignOutForm.SignOutAction += SignOutForm_SignOutAction;
+        page = null;
+    }
+
+    public void SetPage(Page page)
+    {
+        this.page = page;
     }
 
     private void SignOutForm_SignOutAction(object? sender, SignInStatusChangedEventArgs e)
@@ -96,6 +104,11 @@ public partial class SignInForm : FormContent, IAzureForm
     private async Task<bool> HandleSignIn()
     {
         var numPreviousDevIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal().Count();
+
+        if (page is null)
+        {
+            throw new InvalidOperationException("Page is not set.");
+        }
 
         await _developerIdProvider.ShowLogonSession();
 
