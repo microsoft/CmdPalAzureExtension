@@ -105,10 +105,8 @@ public partial class SignInForm : FormContent, IAzureForm
     {
         var numPreviousDevIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal().Count();
 
-        await _developerIdProvider.ShowLogonSession();
+        var result = await _developerIdProvider.ShowLogonSession();
 
-        var numDevIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal().Count();
-
-        return numDevIds > numPreviousDevIds;
+        return result != null;
     }
 }

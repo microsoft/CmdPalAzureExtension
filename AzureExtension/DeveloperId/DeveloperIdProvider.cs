@@ -2,22 +2,11 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Runtime.InteropServices;
-using Azure.Core;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using AzureExtension.Controls.Pages;
 using AzureExtension.DataModel;
 using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.AppConfig;
-using Microsoft.UI;
-using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Serilog;
 using Windows.Foundation;
-using WinRT.Interop;
 
 namespace AzureExtension.DeveloperId;
 
@@ -33,9 +22,6 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     {
         get; set;
     }
-
-    [DllImport("user32.dll")]
-    private static extern IntPtr GetForegroundWindow();
 
     private readonly IAuthenticationHelper _developerIdAuthenticationHelper;
 
@@ -117,104 +103,23 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
 
     public IAsyncOperation<DeveloperIdResult> ShowLogonSession()
     {
-        return (IAsyncOperation<DeveloperIdResult>)Task.Run(async () =>
+        return Task.Run(async () =>
         {
-            var hWnd = GetForegroundWindow();
-            await _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(hWnd);
-            var account = _developerIdAuthenticationHelper.LoginDeveloperAccount(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
+            await _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsyncWithParentWindow();
+            var account = await _developerIdAuthenticationHelper.LoginDeveloperAccount(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
 
-            if (account.Result == null)
+            if (account == null)
             {
                 _log.Error($"Invalid AuthRequest");
                 var exception = new InvalidOperationException();
                 return new DeveloperIdResult(exception, "An issue has occurred with the authentication request");
             }
 
+            var devId = CreateOrUpdateDeveloperId(account);
             _log.Information($"New DeveloperId logged in");
-
-            var devId = CreateOrUpdateDeveloperId(account.Result);
             return new DeveloperIdResult(devId);
-        });
+        }).AsAsyncOperation();
     }
-
-    /*
-public IAsyncOperation<DeveloperIdResult> ShowLogonSession()
-{
-return Task.Run(async () =>
-{
-var windowPtr = GetConsoleOrTerminalWindow();
-await _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(windowPtr);
-var account = _developerIdAuthenticationHelper.LoginDeveloperAccount(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
-
-if (account.Result == null)
-{
-    _log.Error($"Invalid AuthRequest");
-    var exception = new InvalidOperationException();
-    return new DeveloperIdResult(exception, "An issue has occurred with the authentication request");
-}
-
-_log.Information($"New DeveloperId logged in");
-
-var pca = PublicClientApplicationBuilder.Create(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ClientId)
-    .WithAuthority("https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47")
-    .WithRedirectUri("http://localhost")
-    .Build();
-
-var account2 = await pca.AcquireTokenInteractive(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray)
-    .WithUseEmbeddedWebView(false)
-    .ExecuteAsync();
-
-var devId = CreateOrUpdateDeveloperId(account2.Account);
-return new DeveloperIdResult(devId);
-
-// New stuff
-string storageAccountName = "YOUR_STORAGE_ACCOUNT_NAME";
-string containerName = "CONTAINER_NAME";
-
-string appClientId = "ec33db7f-5b7e-4061-b729-8dab727cc764";
-string resourceTenantId = "72f988bf-86f1-41af-91ab-2d7cd011db47";
-Uri authorityUri = new($"https://login.microsoftonline.com/{resourceTenantId}");
-string miClientId = "YOUR_MI_CLIENT_ID";
-string audience = "api://AzureADTokenExchange";
-
-// Get mi token to use as assertion
-var miAssertionProvider = async (AssertionRequestOptions _) =>
-{
-    var miApplication = ManagedIdentityApplicationBuilder
-        .Create(ManagedIdentityId.WithUserAssignedClientId(miClientId))
-        .Build();
-
-    var miResult = await miApplication.AcquireTokenForManagedIdentity(audience)
-        .ExecuteAsync()
-        .ConfigureAwait(false);
-    return miResult.AccessToken;
-};
-
-// Create a confidential client application with the assertion.
-IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(appClientId)
-  .WithAuthority(authorityUri, false)
-  .WithClientAssertion(miAssertionProvider)
-  .WithCacheOptions(CacheOptions.EnableSharedCacheOptions)
-  .Build();
-
-// Get the federated app token for the storage account
-string[] scopes = [$"https://{storageAccountName}.blob.core.windows.net/.default"];
-AuthenticationResult result = await app.AcquireTokenForClient(scopes).ExecuteAsync().ConfigureAwait(false);
-
-TokenCredential tokenCredential = new AccessTokenCredential(result.AccessToken);
-var client = new BlobContainerClient(
-    new Uri($"https://{storageAccountName}.blob.core.windows.net/{containerName}"),
-    tokenCredential);
-
-await foreach (BlobItem blob in containerClient.GetBlobsAsync())
-{
-    // TODO: perform operations with the blobs
-    BlobClient blobClient = containerClient.GetBlobClient(blob.Name);
-    Console.WriteLine($"Blob name: {blobClient.Name}, URI: {blobClient.Uri}");
-}
-
-}).AsAsyncOperation();
-}*/
 
     public ProviderOperationResult LogoutDeveloperId(IDeveloperId developerId)
     {
@@ -425,10 +330,5 @@ await foreach (BlobItem blob in containerClient.GetBlobsAsync())
     {
         OAuthRedirected?.Invoke(this, null);
         throw new NotImplementedException();
-    }
-
-    public static IntPtr GetForegroundWindowHandle()
-    {
-        return GetForegroundWindow();
     }
 }

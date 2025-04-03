@@ -20,7 +20,7 @@ public interface IAuthenticationHelper
 
     public Task<IEnumerable<string>> GetAllStoredLoginIdsAsync();
 
-    public Task InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(IntPtr windowPtr);
+    public Task InitializePublicClientAppForWAMBrokerAsyncWithParentWindow();
 
     public Task<IAccount?> LoginDeveloperAccount(string[] scopes);
 

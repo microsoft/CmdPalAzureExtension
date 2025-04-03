@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
+using System.Runtime.InteropServices;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Broker;
 using Microsoft.Identity.Client.Extensions.Msal;
@@ -44,11 +45,15 @@ public class AuthenticationHelper : IAuthenticationHelper
 
     private static readonly ILogger _log = _logger.Value;
 
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
     public AuthenticationHelper()
     {
         MicrosoftEntraIdSettings = new AuthenticationSettings();
 
         InitializePublicClientApplicationBuilder();
+
         InitializePublicClientAppForWAMBrokerAsync();
     }
 
@@ -72,7 +77,7 @@ public class AuthenticationHelper : IAuthenticationHelper
             PublicClientApplicationBuilder.WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows)
             {
                 MsaPassthrough = true,
-                Title = "AzureExtension",
+                Title = "DevHomeAzureExtension",
             });
 
             PublicClientApplication = PublicClientApplicationBuilder.Build();
@@ -87,17 +92,18 @@ public class AuthenticationHelper : IAuthenticationHelper
         await TokenCacheRegistration();
     }
 
-    public async Task InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(IntPtr windowPtr)
+    public async Task InitializePublicClientAppForWAMBrokerAsyncWithParentWindow()
     {
         if (PublicClientApplicationBuilder != null)
         {
+            var windowHandle = GetForegroundWindow();
             var builder = PublicClientApplicationBuilder
-                .WithParentActivityOrWindow(() => { return windowPtr; });
+                .WithParentActivityOrWindow(() => { return windowHandle; });
 
             builder = builder.WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows)
             {
                 MsaPassthrough = true,
-                Title = "Command Palette Azure Extension",
+                Title = "Dev Home Azure Extension",
             });
 
             PublicClientApplication = PublicClientApplicationBuilder.Build();
