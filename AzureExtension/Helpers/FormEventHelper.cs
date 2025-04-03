@@ -44,8 +44,16 @@ public static class FormEventHelper
         }
         else
         {
-            SetStatusMessage(statusMessage, successMessage, MessageState.Success);
-            ToastStatusMessage(statusMessage);
+            if (args != null && args.Status)
+            {
+                SetStatusMessage(statusMessage, successMessage, MessageState.Success);
+                ToastStatusMessage(statusMessage);
+            }
+            else
+            {
+                SetStatusMessage(statusMessage, errorMessage, MessageState.Error);
+                ToastStatusMessage(statusMessage);
+            }
         }
     }
 

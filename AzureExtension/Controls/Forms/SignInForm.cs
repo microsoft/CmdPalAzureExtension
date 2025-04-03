@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
+using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using CommandPaletteAzureExtension.Helpers;
@@ -81,11 +82,11 @@ public partial class SignInForm : FormContent, IAzureForm
     public override ICommandResult SubmitForm(string inputs, string data)
     {
         LoadingStateChanged?.Invoke(this, true);
-        Task.Run(() =>
+        Task.Run(async () =>
         {
             try
             {
-                var signInSucceeded = HandleSignIn().Result;
+                var signInSucceeded = await HandleSignIn();
                 LoadingStateChanged?.Invoke(this, false);
                 SignInAction?.Invoke(this, new SignInStatusChangedEventArgs(signInSucceeded, null));
                 FormSubmitted?.Invoke(this, new FormSubmitEventArgs(signInSucceeded, null));
@@ -105,8 +106,14 @@ public partial class SignInForm : FormContent, IAzureForm
     {
         var numPreviousDevIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal().Count();
 
-        var result = await _developerIdProvider.ShowLogonSession();
+        var developerIdResult = await _developerIdProvider.ShowLogonSession();
 
-        return result != null;
+        if (developerIdResult.Result.Status == ProviderOperationStatus.Failure)
+        {
+            var errorMessage = $"{developerIdResult.Result.DisplayMessage} - {developerIdResult.Result.DiagnosticText}";
+            throw new InvalidOperationException(developerIdResult.Result.DisplayMessage);
+        }
+
+        return developerIdResult.Result.Status == ProviderOperationStatus.Success;
     }
 }
