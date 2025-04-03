@@ -63,9 +63,9 @@ public class AuthenticationSettings
     public void InitializeSettings()
     {
         Authority = "https://login.microsoftonline.com/organizations";
-        ClientId = "ec33db7f-5b7e-4061-b729-8dab727cc764";
+        ClientId = "318b152a-4c0e-4050-879d-5e98031c4ccf";
         TenantId = string.Empty;
-        RedirectURI = "devhome://oauth_redirect_uri/";
+        RedirectURI = "ms-appx-web://microsoft.aad.brokerplugin/{0}";
         CacheFileName = "msal_cache";
         CacheDir = ApplicationData.Current != null ? ApplicationData.Current.LocalFolder.Path : _cacheFolderPathDefault;
         Scopes = "https://graph.microsoft.com/User.Read";

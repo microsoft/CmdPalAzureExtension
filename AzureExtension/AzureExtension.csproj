@@ -81,6 +81,7 @@
 		<PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.322" />
 	</ItemGroup>
 	<ItemGroup>
+		<Folder Include="Configuration\" />
 		<Folder Include="Controls\Templates\" />
 	</ItemGroup>
 	<ItemGroup>

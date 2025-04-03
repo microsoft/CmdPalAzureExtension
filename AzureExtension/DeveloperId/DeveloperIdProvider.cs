@@ -132,16 +132,7 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
 
             _log.Information($"New DeveloperId logged in");
 
-            var pca = PublicClientApplicationBuilder.Create(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ClientId)
-                .WithAuthority("https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47")
-                .WithRedirectUri("http://localhost")
-                .Build();
-
-            var account2 = await pca.AcquireTokenInteractive(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray)
-                .WithUseEmbeddedWebView(false)
-                .ExecuteAsync();
-
-            var devId = CreateOrUpdateDeveloperId(account2.Account);
+            var devId = CreateOrUpdateDeveloperId(account.Result);
             return new DeveloperIdResult(devId);
         });
     }
