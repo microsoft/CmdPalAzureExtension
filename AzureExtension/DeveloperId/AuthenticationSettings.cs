@@ -62,7 +62,7 @@ public class AuthenticationSettings
 
     public void InitializeSettings()
     {
-        Authority = "https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47";
+        Authority = "https://login.microsoftonline.com/organizations";
         ClientId = "ec33db7f-5b7e-4061-b729-8dab727cc764";
         TenantId = string.Empty;
         RedirectURI = "devhome://oauth_redirect_uri/";

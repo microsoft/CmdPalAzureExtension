@@ -119,11 +119,8 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     {
         return (IAsyncOperation<DeveloperIdResult>)Task.Run(async () =>
         {
-            // var experiment = page.XamlRoot;
-            // var id = experiment.ContentIslandEnvironment.AppWindowId;
-            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
-            await _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(windowId);
+            var hWnd = GetForegroundWindow();
+            await _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(hWnd);
             var account = _developerIdAuthenticationHelper.LoginDeveloperAccount(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
 
             if (account.Result == null)

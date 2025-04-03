@@ -49,8 +49,7 @@ public class AuthenticationHelper : IAuthenticationHelper
         MicrosoftEntraIdSettings = new AuthenticationSettings();
 
         InitializePublicClientApplicationBuilder();
-
-        // InitializePublicClientAppForWAMBrokerAsync();
+        InitializePublicClientAppForWAMBrokerAsync();
     }
 
     public void InitializePublicClientApplicationBuilder()
@@ -88,18 +87,17 @@ public class AuthenticationHelper : IAuthenticationHelper
         await TokenCacheRegistration();
     }
 
-    public async Task InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(WindowId? windowPtr)
+    public async Task InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(IntPtr windowPtr)
     {
-        if (windowPtr != null && PublicClientApplicationBuilder != null)
+        if (PublicClientApplicationBuilder != null)
         {
-            var windowHandle = Win32Interop.GetWindowFromWindowId((WindowId)windowPtr);
             var builder = PublicClientApplicationBuilder
-                .WithParentActivityOrWindow(() => { return windowHandle; });
+                .WithParentActivityOrWindow(() => { return windowPtr; });
 
             builder = builder.WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows)
             {
                 MsaPassthrough = true,
-                Title = "Dev Home Azure Extension",
+                Title = "Command Palette Azure Extension",
             });
 
             PublicClientApplication = PublicClientApplicationBuilder.Build();

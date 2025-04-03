@@ -105,11 +105,6 @@ public partial class SignInForm : FormContent, IAzureForm
     {
         var numPreviousDevIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal().Count();
 
-        if (page is null)
-        {
-            throw new InvalidOperationException("Page is not set.");
-        }
-
         await _developerIdProvider.ShowLogonSession();
 
         var numDevIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal().Count();
