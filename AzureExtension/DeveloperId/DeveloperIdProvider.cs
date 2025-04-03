@@ -139,8 +139,8 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
             string storageAccountName = "YOUR_STORAGE_ACCOUNT_NAME";
             string containerName = "CONTAINER_NAME";
 
-            string appClientId = "YOUR_APP_CLIENT_ID";
-            string resourceTenantId = "YOUR_RESOURCE_TENANT_ID";
+            string appClientId = "ec33db7f-5b7e-4061-b729-8dab727cc764";
+            string resourceTenantId = "72f988bf-86f1-41af-91ab-2d7cd011db47";
             Uri authorityUri = new($"https://login.microsoftonline.com/{resourceTenantId}");
             string miClientId = "YOUR_MI_CLIENT_ID";
             string audience = "api://AzureADTokenExchange";
