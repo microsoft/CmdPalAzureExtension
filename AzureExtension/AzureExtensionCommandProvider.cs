@@ -15,10 +15,12 @@ namespace AzureExtension;
 public partial class AzureExtensionCommandProvider : CommandProvider
 {
     private readonly SignInPage _signInPage;
+    private readonly TestPage _testPage;
 
-    public AzureExtensionCommandProvider(SignInPage signInPage)
+    public AzureExtensionCommandProvider(SignInPage signInPage, TestPage testPage)
     {
         _signInPage = signInPage;
+        _testPage = testPage;
         DisplayName = "Azure Extension";
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
@@ -30,6 +32,11 @@ public partial class AzureExtensionCommandProvider : CommandProvider
     public override ICommandItem[] TopLevelCommands() => [new CommandItem(_signInPage)
     {
         Title = "Azure extension: sign in",
+        Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+    },
+    new CommandItem(_testPage)
+    {
+        Title = "Azure extension: test",
         Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
     }
     ];

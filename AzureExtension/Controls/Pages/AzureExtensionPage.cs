@@ -5,7 +5,6 @@
 using System.Text.Json.Nodes;
 using AzureExtension.Client;
 using AzureExtension.DataManager;
-using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using CommandPaletteAzureExtension.Helpers;

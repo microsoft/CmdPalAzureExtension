@@ -4,6 +4,7 @@
 
 using AzureExtension.Client;
 using AzureExtension.DataModel;
+using Microsoft.TeamFoundation.Build.WebApi;
 
 namespace AzureExtension;
 
@@ -36,6 +37,8 @@ public interface IAzureDataManager : IDisposable
     Identity GetIdentity(long id);
 
     WorkItemType GetWorkItemType(long id);
+
+    Task<IEnumerable<Build>> GetPipelineDataAsync(Uri projectUri);
 
     IEnumerable<Notification> GetNotifications(DateTime? since = null, bool includeToasted = false);
 

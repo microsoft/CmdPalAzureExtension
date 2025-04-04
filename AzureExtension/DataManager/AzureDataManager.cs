@@ -12,6 +12,7 @@ using AzureExtension.DataManager;
 using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
+using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
@@ -282,6 +283,39 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
         return GetPullRequests(repositoryUri.Organization, repositoryUri.Project, repositoryUri.Repository, developerId, view);
     }
 
+    public async Task<IEnumerable<Build>> GetPipelineDataAsync(Uri projectUri)
+    {
+        ValidateDataStore();
+        var developerId = _developerIdProvider.GetLoggedInDeveloperIdsInternal().FirstOrDefault();
+        if (developerId == null)
+        {
+            throw new ArgumentException($"DeveloperId was null.");
+        }
+
+        var connectionResult = GetConnection(projectUri, developerId);
+
+        if (connectionResult.Result != ResultType.Success)
+        {
+            if (connectionResult.Exception != null)
+            {
+                throw connectionResult.Exception;
+            }
+            else
+            {
+                throw new AzureAuthorizationException($"Failed getting connection: {projectUri} for {developerId.LoginId} with {connectionResult.Error}");
+            }
+        }
+
+        var buildClient = connectionResult.Connection!.GetClient<BuildHttpClient>();
+        if (buildClient == null)
+        {
+            throw new AzureClientException($"Failed getting BuildHttpClient for {developerId.LoginId} and {projectUri}");
+        }
+
+        // Example: Get a list of builds for a project
+        return await buildClient.GetBuildsAsync(projectUri.ToString());
+    }
+
     private async Task UpdateDataForQueriesAsync(DataStoreOperationParameters parameters)
     {
         _log.Debug($"Inside UpdateDataForQueriesAsync with Parameters: {parameters}");
@@ -431,7 +465,7 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
                 // System.Id is excluded from the query result.
                 workItemObjFields.Add(SystemIdFieldName, workItem.Id!);
 
-                var htmlUrl = Links.GetLinkHref(workItem.Links, "html");
+                var htmlUrl = Helpers.Links.GetLinkHref(workItem.Links, "html");
                 workItemObjFields.Add(WorkItemHtmlUrlFieldName, htmlUrl);
 
                 foreach (var field in parameters.RequestOptions.Fields)
