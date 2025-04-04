@@ -30,6 +30,7 @@ public partial class SignInPage : ContentPage
         // Wire up events using the helper
         FormEventHelper.WireFormEvents(_signInForm, this, _statusMessage, _successMessage, _errorMessage);
 
+        _signInForm.SetPage(this);
         _signInForm.PropChanged += UpdatePage;
 
         // Hide status message initially
