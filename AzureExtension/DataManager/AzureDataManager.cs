@@ -260,12 +260,6 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
         return WorkItemType.Get(DataStore, id);
     }
 
-    public IEnumerable<Notification> GetNotifications(DateTime? since = null, bool includeToasted = false)
-    {
-        ValidateDataStore();
-        return Notification.Get(DataStore, since, includeToasted);
-    }
-
     public PullRequests? GetPullRequests(string organization, string project, string repositoryName, string developerId, PullRequestView view)
     {
         ValidateDataStore();
@@ -812,18 +806,6 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
         _log.Debug($"PullRequest: {pullRequest.PullRequestId}  Status: {status}  Reason: {reason}");
         var prevStatus = PullRequestPolicyStatus.Get(DataStore, artifactId);
         var curStatus = PullRequestPolicyStatus.Add(DataStore, pullRequest, artifactId, projectId, repositoryId, status, reason, htmlUrl);
-
-        if (ShouldCreateRejectedNotification(curStatus, prevStatus))
-        {
-            _log.Information($"Creating Rejected Notification for {curStatus}");
-            Notification.Create(DataStore, curStatus, NotificationType.PullRequestRejected);
-        }
-
-        if (ShouldCreateApprovalNotification(curStatus, prevStatus))
-        {
-            _log.Information($"Creating Approved Notification for {curStatus}");
-            Notification.Create(DataStore, curStatus, NotificationType.PullRequestApproved);
-        }
     }
 
     private bool ShouldCreateRejectedNotification(PullRequestPolicyStatus curStatus, PullRequestPolicyStatus? prevStatus)
@@ -1086,7 +1068,6 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
         Query.DeleteBefore(DataStore, DateTime.UtcNow - _dataRetentionTime);
         PullRequests.DeleteBefore(DataStore, DateTime.UtcNow - _dataRetentionTime);
         WorkItemType.DeleteBefore(DataStore, DateTime.UtcNow - _dataRetentionTime);
-        Notification.DeleteBefore(DataStore, DateTime.UtcNow - _notificationRetentionTime);
         PullRequestPolicyStatus.DeleteBefore(DataStore, DateTime.UtcNow - _pullRequestStatusRetentionTime);
 
         // The following are not yet pruned, need to ensure there are no current key references

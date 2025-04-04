@@ -7,10 +7,11 @@ using AzureExtension.Controls.Pages;
 using AzureExtension.DataManager;
 using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
-using CommandPaletteAzureExtension.Helpers;
+using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Windows.ApplicationModel.Resources;
 using Microsoft.Windows.AppLifecycle;
 using Serilog;
 using Shmuelie.WinRTServer;
@@ -132,8 +133,12 @@ public sealed class Program
 
         // Add an update whenever CacheManager is updated.
         // cacheManager.OnUpdate += HandleCacheUpdate;
+        var path = ResourceLoader.GetDefaultResourceFilePath();
+        var resourceLoader = new ResourceLoader(path);
+        var resources = new Resources(resourceLoader);
+
         var signInForm = new SignInForm(devIdProvider);
-        var signInPage = new SignInPage(signInForm, new StatusMessage(), Resources.GetResource("Message_Sign_In_Success"), Resources.GetResource("Message_Sign_In_Fail"), devIdProvider);
+        var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"), devIdProvider);
 
         var commandProvider = new AzureExtensionCommandProvider(signInPage);
 
@@ -165,8 +170,8 @@ public sealed class Program
         {
               "MicrosoftWindows.Client.WebExperience_cw5n1h2txyewy",
               "Microsoft.Windows.CommandPalette_8wekyb3d8bbwe",
-              "Microsoft.Windows.CommandPaletteAzureExtension_8wekyb3d8bbwe",
-              "Microsoft.Windows.CommandPaletteAzureExtension.Dev_8wekyb3d8bbwe",
+              "Microsoft.Windows.AzureExtension_8wekyb3d8bbwe",
+              "Microsoft.Windows.AzureExtension.Dev_8wekyb3d8bbwe",
         };
 
         try

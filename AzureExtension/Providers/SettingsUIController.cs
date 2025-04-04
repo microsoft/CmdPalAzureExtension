@@ -10,7 +10,6 @@ using AzureExtension.Controls.Pages;
 using AzureExtension.DataManager;
 using AzureExtension.DataModel;
 using AzureExtension.Helpers;
-using CommandPaletteAzureExtension.Helpers;
 using Serilog;
 using Windows.Foundation;
 
@@ -24,6 +23,8 @@ internal sealed class SettingsUIController : IExtensionAdaptiveCardSession
 
     private readonly CacheManager _cacheManager;
 
+    private readonly IResources _resources;
+
     private static readonly string _notificationsEnabledString = "NotificationsEnabled";
 
     private string? _template;
@@ -36,9 +37,10 @@ internal sealed class SettingsUIController : IExtensionAdaptiveCardSession
         _settingsUI?.Update(null, null, null);
     }
 
-    public SettingsUIController(CacheManager cacheManager)
+    public SettingsUIController(CacheManager cacheManager, IResources resources)
     {
         _cacheManager = cacheManager;
+        _resources = resources;
     }
 
     public ProviderOperationResult Initialize(IExtensionAdaptiveCard extensionUI)
@@ -103,7 +105,7 @@ internal sealed class SettingsUIController : IExtensionAdaptiveCardSession
         try
         {
             var notificationsEnabled = LocalSettings.ReadSettingAsync<string>(_notificationsEnabledString).Result ?? "true";
-            var notificationsEnabledString = (notificationsEnabled == "true") ? Resources.GetResource("Settings_NotificationsEnabled", _log) : Resources.GetResource("Settings_NotificationsDisabled", _log);
+            var notificationsEnabledString = (notificationsEnabled == "true") ? _resources.GetResource("Settings_NotificationsEnabled", _log) : _resources.GetResource("Settings_NotificationsDisabled", _log);
 
             var lastUpdated = _cacheManager.LastUpdated;
             var lastUpdatedString = $"Last updated: {lastUpdated.ToString(CultureInfo.InvariantCulture)}";
@@ -112,7 +114,7 @@ internal sealed class SettingsUIController : IExtensionAdaptiveCardSession
                 lastUpdatedString = "Last updated: never";
             }
 
-            var updateAzureDataString = Resources.GetResource("Settings_UpdateData", _log);
+            var updateAzureDataString = _resources.GetResource("Settings_UpdateData", _log);
             if (_cacheManager.UpdateInProgress)
             {
                 updateAzureDataString = "Update in progress";
@@ -149,7 +151,7 @@ internal sealed class SettingsUIController : IExtensionAdaptiveCardSession
         {
             var path = Path.Combine(AppContext.BaseDirectory, @"Providers\SettingsCardTemplate.json");
             var template = File.ReadAllText(path, Encoding.Default) ?? throw new FileNotFoundException(path);
-            template = Resources.ReplaceIdentifiers(template, GetSettingsCardResourceIdentifiers(), _log);
+            template = _resources.ReplaceIdentifiers(template, GetSettingsCardResourceIdentifiers(), _log);
             _log.Debug($"Caching template");
             _template = template;
             return _template;

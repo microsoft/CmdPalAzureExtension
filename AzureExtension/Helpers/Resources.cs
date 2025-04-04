@@ -2,27 +2,26 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Globalization;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Serilog;
 
-namespace CommandPaletteAzureExtension.Helpers;
+namespace AzureExtension.Helpers;
 
-public static class Resources
+public class Resources : IResources
 {
     private const int MaxBufferLength = 1024;
 
-    private static ResourceLoader? _resourceLoader;
+    private readonly ResourceLoader _resourceLoader;
 
-    public static string GetResource(string identifier, ILogger? log = null)
+    public Resources(ResourceLoader resourceLoader)
+    {
+        _resourceLoader = resourceLoader;
+    }
+
+    public string GetResource(string identifier, ILogger? log = null)
     {
         try
         {
-            if (_resourceLoader == null)
-            {
-                _resourceLoader = new ResourceLoader(ResourceLoader.GetDefaultResourceFilePath());
-            }
-
             return _resourceLoader.GetString(identifier);
         }
         catch (Exception ex)
@@ -34,33 +33,10 @@ public static class Resources
         }
     }
 
-    /// <summary>
-    /// Gets the localized string of a resource key.
-    /// </summary>
-    /// <param name="key">Resource key.</param>
-    /// <param name="args">Placeholder arguments.</param>
-    /// <returns>Localized value, or resource key if the value is empty or an exception occurred.</returns>
-    public static string GetResource(string key, params object[] args)
-    {
-        string value;
-
-        try
-        {
-            value = GetResource(key);
-            value = string.Format(CultureInfo.CurrentCulture, value, args);
-        }
-        catch
-        {
-            value = string.Empty;
-        }
-
-        return string.IsNullOrEmpty(value) ? key : value;
-    }
-
     // Replaces all identifiers in the provided list in the target string. Assumes all identifiers
     // are wrapped with '%' to prevent sub-string replacement errors. This is intended for strings
     // such as a JSON string with resource identifiers embedded.
-    public static string ReplaceIdentifiers(string str, string[] resourceIdentifiers, ILogger? log = null)
+    public string ReplaceIdentifiers(string str, string[] resourceIdentifiers, ILogger? log = null)
     {
         var start = DateTime.UtcNow;
         foreach (var identifier in resourceIdentifiers)
@@ -75,54 +51,11 @@ public static class Resources
         log?.Debug($"Replaced identifiers in {elapsed.TotalMilliseconds}ms");
         return str;
     }
+}
 
-    // These are all the string identifiers that appear in widgets.
-    public static string[] GetWidgetResourceIdentifiers()
-    {
-        return
-        [
-            "Extension_Name/Azure",
-            "Widget_Template/Loading",
-            "Widget_Template/Updated",
-            "Widget_Template_Tooltip/Submit",
-            "Widget_Template_Button/Submit",
-            "Widget_Template_Button/SignIn",
-            "Widget_Template_Tooltip/SignIn",
-            "Widget_Template/SignInRequired",
-            "Widget_Template_Button/Save",
-            "Widget_Template_Button/Cancel",
-            "Widget_Template_Tooltip/Save",
-            "Widget_Template_Tooltip/Cancel",
-            "Widget_Template/PRCreated",
-            "Widget_Template/PRInto",
-            "Widget_Template/ChooseAccountPlaceholder",
-            "Widget_Template_Tooltip/ClickWorkItem",
-            "Widget_Template_Tooltip/ClickPullRequest",
-            "Widget_Template/RepositoryURLLabel",
-            "Widget_Template/EnterURLPlaceholder",
-            "Widget_Template_ErrorMessage/RepositoryURL",
-            "Widget_Template/PRMine",
-            "Widget_Template/PRAssigned",
-            "Widget_Template/PRAll",
-            "Widget_Template/PRDefaultView",
-            "Widget_Template_ErrorMessage/QueryURL",
-            "Widget_Template/QueryURLLabel",
-            "Widget_Template/WidgetTitlePlaceholder",
-            "Widget_Template/WidgetTitleLabel",
-            "Widget_Template/NumberOfTiles",
-            "Widget_Template_Button/AddTile",
-            "Widget_Template_Button/RemoveTile",
-            "Widget_Template/CanBePinned",
-            "Widget_Template/WorkItems",
-            "Widget_Template_Tooltip/ClickTile",
-            "Widget_Template/EmptyWorkItems",
-            "Widget_Template/NotShownItems",
-            "Widget_Template/ContentLoading",
-        ];
-    }
+public interface IResources
+{
+    string GetResource(string identifier, ILogger? log = null);
 
-    public interface IResources
-    {
-        string GetResource(string identifier, ILogger? log = null);
-    }
+    string ReplaceIdentifiers(string str, string[] resourceIdentifiers, ILogger? log = null);
 }

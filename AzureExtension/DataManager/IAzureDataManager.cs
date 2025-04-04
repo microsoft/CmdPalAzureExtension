@@ -37,8 +37,6 @@ public interface IAzureDataManager : IDisposable
 
     WorkItemType GetWorkItemType(long id);
 
-    IEnumerable<Notification> GetNotifications(DateTime? since = null, bool includeToasted = false);
-
     IEnumerable<Repository> GetRepositories();
 
     IEnumerable<Repository> GetDeveloperRepositories();

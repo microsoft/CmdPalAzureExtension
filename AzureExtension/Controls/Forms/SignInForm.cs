@@ -6,7 +6,6 @@ using System.Globalization;
 using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
-using CommandPaletteAzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 

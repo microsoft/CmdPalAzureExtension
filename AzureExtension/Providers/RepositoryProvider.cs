@@ -7,7 +7,6 @@ using AzureExtension.Client;
 using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
-using CommandPaletteAzureExtension.Helpers;
 using Microsoft.Identity.Client;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
@@ -28,6 +27,8 @@ public class RepositoryProvider : IRepositoryProvider2, IDisposable
 
     private readonly IDeveloperIdProvider _developerIdProvider;
 
+    private readonly IResources _resources;
+
     private AzureRepositoryHierarchy? _azureHierarchy;
 
     private string _serverToSearch = string.Empty;
@@ -42,7 +43,7 @@ public class RepositoryProvider : IRepositoryProvider2, IDisposable
 
     private const string Project = "project";
 
-    public string DisplayName => Resources.GetResource(@"RepositoryProviderDisplayName");
+    public string DisplayName => _resources.GetResource(@"RepositoryProviderDisplayName");
 
     public IRandomAccessStreamReference Icon
     {
@@ -51,20 +52,22 @@ public class RepositoryProvider : IRepositoryProvider2, IDisposable
 
     public string[] SearchFieldNames => [Server, Organization];
 
-    public string AskToSearchLabel => Resources.GetResource(@"SelectionOptionsPrompt");
+    public string AskToSearchLabel => _resources.GetResource(@"SelectionOptionsPrompt");
 
     public bool IsSearchingSupported => true;
 
-    private RepositoryProvider(IRandomAccessStreamReference icon, IDeveloperIdProvider developerIdProvider)
+    private RepositoryProvider(IRandomAccessStreamReference icon, IDeveloperIdProvider developerIdProvider, IResources resources)
     {
         Icon = icon;
         _developerIdProvider = developerIdProvider;
+        _resources = resources;
     }
 
-    public RepositoryProvider(IDeveloperIdProvider developerIdProvider)
+    public RepositoryProvider(IDeveloperIdProvider developerIdProvider, IResources resources)
         : this(
             RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///AzureExtension/Assets/AzureExtensionDark.png")),
-            developerIdProvider)
+            developerIdProvider,
+            resources)
     {
     }
 
