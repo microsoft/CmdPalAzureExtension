@@ -21,6 +21,8 @@ public partial class SignInPage : ContentPage
 
     public SignInPage(SignInForm signInForm, StatusMessage statusMessage, string successMessage, string errorMessage, IDeveloperIdProvider developerIdProvider)
     {
+        Title = "Sign in";
+        Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
         _developerIdProvider = developerIdProvider;
         _signInForm = signInForm;
         _statusMessage = statusMessage;

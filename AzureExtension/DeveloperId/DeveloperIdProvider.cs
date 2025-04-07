@@ -331,4 +331,9 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
         OAuthRedirected?.Invoke(this, null);
         throw new NotImplementedException();
     }
+
+    public bool IsSignedIn()
+    {
+        return DeveloperIds.Count > 0;
+    }
 }

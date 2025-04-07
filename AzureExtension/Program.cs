@@ -139,8 +139,10 @@ public sealed class Program
 
         var signInForm = new SignInForm(devIdProvider);
         var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"), devIdProvider);
+        var signOutForm = new SignOutForm(devIdProvider, resources);
+        var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"));
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage);
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, devIdProvider);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 

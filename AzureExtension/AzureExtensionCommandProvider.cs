@@ -15,9 +15,15 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 {
     private readonly SignInPage _signInPage;
 
-    public AzureExtensionCommandProvider(SignInPage signInPage)
+    private readonly SignOutPage _signOutPage;
+
+    private readonly IDeveloperIdProvider _developerIdProvider;
+
+    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IDeveloperIdProvider developerIdProvider)
     {
         _signInPage = signInPage;
+        _signOutPage = signOutPage;
+        _developerIdProvider = developerIdProvider;
         DisplayName = "Azure Extension";
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
@@ -26,10 +32,31 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         var authenticationHelper = new AuthenticationHelper();
     }
 
-    public override ICommandItem[] TopLevelCommands() => [new CommandItem(_signInPage)
+    public override ICommandItem[] TopLevelCommands()
     {
-        Title = "Azure extension: sign in",
-        Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+        if (_developerIdProvider.IsSignedIn())
+        {
+            return new ICommandItem[]
+            {
+                new CommandItem(_signOutPage)
+                {
+                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                    Title = "Sign out",
+                    Subtitle = "Sign out of your Azure DevOps account",
+                },
+            };
+        }
+        else
+        {
+            return new ICommandItem[]
+            {
+                new CommandItem(_signInPage)
+                {
+                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                    Title = "Sign in",
+                    Subtitle = "Sign into your Azure DevOps account",
+                },
+            };
+        }
     }
-    ];
 }
