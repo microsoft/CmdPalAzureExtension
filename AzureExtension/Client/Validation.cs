@@ -6,7 +6,7 @@ using Serilog;
 
 namespace AzureExtension.Client;
 
-// Validation layer to help parsing GitHub URL.
+// Validation layer to help parsing Azure URL.
 public static class Validation
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", nameof(Validation)));
