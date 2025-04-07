@@ -74,9 +74,15 @@ public partial class SavedSearchesPage : ListPage
 
     public override IListItem[] GetItems()
     {
-        var items = _searchPages
-            .Select(searchPage => searchPage.GetListItem(searchPage.CurrentSearch))
-            .ToList();
+        List<ListItem> items = new List<ListItem>();
+        foreach (var searchPage in _searchPages)
+        {
+            items.Add(new ListItem(searchPage)
+            {
+                Title = searchPage.Name,
+                Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+            });
+        }
 
         var iListItems = items
             .Select(item => item as IListItem)

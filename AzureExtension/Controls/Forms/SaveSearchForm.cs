@@ -123,7 +123,7 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
             var selectedQueryId = queryInfo.AzureUri.Query;   // This will be empty string if invalid query.
         }
 
-        return new SearchCandidate(enteredSearch, name, isTopLevel);
+        return new SearchCandidate(name, enteredSearch, isTopLevel);
     }
 
     public bool GetIsTopLevel()
