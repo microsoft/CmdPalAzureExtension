@@ -23,11 +23,14 @@ public partial class SavedSearchesPage : ListPage
 
     private IDeveloperIdProvider? _developerIdProvider;
 
+    private AzureDataManager _azureDataManager;
+
     public SavedSearchesPage(
        IResources resources,
        IListItem addSearchListItem,
        SavedSearchesMediator savedSearchesMediator,
-       IDeveloperIdProvider developerIdProvider)
+       IDeveloperIdProvider developerIdProvider,
+       AzureDataManager azureDataManager)
     {
         _resources = resources;
 
@@ -40,6 +43,7 @@ public partial class SavedSearchesPage : ListPage
         _savedSearchesMediator.SearchSaved += OnSearchSaved;
         _searchPages = new List<SearchPage<object>>();
         _developerIdProvider = developerIdProvider;
+        _azureDataManager = azureDataManager;
     }
 
     private void OnSearchRemoved(object? sender, object? args)
@@ -107,7 +111,8 @@ public partial class SavedSearchesPage : ListPage
             _searchPages.Add(new SearchPage<object>(
                 searchCandidate,
                 _resources,
-                _developerIdProvider!));
+                _developerIdProvider!,
+                _azureDataManager));
             RaiseItemsChanged(0);
         }
 

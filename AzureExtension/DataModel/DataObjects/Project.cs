@@ -62,7 +62,7 @@ public class Project
 
     public override string ToString() => Name;
 
-    private static Project CreateFromTeamProject(TeamProject project, long organizationId)
+    public static Project CreateFromTeamProject(TeamProject project, long organizationId)
     {
         return new Project
         {

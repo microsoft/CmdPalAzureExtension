@@ -15,17 +15,19 @@ public class SearchPageFactory : ISearchPageFactory
     private readonly IResources _resources;
     private readonly SavedSearchesMediator _savedSearchesMediator;
     private readonly IDeveloperIdProvider _developerIdProvider;
+    private readonly AzureDataManager _azureDataManager;
 
-    public SearchPageFactory(IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
+    public SearchPageFactory(IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider, AzureDataManager azureDataManager)
     {
         _resources = resources;
         _savedSearchesMediator = savedSearchesMediator;
         _developerIdProvider = developerIdProvider;
+        _azureDataManager = azureDataManager;
     }
 
     private ListPage CreatePageForSearch(ISearch search)
     {
-        return new SearchPage<object>(search, _resources, _developerIdProvider);
+        return new SearchPage<object>(search, _resources, _developerIdProvider, _azureDataManager);
     }
 
     public IListItem CreateItemForSearch(ISearch search)

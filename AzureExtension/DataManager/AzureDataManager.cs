@@ -276,6 +276,126 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
         return GetPullRequests(repositoryUri.Organization, repositoryUri.Project, repositoryUri.Repository, developerId, view);
     }
 
+    public async Task<List<TFModels.WorkItem>> GetWorkItemsAsync(AzureUri queryUri, IDeveloperId developerId)
+    {
+        if (!queryUri!.IsQuery)
+        {
+            throw new ArgumentException($"Query is not a valid Uri Query: {queryUri}");
+        }
+
+        var result = GetConnection(queryUri.Connection, developerId);
+        if (result.Result != ResultType.Success)
+        {
+            if (result.Exception != null)
+            {
+                throw result.Exception;
+            }
+            else
+            {
+                throw new AzureAuthorizationException($"Failed getting connection: {queryUri.Connection} for {developerId.LoginId} with {result.Error}");
+            }
+        }
+
+        var witClient = result.Connection!.GetClient<WorkItemTrackingHttpClient>();
+        if (witClient == null)
+        {
+            throw new AzureClientException($"Failed getting WorkItemTrackingHttpClient for {developerId.LoginId} and {queryUri.Connection}");
+        }
+
+        // Good practice to only create data after we know the client is valid, but any exceptions
+        // will roll back the transaction.
+        var org = Organization.Create(result.Connection.Uri);
+        if (org == null)
+        {
+            throw new DataStoreException($"Organization.GetOrCreate failed for: {queryUri.Connection}");
+        }
+
+        var teamProject = GetTeamProject(queryUri.Project, developerId, queryUri.Connection);
+        var project = Project.CreateFromTeamProject(teamProject, org.Id);
+
+        var getQueryResult = await witClient.GetQueryAsync(project.InternalId, queryUri.Query);
+        if (getQueryResult == null)
+        {
+            throw new AzureClientException($"GetQueryAsync failed for {queryUri.Connection}, {project.InternalId}, {queryUri.Query}");
+        }
+
+        var queryId = new Guid(queryUri.Query);
+        var count = await witClient.GetQueryResultCountAsync(project.Name, queryId);
+        var queryResult = await witClient.QueryByIdAsync(project.InternalId, queryId);
+        if (queryResult == null)
+        {
+            throw new AzureClientException($"QueryByIdAsync failed for {queryUri.Connection}, {project.InternalId}, {queryId}");
+        }
+
+        var workItemIds = new List<int>();
+
+        // The WorkItems collection and individual reference objects may be null.
+        switch (queryResult.QueryType)
+        {
+            // Tree types are treated as flat, but the data structure is different.
+            case TFModels.QueryType.Tree:
+                if (queryResult.WorkItemRelations is not null)
+                {
+                    foreach (var workItemRelation in queryResult.WorkItemRelations)
+                    {
+                        if (workItemRelation is null || workItemRelation.Target is null)
+                        {
+                            continue;
+                        }
+
+                        workItemIds.Add(workItemRelation.Target.Id);
+                        if (workItemIds.Count >= QueryResultLimit)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                break;
+
+            case TFModels.QueryType.Flat:
+                if (queryResult.WorkItems is not null)
+                {
+                    foreach (var item in queryResult.WorkItems)
+                    {
+                        if (item is null)
+                        {
+                            continue;
+                        }
+
+                        workItemIds.Add(item.Id);
+                        if (workItemIds.Count >= QueryResultLimit)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                break;
+
+            case TFModels.QueryType.OneHop:
+
+                // OneHop work item structure is the same as the tree type.
+                goto case TFModels.QueryType.Tree;
+
+            default:
+                _log.Warning($"Found unhandled QueryType: {queryResult.QueryType} for query: {queryId}");
+                break;
+        }
+
+        var workItems = new List<TFModels.WorkItem>();
+        if (workItemIds.Count > 0)
+        {
+            workItems = await witClient.GetWorkItemsAsync(project.InternalId, workItemIds, null, null, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit);
+            if (workItems == null)
+            {
+                throw new AzureClientException($"GetWorkItemsAsync failed for {queryUri.Connection}, {project.InternalId}, Ids: {string.Join(",", workItemIds.ToArray())}");
+            }
+        }
+
+        return workItems;
+    }
+
     private async Task UpdateDataForQueriesAsync(DataStoreOperationParameters parameters)
     {
         _log.Debug($"Inside UpdateDataForQueriesAsync with Parameters: {parameters}");

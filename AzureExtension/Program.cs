@@ -151,7 +151,7 @@ public sealed class Program
 
         var addSearchForm = new SaveSearchForm(resources, savedSearchesMediator, devIdProvider);
         var addSearchListItem = new AddSearchListItem(new SaveSearchPage(addSearchForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
-        var savedSearchesPage = new SavedSearchesPage(resources, addSearchListItem, savedSearchesMediator, devIdProvider);
+        var savedSearchesPage = new SavedSearchesPage(resources, addSearchListItem, savedSearchesMediator, devIdProvider, azureDataManager);
 
         var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, devIdProvider, savedSearchesPage, resources);
 
