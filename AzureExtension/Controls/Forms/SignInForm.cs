@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
+using AzureExtension.Client;
 using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
@@ -111,6 +112,14 @@ public partial class SignInForm : FormContent, IAzureForm
         {
             var errorMessage = $"{developerIdResult.Result.DisplayMessage} - {developerIdResult.Result.DiagnosticText}";
             throw new InvalidOperationException(developerIdResult.Result.DisplayMessage);
+        }
+
+        if (developerIdResult.Result.Status == ProviderOperationStatus.Success)
+        {
+            var developerId = developerIdResult.DeveloperId;
+            var selectedQueryUrl = new AzureUri("https://microsoft.visualstudio.com/OS/_queries/query-edit/fd7ad0f5-17b0-46be-886a-92e4043c1c4f/");
+            var queryInfo = AzureClientHelpers.GetQueryInfo(selectedQueryUrl, developerId!);
+            var selectedQueryId = queryInfo.AzureUri.Query;
         }
 
         return developerIdResult.Result.Status == ProviderOperationStatus.Success;
