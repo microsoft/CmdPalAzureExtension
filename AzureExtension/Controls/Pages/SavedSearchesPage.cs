@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Controls;
+using AzureExtension.Controls.Pages;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
@@ -16,6 +17,8 @@ public partial class SavedSearchesPage : ListPage
     private readonly IResources _resources;
 
     private readonly SavedSearchesMediator _savedSearchesMediator;
+
+    private readonly List<SearchPage<object>> _searchPages;
 
     public SavedSearchesPage(
        IResources resources,
@@ -31,6 +34,7 @@ public partial class SavedSearchesPage : ListPage
         _savedSearchesMediator.SearchRemoving += OnSearchRemoving;
         _addSearchListItem = addSearchListItem;
         _savedSearchesMediator.SearchSaved += OnSearchSaved;
+        _searchPages = new List<SearchPage<object>>();
     }
 
     private void OnSearchRemoved(object? sender, object? args)
@@ -70,7 +74,15 @@ public partial class SavedSearchesPage : ListPage
 
     public override IListItem[] GetItems()
     {
-            return [_addSearchListItem];
+        var items = _searchPages
+            .Select(searchPage => searchPage.GetListItem(searchPage.CurrentSearch))
+            .ToList();
+
+        var iListItems = items
+            .Select(item => item as IListItem)
+            .ToList();
+        iListItems.Add(_addSearchListItem);
+        return iListItems.ToArray();
     }
 
     // Change this to public to facilitate tests. As the event handler is
@@ -79,8 +91,11 @@ public partial class SavedSearchesPage : ListPage
     {
         IsLoading = false;
 
-        if (args != null && args is SearchCandidate)
+        if (args != null && args is SearchCandidate searchCandidate)
         {
+            _searchPages.Add(new SearchPage<object>(
+                searchCandidate,
+                _resources));
             RaiseItemsChanged(0);
         }
 

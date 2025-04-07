@@ -3,10 +3,16 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography.Xml;
 using System.Text.Json.Nodes;
+using AzureExtension.Client;
+using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Microsoft.Extensions.Configuration;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AzureExtension.Controls.Forms;
 
@@ -17,6 +23,8 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
     private readonly IResources _resources;
 
     private readonly SavedSearchesMediator _savedSearchesMediator;
+
+    private readonly IDeveloperIdProvider _developerIdProvider;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
@@ -39,19 +47,21 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
     };
 
     // for saving a new query
-    public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator)
+    public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
     {
         _resources = resources;
         _savedSearch = new SearchCandidate();
         _savedSearchesMediator = savedSearchesMediator;
+        _developerIdProvider = developerIdProvider;
     }
 
     // for editing an existing query
-    public SaveSearchForm(ISearch savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator)
+    public SaveSearchForm(ISearch savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
     {
         _resources = resources;
         _savedSearch = savedSearch;
         _savedSearchesMediator = savedSearchesMediator;
+        _developerIdProvider = developerIdProvider;
     }
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SaveSearch", TemplateSubstitutions);
@@ -100,17 +110,20 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
         return new SearchCandidate();
     }
 
-    public static SearchCandidate CreateSearchFromJson(JsonNode? jsonNode)
+    public SearchCandidate CreateSearchFromJson(JsonNode? jsonNode)
     {
         var enteredSearch = jsonNode?["EnteredSearch"]?.ToString() ?? string.Empty;
         var name = jsonNode?["Name"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
-        string? searchStr;
+        if (!string.IsNullOrEmpty(enteredSearch) && !string.IsNullOrEmpty(name))
+        {
+            var azureUri = new AzureUri(enteredSearch);
+            var queryInfo = AzureClientHelpers.GetQueryInfo(azureUri, _developerIdProvider.GetLoggedInDeveloperIdsInternal().FirstOrDefault()!);
+            var selectedQueryId = queryInfo.AzureUri.Query;   // This will be empty string if invalid query.
+        }
 
-        searchStr = string.IsNullOrEmpty(enteredSearch) ? enteredSearch : string.Empty;
-
-        return new SearchCandidate(searchStr, name, isTopLevel);
+        return new SearchCandidate(enteredSearch, name, isTopLevel);
     }
 
     public bool GetIsTopLevel()

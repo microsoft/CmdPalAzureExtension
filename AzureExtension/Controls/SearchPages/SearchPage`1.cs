@@ -84,7 +84,7 @@ public class SearchPage<T> : ListPage
         }
     }
 
-    private ListItem GetListItem(object item) => new ListItem(new NoOpCommand())
+    public ListItem GetListItem(object item) => new ListItem(new NoOpCommand())
     {
         Title = "Dummy Title",
         Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),

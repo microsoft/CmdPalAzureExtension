@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Controls.Forms;
+using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
@@ -13,11 +14,13 @@ public class SearchPageFactory : ISearchPageFactory
 {
     private readonly IResources _resources;
     private readonly SavedSearchesMediator _savedSearchesMediator;
+    private readonly IDeveloperIdProvider _developerIdProvider;
 
-    public SearchPageFactory(IResources resources, SavedSearchesMediator savedSearchesMediator)
+    public SearchPageFactory(IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
     {
         _resources = resources;
         _savedSearchesMediator = savedSearchesMediator;
+        _developerIdProvider = developerIdProvider;
     }
 
     private ListPage CreatePageForSearch(ISearch search)
@@ -36,7 +39,7 @@ public class SearchPageFactory : ISearchPageFactory
             {
                 new(new EditSearchPage(
                     _resources,
-                    new SaveSearchForm(search, _resources, _savedSearchesMediator),
+                    new SaveSearchForm(search, _resources, _savedSearchesMediator, _developerIdProvider),
                     new StatusMessage(),
                     _resources.GetResource("Pages_Search_Edited_Success"),
                     _resources.GetResource("Pages_Search_Edited_Failed"))),
