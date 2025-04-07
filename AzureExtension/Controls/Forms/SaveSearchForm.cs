@@ -116,14 +116,15 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
         var name = jsonNode?["Name"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
+        AzureUri? azureUri = null;
         if (!string.IsNullOrEmpty(enteredSearch) && !string.IsNullOrEmpty(name))
         {
-            var azureUri = new AzureUri(enteredSearch);
+            azureUri = new AzureUri(enteredSearch);
             var queryInfo = AzureClientHelpers.GetQueryInfo(azureUri, _developerIdProvider.GetLoggedInDeveloperIdsInternal().FirstOrDefault()!);
             var selectedQueryId = queryInfo.AzureUri.Query;   // This will be empty string if invalid query.
         }
 
-        return new SearchCandidate(name, enteredSearch, isTopLevel);
+        return new SearchCandidate(name, enteredSearch, isTopLevel, azureUri);
     }
 
     public bool GetIsTopLevel()

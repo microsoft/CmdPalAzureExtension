@@ -25,7 +25,7 @@ public class SearchPageFactory : ISearchPageFactory
 
     private ListPage CreatePageForSearch(ISearch search)
     {
-        return new SearchPage<object>(search, _resources);
+        return new SearchPage<object>(search, _resources, _developerIdProvider);
     }
 
     public IListItem CreateItemForSearch(ISearch search)

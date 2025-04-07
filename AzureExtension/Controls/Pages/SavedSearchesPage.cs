@@ -4,6 +4,7 @@
 
 using AzureExtension.Controls;
 using AzureExtension.Controls.Pages;
+using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
@@ -20,10 +21,13 @@ public partial class SavedSearchesPage : ListPage
 
     private readonly List<SearchPage<object>> _searchPages;
 
+    private IDeveloperIdProvider? _developerIdProvider;
+
     public SavedSearchesPage(
        IResources resources,
        IListItem addSearchListItem,
-       SavedSearchesMediator savedSearchesMediator)
+       SavedSearchesMediator savedSearchesMediator,
+       IDeveloperIdProvider developerIdProvider)
     {
         _resources = resources;
 
@@ -35,6 +39,7 @@ public partial class SavedSearchesPage : ListPage
         _addSearchListItem = addSearchListItem;
         _savedSearchesMediator.SearchSaved += OnSearchSaved;
         _searchPages = new List<SearchPage<object>>();
+        _developerIdProvider = developerIdProvider;
     }
 
     private void OnSearchRemoved(object? sender, object? args)
@@ -101,7 +106,8 @@ public partial class SavedSearchesPage : ListPage
         {
             _searchPages.Add(new SearchPage<object>(
                 searchCandidate,
-                _resources));
+                _resources,
+                _developerIdProvider!));
             RaiseItemsChanged(0);
         }
 

@@ -79,7 +79,7 @@ public class Organization
         _log.Debug($"Updated {rowsUpdated} rows.");
     }
 
-    private static Organization Create(Uri connection)
+    public static Organization Create(Uri connection)
     {
         var azureUri = new AzureUri(connection);
         if (!azureUri.IsValid)
