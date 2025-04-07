@@ -2,7 +2,9 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Client;
 using AzureExtension.Controls.Pages;
+using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -36,8 +38,19 @@ public partial class AzureExtensionCommandProvider : CommandProvider
     {
         if (_developerIdProvider.IsSignedIn())
         {
+            var developerId = _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault();
+            var selectedQueryUrl = new AzureUri("https://microsoft.visualstudio.com/OS/_queries/query-edit/fd7ad0f5-17b0-46be-886a-92e4043c1c4f/");
+            var queryInfo = AzureClientHelpers.GetQueryInfo(selectedQueryUrl, developerId!);
+            var selectedQueryId = queryInfo.AzureUri.Query;
+
             return new ICommandItem[]
             {
+                new CommandItem(_signInPage)
+                {
+                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                    Title = "Sign in",
+                    Subtitle = "Sign into your Azure DevOps account",
+                },
                 new CommandItem(_signOutPage)
                 {
                     Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
