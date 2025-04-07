@@ -310,7 +310,7 @@ public class RepositoryProvider : IRepositoryProvider2, IDisposable
 
                 cloneOptions.FetchOptions.CredentialsProvider = (url, user, cred) => new LibGit2Sharp.UsernamePasswordCredentials
                 {
-                    // Password is a PAT unique to GitHub.
+                    // Password is a PAT unique to Azure.
                     Username = authResult.AccessToken,
                     Password = string.Empty,
                 };

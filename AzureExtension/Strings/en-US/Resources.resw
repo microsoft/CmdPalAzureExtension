@@ -655,15 +655,15 @@
     <comment>Title for search "state:open is:pr review-requested:{login} archived:false"</comment>
   </data>
   <data name="ExtensionPackageDescription" xml:space="preserve">
-    <value>The GitHub extension for Windows Command Palette.</value>
+    <value>The Azure extension for Windows Command Palette.</value>
     <comment>Description for extension package</comment>
   </data>
   <data name="ExtensionPackageTitle" xml:space="preserve">
-    <value>GitHub Extension for Command Palette</value>
+    <value>Azure Extension for Command Palette</value>
     <comment>Title for the extension package</comment>
   </data>
   <data name="ExtensionTitle" xml:space="preserve">
-    <value>GitHub Extension</value>
+    <value>Azure Extension</value>
     <comment>Title for the extension</comment>
   </data>
   <data name="Forms_Edit_Search" xml:space="preserve">
@@ -703,7 +703,7 @@
     <comment>Shown in sign in form as title and button title</comment>
   </data>
   <data name="Forms_Sign_In_Tooltip" xml:space="preserve">
-    <value>Sign in to GitHub</value>
+    <value>Sign in to Azure Dev Ops</value>
     <comment>Shown in form's sign in button tooltip</comment>
   </data>
   <data name="Forms_Sign_Out_Button_Title" xml:space="preserve">
@@ -715,7 +715,7 @@
     <comment>Title for sign out form page</comment>
   </data>
   <data name="Forms_Sign_Out_Tooltip" xml:space="preserve">
-    <value>Sign out from GitHub extension</value>
+    <value>Sign out from Azure extension</value>
     <comment>Tooltip for sign out button on sign out form</comment>
   </data>
   <data name="ListItems_AddSearch" xml:space="preserve">
@@ -803,7 +803,7 @@
     <comment>Shown in command to copy title of pull request on a page</comment>
   </data>
   <data name="Pages_Saved_Searches" xml:space="preserve">
-    <value>Saved GitHub Queries</value>
+    <value>Saved ADO Queries</value>
     <comment>Name of page that shows list of saved github queries</comment>
   </data>
   <data name="Pages_Saved_Searches_Error" xml:space="preserve">

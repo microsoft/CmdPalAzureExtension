@@ -2,7 +2,10 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Client;
+using AzureExtension.Controls;
 using AzureExtension.Controls.Forms;
+using AzureExtension.Controls.ListItems;
 using AzureExtension.Controls.Pages;
 using AzureExtension.DataManager;
 using AzureExtension.DataModel;
@@ -142,7 +145,15 @@ public sealed class Program
         var signOutForm = new SignOutForm(devIdProvider, resources);
         var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"));
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, devIdProvider);
+        var azureClientProvider = new AzureClientProvider();
+
+        var savedSearchesMediator = new SavedSearchesMediator();
+
+        var addSearchForm = new SaveSearchForm(resources, savedSearchesMediator);
+        var addSearchListItem = new AddSearchListItem(new SaveSearchPage(addSearchForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
+        var savedSearchesPage = new SavedSearchesPage(resources, addSearchListItem, savedSearchesMediator);
+
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, devIdProvider, savedSearchesPage, resources);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 
