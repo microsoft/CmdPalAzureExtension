@@ -28,23 +28,6 @@ public class Search : ISearch
 
     public bool IsTopLevel { get; set; }
 
-    private AzureUri? _uri;
-
-    [Write(false)]
-    [Computed]
-    public AzureUri? Uri
-    {
-        get
-        {
-            if (_uri is null)
-            {
-                _uri = new AzureUri(SearchString);
-            }
-
-            return _uri;
-        }
-    }
-
     public static Search? Get(DataStore datastore, string name, string searchString)
     {
         var sql = "SELECT * FROM Search WHERE Name = @Name AND SearchString = @SearchString";

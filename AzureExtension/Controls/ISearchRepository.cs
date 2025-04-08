@@ -16,8 +16,6 @@ public interface ISearchRepository
 
     bool ValidateSearch(ISearch search, IDeveloperId developerId);
 
-    Task AddSavedSearch(ISearch search);
-
     Task InitializeTopLevelSearches(IEnumerable<ISearch> searches);
 
     Task<IEnumerable<ISearch>> GetTopLevelSearches();

@@ -184,12 +184,6 @@ public class PersistentDataManager : IDisposable, ISearchRepository
         return queryInfo;
     }
 
-    public async Task AddSavedSearch(ISearch search)
-    {
-        // TODO: Add back validation
-        await AddSearchAsync(search);
-    }
-
     private readonly object _insertLock = new();
 
     public async Task InitializeTopLevelSearches(IEnumerable<ISearch> searches, IDeveloperId developerId)

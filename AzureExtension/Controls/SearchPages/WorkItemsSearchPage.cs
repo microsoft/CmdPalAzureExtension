@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Collections.Concurrent;
+using AzureExtension.Client;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
@@ -88,7 +89,7 @@ public sealed partial class WorkItemsSearchPage(ISearch search, AzureDataManager
 
     private async Task<IEnumerable<TFModels.WorkItem>> GetSearchItems()
     {
-        return await AzureDataManager.GetWorkItemsAsync(CurrentSearch.Uri!, DeveloperId);
+        return await AzureDataManager.GetWorkItemsAsync(new AzureUri(CurrentSearch.SearchString), DeveloperId);
     }
 
     protected override ListItem GetListItem(IWorkItem item)

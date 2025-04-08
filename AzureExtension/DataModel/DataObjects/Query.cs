@@ -2,16 +2,16 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Controls;
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Serilog;
-using DevId = AzureExtension.DeveloperId;
 
 namespace AzureExtension.DataModel;
 
 [Table("Query")]
-public class Query
+public class Query : ISearch
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", $"DataModel/{nameof(Query)}"));
 
@@ -25,6 +25,9 @@ public class Query
 
     // Guid
     public string QueryId { get; set; } = string.Empty;
+
+    // SearchString to satisfy ISearch interface
+    public string SearchString { get; set; } = string.Empty;
 
     public string DisplayName { get; set; } = string.Empty;
 
@@ -42,6 +45,8 @@ public class Query
 
     public long TimeUpdated { get; set; } = DataStore.NoForeignKey;
 
+    public bool IsTopLevel { get; set; }
+
     public override string ToString() => QueryId;
 
     [Write(false)]
@@ -55,7 +60,10 @@ public class Query
     [Computed]
     public DateTime UpdatedAt => TimeUpdated.ToDateTime();
 
-    private static Query Create(string queryId, long projectId, string developerLogin, string displayName, string queryResults, long queryResultCount)
+    // Implement ISearch interface
+    public string Name => DisplayName;
+
+    private static Query Create(string queryId, long projectId, string developerLogin, string displayName, string queryResults, long queryResultCount, string searchString)
     {
         return new Query
         {
@@ -66,6 +74,7 @@ public class Query
             QueryResults = queryResults,
             QueryResultCount = queryResultCount,
             TimeUpdated = DateTime.UtcNow.ToDataStoreInteger(),
+            SearchString = searchString,
         };
     }
 
@@ -127,10 +136,16 @@ public class Query
         return query;
     }
 
+    public static Query GetOrCreate(DataStore dataStore, string queryId, long projectId, string developerId, string displayName, string queryResults, long queryResultCount, string searchString)
+    {
+        var newQuery = Create(queryId, projectId, developerId, displayName, queryResults, queryResultCount, searchString);
+        return AddOrUpdate(dataStore, newQuery);
+    }
+
+    // Overload that uses queryId as searchString for backward compatibility
     public static Query GetOrCreate(DataStore dataStore, string queryId, long projectId, string developerId, string displayName, string queryResults, long queryResultCount)
     {
-        var newQuery = Create(queryId, projectId, developerId, displayName, queryResults, queryResultCount);
-        return AddOrUpdate(dataStore, newQuery);
+        return GetOrCreate(dataStore, queryId, projectId, developerId, displayName, queryResults, queryResultCount, queryId);
     }
 
     public static void DeleteBefore(DataStore dataStore, DateTime date)

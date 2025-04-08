@@ -3,18 +3,12 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.Xml;
 using System.Text.Json.Nodes;
-using AzureExtension.Client;
-using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Microsoft.Extensions.Configuration;
 using Serilog;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AzureExtension.Controls.Forms;
 
@@ -32,7 +26,7 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
 
     public event EventHandler<bool>? LoadingStateChanged;
 
-    private string IsTopLevelChecked => GetIsTopLevel().ToString().ToLower(CultureInfo.InvariantCulture);
+    private string IsTopLevelChecked => GetIsTopLevel().Result.ToString().ToLower(CultureInfo.InvariantCulture);
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
@@ -84,13 +78,13 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
         return CommandResult.KeepOpen();
     }
 
-    public async Task<SearchCandidate> GetSearch(string payload)
+    public async Task<QueryCandidate> GetSearch(string payload)
     {
         try
         {
             var payloadJson = JsonNode.Parse(payload) ?? throw new InvalidOperationException("No search found");
 
-            var search = CreateSearchFromJson(payloadJson);
+            var query = CreateQueryFromJson(payloadJson);
 
             var devId = _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!;
 
@@ -106,12 +100,12 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
             }
 
             // UpdateSearchTopLevelStatus adds the search if it's not already in the datastore
-            _searchRepository.UpdateSearchTopLevelStatus(search, search.IsTopLevel, devId);
+            _searchRepository.UpdateSearchTopLevelStatus(query, query.IsTopLevel, devId);
 
             LoadingStateChanged?.Invoke(this, false);
-            _savedSearchesMediator.AddSearch(search);
+            _savedSearchesMediator.AddSearch(query);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
-            return search;
+            return query;
         }
         catch (Exception ex)
         {
@@ -120,27 +114,39 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
         }
 
-        return new SearchCandidate();
+        return new QueryCandidate();
     }
 
-    public SearchCandidate CreateSearchFromJson(JsonNode? jsonNode)
+    public async Task<bool> GetIsTopLevel()
+    {
+        var getTopLevel = await _searchRepository.IsTopLevel(_savedSearch);
+        return getTopLevel;
+    }
+
+    public QueryCandidate CreateQueryFromJson(JsonNode? jsonNode)
     {
         var queryUrl = jsonNode?["EnteredSearch"]?.ToString() ?? string.Empty;
         var name = jsonNode?["Name"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
-        var queryInfo = SearchValidator.GetQueryInfo(queryUrl, name, _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!);
+        var developerId = _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!;
+        var queryInfo = SearchValidator.GetQueryInfo(queryUrl, name, developerId);
 
         if (string.IsNullOrEmpty(name))
         {
             name = queryInfo.Name;
         }
 
-        return new SearchCandidate(name, queryUrl, isTopLevel, queryInfo.AzureUri);
-    }
-
-    public bool GetIsTopLevel()
-    {
-        return false;
+        // Create a QueryCandidate with the required information
+        return new QueryCandidate(
+            displayName: name,
+            queryId: queryInfo.AzureUri?.Query ?? string.Empty,
+            searchString: queryUrl,
+            projectId: 0, // Will be filled in by the repository later
+            developerLogin: developerId.LoginId,
+            queryResults: string.Empty, // Will be filled in by the repository later
+            queryResultCount: 0, // Will be filled in by the repository later
+            isTopLevel: isTopLevel,
+            azureUri: queryInfo.AzureUri);
     }
 }

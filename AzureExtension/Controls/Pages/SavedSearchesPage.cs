@@ -108,7 +108,7 @@ public partial class SavedSearchesPage : ListPage
     {
         IsLoading = false;
 
-        if (args != null && args is SearchCandidate searchCandidate)
+        if (args != null && args is QueryCandidate queryCandidate)
         {
             RaiseItemsChanged(0);
         }
