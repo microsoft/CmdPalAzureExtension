@@ -680,7 +680,7 @@
   </data>
   <data name="Forms_SaveSearchTemplateEnteredSearchLabel" xml:space="preserve">
     <value>Query string or URL:</value>
-    <comment>Shown as the label for the input text box for the GitHub query</comment>
+    <comment>Shown as the label for the input text box for the Azure query</comment>
   </data>
   <data name="Forms_SaveSearchTemplateIsTopLevelTitle" xml:space="preserve">
     <value>Pin query to top-level commands</value>

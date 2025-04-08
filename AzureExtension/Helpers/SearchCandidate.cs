@@ -21,11 +21,17 @@ public class SearchCandidate : ISearch
     {
     }
 
-    public SearchCandidate(string name, string searchString, bool isTopLevel, AzureUri? uri)
+    public SearchCandidate(string name, string searchString)
+    {
+        Name = name;
+        SearchString = searchString;
+    }
+
+    public SearchCandidate(string name, string searchString, bool isTopLevel, AzureUri? azureUri)
     {
         Name = name;
         SearchString = searchString;
         IsTopLevel = isTopLevel;
-        Uri = uri;
+        Uri = azureUri;
     }
 }

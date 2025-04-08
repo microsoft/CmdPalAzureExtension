@@ -6,6 +6,7 @@ using AzureExtension.Controls;
 using AzureExtension.Controls.Pages;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
+using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
@@ -19,7 +20,9 @@ public partial class SavedSearchesPage : ListPage
 
     private readonly SavedSearchesMediator _savedSearchesMediator;
 
-    private readonly List<SearchPage<object>> _searchPages;
+    private readonly PersistentDataManager _searchRepository;
+
+    private readonly ISearchPageFactory _searchPageFactory;
 
     private IDeveloperIdProvider? _developerIdProvider;
 
@@ -30,7 +33,9 @@ public partial class SavedSearchesPage : ListPage
        IListItem addSearchListItem,
        SavedSearchesMediator savedSearchesMediator,
        IDeveloperIdProvider developerIdProvider,
-       AzureDataManager azureDataManager)
+       AzureDataManager azureDataManager,
+       PersistentDataManager searchRepository,
+       ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
 
@@ -41,9 +46,10 @@ public partial class SavedSearchesPage : ListPage
         _savedSearchesMediator.SearchRemoving += OnSearchRemoving;
         _addSearchListItem = addSearchListItem;
         _savedSearchesMediator.SearchSaved += OnSearchSaved;
-        _searchPages = new List<SearchPage<object>>();
         _developerIdProvider = developerIdProvider;
         _azureDataManager = azureDataManager;
+        _searchRepository = searchRepository;
+        _searchPageFactory = searchPageFactory;
     }
 
     private void OnSearchRemoved(object? sender, object? args)
@@ -83,21 +89,19 @@ public partial class SavedSearchesPage : ListPage
 
     public override IListItem[] GetItems()
     {
-        List<ListItem> items = new List<ListItem>();
-        foreach (var searchPage in _searchPages)
+        var savedSearches = _searchRepository.GetSavedSearches().Result;
+        if (savedSearches.Any())
         {
-            items.Add(new ListItem(searchPage)
-            {
-                Title = searchPage.Name,
-                Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-            });
-        }
+            var searchPages = savedSearches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch)).ToList();
 
-        var iListItems = items
-            .Select(item => item as IListItem)
-            .ToList();
-        iListItems.Add(_addSearchListItem);
-        return iListItems.ToArray();
+            searchPages.Add(_addSearchListItem);
+
+            return searchPages.ToArray();
+        }
+        else
+        {
+            return [_addSearchListItem];
+        }
     }
 
     // Change this to public to facilitate tests. As the event handler is
@@ -108,11 +112,7 @@ public partial class SavedSearchesPage : ListPage
 
         if (args != null && args is SearchCandidate searchCandidate)
         {
-            _searchPages.Add(new SearchPage<object>(
-                searchCandidate,
-                _resources,
-                _developerIdProvider!,
-                _azureDataManager));
+            // use search factory
             RaiseItemsChanged(0);
         }
 

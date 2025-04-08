@@ -70,12 +70,12 @@ public class AzureClientHelpers
         }
     }
 
-    public static InfoResult GetQueryInfo(string uri, DeveloperId.DeveloperId devId)
+    public static InfoResult GetQueryInfo(string uri, IDeveloperId devId)
     {
         return GetQueryInfo(new AzureUri(uri), devId);
     }
 
-    public static InfoResult GetQueryInfo(Uri uri, DeveloperId.DeveloperId devId)
+    public static InfoResult GetQueryInfo(Uri uri, IDeveloperId devId)
     {
         return GetQueryInfo(new AzureUri(uri), devId);
     }

@@ -11,6 +11,7 @@ using AzureExtension.DataManager;
 using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
+using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Extensions.Configuration;
@@ -148,10 +149,12 @@ public sealed class Program
         var azureClientProvider = new AzureClientProvider();
 
         var savedSearchesMediator = new SavedSearchesMediator();
+        var persistentDataManager = new PersistentDataManager(new AzureValidatorAdapter(azureClientProvider));
 
-        var addSearchForm = new SaveSearchForm(resources, savedSearchesMediator, devIdProvider);
+        var addSearchForm = new SaveSearchForm(resources, savedSearchesMediator, devIdProvider, persistentDataManager);
         var addSearchListItem = new AddSearchListItem(new SaveSearchPage(addSearchForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
-        var savedSearchesPage = new SavedSearchesPage(resources, addSearchListItem, savedSearchesMediator, devIdProvider, azureDataManager);
+        var searchPageFactory = new SearchPageFactory(persistentDataManager, azureDataManager, resources, savedSearchesMediator, devIdProvider);
+        var savedSearchesPage = new SavedSearchesPage(resources, addSearchListItem, savedSearchesMediator, devIdProvider, azureDataManager, persistentDataManager, searchPageFactory);
 
         var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, devIdProvider, savedSearchesPage, resources);
 

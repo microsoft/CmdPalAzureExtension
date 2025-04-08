@@ -82,6 +82,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Controls\Templates\" />
+		<Folder Include="DataManager\Data\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" />

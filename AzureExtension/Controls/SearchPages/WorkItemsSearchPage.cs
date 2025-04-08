@@ -3,55 +3,25 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Collections.Concurrent;
-using System.Dynamic;
-using System.Text.Json;
-using AzureExtension.Client;
-using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
-using Microsoft.Azure.Pipelines.WebApi;
+using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Microsoft.TeamFoundation.Core.WebApi;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
 using Serilog;
 using TFModels = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 namespace AzureExtension.Controls.Pages;
 
-public class SearchPage<T> : ListPage
+public sealed partial class WorkItemsSearchPage(ISearch search, AzureDataManager azureDataManager, PersistentDataManager persistentDataManager, IResources resources, IDeveloperId developerId)
+    : SearchPage<IWorkItem>(search, azureDataManager, persistentDataManager, resources, developerId)
 {
-    private readonly ILogger _log;
-
-    public ISearch CurrentSearch { get; private set; }
-
-    protected IResources Resources { get; private set; }
-
-    private IDeveloperIdProvider DeveloperIdProvider { get; set; }
-
-    private AzureDataManager AzureDataManager { get; set; }
-
-    private IDeveloperId _developerId;
-
     // Max number of query results to fetch for a given query.
     public static readonly int QueryResultLimit = 25;
 
     // Connections are a pairing of DeveloperId and a Uri.
     private static readonly ConcurrentDictionary<Tuple<Uri, IDeveloperId>, VssConnection> _connections = new();
-
-    // Search is mandatory for this page to exist
-    public SearchPage(ISearch search, IResources resources, IDeveloperIdProvider developerIdProvider, AzureDataManager azureDataManager)
-    {
-        Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
-        Name = search.Name;
-        CurrentSearch = search;
-        Resources = resources;
-        _log = Serilog.Log.ForContext("SourceContext", $"AzureExtension/Controls/Pages/{nameof(SearchPage<T>)}");
-        DeveloperIdProvider = developerIdProvider;
-        _developerId = developerIdProvider.GetLoggedInDeveloperIdsInternal().FirstOrDefault() ?? throw new ArgumentNullException(nameof(developerIdProvider));
-        AzureDataManager = azureDataManager;
-    }
 
     public override IListItem[] GetItems() => DoGetItems(SearchText).GetAwaiter().GetResult();
 
@@ -59,7 +29,7 @@ public class SearchPage<T> : ListPage
     {
         try
         {
-            _log.Information($"Getting items for search query \"{CurrentSearch.Name}\"");
+            Log.Information($"Getting items for search query \"{CurrentSearch.Name}\"");
             var items = await GetSearchItems();
 
             var iconString = "logo";
@@ -118,6 +88,16 @@ public class SearchPage<T> : ListPage
 
     private async Task<IEnumerable<TFModels.WorkItem>> GetSearchItems()
     {
-        return await AzureDataManager.GetWorkItemsAsync(CurrentSearch.Uri!, _developerId);
+        return await AzureDataManager.GetWorkItemsAsync(CurrentSearch.Uri!, DeveloperId);
+    }
+
+    protected override ListItem GetListItem(IWorkItem item)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override Task<IEnumerable<IWorkItem>> LoadContentData()
+    {
+        throw new NotImplementedException();
     }
 }
