@@ -47,6 +47,7 @@ public class SearchPageFactory : ISearchPageFactory
             Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
             MoreCommands = new CommandContextItem[]
             {
+                new(new LinkCommand(search.SearchString, _resources)),
                 new(new RemoveSavedSearchCommand(search, _persistentDataManager, _resources, _savedSearchesMediator, _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!)),
                 new(new EditSearchPage(
                     _resources,
