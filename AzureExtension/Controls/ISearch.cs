@@ -8,6 +8,7 @@ namespace AzureExtension.Controls;
 
 public interface ISearch
 {
+    // The display name that a user enters, which could be the query name in ADO
     string Name { get; }
 
     string SearchString { get; }

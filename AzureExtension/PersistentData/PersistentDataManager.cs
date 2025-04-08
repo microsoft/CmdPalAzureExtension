@@ -227,7 +227,7 @@ public class PersistentDataManager : IDisposable, ISearchRepository
     public bool ValidateSearch(ISearch search, IDeveloperId developerId)
     {
         var queryInfo = GetQueryInfo(search.SearchString, search.Name, developerId);
-        return queryInfo != null;
+        return queryInfo.Result == ResultType.Success;
     }
 
     public Task InitializeTopLevelSearches(IEnumerable<ISearch> searches)

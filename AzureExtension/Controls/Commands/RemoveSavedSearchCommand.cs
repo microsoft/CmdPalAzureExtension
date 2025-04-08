@@ -5,7 +5,6 @@
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Windows.Foundation;
 
 namespace AzureExtension.Controls.Commands;
 
@@ -24,7 +23,7 @@ public partial class RemoveSavedSearchCommand : InvokableCommand
         _savedSearchesMediator = savedSearchesMediator;
         _devId = devId;
 
-        savedSearch = new SearchCandidate(search.SearchString, search.Name);
+        savedSearch = new SearchCandidate(search.Name, search.SearchString);
         Name = _resources.GetResource("Commands_Remove_Saved_Search");
         Icon = new IconInfo("\uecc9");
     }
