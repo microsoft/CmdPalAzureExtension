@@ -12,7 +12,7 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public class SearchPageFactory : ISearchPageFactory
+public class SearchPageFactory : QueryObjectPageFactory
 {
     private readonly PersistentDataManager _persistentDataManager;
     private readonly AzureDataManager _azureDataManager;
@@ -31,7 +31,7 @@ public class SearchPageFactory : ISearchPageFactory
         _timeSpanHelper = timeSpanHelper;
     }
 
-    private ListPage CreatePageForSearch(ISearch search)
+    private ListPage CreatePageForSearch(QueryObject search)
     {
         return new WorkItemsSearchPage(search, _azureDataManager, _persistentDataManager, _resources, _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!, _timeSpanHelper)
         {
@@ -40,16 +40,16 @@ public class SearchPageFactory : ISearchPageFactory
         };
     }
 
-    public IListItem CreateItemForSearch(ISearch search)
+    public IListItem CreateItemForSearch(QueryObject search)
     {
         return new ListItem(CreatePageForSearch(search))
         {
             Title = search.Name,
-            Subtitle = search.SearchString,
+            Subtitle = search.AzureUri.ToString(),
             Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(search.SearchString, _resources)),
+                new(new LinkCommand(search.AzureUri.ToString(), _resources)),
                 new(new RemoveSavedSearchCommand(search, _persistentDataManager, _resources, _savedSearchesMediator, _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!)),
                 new(new EditSearchPage(
                     _resources,

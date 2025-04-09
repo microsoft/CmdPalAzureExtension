@@ -4,6 +4,7 @@
 
 using System.Globalization;
 using System.Text.Json.Nodes;
+using AzureExtension.Client;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -14,7 +15,7 @@ namespace AzureExtension.Controls.Forms;
 
 public sealed partial class SaveSearchForm : FormContent, IAzureForm
 {
-    private readonly ISearch _savedSearch;
+    private readonly QueryObject _savedSearch;
 
     private readonly IResources _resources;
 
@@ -33,7 +34,7 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{SaveSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedSearch.Name) ? "Forms_Save_Search" : "Forms_Edit_Search") },
-        { "{{SavedSearchString}}", _savedSearch.SearchString },
+        { "{{SavedSearchString}}", _savedSearch.AzureUri.ToString() },
         { "{{SavedSearchName}}", _savedSearch.Name },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{EnteredSearchErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchError") },
@@ -45,17 +46,17 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
     };
 
     // for saving a new query
-    public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider, ISearchRepository searchRepository)
+    public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider, QueryObjectRepository searchRepository)
     {
         _resources = resources;
-        _savedSearch = new SearchCandidate();
+        _savedSearch = new QueryObject();
         _savedSearchesMediator = savedSearchesMediator;
         _developerIdProvider = developerIdProvider;
         _searchRepository = searchRepository;
     }
 
     // for editing an existing query
-    public SaveSearchForm(ISearch savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider, ISearchRepository searchRepository)
+    public SaveSearchForm(QueryObject savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider, QueryObjectRepository searchRepository)
     {
         _resources = resources;
         _savedSearch = savedSearch;
@@ -78,7 +79,7 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
         return CommandResult.KeepOpen();
     }
 
-    public QueryCandidate GetSearch(string payload)
+    public QueryObject GetSearch(string payload)
     {
         try
         {
@@ -90,17 +91,12 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
 
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
-            if (_savedSearch.SearchString != string.Empty)
+            if (_savedSearch.AzureUri.ToString() != string.Empty)
             {
-                Log.Information($"Removing outdated search {_savedSearch.Name}, {_savedSearch.SearchString}");
+                Log.Information($"Removing outdated search {_savedSearch.Name}, {_savedSearch.AzureUri.ToString()}");
 
-                // Remove deleted search from top-level commands
-                // _searchRepository.UpdateSearchTopLevelStatus(_savedSearch, false, devId);
-                // await _searchRepository.RemoveSavedSearch(_savedSearch);
+                _savedSearchesMediator.RemoveSearch(_savedSearch);
             }
-
-            // UpdateSearchTopLevelStatus adds the search if it's not already in the datastore
-            _searchRepository.UpdateSearchTopLevelStatus(query, query.IsTopLevel, devId);
 
             LoadingStateChanged?.Invoke(this, false);
             _savedSearchesMediator.AddSearch(query);
@@ -114,39 +110,29 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
         }
 
-        return new QueryCandidate();
+        return new QueryObject();
     }
 
-    public async Task<bool> GetIsTopLevel()
-    {
-        var getTopLevel = await _searchRepository.IsTopLevel(_savedSearch);
-        return getTopLevel;
-    }
-
-    public QueryCandidate CreateQueryFromJson(JsonNode? jsonNode)
+    public QueryObject CreateQueryFromJson(JsonNode? jsonNode)
     {
         var queryUrl = jsonNode?["EnteredSearch"]?.ToString() ?? string.Empty;
         var name = jsonNode?["Name"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
         var developerId = _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!;
-        var queryInfo = SearchValidator.GetQueryInfo(queryUrl, name, developerId);
+        var queryInfo = AzureClientHelpers.GetQueryInfo(queryUrl, developerId);
+
+        if (queryInfo.Result != ResultType.Success)
+        {
+            var error = queryInfo.Error;
+            throw new InvalidOperationException($"Failed to get query info {queryInfo.Error}: {queryInfo.ErrorMessage}");
+        }
 
         if (string.IsNullOrEmpty(name))
         {
             name = queryInfo.Name;
         }
 
-        // Create a QueryCandidate with the required information
-        return new QueryCandidate(
-            displayName: name,
-            queryId: queryInfo.AzureUri?.Query ?? string.Empty,
-            searchString: queryUrl,
-            projectId: 0, // Will be filled in by the repository later
-            developerLogin: developerId.LoginId,
-            queryResults: string.Empty, // Will be filled in by the repository later
-            queryResultCount: 0, // Will be filled in by the repository later
-            isTopLevel: isTopLevel,
-            azureUri: queryInfo.AzureUri);
+        return new QueryObject(queryInfo.AzureUri, name, queryInfo.Description);
     }
 }

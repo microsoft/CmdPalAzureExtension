@@ -1008,7 +1008,7 @@ public partial class AzureDataManager : IAzureDataManager, IDisposable
         return false;
     }
 
-    private TeamProject GetTeamProject(string projectName, IDeveloperId developerId, Uri connection)
+    public static TeamProject GetTeamProject(string projectName, IDeveloperId developerId, Uri connection)
     {
         var result = GetConnection(connection, developerId);
         if (result.Result != ResultType.Success)

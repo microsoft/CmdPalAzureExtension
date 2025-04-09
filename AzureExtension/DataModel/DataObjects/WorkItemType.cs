@@ -88,7 +88,7 @@ public class WorkItemType
         }
     }
 
-    private static WorkItemType CreateFromTeamWorkItemType(TeamWorkItemType workItemType, long projectId)
+    public static WorkItemType CreateFromTeamWorkItemType(TeamWorkItemType workItemType, long projectId)
     {
         return new WorkItemType
         {

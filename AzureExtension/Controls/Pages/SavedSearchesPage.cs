@@ -3,6 +3,8 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Controls;
+using AzureExtension.Controls.Commands;
+using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.Pages;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
@@ -22,7 +24,7 @@ public partial class SavedSearchesPage : ListPage
 
     private readonly PersistentDataManager _searchRepository;
 
-    private readonly ISearchPageFactory _searchPageFactory;
+    private List<QueryObject> _searches = new List<QueryObject>();
 
     private IDeveloperIdProvider? _developerIdProvider;
 
@@ -49,7 +51,6 @@ public partial class SavedSearchesPage : ListPage
         _developerIdProvider = developerIdProvider;
         _azureDataManager = azureDataManager;
         _searchRepository = searchRepository;
-        _searchPageFactory = searchPageFactory;
     }
 
     private void OnSearchRemoved(object? sender, object? args)
@@ -89,10 +90,9 @@ public partial class SavedSearchesPage : ListPage
 
     public override IListItem[] GetItems()
     {
-        var savedSearches = _searchRepository.GetSavedSearches().Result;
-        if (savedSearches.Any())
+        if (_searches.Count != 0)
         {
-            var searchPages = savedSearches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch)).ToList();
+            var searchPages = _searches.Select(savedSearch => CreateItemForSearch(savedSearch)).ToList();
 
             searchPages.Add(_addSearchListItem);
 
@@ -104,15 +104,40 @@ public partial class SavedSearchesPage : ListPage
         }
     }
 
+    private object CreateItemForSearch(QueryObject savedSearch)
+    {
+        throw new NotImplementedException();
+    }
+
     public void OnSearchSaved(object? sender, object? args)
     {
         IsLoading = false;
 
-        if (args != null && args is QueryCandidate queryCandidate)
+        if (args != null && args is QueryObject queryObject)
         {
+            _searches.Add(queryObject);
             RaiseItemsChanged(0);
         }
 
         // errors are handled in SaveSearchPage
+    }
+
+    public IListItem CreateItemForSearch(QueryObject search)
+    {
+        return new ListItem(CreatePageForSearch(search))
+        {
+            Title = search.Name,
+            Subtitle = search.AzureUri.ToString(),
+            Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
+        };
+    }
+
+    private ListPage CreatePageForSearch(QueryObject search)
+    {
+        return new WorkItemsSearchPage(search, _azureDataManager, _persistentDataManager, _resources, _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!, _timeSpanHelper)
+        {
+            Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
+            Name = search.Name,
+        };
     }
 }
