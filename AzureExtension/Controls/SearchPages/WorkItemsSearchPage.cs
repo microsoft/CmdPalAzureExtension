@@ -39,7 +39,7 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
     private readonly IDeveloperId _developerId;
 
-    private readonly QueryObject _queryObject;
+    private readonly Query _queryObject;
 
     private readonly IResources _resources;
 
@@ -47,7 +47,7 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public WorkItemsSearchPage(QueryObject queryObject, IDeveloperId developerId, IResources resources, AzureDataManager azureDataManager, TimeSpanHelper timeSpanHelper)
+    public WorkItemsSearchPage(Query queryObject, IDeveloperId developerId, IResources resources, AzureDataManager azureDataManager, TimeSpanHelper timeSpanHelper)
     {
         _developerId = developerId;
         _queryObject = queryObject;

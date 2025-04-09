@@ -15,7 +15,7 @@ namespace AzureExtension.Controls.Forms;
 
 public sealed partial class SaveSearchForm : FormContent, IAzureForm
 {
-    private readonly QueryObject _savedSearch;
+    private readonly Query _savedSearch;
 
     private readonly IResources _resources;
 
@@ -47,13 +47,13 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
     public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
     {
         _resources = resources;
-        _savedSearch = new QueryObject();
+        _savedSearch = new Query();
         _savedSearchesMediator = savedSearchesMediator;
         _developerIdProvider = developerIdProvider;
     }
 
     // for editing an existing query
-    public SaveSearchForm(QueryObject savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
+    public SaveSearchForm(Query savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
     {
         _resources = resources;
         _savedSearch = savedSearch;
@@ -75,7 +75,7 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
         return CommandResult.KeepOpen();
     }
 
-    public QueryObject GetSearch(string payload)
+    public Query GetSearch(string payload)
     {
         try
         {
@@ -106,10 +106,10 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
         }
 
-        return new QueryObject();
+        return new Query();
     }
 
-    public QueryObject CreateQueryFromJson(JsonNode? jsonNode)
+    public Query CreateQueryFromJson(JsonNode? jsonNode)
     {
         var queryUrl = jsonNode?["EnteredSearch"]?.ToString() ?? string.Empty;
         var name = jsonNode?["Name"]?.ToString() ?? string.Empty;
@@ -129,6 +129,6 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
             name = queryInfo.Name;
         }
 
-        return new QueryObject(queryInfo.AzureUri, name, queryInfo.Description);
+        return new Query(queryInfo.AzureUri, name, queryInfo.Description);
     }
 }

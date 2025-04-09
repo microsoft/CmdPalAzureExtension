@@ -9,11 +9,11 @@ namespace AzureExtension.Controls.Commands;
 
 public partial class RemoveSavedSearchCommand : InvokableCommand
 {
-    private readonly QueryObject savedSearch;
+    private readonly Query savedSearch;
     private readonly IResources _resources;
     private readonly SavedSearchesMediator _savedSearchesMediator;
 
-    public RemoveSavedSearchCommand(QueryObject search, IResources resources, SavedSearchesMediator savedSearchesMediator)
+    public RemoveSavedSearchCommand(Query search, IResources resources, SavedSearchesMediator savedSearchesMediator)
     {
         _resources = resources;
         _savedSearchesMediator = savedSearchesMediator;

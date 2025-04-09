@@ -21,7 +21,7 @@ public partial class SavedSearchesPage : ListPage
 
     private readonly SavedSearchesMediator _savedSearchesMediator;
 
-    private List<QueryObject> _searches = new List<QueryObject>();
+    private List<Query> _searches = new List<Query>();
 
     private IDeveloperIdProvider? _developerIdProvider;
 
@@ -65,7 +65,7 @@ public partial class SavedSearchesPage : ListPage
 
             toast.Show();
         }
-        else if (args != null && args is QueryObject queryObject)
+        else if (args != null && args is Query queryObject)
         {
             _searches.Remove(queryObject);
             RaiseItemsChanged(0);
@@ -109,7 +109,7 @@ public partial class SavedSearchesPage : ListPage
     {
         IsLoading = false;
 
-        if (args != null && args is QueryObject queryObject)
+        if (args != null && args is Query queryObject)
         {
             _searches.Add(queryObject);
             RaiseItemsChanged(0);
@@ -118,7 +118,7 @@ public partial class SavedSearchesPage : ListPage
         // errors are handled in SaveSearchPage
     }
 
-    public IListItem CreateItemForSearch(QueryObject search)
+    public IListItem CreateItemForSearch(Query search)
     {
         return new ListItem(CreatePageForSearch(search))
         {
@@ -143,7 +143,7 @@ public partial class SavedSearchesPage : ListPage
         };
     }
 
-    private ListPage CreatePageForSearch(QueryObject search)
+    private ListPage CreatePageForSearch(Query search)
     {
         return new WorkItemsSearchPage(search, _developerIdProvider!.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!, _resources, _azureDataManager, _timeSpanHelper)
         {

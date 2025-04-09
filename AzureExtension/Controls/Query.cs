@@ -6,7 +6,7 @@ using AzureExtension.Client;
 
 namespace AzureExtension.Controls
 {
-    public class QueryObject
+    public class Query
     {
         public AzureUri AzureUri { get; set; }
 
@@ -14,14 +14,14 @@ namespace AzureExtension.Controls
 
         public string Description { get; set; } = string.Empty;
 
-        public QueryObject()
+        public Query()
         {
             AzureUri = new AzureUri();
             Name = string.Empty;
             Description = string.Empty;
         }
 
-        public QueryObject(AzureUri azureUri, string name, string description)
+        public Query(AzureUri azureUri, string name, string description)
         {
             AzureUri = azureUri;
             Name = name;
