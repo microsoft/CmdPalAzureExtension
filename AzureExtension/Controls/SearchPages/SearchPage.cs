@@ -26,8 +26,10 @@ public abstract partial class SearchPage<T> : ListPage
 
     protected IDeveloperId DeveloperId { get; private set; }
 
+    protected TimeSpanHelper TimeSpanHelper { get; private set; }
+
     // Search is mandatory for this page to exist
-    protected SearchPage(ISearch search, AzureDataManager azureDataManager, PersistentDataManager persistentDataManager, IResources resources, IDeveloperId developerId)
+    protected SearchPage(ISearch search, AzureDataManager azureDataManager, PersistentDataManager persistentDataManager, IResources resources, IDeveloperId developerId, TimeSpanHelper timeSpanHelper)
     {
         Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
         Name = search.Name;
@@ -37,6 +39,7 @@ public abstract partial class SearchPage<T> : ListPage
         PersistentDataManager = persistentDataManager;
         Resources = resources;
         DeveloperId = developerId;
+        TimeSpanHelper = timeSpanHelper;
     }
 
     public override IListItem[] GetItems() => DoGetItems(SearchText).GetAwaiter().GetResult();

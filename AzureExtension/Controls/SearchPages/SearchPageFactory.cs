@@ -19,19 +19,21 @@ public class SearchPageFactory : ISearchPageFactory
     private readonly IResources _resources;
     private readonly SavedSearchesMediator _savedSearchesMediator;
     private readonly IDeveloperIdProvider _developerIdProvider;
+    private readonly TimeSpanHelper _timeSpanHelper;
 
-    public SearchPageFactory(PersistentDataManager persistentDataManager, AzureDataManager azureDataManager, IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
+    public SearchPageFactory(PersistentDataManager persistentDataManager, AzureDataManager azureDataManager, IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider, TimeSpanHelper timeSpanHelper)
     {
         _persistentDataManager = persistentDataManager;
         _azureDataManager = azureDataManager;
         _resources = resources;
         _savedSearchesMediator = savedSearchesMediator;
         _developerIdProvider = developerIdProvider;
+        _timeSpanHelper = timeSpanHelper;
     }
 
     private ListPage CreatePageForSearch(ISearch search)
     {
-        return new WorkItemsSearchPage(search, _azureDataManager, _persistentDataManager, _resources, _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!)
+        return new WorkItemsSearchPage(search, _azureDataManager, _persistentDataManager, _resources, _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!, _timeSpanHelper)
         {
             Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
             Name = search.Name,

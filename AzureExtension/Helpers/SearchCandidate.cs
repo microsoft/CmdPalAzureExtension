@@ -3,6 +3,8 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Controls;
+using AzureExtension.DataModel;
+using AzureExtension.DeveloperId;
 
 namespace AzureExtension.Helpers;
 
@@ -13,6 +15,10 @@ public class SearchCandidate : ISearch
     public string SearchString { get; set; } = string.Empty;
 
     public bool IsTopLevel { get; set; }
+
+    public IDeveloperId DeveloperId => throw new NotImplementedException();
+
+    public Query Query => throw new NotImplementedException();
 
     public SearchCandidate()
     {

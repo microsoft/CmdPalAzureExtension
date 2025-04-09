@@ -78,7 +78,7 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
         return CommandResult.KeepOpen();
     }
 
-    public async Task<QueryCandidate> GetSearch(string payload)
+    public QueryCandidate GetSearch(string payload)
     {
         try
         {
@@ -95,8 +95,8 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
                 Log.Information($"Removing outdated search {_savedSearch.Name}, {_savedSearch.SearchString}");
 
                 // Remove deleted search from top-level commands
-                _searchRepository.UpdateSearchTopLevelStatus(_savedSearch, false, devId);
-                await _searchRepository.RemoveSavedSearch(_savedSearch);
+                // _searchRepository.UpdateSearchTopLevelStatus(_savedSearch, false, devId);
+                // await _searchRepository.RemoveSavedSearch(_savedSearch);
             }
 
             // UpdateSearchTopLevelStatus adds the search if it's not already in the datastore

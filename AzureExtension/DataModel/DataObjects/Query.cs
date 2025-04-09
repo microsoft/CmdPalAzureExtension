@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Controls;
+using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
@@ -62,6 +63,8 @@ public class Query : ISearch
 
     // Implement ISearch interface
     public string Name => DisplayName;
+
+    public IDeveloperId DeveloperId => throw new NotImplementedException();
 
     private static Query Create(string queryId, long projectId, string developerLogin, string displayName, string queryResults, long queryResultCount, string searchString)
     {

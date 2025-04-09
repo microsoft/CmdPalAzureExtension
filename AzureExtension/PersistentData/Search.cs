@@ -2,9 +2,9 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.DataModel;
+using AzureExtension.DeveloperId;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Octokit;
@@ -27,6 +27,10 @@ public class Search : ISearch
     public string SearchString { get; set; } = string.Empty;
 
     public bool IsTopLevel { get; set; }
+
+    public IDeveloperId DeveloperId => throw new NotImplementedException();
+
+    public Query Query => throw new NotImplementedException();
 
     public static Search? Get(DataStore datastore, string name, string searchString)
     {
