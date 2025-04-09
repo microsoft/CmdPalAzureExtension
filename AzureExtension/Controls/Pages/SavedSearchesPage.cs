@@ -123,6 +123,10 @@ public partial class SavedSearchesPage : ListPage
             Title = search.Name,
             Subtitle = search.AzureUri.ToString(),
             Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
+            MoreCommands = new CommandContextItem[]
+            {
+                new(new LinkCommand(search.AzureUri.ToString(), _resources)),
+            },
         };
     }
 
