@@ -78,16 +78,15 @@ public sealed partial class WorkItemsSearchPage : ListPage
         return Array.Empty<IListItem>();
     }
 
-    public ListItem GetListItem(JsonObject item)
+    public ListItem GetListItem(WorkItem item)
     {
-        var title = item["title"]?.GetValue<string>() ?? string.Empty;
-        var iconBase64 = item["icon"]?.GetValue<string>() ?? string.Empty;
-        var url = item["url"]?.GetValue<string>() ?? string.Empty;
+        var title = item.SystemTitle;
+        var url = item.HtmlUrl;
 
         return new ListItem(new LinkCommand(url, _resources))
         {
             Title = title,
-            Icon = new IconInfo(iconBase64),
+            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
         };
     }
 
@@ -115,12 +114,12 @@ public sealed partial class WorkItemsSearchPage : ListPage
         };
     }
 
-    public Task<IEnumerable<JsonObject>> LoadContentData()
+    public Task<IEnumerable<WorkItem>> LoadContentData()
     {
-        return GetQueryResult();
+        return GetWorkItems();
     }
 
-    private async Task<IEnumerable<JsonObject>> GetQueryResult()
+    private async Task<IEnumerable<WorkItem>> GetWorkItems()
     {
         var result = AzureDataManager.GetConnection(_queryObject.AzureUri.Connection, _developerId);
 
@@ -229,49 +228,45 @@ public sealed partial class WorkItemsSearchPage : ListPage
             }
         }
 
-        // Convert all work items to Json based on fields provided in RequestOptions.
-        dynamic workItemsObj = new ExpandoObject();
-        var workItemsObjDict = (IDictionary<string, object>)workItemsObj;
+        var workItemsList = new List<WorkItem>();
+
         foreach (var workItem in workItems)
         {
-            dynamic workItemObj = new ExpandoObject();
-            var workItemObjFields = (IDictionary<string, object>)workItemObj;
+            var cmdPalWorkItem = new WorkItem();
 
-            // System.Id is excluded from the query result.
-            workItemObjFields.Add(AzureDataManager.SystemIdFieldName, workItem.Id!);
+            cmdPalWorkItem.AddSystemId(workItem.Id);
 
-            var htmlUrl = Links.GetLinkHDref(workItem.Links, "html");
-            workItemObjFields.Add(AzureDataManager.WorkItemHtmlUrlFieldName, htmlUrl);
+            // cmdPalWorkItem.Icon = new IconInfo(GetIconForType(workItem.Fields[AzureDataManager.WorkItemTypeFieldName]?.ToString()));
+            // cmdPalWorkItem.StatusIcon = new IconInfo(GetIconForStatusState(workItem.Fields["System.State"]?.ToString()));
+            var htmlUrl = Links.GetLinkHref(workItem.Links, "html");
+            cmdPalWorkItem.AddHtmlUrl(htmlUrl);
 
             var requestOptions = RequestOptions.RequestOptionsDefault();
 
             foreach (var field in requestOptions.Fields)
             {
-                // Ensure we do not try to add duplicate fields.
-                if (workItemObjFields.ContainsKey(field))
-                {
-                    ExtensionHost.LogMessage($"Duplicate field '{field} in RequestOptions.Fields: {string.Join(", ", requestOptions.Fields.ToArray())}");
-                    continue;
-                }
-
                 if (!workItem.Fields.ContainsKey(field))
                 {
-                    workItemObjFields.Add(field, string.Empty);
                     continue;
                 }
 
                 var fieldValue = workItem.Fields[field].ToString();
                 if (fieldValue is null)
                 {
-                    workItemObjFields.Add(field, string.Empty);
                     continue;
                 }
 
                 if (workItem.Fields[field] is DateTime dateTime)
                 {
-                    // If we have a datetime object, convert it to ticks for easy conversion
-                    // to a DateTime object in whatever local format the user is in.
-                    workItemObjFields.Add(field, dateTime.Ticks);
+                    if (field == "System.CreatedDate")
+                    {
+                        cmdPalWorkItem.SystemCreatedDate = dateTime.Ticks;
+                    }
+                    else if (field == "System.ChangedDate")
+                    {
+                        cmdPalWorkItem.SystemChangedDate = dateTime.Ticks;
+                    }
+
                     continue;
                 }
 
@@ -279,7 +274,16 @@ public sealed partial class WorkItemsSearchPage : ListPage
                 if (fieldValue == AzureDataManager.IdentityRefFieldValueName && fieldIdentityRef != null)
                 {
                     var identity = Identity.CreateFromIdentityRef(fieldIdentityRef, result.Connection);
-                    workItemObjFields.Add(field, identity.Id);
+
+                    if (field == "System.CreatedBy")
+                    {
+                        cmdPalWorkItem.SystemCreatedBy = identity;
+                    }
+                    else if (field == "System.ChangedBy")
+                    {
+                        cmdPalWorkItem.SystemChangedBy = identity;
+                    }
+
                     continue;
                 }
 
@@ -289,67 +293,32 @@ public sealed partial class WorkItemsSearchPage : ListPage
                     var workItemTypeInfo = await witClient!.GetWorkItemTypeAsync(project.InternalId, fieldValue);
                     var workItemType = WorkItemType.CreateFromTeamWorkItemType(workItemTypeInfo, project.Id);
 
-                    workItemObjFields.Add(field, workItemType.Id);
+                    cmdPalWorkItem.SystemWorkItemType = workItemType;
                     continue;
                 }
 
-                workItemObjFields.Add(field, workItem.Fields[field].ToString()!);
+                if (field == "System.State")
+                {
+                    cmdPalWorkItem.SystemState = fieldValue;
+                    continue;
+                }
+
+                if (field == "System.Reason")
+                {
+                    cmdPalWorkItem.SystemReason = fieldValue;
+                    continue;
+                }
+
+                if (field == "System.Title")
+                {
+                    cmdPalWorkItem.SystemTitle = fieldValue;
+                    continue;
+                }
             }
 
-            workItemsObjDict.Add(workItem.Id.ToStringInvariant(), workItemObj);
+            workItemsList.Add(cmdPalWorkItem);
         }
 
-        JsonSerializerOptions serializerOptions = new()
-        {
-#if DEBUG
-            WriteIndented = true,
-#else
-            WriteIndented = false,
-#endif
-        };
-
-        var serializedJson = System.Text.Json.JsonSerializer.Serialize(workItemsObj, serializerOptions);
-
-        var itemsArray = new JsonArray();
-
-        foreach (var element in serializedJson)
-        {
-            var workItem = JsonNode.Parse(element.Value.ToStringInvariant());
-
-            if (workItem != null)
-            {
-                var dateTicks = workItem["System.ChangedDate"]?.GetValue<long>() ?? DateTime.UtcNow.Ticks;
-                var dateTime = dateTicks.ToDateTime();
-                var creator = _azureDataManager.GetIdentity(workItem["System.CreatedBy"]?.GetValue<long>() ?? 0L);
-                var workItemType = _azureDataManager.GetWorkItemType(workItem["System.WorkItemType"]?.GetValue<long>() ?? 0L);
-
-                var item = new JsonObject
-            {
-                { "title", workItem["System.Title"]?.GetValue<string>() ?? string.Empty },
-                { "url", workItem[AzureDataManager.WorkItemHtmlUrlFieldName]?.GetValue<string>() ?? string.Empty },
-                { "icon", GetIconForType(workItemType.Name) },
-                { "status_icon", GetIconForStatusState(workItem["System.State"]?.GetValue<string>()) },
-                { "number", element.Key },
-                { "date", _timeSpanHelper.DateTimeOffsetToDisplayString(dateTime, Log) },
-                { "user", creator.Name },
-                { "status", workItem["System.State"]?.GetValue<string>() ?? string.Empty },
-                { "avatar", creator.Avatar },
-            };
-
-                itemsArray.Add(item);
-            }
-        }
-
-        // convert JsonArray into a List of JsonObject
-        var itemsList = new List<JsonObject>();
-        foreach (var item in itemsArray)
-        {
-            if (item is JsonObject jsonObject)
-            {
-                itemsList.Add(jsonObject);
-            }
-        }
-
-        return itemsList;
+        return workItemsList;
     }
 }

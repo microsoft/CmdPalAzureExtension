@@ -22,13 +22,13 @@ public partial class SavedSearchesPage : ListPage
 
     private readonly SavedSearchesMediator _savedSearchesMediator;
 
-    private readonly PersistentDataManager _searchRepository;
-
     private List<QueryObject> _searches = new List<QueryObject>();
 
     private IDeveloperIdProvider? _developerIdProvider;
 
     private AzureDataManager _azureDataManager;
+
+    private TimeSpanHelper _timeSpanHelper;
 
     public SavedSearchesPage(
        IResources resources,
@@ -36,8 +36,7 @@ public partial class SavedSearchesPage : ListPage
        SavedSearchesMediator savedSearchesMediator,
        IDeveloperIdProvider developerIdProvider,
        AzureDataManager azureDataManager,
-       PersistentDataManager searchRepository,
-       ISearchPageFactory searchPageFactory)
+       TimeSpanHelper timeSpanHelper)
     {
         _resources = resources;
 
@@ -50,7 +49,7 @@ public partial class SavedSearchesPage : ListPage
         _savedSearchesMediator.SearchSaved += OnSearchSaved;
         _developerIdProvider = developerIdProvider;
         _azureDataManager = azureDataManager;
-        _searchRepository = searchRepository;
+        _timeSpanHelper = timeSpanHelper;
     }
 
     private void OnSearchRemoved(object? sender, object? args)
@@ -104,11 +103,6 @@ public partial class SavedSearchesPage : ListPage
         }
     }
 
-    private object CreateItemForSearch(QueryObject savedSearch)
-    {
-        throw new NotImplementedException();
-    }
-
     public void OnSearchSaved(object? sender, object? args)
     {
         IsLoading = false;
@@ -134,10 +128,11 @@ public partial class SavedSearchesPage : ListPage
 
     private ListPage CreatePageForSearch(QueryObject search)
     {
-        return new WorkItemsSearchPage(search, _azureDataManager, _persistentDataManager, _resources, _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!, _timeSpanHelper)
+        return new WorkItemsSearchPage(search, _developerIdProvider!.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!, _resources, _azureDataManager, _timeSpanHelper)
         {
-            Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
+            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
             Name = search.Name,
+            IsLoading = true,
         };
     }
 }

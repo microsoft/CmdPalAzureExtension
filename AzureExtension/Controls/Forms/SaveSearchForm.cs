@@ -23,11 +23,9 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
 
     private readonly IDeveloperIdProvider _developerIdProvider;
 
-    private readonly ISearchRepository _searchRepository;
-
     public event EventHandler<bool>? LoadingStateChanged;
 
-    private string IsTopLevelChecked => GetIsTopLevel().Result.ToString().ToLower(CultureInfo.InvariantCulture);
+    private string isTopLevelChecked = "false";
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
@@ -36,7 +34,7 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
         { "{{SaveSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedSearch.Name) ? "Forms_Save_Search" : "Forms_Edit_Search") },
         { "{{SavedSearchString}}", _savedSearch.AzureUri.ToString() },
         { "{{SavedSearchName}}", _savedSearch.Name },
-        { "{{IsTopLevel}}", IsTopLevelChecked },
+        { "{{IsTopLevel}}", isTopLevelChecked },
         { "{{EnteredSearchErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchError") },
         { "{{EnteredSearchLabel}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchLabel") },
         { "{{NameLabel}}", _resources.GetResource("Forms_SaveSearchTemplateNameLabel") },
@@ -46,23 +44,21 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
     };
 
     // for saving a new query
-    public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider, QueryObjectRepository searchRepository)
+    public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
     {
         _resources = resources;
         _savedSearch = new QueryObject();
         _savedSearchesMediator = savedSearchesMediator;
         _developerIdProvider = developerIdProvider;
-        _searchRepository = searchRepository;
     }
 
     // for editing an existing query
-    public SaveSearchForm(QueryObject savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider, QueryObjectRepository searchRepository)
+    public SaveSearchForm(QueryObject savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
     {
         _resources = resources;
         _savedSearch = savedSearch;
         _savedSearchesMediator = savedSearchesMediator;
         _developerIdProvider = developerIdProvider;
-        _searchRepository = searchRepository;
     }
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SaveSearch", TemplateSubstitutions);
