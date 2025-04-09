@@ -2,15 +2,20 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Client;
+using AzureExtension.Controls;
 using AzureExtension.Controls.Forms;
+using AzureExtension.Controls.ListItems;
 using AzureExtension.Controls.Pages;
 using AzureExtension.DataManager;
 using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
-using CommandPaletteAzureExtension.Helpers;
+using AzureExtension.Helpers;
+using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Windows.ApplicationModel.Resources;
 using Microsoft.Windows.AppLifecycle;
 using Serilog;
 using Shmuelie.WinRTServer;
@@ -132,10 +137,26 @@ public sealed class Program
 
         // Add an update whenever CacheManager is updated.
         // cacheManager.OnUpdate += HandleCacheUpdate;
-        var signInForm = new SignInForm(devIdProvider);
-        var signInPage = new SignInPage(signInForm, new StatusMessage(), Resources.GetResource("Message_Sign_In_Success"), Resources.GetResource("Message_Sign_In_Fail"), devIdProvider);
+        var path = ResourceLoader.GetDefaultResourceFilePath();
+        var resourceLoader = new ResourceLoader(path);
+        var resources = new Resources(resourceLoader);
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage);
+        var signInForm = new SignInForm(devIdProvider);
+        var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"), devIdProvider);
+        var signOutForm = new SignOutForm(devIdProvider, resources);
+        var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"));
+
+        var azureClientProvider = new AzureClientProvider();
+
+        var savedSearchesMediator = new SavedSearchesMediator();
+        var persistentDataManager = new PersistentDataManager(new AzureValidatorAdapter(azureClientProvider));
+
+        var addSearchForm = new SaveSearchForm(resources, savedSearchesMediator, devIdProvider, persistentDataManager);
+        var addSearchListItem = new AddSearchListItem(new SaveSearchPage(addSearchForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
+        var searchPageFactory = new SearchPageFactory(persistentDataManager, azureDataManager, resources, savedSearchesMediator, devIdProvider);
+        var savedSearchesPage = new SavedSearchesPage(resources, addSearchListItem, savedSearchesMediator, devIdProvider, azureDataManager, persistentDataManager, searchPageFactory);
+
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, devIdProvider, savedSearchesPage, resources);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 
@@ -165,8 +186,8 @@ public sealed class Program
         {
               "MicrosoftWindows.Client.WebExperience_cw5n1h2txyewy",
               "Microsoft.Windows.CommandPalette_8wekyb3d8bbwe",
-              "Microsoft.Windows.CommandPaletteAzureExtension_8wekyb3d8bbwe",
-              "Microsoft.Windows.CommandPaletteAzureExtension.Dev_8wekyb3d8bbwe",
+              "Microsoft.Windows.AzureExtension_8wekyb3d8bbwe",
+              "Microsoft.Windows.AzureExtension.Dev_8wekyb3d8bbwe",
         };
 
         try

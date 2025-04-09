@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
+using System.Runtime.InteropServices;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Broker;
 using Microsoft.Identity.Client.Extensions.Msal;
@@ -44,13 +45,16 @@ public class AuthenticationHelper : IAuthenticationHelper
 
     private static readonly ILogger _log = _logger.Value;
 
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
     public AuthenticationHelper()
     {
         MicrosoftEntraIdSettings = new AuthenticationSettings();
 
         InitializePublicClientApplicationBuilder();
 
-        // InitializePublicClientAppForWAMBrokerAsync();
+        InitializePublicClientAppForWAMBrokerAsync();
     }
 
     public void InitializePublicClientApplicationBuilder()
@@ -73,7 +77,7 @@ public class AuthenticationHelper : IAuthenticationHelper
             PublicClientApplicationBuilder.WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows)
             {
                 MsaPassthrough = true,
-                Title = "AzureExtension",
+                Title = "DevHomeAzureExtension",
             });
 
             PublicClientApplication = PublicClientApplicationBuilder.Build();
@@ -88,11 +92,11 @@ public class AuthenticationHelper : IAuthenticationHelper
         await TokenCacheRegistration();
     }
 
-    public async Task InitializePublicClientAppForWAMBrokerAsyncWithParentWindow(WindowId? windowPtr)
+    public async Task InitializePublicClientAppForWAMBrokerAsyncWithParentWindow()
     {
-        if (windowPtr != null && PublicClientApplicationBuilder != null)
+        if (PublicClientApplicationBuilder != null)
         {
-            var windowHandle = Win32Interop.GetWindowFromWindowId((WindowId)windowPtr);
+            var windowHandle = GetForegroundWindow();
             var builder = PublicClientApplicationBuilder
                 .WithParentActivityOrWindow(() => { return windowHandle; });
 

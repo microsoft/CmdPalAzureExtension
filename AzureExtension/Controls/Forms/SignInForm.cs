@@ -3,9 +3,10 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
+using AzureExtension.Client;
+using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
-using CommandPaletteAzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
@@ -26,11 +27,19 @@ public partial class SignInForm : FormContent, IAzureForm
     private string IsButtonEnabled =>
         _isButtonEnabled.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture);
 
+    private Page? page;
+
     public SignInForm(IDeveloperIdProvider developerIdProvider)
     {
         _developerIdProvider = developerIdProvider;
         _developerIdProvider.OAuthRedirected += DeveloperIdProvider_OAuthRedirected;
         SignOutForm.SignOutAction += SignOutForm_SignOutAction;
+        page = null;
+    }
+
+    public void SetPage(Page page)
+    {
+        this.page = page;
     }
 
     private void SignOutForm_SignOutAction(object? sender, SignInStatusChangedEventArgs e)
@@ -73,11 +82,11 @@ public partial class SignInForm : FormContent, IAzureForm
     public override ICommandResult SubmitForm(string inputs, string data)
     {
         LoadingStateChanged?.Invoke(this, true);
-        Task.Run(() =>
+        Task.Run(async () =>
         {
             try
             {
-                var signInSucceeded = HandleSignIn().Result;
+                var signInSucceeded = await HandleSignIn();
                 LoadingStateChanged?.Invoke(this, false);
                 SignInAction?.Invoke(this, new SignInStatusChangedEventArgs(signInSucceeded, null));
                 FormSubmitted?.Invoke(this, new FormSubmitEventArgs(signInSucceeded, null));
@@ -97,10 +106,22 @@ public partial class SignInForm : FormContent, IAzureForm
     {
         var numPreviousDevIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal().Count();
 
-        await _developerIdProvider.ShowLogonSession();
+        var developerIdResult = await _developerIdProvider.ShowLogonSession();
 
-        var numDevIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal().Count();
+        if (developerIdResult.Result.Status == ProviderOperationStatus.Failure)
+        {
+            var errorMessage = $"{developerIdResult.Result.DisplayMessage} - {developerIdResult.Result.DiagnosticText}";
+            throw new InvalidOperationException(developerIdResult.Result.DisplayMessage);
+        }
 
-        return numDevIds > numPreviousDevIds;
+        if (developerIdResult.Result.Status == ProviderOperationStatus.Success)
+        {
+            var developerId = developerIdResult.DeveloperId;
+            var selectedQueryUrl = new AzureUri("https://microsoft.visualstudio.com/OS/_queries/query-edit/fd7ad0f5-17b0-46be-886a-92e4043c1c4f/");
+            var queryInfo = AzureClientHelpers.GetQueryInfo(selectedQueryUrl, developerId!);
+            var selectedQueryId = queryInfo.AzureUri.Query;
+        }
+
+        return developerIdResult.Result.Status == ProviderOperationStatus.Success;
     }
 }

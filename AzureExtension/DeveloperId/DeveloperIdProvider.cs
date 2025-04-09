@@ -5,7 +5,6 @@
 using AzureExtension.Controls.Pages;
 using AzureExtension.DataModel;
 using Microsoft.Identity.Client;
-using Microsoft.UI;
 using Serilog;
 using Windows.Foundation;
 
@@ -104,19 +103,19 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
 
     public IAsyncOperation<DeveloperIdResult> ShowLogonSession()
     {
-        return Task.Run(() =>
+        return Task.Run(async () =>
         {
-            _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsync();
-            var account = _developerIdAuthenticationHelper.LoginDeveloperAccount(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
+            await _developerIdAuthenticationHelper.InitializePublicClientAppForWAMBrokerAsyncWithParentWindow();
+            var account = await _developerIdAuthenticationHelper.LoginDeveloperAccount(_developerIdAuthenticationHelper.MicrosoftEntraIdSettings.ScopesArray);
 
-            if (account.Result == null)
+            if (account == null)
             {
                 _log.Error($"Invalid AuthRequest");
                 var exception = new InvalidOperationException();
                 return new DeveloperIdResult(exception, "An issue has occurred with the authentication request");
             }
 
-            var devId = CreateOrUpdateDeveloperId(account.Result);
+            var devId = CreateOrUpdateDeveloperId(account);
             _log.Information($"New DeveloperId logged in");
             return new DeveloperIdResult(devId);
         }).AsAsyncOperation();
@@ -331,5 +330,10 @@ public class DeveloperIdProvider : IDeveloperIdProvider, IDisposable
     {
         OAuthRedirected?.Invoke(this, null);
         throw new NotImplementedException();
+    }
+
+    public bool IsSignedIn()
+    {
+        return DeveloperIds.Count > 0;
     }
 }

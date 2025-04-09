@@ -16,7 +16,6 @@
       "type": "Input.Text",
       "id": "Name",
       "label": "{{NameLabel}}",
-      "isRequired": true,
       "errorMessage": "{{NameErrorMessage}}",
       "value": "{{SavedSearchName}}"
     },

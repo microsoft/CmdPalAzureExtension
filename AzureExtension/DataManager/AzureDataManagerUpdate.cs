@@ -53,16 +53,5 @@ public partial class AzureDataManager
         var identifier = Guid.NewGuid();
         using var dataManager = new AzureDataManager(identifier.ToString(), _developerIdProvider) ?? throw new DataStoreInaccessibleException();
         await dataManager.UpdatePullRequestsForLoggedInDeveloperIdsAsync(null, identifier);
-
-        // Show any new notifications that were created from the pull request update.
-        var notifications = dataManager.GetNotifications();
-        foreach (var notification in notifications)
-        {
-            // Show notifications for failed checkruns for Developer users.
-            if (notification.Type == NotificationType.PullRequestRejected || notification.Type == NotificationType.PullRequestApproved)
-            {
-                notification.ShowToast();
-            }
-        }
     }
 }

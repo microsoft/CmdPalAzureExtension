@@ -4,6 +4,7 @@
 
 using AzureExtension.Controls.Pages;
 using AzureExtension.DataManager;
+using AzureExtension.Helpers;
 
 namespace AzureExtension.Providers;
 
@@ -11,5 +12,5 @@ public interface ISettingsProvider : IDisposable
 {
     string DisplayName { get; }
 
-    AdaptiveCardSessionResult GetSettingsAdaptiveCardSession(CacheManager cacheManager);
+    AdaptiveCardSessionResult GetSettingsAdaptiveCardSession(CacheManager cacheManager, IResources resources);
 }

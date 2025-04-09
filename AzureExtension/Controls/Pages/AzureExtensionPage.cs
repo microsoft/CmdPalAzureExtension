@@ -5,10 +5,8 @@
 using System.Text.Json.Nodes;
 using AzureExtension.Client;
 using AzureExtension.DataManager;
-using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
-using CommandPaletteAzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Windows.Widgets.Providers;
@@ -35,6 +33,10 @@ public partial class AzureExtensionPage : ListPage
     protected IAzureDataManager? DataManager { get; private set; }
 
     private readonly IDeveloperIdProvider _developerIdProvider;
+
+    private readonly IResources _resources;
+
+    private readonly TimeSpanHelper _timeSpanHelper;
 
     protected string DataErrorMessage { get; set; } = string.Empty;
 
@@ -69,12 +71,14 @@ public partial class AzureExtensionPage : ListPage
 
     protected DataUpdater? DataUpdater { get; private set; }
 
-    public AzureExtensionPage(IDeveloperIdProvider developerIdProvider)
+    public AzureExtensionPage(IDeveloperIdProvider developerIdProvider, IResources resources, TimeSpanHelper timeSpanHelper)
     {
         _developerIdProvider = developerIdProvider;
         Icon = new(string.Empty);
         Name = "Azure extension for cmdpal";
         _log = new(() => Serilog.Log.ForContext("SourceContext", nameof(AzureExtensionPage)));
+        _resources = resources;
+        _timeSpanHelper = timeSpanHelper;
     }
 
     public override IListItem[] GetItems()
@@ -142,7 +146,7 @@ public partial class AzureExtensionPage : ListPage
             var developerId = GetDevId(DeveloperLoginId);
             if (developerId == null)
             {
-                _message = Resources.GetResource(@"Widget_Template/DevIDError");
+                _message = _resources.GetResource(@"Widget_Template/DevIDError");
                 return false;
             }
 
@@ -339,7 +343,7 @@ public partial class AzureExtensionPage : ListPage
                         { "icon", GetIconForType(workItemType.Name) },
                         { "status_icon", GetIconForStatusState(workItem["System.State"]?.GetValue<string>()) },
                         { "number", element.Key },
-                        { "date", TimeSpanHelper.DateTimeOffsetToDisplayString(dateTime, Log) },
+                        { "date", _timeSpanHelper.DateTimeOffsetToDisplayString(dateTime, Log) },
                         { "user", creator.Name },
                         { "status", workItem["System.State"]?.GetValue<string>() ?? string.Empty },
                         { "avatar", creator.Avatar },
@@ -385,7 +389,7 @@ public partial class AzureExtensionPage : ListPage
         var message = errorType switch
         {
             ErrorType.None => string.Empty,
-            _ => Resources.GetResource(identifier, Log),
+            _ => _resources.GetResource(identifier, Log),
         };
 
         // If identifier and message are different, then it means we have a specific message to

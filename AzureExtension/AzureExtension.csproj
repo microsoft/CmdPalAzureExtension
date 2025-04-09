@@ -29,6 +29,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+        <PackageReference Include="Azure.Core" Version="1.45.0" />
+        <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
         <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
         <PackageReference Include="LibGit2Sharp" Version="0.30.0" />
         <PackageReference Include="MessageFormat" Version="6.0.2" />
@@ -80,6 +82,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Controls\Templates\" />
+		<Folder Include="DataManager\Data\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" />

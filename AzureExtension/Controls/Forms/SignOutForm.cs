@@ -6,7 +6,6 @@ using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using static CommandPaletteAzureExtension.Helpers.Resources;
 
 namespace AzureExtension.Controls.Forms;
 

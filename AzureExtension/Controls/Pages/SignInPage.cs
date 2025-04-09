@@ -21,6 +21,8 @@ public partial class SignInPage : ContentPage
 
     public SignInPage(SignInForm signInForm, StatusMessage statusMessage, string successMessage, string errorMessage, IDeveloperIdProvider developerIdProvider)
     {
+        Title = "Sign in";
+        Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
         _developerIdProvider = developerIdProvider;
         _signInForm = signInForm;
         _statusMessage = statusMessage;
@@ -30,6 +32,7 @@ public partial class SignInPage : ContentPage
         // Wire up events using the helper
         FormEventHelper.WireFormEvents(_signInForm, this, _statusMessage, _successMessage, _errorMessage);
 
+        _signInForm.SetPage(this);
         _signInForm.PropChanged += UpdatePage;
 
         // Hide status message initially
