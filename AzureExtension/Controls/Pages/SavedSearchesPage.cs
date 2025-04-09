@@ -4,11 +4,9 @@
 
 using AzureExtension.Controls;
 using AzureExtension.Controls.Commands;
-using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.Pages;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
@@ -66,9 +64,12 @@ public partial class SavedSearchesPage : ListPage
 
             toast.Show();
         }
-        else if (args is true)
+        else if (args != null && args is QueryObject queryObject)
         {
+            _searches.Remove(queryObject);
             RaiseItemsChanged(0);
+
+            // no toast yet
         }
         else if (args is false)
         {
@@ -126,6 +127,7 @@ public partial class SavedSearchesPage : ListPage
             MoreCommands = new CommandContextItem[]
             {
                 new(new LinkCommand(search.AzureUri.ToString(), _resources)),
+                new(new RemoveSavedSearchCommand(search, _resources, _savedSearchesMediator)),
             },
         };
     }
