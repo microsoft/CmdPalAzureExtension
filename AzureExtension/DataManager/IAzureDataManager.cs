@@ -4,6 +4,7 @@
 
 using AzureExtension.Client;
 using AzureExtension.DataModel;
+using AzureExtension.PersistentData;
 
 namespace AzureExtension;
 

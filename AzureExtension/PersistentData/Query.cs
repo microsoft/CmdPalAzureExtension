@@ -3,18 +3,19 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Controls;
+using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Serilog;
 
-namespace AzureExtension.DataModel;
+namespace AzureExtension.PersistentData;
 
 [Table("Query")]
-public class Query : ISearch
+public class Query
 {
-    private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", $"DataModel/{nameof(Query)}"));
+    private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", $"DataModel/{nameof(Query)}"));
 
     private static readonly ILogger _log = _logger.Value;
 
