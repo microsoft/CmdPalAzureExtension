@@ -4,6 +4,7 @@
 
 using AzureExtension.Controls;
 using AzureExtension.Controls.Commands;
+using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.Pages;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
@@ -128,6 +129,16 @@ public partial class SavedSearchesPage : ListPage
             {
                 new(new LinkCommand(search.AzureUri.ToString(), _resources)),
                 new(new RemoveSavedSearchCommand(search, _resources, _savedSearchesMediator)),
+                new(new EditSearchPage(
+                    _resources,
+                    new SaveSearchForm(
+                        search,
+                        _resources,
+                        _savedSearchesMediator,
+                        _developerIdProvider!),
+                    new StatusMessage(),
+                    _resources.GetResource("Pages_Search_Edited_Success"),
+                    _resources.GetResource("Pages_Search_Edited_Failed"))),
             },
         };
     }
