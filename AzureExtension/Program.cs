@@ -115,31 +115,23 @@ public sealed class Program
         await using global::Shmuelie.WinRTServer.ComServer server = new();
         var extensionDisposedEvent = new ManualResetEvent(false);
 
-        // We may have received an event on previous launch that the datastore should be recreated.
-        // It should be recreated now before anything else tries to use it.
-
-        // In the case that this is the first launch we will try to automatically connect the default Windows account
         var authenticationSettings = new AuthenticationSettings();
         authenticationSettings.InitializeSettings();
 
         var accountProvider = new AccountProvider(authenticationSettings);
+
+        // In the case that this is the first launch we will try to automatically connect the default Windows account
         await accountProvider.EnableSSOForAzureExtensionAsync();
 
         var azureClientProvider = new AzureClientProvider(accountProvider);
         var azureClientHelpers = new AzureClientHelpers(azureClientProvider);
 
+        var azureValidator = new AzureValidatorAdapter(azureClientHelpers);
+
+        var persistentDataManager = new PersistentDataManager(azureValidator);
+
         var dataProvider = new DataProvider(accountProvider, azureClientProvider);
 
-        // Cache manager updates account data.
-        // using var cacheManager = new CacheManager(azureDataManager, devIdProvider);
-        // cacheManager.Start();
-
-        // Set up the data updater. This will schedule updating the Developer Pull Requests.
-        // using var dataUpdater = new DataUpdater(azureDataManager.Update);
-        // _ = dataUpdater.Start();
-
-        // Add an update whenever CacheManager is updated.
-        // cacheManager.OnUpdate += HandleCacheUpdate;
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);
         var resources = new Resources(resourceLoader);

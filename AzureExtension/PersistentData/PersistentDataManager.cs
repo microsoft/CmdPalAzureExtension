@@ -13,7 +13,7 @@ using Windows.Storage;
 
 namespace AzureExtension.PersistentData;
 
-public class PersistentDataManager : IDisposable, ISearchRepository
+public class PersistentDataManager : IDisposable
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", nameof(PersistentDataManager)));
 
@@ -91,115 +91,98 @@ public class PersistentDataManager : IDisposable, ISearchRepository
         GC.SuppressFinalize(this);
     }
 
-    public async Task<IEnumerable<Repository>> GetAllRepositoriesAsync()
+    public Task AddSavedQueryAsync(IQuery query)
     {
-        return await Task.Run(() =>
+        ValidateDataStore();
+
+        var name = query.Name;
+        var url = query.Url;
+
+        _log.Information($"Adding query: {name} - {url}.");
+        if (Query.Get(DataStore, name, url) != null)
         {
-            ValidateDataStore();
-            return Repository.GetAll(DataStore);
-        });
+            throw new InvalidOperationException($"Search {name} - {url} already exists.");
+        }
+
+        Query.Add(DataStore, name, url, false);
+
+        return Task.CompletedTask;
     }
 
-    private Task AddSearchAsync(ISearch search)
+    public Task RemoveSavedQueryAsync(IQuery query)
     {
-        return Task.Run(() =>
+        ValidateDataStore();
+
+        var name = query.Name;
+        var url = query.Url;
+
+        _log.Information($"Removing query: {name} - {url}.");
+        if (Query.Get(DataStore, name, url) == null)
         {
-            ValidateDataStore();
+            throw new InvalidOperationException($"Search {name} - {url} not found.");
+        }
 
-            var name = search.Name;
-            var searchString = search.SearchString;
+        Query.Remove(DataStore, name, url);
 
-            _log.Information($"Adding search: {name} - {searchString}.");
-            if (Search.Get(DataStore, name, searchString) != null)
-            {
-                throw new InvalidOperationException($"Search {name} - {searchString} already exists.");
-            }
-
-            Search.Add(DataStore, name, searchString);
-        });
+        return Task.CompletedTask;
     }
 
-    private async Task RemoveSearchAsync(string name, string searchString)
+    private Task<IEnumerable<IQuery>> GetAllQueriesAsync(bool isTopLevel)
     {
-        await Task.Run(() =>
+        ValidateDataStore();
+        if (isTopLevel)
         {
-            ValidateDataStore();
-            _log.Information($"Removing search: {name} - {searchString}.");
-            Search.Remove(DataStore, name, searchString);
-        });
-    }
+            return Task.FromResult(Query.GetTopLevel(DataStore));
+        }
 
-    private async Task<IEnumerable<ISearch>> GetAllSearchesAsync(bool isTopLevel)
-    {
-        return await Task.Run(() =>
-        {
-            ValidateDataStore();
-            if (isTopLevel)
-            {
-                return Search.GetAllTopLevel(DataStore);
-            }
-
-            return Search.GetAll(DataStore);
-        });
+        return Task.FromResult(Query.GetAll(DataStore));
     }
 
     // ISearchRepository implementation
-    public ISearch GetSearch(string name, string searchString)
+    public IQuery GetQuery(string name, string url)
     {
         ValidateDataStore();
-        return Search.Get(DataStore, name, searchString) ?? throw new InvalidOperationException($"Search {name} - {searchString} not found.");
+        return Query.Get(DataStore, name, url) ?? throw new InvalidOperationException($"Search {name} - {url} not found.");
     }
 
-    public Task<IEnumerable<ISearch>> GetSavedSearches()
+    public Task<IEnumerable<IQuery>> GetSavedQueries()
     {
-        return GetAllSearchesAsync(false);
+        return GetAllQueriesAsync(false);
     }
 
-    public Task<IEnumerable<ISearch>> GetTopLevelSearches()
+    public Task<IEnumerable<IQuery>> GetTopLevelQueries()
     {
-        return GetAllSearchesAsync(true);
+        return GetAllQueriesAsync(true);
     }
 
-    public Task<bool> IsTopLevel(ISearch search)
+    public Task<bool> IsTopLevel(IQuery query)
     {
         ValidateDataStore();
-        var dsSearch = Search.Get(DataStore, search.Name, search.SearchString);
-        return dsSearch != null ? Task.FromResult(dsSearch.IsTopLevel) : Task.FromResult(false);
+        var dsQuery = Query.Get(DataStore, query.Name, query.Url);
+        return dsQuery != null ? Task.FromResult(dsQuery.IsTopLevel) : Task.FromResult(false);
     }
 
-    public void UpdateSearchTopLevelStatus(ISearch search, bool isTopLevel, IAccount account)
+    public void UpdateQueryTopLevelStatus(IQuery query, bool isTopLevel, IAccount account)
     {
-        ValidateSearch(search, account);
+        ValidateQuery(query, account);
         ValidateDataStore();
-        Search.AddOrUpdate(DataStore, search.Name, search.SearchString, isTopLevel);
-    }
-
-    public Task RemoveSavedSearch(ISearch search)
-    {
-        return RemoveSearchAsync(search.Name, search.SearchString);
-    }
-
-    public InfoResult GetQueryInfo(string queryUrl, string name, IAccount account)
-    {
-        var queryInfo = _azureValidator.GetQueryInfo(queryUrl, name, account);
-        return queryInfo;
+        Query.AddOrUpdate(DataStore, query.Name, query.Url, isTopLevel);
     }
 
     private readonly object _insertLock = new();
 
-    public async Task InitializeTopLevelSearches(IEnumerable<ISearch> searches, IAccount account)
+    public async Task InitializeTopLevelQueries(IEnumerable<IQuery> queries, IAccount account)
     {
         var defaultTasks = new List<Task>();
-        foreach (var search in searches)
+        foreach (var query in queries)
         {
             var task = Task.Run(() =>
             {
-                _log.Information($"Validating search: {search.Name} - {search.SearchString}.");
-                var queryInfo = GetQueryInfo(search.SearchString, search.Name, account);
+                _log.Information($"Validating search: {query.Name} - {query.Url}.");
 
-                if (queryInfo == null)
+                if (!ValidateQuery(query, account))
                 {
-                    _log.Error($"Search {search.Name} - {search.SearchString} is invalid.");
+                    _log.Error($"Search {query.Name}  -  {query.Url} is invalid.");
                     return;
                 }
 
@@ -207,9 +190,9 @@ public class PersistentDataManager : IDisposable, ISearchRepository
                 // But doing that asynchronously will not keep the original order of the searches.
                 lock (_insertLock)
                 {
-                    _log.Information($"Adding search: {search.Name} - {search.SearchString}.");
+                    _log.Information($"Adding search: {query.Name}  -  {query.Url}.");
                     ValidateDataStore();
-                    Search.AddOrUpdate(DataStore, search.Name, search.SearchString, true);
+                    Query.AddOrUpdate(DataStore, query.Name, query.Url, true);
                 }
             });
 
@@ -219,14 +202,9 @@ public class PersistentDataManager : IDisposable, ISearchRepository
         await Task.WhenAll(defaultTasks);
     }
 
-    public bool ValidateSearch(ISearch search, IAccount account)
+    public bool ValidateQuery(IQuery query, IAccount account)
     {
-        var queryInfo = GetQueryInfo(search.SearchString, search.Name, account);
+        var queryInfo = _azureValidator.GetQueryInfo(query.Url, account);
         return queryInfo.Result == ResultType.Success;
-    }
-
-    public Task InitializeTopLevelSearches(IEnumerable<ISearch> searches)
-    {
-        throw new NotImplementedException();
     }
 }
