@@ -6,6 +6,7 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
+using Microsoft.Identity.Client;
 using Serilog;
 using Windows.Devices;
 using Windows.Storage;
@@ -166,9 +167,9 @@ public class PersistentDataManager : IDisposable, ISearchRepository
         return dsSearch != null ? Task.FromResult(dsSearch.IsTopLevel) : Task.FromResult(false);
     }
 
-    public void UpdateSearchTopLevelStatus(ISearch search, bool isTopLevel, IDeveloperId developerId)
+    public void UpdateSearchTopLevelStatus(ISearch search, bool isTopLevel, IAccount account)
     {
-        ValidateSearch(search, developerId);
+        ValidateSearch(search, account);
         ValidateDataStore();
         Search.AddOrUpdate(DataStore, search.Name, search.SearchString, isTopLevel);
     }
@@ -178,15 +179,15 @@ public class PersistentDataManager : IDisposable, ISearchRepository
         return RemoveSearchAsync(search.Name, search.SearchString);
     }
 
-    public InfoResult GetQueryInfo(string queryUrl, string name, IDeveloperId developerId)
+    public InfoResult GetQueryInfo(string queryUrl, string name, IAccount account)
     {
-        var queryInfo = _azureValidator.GetQueryInfo(queryUrl, name, developerId);
+        var queryInfo = _azureValidator.GetQueryInfo(queryUrl, name, account);
         return queryInfo;
     }
 
     private readonly object _insertLock = new();
 
-    public async Task InitializeTopLevelSearches(IEnumerable<ISearch> searches, IDeveloperId developerId)
+    public async Task InitializeTopLevelSearches(IEnumerable<ISearch> searches, IAccount account)
     {
         var defaultTasks = new List<Task>();
         foreach (var search in searches)
@@ -194,7 +195,7 @@ public class PersistentDataManager : IDisposable, ISearchRepository
             var task = Task.Run(() =>
             {
                 _log.Information($"Validating search: {search.Name} - {search.SearchString}.");
-                var queryInfo = GetQueryInfo(search.SearchString, search.Name, developerId);
+                var queryInfo = GetQueryInfo(search.SearchString, search.Name, account);
 
                 if (queryInfo == null)
                 {
@@ -218,9 +219,9 @@ public class PersistentDataManager : IDisposable, ISearchRepository
         await Task.WhenAll(defaultTasks);
     }
 
-    public bool ValidateSearch(ISearch search, IDeveloperId developerId)
+    public bool ValidateSearch(ISearch search, IAccount account)
     {
-        var queryInfo = GetQueryInfo(search.SearchString, search.Name, developerId);
+        var queryInfo = GetQueryInfo(search.SearchString, search.Name, account);
         return queryInfo.Result == ResultType.Success;
     }
 

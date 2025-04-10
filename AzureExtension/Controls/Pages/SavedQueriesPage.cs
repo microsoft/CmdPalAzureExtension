@@ -2,10 +2,12 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.Pages;
+using AzureExtension.DataManager;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -16,26 +18,25 @@ namespace AzureExtension;
 public partial class SavedQueriesPage : ListPage
 {
     private readonly IListItem _addQueryListItem;
-
     private readonly IResources _resources;
+    private readonly IDataProvider _dataProvider;
+    private readonly IAccountProvider _accountProvider;
+    private readonly AzureClientHelpers _azureClientHelpers;
 
     private readonly SavedQueriesMediator _savedQueriesMediator;
 
-    private List<Query> _queryes = new List<Query>();
+    private readonly List<Query> _queryes = new List<Query>();
 
-    private IDeveloperIdProvider? _developerIdProvider;
-
-    private AzureDataManager _azureDataManager;
-
-    private TimeSpanHelper _timeSpanHelper;
+    private readonly TimeSpanHelper _timeSpanHelper;
 
     public SavedQueriesPage(
        IResources resources,
        IListItem addQueryListItem,
        SavedQueriesMediator savedQueriesMediator,
-       IDeveloperIdProvider developerIdProvider,
-       AzureDataManager azureDataManager,
-       TimeSpanHelper timeSpanHelper)
+       IDataProvider dataProvider,
+       TimeSpanHelper timeSpanHelper,
+       IAccountProvider accountProvider,
+       AzureClientHelpers azureClientHelpers)
     {
         _resources = resources;
 
@@ -46,9 +47,10 @@ public partial class SavedQueriesPage : ListPage
         _savedQueriesMediator.QueryRemoving += OnQueryRemoving;
         _addQueryListItem = addQueryListItem;
         _savedQueriesMediator.QuerySaved += OnQuerySaved;
-        _developerIdProvider = developerIdProvider;
-        _azureDataManager = azureDataManager;
+        _dataProvider = dataProvider;
         _timeSpanHelper = timeSpanHelper;
+        _accountProvider = accountProvider;
+        _azureClientHelpers = azureClientHelpers;
     }
 
     private void OnQueryRemoved(object? sender, object? args)
@@ -135,7 +137,8 @@ public partial class SavedQueriesPage : ListPage
                         query,
                         _resources,
                         _savedQueriesMediator,
-                        _developerIdProvider!),
+                        _accountProvider,
+                        _azureClientHelpers),
                     new StatusMessage(),
                     _resources.GetResource("Pages_Query_Edited_Success"),
                     _resources.GetResource("Pages_Query_Edited_Failed"))),
@@ -145,7 +148,7 @@ public partial class SavedQueriesPage : ListPage
 
     private ListPage CreatePageForQuery(Query query)
     {
-        return new WorkItemsSearchPage(query, _developerIdProvider!.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!, _resources, _azureDataManager, _timeSpanHelper)
+        return new WorkItemsSearchPage(query, _resources, _dataProvider, _timeSpanHelper)
         {
             Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
             Name = query.Name,

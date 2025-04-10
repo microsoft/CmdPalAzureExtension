@@ -3,12 +3,11 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Client;
-using AzureExtension.Controls;
-using AzureExtension.DeveloperId;
+using Microsoft.Identity.Client;
 
 namespace AzureExtension.PersistentData;
 
 public interface IAzureValidator
 {
-    public abstract InfoResult GetQueryInfo(string queryUrl, string queryName, IDeveloperId developerId);
+    InfoResult GetQueryInfo(string queryUrl, string queryName, IAccount account);
 }
