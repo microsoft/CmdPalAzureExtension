@@ -2,10 +2,12 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.Pages;
+using AzureExtension.DataManager;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -16,25 +18,21 @@ namespace AzureExtension;
 public partial class SavedSearchesPage : ListPage
 {
     private readonly IListItem _addSearchListItem;
-
     private readonly IResources _resources;
-
     private readonly SavedSearchesMediator _savedSearchesMediator;
-
-    private List<Query> _searches = new List<Query>();
-
-    private IDeveloperIdProvider? _developerIdProvider;
-
-    private AzureDataManager _azureDataManager;
-
-    private TimeSpanHelper _timeSpanHelper;
+    private readonly List<Query> _searches = new List<Query>();
+    private readonly TimeSpanHelper _timeSpanHelper;
+    private readonly IDataProvider _dataProvider;
+    private readonly IAccountProvider _accountProvider;
+    private readonly AzureClientHelpers _azureClientHelpers;
 
     public SavedSearchesPage(
        IResources resources,
        IListItem addSearchListItem,
        SavedSearchesMediator savedSearchesMediator,
-       IDeveloperIdProvider developerIdProvider,
-       AzureDataManager azureDataManager,
+       IDataProvider dataProvider,
+       IAccountProvider accountProvider,
+       AzureClientHelpers azureClientHelpers,
        TimeSpanHelper timeSpanHelper)
     {
         _resources = resources;
@@ -46,9 +44,10 @@ public partial class SavedSearchesPage : ListPage
         _savedSearchesMediator.SearchRemoving += OnSearchRemoving;
         _addSearchListItem = addSearchListItem;
         _savedSearchesMediator.SearchSaved += OnSearchSaved;
-        _developerIdProvider = developerIdProvider;
-        _azureDataManager = azureDataManager;
         _timeSpanHelper = timeSpanHelper;
+        _dataProvider = dataProvider;
+        _accountProvider = accountProvider;
+        _azureClientHelpers = azureClientHelpers;
     }
 
     private void OnSearchRemoved(object? sender, object? args)
@@ -135,7 +134,8 @@ public partial class SavedSearchesPage : ListPage
                         search,
                         _resources,
                         _savedSearchesMediator,
-                        _developerIdProvider!),
+                        _accountProvider,
+                        _azureClientHelpers),
                     new StatusMessage(),
                     _resources.GetResource("Pages_Search_Edited_Success"),
                     _resources.GetResource("Pages_Search_Edited_Failed"))),
@@ -145,7 +145,7 @@ public partial class SavedSearchesPage : ListPage
 
     private ListPage CreatePageForSearch(Query search)
     {
-        return new WorkItemsSearchPage(search, _developerIdProvider!.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!, _resources, _azureDataManager, _timeSpanHelper)
+        return new WorkItemsSearchPage(search, _resources, _dataProvider, _timeSpanHelper)
         {
             Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
             Name = search.Name,

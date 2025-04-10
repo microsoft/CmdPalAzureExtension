@@ -17,12 +17,12 @@ public sealed partial class SignOutForm : FormContent, IAzureForm
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
-    private readonly IDeveloperIdProvider _developerIdProvider;
+    private readonly IAccountProvider _accountProvider;
     private readonly IResources _resources;
 
-    public SignOutForm(IDeveloperIdProvider developerIdProvider, IResources resources)
+    public SignOutForm(IAccountProvider accountProvider, IResources resources)
     {
-        _developerIdProvider = developerIdProvider;
+        _accountProvider = accountProvider;
         _resources = resources;
     }
 
@@ -40,18 +40,18 @@ public sealed partial class SignOutForm : FormContent, IAzureForm
     public override ICommandResult SubmitForm(string inputs, string data)
     {
         LoadingStateChanged?.Invoke(this, true);
-        Task.Run(() =>
+        Task.Run(async () =>
         {
             try
             {
-                var devIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal();
+                var accounts = await _accountProvider.GetLoggedInAccounts();
 
-                foreach (var devId in devIds)
+                foreach (var account in accounts)
                 {
-                    _developerIdProvider.LogoutDeveloperId(devId);
+                    await _accountProvider.LogoutAccount(account.Username);
                 }
 
-                var signOutSucceeded = !_developerIdProvider.GetLoggedInDeveloperIdsInternal().Any();
+                var signOutSucceeded = !_accountProvider.IsSignedIn();
 
                 LoadingStateChanged?.Invoke(this, false);
                 SignOutAction?.Invoke(this, new SignInStatusChangedEventArgs(!signOutSucceeded, null));

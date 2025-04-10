@@ -119,13 +119,16 @@ public sealed class Program
         // It should be recreated now before anything else tries to use it.
 
         // In the case that this is the first launch we will try to automatically connect the default Windows account
-        var authenticationHelper = new AuthenticationHelper();
-        var devIdProvider = new DeveloperIdProvider(authenticationHelper);
-        devIdProvider.EnableSSOForAzureExtensionAsync();
+        var authenticationSettings = new AuthenticationSettings();
+        authenticationSettings.InitializeSettings();
 
-        RecreateDataStoreIfNecessary(devIdProvider);
+        var accountProvider = new AccountProvider(authenticationSettings);
+        await accountProvider.EnableSSOForAzureExtensionAsync();
 
-        using var azureDataManager = new AzureDataManager("MainInstance", devIdProvider);
+        var azureClientProvider = new AzureClientProvider(accountProvider);
+        var azureClientHelpers = new AzureClientHelpers(azureClientProvider);
+
+        var dataProvider = new DataProvider(accountProvider, azureClientProvider);
 
         // Cache manager updates account data.
         // using var cacheManager = new CacheManager(azureDataManager, devIdProvider);
@@ -143,20 +146,18 @@ public sealed class Program
 
         var timeSpanHelper = new TimeSpanHelper(resources);
 
-        var signInForm = new SignInForm(devIdProvider);
-        var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"), devIdProvider);
-        var signOutForm = new SignOutForm(devIdProvider, resources);
+        var signInForm = new SignInForm(accountProvider, azureClientHelpers);
+        var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"));
+        var signOutForm = new SignOutForm(accountProvider, resources);
         var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"));
-
-        var azureClientProvider = new AzureClientProvider();
 
         var savedSearchesMediator = new SavedSearchesMediator();
 
-        var addSearchForm = new SaveSearchForm(resources, savedSearchesMediator, devIdProvider);
+        var addSearchForm = new SaveSearchForm(resources, savedSearchesMediator, accountProvider, azureClientHelpers);
         var addSearchListItem = new AddSearchListItem(new SaveSearchPage(addSearchForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
-        var savedSearchesPage = new SavedSearchesPage(resources, addSearchListItem, savedSearchesMediator, devIdProvider, azureDataManager, timeSpanHelper);
+        var savedSearchesPage = new SavedSearchesPage(resources, addSearchListItem, savedSearchesMediator, dataProvider, accountProvider, azureClientHelpers, timeSpanHelper);
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, devIdProvider, savedSearchesPage, resources);
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedSearchesPage, resources, azureClientHelpers);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 
@@ -167,17 +168,6 @@ public sealed class Program
         // Since we have single instance of the extension object, we exit as soon as it is disposed.
         extensionDisposedEvent.WaitOne();
         Log.Information($"Extension is disposed.");
-    }
-
-    private static void HandleCacheUpdate(object? source, CacheManagerUpdateEventArgs e)
-    {
-        if (e.Kind == CacheManagerUpdateKind.Updated)
-        {
-            Log.Debug("Cache was updated, updating developer pull requests.");
-
-            // _ = AzureDataManager.UpdateDeveloperPullRequests();
-            // TODO: THIS CODE SHOULD NOT BE HERE. FIX CYCLIC DEPENDENCY.
-        }
     }
 
     private static void LogPackageInformation()
@@ -204,41 +194,6 @@ public sealed class Program
         catch (Exception ex)
         {
             Log.Information(ex, "Failed getting package information.");
-        }
-    }
-
-    private static void RecreateDataStoreIfNecessary(IDeveloperIdProvider developerIdProvider)
-    {
-        try
-        {
-            var localSettings = ApplicationData.Current.LocalSettings;
-            if (localSettings.Values.TryGetValue(AzureDataManager.RecreateDataStoreSettingsKey, out var recreateDataStore))
-            {
-                if ((bool)recreateDataStore)
-                {
-                    Log.Information("Recreating DataStore");
-
-                    // Creating an instance of AzureDataManager with the recreate option will
-                    // attempt to recreate the datastore. A new options is created to avoid
-                    // altering the default options since it is a singleton.
-                    var dataStoreOptions = new DataStoreOptions
-                    {
-                        DataStoreFileName = AzureDataManager.DefaultOptions.DataStoreFileName,
-                        DataStoreSchema = AzureDataManager.DefaultOptions.DataStoreSchema,
-                        DataStoreFolderPath = AzureDataManager.DefaultOptions.DataStoreFolderPath,
-                        RecreateDataStore = true,
-                    };
-
-                    using var dataManager = new AzureDataManager("RecreateDataStore", developerIdProvider, dataStoreOptions);
-
-                    // After we get this key once, set it back to false.
-                    localSettings.Values[AzureDataManager.RecreateDataStoreSettingsKey] = false;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Failed attempting to verify or perform database recreation.");
         }
     }
 }

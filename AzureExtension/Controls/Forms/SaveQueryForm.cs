@@ -20,11 +20,13 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
     private readonly SavedQueriesMediator _savedQueriesMediator;
 
-    private readonly IDeveloperIdProvider _developerIdProvider;
+    private readonly IAccountProvider _accountProvider;
+
+    private readonly AzureClientHelpers _azureClientHelpers;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
-    private string isTopLevelChecked = "false";
+    private readonly string isTopLevelChecked = "false";
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
@@ -43,21 +45,23 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     };
 
     // for saving a new query
-    public SaveQueryForm(IResources resources, SavedQueriesMediator savedQueriesMediator, IDeveloperIdProvider developerIdProvider)
+    public SaveQueryForm(IResources resources, SavedQueriesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers)
     {
         _resources = resources;
         _savedQuery = new Query();
         _savedQueriesMediator = savedQueriesMediator;
-        _developerIdProvider = developerIdProvider;
+        _accountProvider = accountProvider;
+        _azureClientHelpers = azureClientHelpers;
     }
 
     // for editing an existing query
-    public SaveQueryForm(Query savedQuery, IResources resources, SavedQueriesMediator savedQueriesMediator, IDeveloperIdProvider developerIdProvider)
+    public SaveQueryForm(Query savedQuery, IResources resources, SavedQueriesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers)
     {
         _resources = resources;
         _savedQuery = savedQuery;
         _savedQueriesMediator = savedQueriesMediator;
-        _developerIdProvider = developerIdProvider;
+        _accountProvider = accountProvider;
+        _azureClientHelpers = azureClientHelpers;
     }
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SaveQuery", TemplateSubstitutions);
@@ -81,8 +85,6 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             var payloadJson = JsonNode.Parse(payload) ?? throw new InvalidOperationException("No query found");
 
             var query = CreateQueryFromJson(payloadJson);
-
-            var devId = _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!;
 
             // if editing the query, delete the old one
             // it is safe to do as the new one is already validated
@@ -114,8 +116,8 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
         var name = jsonNode?["Name"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
-        var developerId = _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!;
-        var queryInfo = AzureClientHelpers.GetQueryInfo(queryUrl, developerId);
+        var account = _accountProvider.GetDefaultAccount();
+        var queryInfo = _azureClientHelpers.GetQueryInfo(queryUrl, account);
 
         if (queryInfo.Result != ResultType.Success)
         {

@@ -2,7 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.DeveloperId;
+using Microsoft.Identity.Client;
 
 namespace AzureExtension.Controls;
 
@@ -14,7 +14,7 @@ public interface ISearchRepository
 
     Task RemoveSavedSearch(ISearch search);
 
-    bool ValidateSearch(ISearch search, IDeveloperId developerId);
+    bool ValidateSearch(ISearch search, IAccount account);
 
     Task InitializeTopLevelSearches(IEnumerable<ISearch> searches);
 
@@ -22,5 +22,5 @@ public interface ISearchRepository
 
     Task<bool> IsTopLevel(ISearch search);
 
-    void UpdateSearchTopLevelStatus(ISearch search, bool isTopLevel, IDeveloperId developerId);
+    void UpdateSearchTopLevelStatus(ISearch search, bool isTopLevel, IAccount account);
 }
