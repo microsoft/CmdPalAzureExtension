@@ -12,13 +12,13 @@ using Serilog;
 
 namespace AzureExtension.Controls.Forms;
 
-public sealed partial class SaveSearchForm : FormContent, IAzureForm
+public sealed partial class SaveQueryForm : FormContent, IAzureForm
 {
-    private readonly Query _savedSearch;
+    private readonly Query _savedQuery;
 
     private readonly IResources _resources;
 
-    private readonly SavedSearchesMediator _savedSearchesMediator;
+    private readonly SavedQueriesMediator _savedQueriesMediator;
 
     private readonly IDeveloperIdProvider _developerIdProvider;
 
@@ -30,78 +30,78 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "{{SaveSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedSearch.Name) ? "Forms_Save_Search" : "Forms_Edit_Search") },
-        { "{{SavedSearchString}}", _savedSearch.AzureUri.ToString() },
-        { "{{SavedSearchName}}", _savedSearch.Name },
+        { "{{SaveQueryFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Query" : "Forms_Edit_Query") },
+        { "{{SavedQueryString}}", _savedQuery.AzureUri.ToString() },
+        { "{{SavedQueryName}}", _savedQuery.Name },
         { "{{IsTopLevel}}", isTopLevelChecked },
-        { "{{EnteredSearchErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchError") },
-        { "{{EnteredSearchLabel}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchLabel") },
-        { "{{NameLabel}}", _resources.GetResource("Forms_SaveSearchTemplateNameLabel") },
-        { "{{NameErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateNameError") },
-        { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveSearchTemplateIsTopLevelTitle") },
-        { "{{SaveSearchActionTitle}}", _resources.GetResource("Forms_SaveSearchTemplateSaveSearchActionTitle") },
+        { "{{EnteredQueryErrorMessage}}", _resources.GetResource("Forms_SaveQueryTemplateEnteredQueryError") },
+        { "{{EnteredQueryLabel}}", _resources.GetResource("Forms_SaveQueryTemplateEnteredQueryLabel") },
+        { "{{NameLabel}}", _resources.GetResource("Forms_SaveQueryTemplateNameLabel") },
+        { "{{NameErrorMessage}}", _resources.GetResource("Forms_SaveQueryTemplateNameError") },
+        { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveQueryTemplateIsTopLevelTitle") },
+        { "{{SaveQueryActionTitle}}", _resources.GetResource("Forms_SaveQueryTemplateSaveQueryActionTitle") },
     };
 
     // for saving a new query
-    public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
+    public SaveQueryForm(IResources resources, SavedQueriesMediator savedQueriesMediator, IDeveloperIdProvider developerIdProvider)
     {
         _resources = resources;
-        _savedSearch = new Query();
-        _savedSearchesMediator = savedSearchesMediator;
+        _savedQuery = new Query();
+        _savedQueriesMediator = savedQueriesMediator;
         _developerIdProvider = developerIdProvider;
     }
 
     // for editing an existing query
-    public SaveSearchForm(Query savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
+    public SaveQueryForm(Query savedQuery, IResources resources, SavedQueriesMediator savedQueriesMediator, IDeveloperIdProvider developerIdProvider)
     {
         _resources = resources;
-        _savedSearch = savedSearch;
-        _savedSearchesMediator = savedSearchesMediator;
+        _savedQuery = savedQuery;
+        _savedQueriesMediator = savedQueriesMediator;
         _developerIdProvider = developerIdProvider;
     }
 
-    public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SaveSearch", TemplateSubstitutions);
+    public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SaveQuery", TemplateSubstitutions);
 
     public override ICommandResult SubmitForm(string inputs, string data)
     {
         LoadingStateChanged?.Invoke(this, true);
         Task.Run(() =>
         {
-            var search = GetSearch(inputs);
-            ExtensionHost.LogMessage(new LogMessage() { Message = $"Search: {search}" });
+            var query = GetQuery(inputs);
+            ExtensionHost.LogMessage(new LogMessage() { Message = $"Query: {query}" });
         });
 
         return CommandResult.KeepOpen();
     }
 
-    public Query GetSearch(string payload)
+    public Query GetQuery(string payload)
     {
         try
         {
-            var payloadJson = JsonNode.Parse(payload) ?? throw new InvalidOperationException("No search found");
+            var payloadJson = JsonNode.Parse(payload) ?? throw new InvalidOperationException("No query found");
 
             var query = CreateQueryFromJson(payloadJson);
 
             var devId = _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!;
 
-            // if editing the search, delete the old one
+            // if editing the query, delete the old one
             // it is safe to do as the new one is already validated
-            if (_savedSearch.AzureUri.ToString() != string.Empty)
+            if (_savedQuery.AzureUri.ToString() != string.Empty)
             {
-                Log.Information($"Removing outdated search {_savedSearch.Name}, {_savedSearch.AzureUri.ToString()}");
+                Log.Information($"Removing outdated query {_savedQuery.Name}, {_savedQuery.AzureUri.ToString()}");
 
-                _savedSearchesMediator.RemoveSearch(_savedSearch);
+                _savedQueriesMediator.RemoveQuery(_savedQuery);
             }
 
             LoadingStateChanged?.Invoke(this, false);
-            _savedSearchesMediator.AddSearch(query);
+            _savedQueriesMediator.AddQuery(query);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
             return query;
         }
         catch (Exception ex)
         {
             LoadingStateChanged?.Invoke(this, false);
-            _savedSearchesMediator.AddSearch(ex);
+            _savedQueriesMediator.AddQuery(ex);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
         }
 
@@ -110,7 +110,7 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
 
     public Query CreateQueryFromJson(JsonNode? jsonNode)
     {
-        var queryUrl = jsonNode?["EnteredSearch"]?.ToString() ?? string.Empty;
+        var queryUrl = jsonNode?["EnteredQuery"]?.ToString() ?? string.Empty;
         var name = jsonNode?["Name"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 

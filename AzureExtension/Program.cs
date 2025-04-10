@@ -141,6 +141,8 @@ public sealed class Program
         var resourceLoader = new ResourceLoader(path);
         var resources = new Resources(resourceLoader);
 
+        var timeSpanHelper = new TimeSpanHelper(resources);
+
         var signInForm = new SignInForm(devIdProvider);
         var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"), devIdProvider);
         var signOutForm = new SignOutForm(devIdProvider, resources);
@@ -149,12 +151,10 @@ public sealed class Program
         var azureClientProvider = new AzureClientProvider();
 
         var savedSearchesMediator = new SavedSearchesMediator();
-        var persistentDataManager = new PersistentDataManager(new AzureValidatorAdapter(azureClientProvider));
 
-        var addSearchForm = new SaveSearchForm(resources, savedSearchesMediator, devIdProvider, persistentDataManager);
+        var addSearchForm = new SaveSearchForm(resources, savedSearchesMediator, devIdProvider);
         var addSearchListItem = new AddSearchListItem(new SaveSearchPage(addSearchForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
-        var searchPageFactory = new SearchPageFactory(persistentDataManager, azureDataManager, resources, savedSearchesMediator, devIdProvider);
-        var savedSearchesPage = new SavedSearchesPage(resources, addSearchListItem, savedSearchesMediator, devIdProvider, azureDataManager, persistentDataManager, searchPageFactory);
+        var savedSearchesPage = new SavedSearchesPage(resources, addSearchListItem, savedSearchesMediator, devIdProvider, azureDataManager, timeSpanHelper);
 
         var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, devIdProvider, savedSearchesPage, resources);
 

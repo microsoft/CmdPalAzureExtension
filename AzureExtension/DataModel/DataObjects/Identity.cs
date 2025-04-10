@@ -106,7 +106,7 @@ public class Identity
         }
     }
 
-    private static Identity CreateFromIdentityRef(IdentityRef identityRef, VssConnection connection)
+    public static Identity CreateFromIdentityRef(IdentityRef identityRef, VssConnection connection)
     {
         // It is possible the IdentityRef object content is null but contains
         // a display name like "Closed". This is what is given to work items

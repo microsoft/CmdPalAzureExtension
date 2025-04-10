@@ -3,17 +3,19 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Controls;
+using AzureExtension.DataModel;
+using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Serilog;
 
-namespace AzureExtension.DataModel;
+namespace AzureExtension.PersistentData;
 
 [Table("Query")]
 public class Query : ISearch
 {
-    private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", $"DataModel/{nameof(Query)}"));
+    private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", $"DataModel/{nameof(Query)}"));
 
     private static readonly ILogger _log = _logger.Value;
 
@@ -62,6 +64,8 @@ public class Query : ISearch
 
     // Implement ISearch interface
     public string Name => DisplayName;
+
+    public IDeveloperId DeveloperId => throw new NotImplementedException();
 
     private static Query Create(string queryId, long projectId, string developerLogin, string displayName, string queryResults, long queryResultCount, string searchString)
     {

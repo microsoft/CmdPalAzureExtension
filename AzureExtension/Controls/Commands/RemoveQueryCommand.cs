@@ -7,24 +7,25 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Commands;
 
-public partial class RemoveSavedSearchCommand : InvokableCommand
+public partial class RemoveQueryCommand : InvokableCommand
 {
-    private readonly Query savedSearch;
+    private readonly Query savedQuery;
     private readonly IResources _resources;
-    private readonly SavedSearchesMediator _savedSearchesMediator;
+    private readonly SavedQueriesMediator _savedQueriesMediator;
 
-    public RemoveSavedSearchCommand(Query search, IResources resources, SavedSearchesMediator savedSearchesMediator)
+    public RemoveQueryCommand(Query query, IResources resources, SavedQueriesMediator savedQueriesMediator)
     {
         _resources = resources;
-        _savedSearchesMediator = savedSearchesMediator;
-        savedSearch = search;
-        Name = _resources.GetResource("Commands_Remove_Saved_Search");
+        _savedQueriesMediator = savedQueriesMediator;
+
+        savedQuery = query;
+        Name = _resources.GetResource("Commands_Remove_Saved_Query");
         Icon = new IconInfo("\uecc9");
     }
 
     public override CommandResult Invoke()
     {
-       _savedSearchesMediator.RemoveSearch(savedSearch);
+       _savedQueriesMediator.RemoveQuery(savedQuery);
 
        return CommandResult.KeepOpen();
     }
