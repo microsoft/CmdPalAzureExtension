@@ -2,12 +2,8 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Globalization;
 using System.Text.Json.Nodes;
-<<<<<<< HEAD
 using AzureExtension.Client;
-=======
->>>>>>> main
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -18,11 +14,7 @@ namespace AzureExtension.Controls.Forms;
 
 public sealed partial class SaveSearchForm : FormContent, IAzureForm
 {
-<<<<<<< HEAD
     private readonly Query _savedSearch;
-=======
-    private readonly ISearch _savedSearch;
->>>>>>> main
 
     private readonly IResources _resources;
 
