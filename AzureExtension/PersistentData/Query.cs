@@ -13,7 +13,7 @@ using Serilog;
 namespace AzureExtension.PersistentData;
 
 [Table("Query")]
-public class Query
+public class Query : ISearch
 {
     private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", $"DataModel/{nameof(Query)}"));
 

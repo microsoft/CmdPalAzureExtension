@@ -12,17 +12,13 @@ public partial class RemoveSavedSearchCommand : InvokableCommand
     private readonly Query savedSearch;
     private readonly IResources _resources;
     private readonly SavedSearchesMediator _savedSearchesMediator;
-
     public RemoveSavedSearchCommand(Query search, IResources resources, SavedSearchesMediator savedSearchesMediator)
     {
         _resources = resources;
         _savedSearchesMediator = savedSearchesMediator;
 
         savedSearch = search;
-        Name = _resources.GetResource("Commands_Remove_Saved_Search");
-        Icon = new IconInfo("\uecc9");
     }
-
     public override CommandResult Invoke()
     {
        _savedSearchesMediator.RemoveSearch(savedSearch);
