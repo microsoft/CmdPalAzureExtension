@@ -65,8 +65,6 @@ public class Query : ISearch
     // Implement ISearch interface
     public string Name => DisplayName;
 
-    public IDeveloperId DeveloperId => throw new NotImplementedException();
-
     private static Query Create(string queryId, long projectId, string developerLogin, string displayName, string queryResults, long queryResultCount, string searchString)
     {
         return new Query

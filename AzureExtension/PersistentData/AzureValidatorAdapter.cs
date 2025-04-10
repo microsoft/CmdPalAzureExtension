@@ -5,26 +5,27 @@
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.DeveloperId;
+using Microsoft.Identity.Client;
 
 namespace AzureExtension.PersistentData;
 
 public class AzureValidatorAdapter : IAzureValidator
 {
-    private readonly AzureClientProvider _azureClientProvider;
+    private readonly AzureClientHelpers _azureClientHelpers;
 
-    public AzureValidatorAdapter(AzureClientProvider azureClientProvider)
+    public AzureValidatorAdapter(AzureClientHelpers azureClientHelpers)
     {
-        _azureClientProvider = azureClientProvider;
+        _azureClientHelpers = azureClientHelpers;
     }
 
-    public InfoResult GetQueryInfo(string queryUrl, string queryName, IDeveloperId developerId)
+    public InfoResult GetQueryInfo(string queryUrl, string queryName, IAccount account)
     {
         if (string.IsNullOrEmpty(queryUrl))
         {
             throw new InvalidOperationException("Query URL or name cannot be null or empty.");
         }
 
-        var queryInfo = AzureClientHelpers.GetQueryInfo(queryUrl, developerId);
+        var queryInfo = _azureClientHelpers.GetQueryInfo(queryUrl, account);
         if (queryInfo.Result != ResultType.Success)
         {
             throw new InvalidOperationException(queryInfo.ErrorMessage);

@@ -2,26 +2,12 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Collections.Concurrent;
-using System.Dynamic;
-using System.Net;
-using System.Reflection.Metadata.Ecma335;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
-using AzureExtension.DataModel;
-using AzureExtension.DeveloperId;
+using AzureExtension.DataManager;
 using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
-using Microsoft.VisualStudio.Services.WebApi;
-using Newtonsoft.Json;
-using Octokit;
 using Serilog;
-using TFModels = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 namespace AzureExtension.Controls.Pages;
 
@@ -34,27 +20,21 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
     private ILogger Log => _log.Value;
 
-    // Connections are a pairing of DeveloperId and a Uri.
-    private static readonly ConcurrentDictionary<Tuple<Uri, IDeveloperId>, VssConnection> _connections = new();
-
-    private readonly IDeveloperId _developerId;
-
     private readonly Query _query;
 
     private readonly IResources _resources;
 
-    private readonly AzureDataManager _azureDataManager;
+    private readonly IDataProvider _dataProvider;
 
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public WorkItemsSearchPage(Query query, IDeveloperId developerId, IResources resources, AzureDataManager azureDataManager, TimeSpanHelper timeSpanHelper)
+    public WorkItemsSearchPage(Query query, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
     {
-        _developerId = developerId;
         _query = query;
         _resources = resources;
+        _dataProvider = dataProvider;
         Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
         Name = query.Name;
-        _azureDataManager = azureDataManager;
         _timeSpanHelper = timeSpanHelper;
     }
 
@@ -116,209 +96,6 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
     public Task<IEnumerable<WorkItem>> LoadContentData()
     {
-        return GetWorkItems();
-    }
-
-    private async Task<IEnumerable<WorkItem>> GetWorkItems()
-    {
-        var result = AzureDataManager.GetConnection(_query.AzureUri.Connection, _developerId);
-
-        if (result.Result != ResultType.Success)
-        {
-            if (result.Exception != null)
-            {
-                throw result.Exception;
-            }
-            else
-            {
-                throw new AzureAuthorizationException($"Failed getting connection: {_query.AzureUri.Connection} with {result.Error}");
-            }
-        }
-
-        var witClient = result.Connection!.GetClient<WorkItemTrackingHttpClient>();
-        if (witClient == null)
-        {
-            throw new AzureClientException($"Failed getting WorkItemTrackingHttpClient");
-        }
-
-        // Good practice to only create data after we know the client is valid, but any exceptions
-        // will roll back the transaction.
-        var org = DataModel.Organization.Create(_query.AzureUri.Connection);
-
-        var teamProject = AzureDataManager.GetTeamProject(_query.AzureUri.Project, _developerId, _query.AzureUri.Connection);
-
-        var project = DataModel.Project.CreateFromTeamProject(teamProject, org.Id);
-
-        var getQueryResult = await witClient.GetQueryAsync(project.InternalId, _query.AzureUri.Query);
-        if (getQueryResult == null)
-        {
-            throw new AzureClientException($"GetQueryAsync failed for {_query.AzureUri.Connection}, {project.InternalId}, {_query.AzureUri.Query}");
-        }
-
-        var queryId = new Guid(_query.AzureUri.Query);
-        var count = await witClient.GetQueryResultCountAsync(project.Name, queryId);
-        var queryResult = await witClient.QueryByIdAsync(project.InternalId, queryId);
-        if (queryResult == null)
-        {
-            throw new AzureClientException($"QueryByIdAsync failed for {_query.AzureUri.Connection}, {project.InternalId}, {queryId}");
-        }
-
-        var workItemIds = new List<int>();
-
-        // The WorkItems collection and individual reference objects may be null.
-        switch (queryResult.QueryType)
-        {
-            // Tree types are treated as flat, but the data structure is different.
-            case TFModels.QueryType.Tree:
-                if (queryResult.WorkItemRelations is not null)
-                {
-                    foreach (var workItemRelation in queryResult.WorkItemRelations)
-                    {
-                        if (workItemRelation is null || workItemRelation.Target is null)
-                        {
-                            continue;
-                        }
-
-                        workItemIds.Add(workItemRelation.Target.Id);
-                        if (workItemIds.Count >= QueryResultLimit)
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                break;
-
-            case TFModels.QueryType.Flat:
-                if (queryResult.WorkItems is not null)
-                {
-                    foreach (var item in queryResult.WorkItems)
-                    {
-                        if (item is null)
-                        {
-                            continue;
-                        }
-
-                        workItemIds.Add(item.Id);
-                        if (workItemIds.Count >= QueryResultLimit)
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                break;
-
-            case TFModels.QueryType.OneHop:
-
-                // OneHop work item structure is the same as the tree type.
-                goto case TFModels.QueryType.Tree;
-
-            default:
-                break;
-        }
-
-        var workItems = new List<TFModels.WorkItem>();
-        if (workItemIds.Count > 0)
-        {
-            workItems = await witClient.GetWorkItemsAsync(project.InternalId, workItemIds, null, null, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit);
-            if (workItems == null)
-            {
-                throw new AzureClientException($"GetWorkItemsAsync failed for {_query.AzureUri.Connection}, {project.InternalId}, Ids: {string.Join(",", workItemIds.ToArray())}");
-            }
-        }
-
-        var workItemsList = new List<WorkItem>();
-
-        foreach (var workItem in workItems)
-        {
-            var cmdPalWorkItem = new WorkItem();
-
-            cmdPalWorkItem.AddSystemId(workItem.Id);
-
-            // cmdPalWorkItem.Icon = new IconInfo(GetIconForType(workItem.Fields[AzureDataManager.WorkItemTypeFieldName]?.ToString()));
-            // cmdPalWorkItem.StatusIcon = new IconInfo(GetIconForStatusState(workItem.Fields["System.State"]?.ToString()));
-            var htmlUrl = Links.GetLinkHref(workItem.Links, "html");
-            cmdPalWorkItem.AddHtmlUrl(htmlUrl);
-
-            var requestOptions = RequestOptions.RequestOptionsDefault();
-
-            foreach (var field in requestOptions.Fields)
-            {
-                if (!workItem.Fields.ContainsKey(field))
-                {
-                    continue;
-                }
-
-                var fieldValue = workItem.Fields[field].ToString();
-                if (fieldValue is null)
-                {
-                    continue;
-                }
-
-                if (workItem.Fields[field] is DateTime dateTime)
-                {
-                    if (field == "System.CreatedDate")
-                    {
-                        cmdPalWorkItem.SystemCreatedDate = dateTime.Ticks;
-                    }
-                    else if (field == "System.ChangedDate")
-                    {
-                        cmdPalWorkItem.SystemChangedDate = dateTime.Ticks;
-                    }
-
-                    continue;
-                }
-
-                var fieldIdentityRef = workItem.Fields[field] as IdentityRef;
-                if (fieldValue == AzureDataManager.IdentityRefFieldValueName && fieldIdentityRef != null)
-                {
-                    var identity = Identity.CreateFromIdentityRef(fieldIdentityRef, result.Connection);
-
-                    if (field == "System.CreatedBy")
-                    {
-                        cmdPalWorkItem.SystemCreatedBy = identity;
-                    }
-                    else if (field == "System.ChangedBy")
-                    {
-                        cmdPalWorkItem.SystemChangedBy = identity;
-                    }
-
-                    continue;
-                }
-
-                if (field == AzureDataManager.WorkItemTypeFieldName)
-                {
-                    // Need a separate query to create WorkItemType object.
-                    var workItemTypeInfo = await witClient!.GetWorkItemTypeAsync(project.InternalId, fieldValue);
-                    var workItemType = WorkItemType.CreateFromTeamWorkItemType(workItemTypeInfo, project.Id);
-
-                    cmdPalWorkItem.SystemWorkItemType = workItemType;
-                    continue;
-                }
-
-                if (field == "System.State")
-                {
-                    cmdPalWorkItem.SystemState = fieldValue;
-                    continue;
-                }
-
-                if (field == "System.Reason")
-                {
-                    cmdPalWorkItem.SystemReason = fieldValue;
-                    continue;
-                }
-
-                if (field == "System.Title")
-                {
-                    cmdPalWorkItem.SystemTitle = fieldValue;
-                    continue;
-                }
-            }
-
-            workItemsList.Add(cmdPalWorkItem);
-        }
-
-        return workItemsList;
+        return _dataProvider.GetWorkItems(_query);
     }
 }

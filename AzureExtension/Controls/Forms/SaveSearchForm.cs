@@ -20,11 +20,13 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
 
     private readonly SavedSearchesMediator _savedSearchesMediator;
 
-    private readonly IDeveloperIdProvider _developerIdProvider;
+    private readonly IAccountProvider _accountProvider;
+
+    private readonly AzureClientHelpers _azureClientHelpers;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
-    private string isTopLevelChecked = "false";
+    private readonly string isTopLevelChecked = "false";
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
@@ -43,21 +45,23 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
     };
 
     // for saving a new query
-    public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
+    public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers)
     {
         _resources = resources;
         _savedSearch = new Query();
         _savedSearchesMediator = savedSearchesMediator;
-        _developerIdProvider = developerIdProvider;
+        _accountProvider = accountProvider;
+        _azureClientHelpers = azureClientHelpers;
     }
 
     // for editing an existing query
-    public SaveSearchForm(Query savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IDeveloperIdProvider developerIdProvider)
+    public SaveSearchForm(Query savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers)
     {
         _resources = resources;
         _savedSearch = savedSearch;
         _savedSearchesMediator = savedSearchesMediator;
-        _developerIdProvider = developerIdProvider;
+        _accountProvider = accountProvider;
+        _azureClientHelpers = azureClientHelpers;
     }
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SaveSearch", TemplateSubstitutions);
@@ -81,8 +85,6 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
             var payloadJson = JsonNode.Parse(payload) ?? throw new InvalidOperationException("No search found");
 
             var query = CreateQueryFromJson(payloadJson);
-
-            var devId = _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!;
 
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
@@ -114,8 +116,8 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
         var name = jsonNode?["Name"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
-        var developerId = _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!;
-        var queryInfo = AzureClientHelpers.GetQueryInfo(queryUrl, developerId);
+        var account = _accountProvider.GetDefaultAccount();
+        var queryInfo = _azureClientHelpers.GetQueryInfo(queryUrl, account);
 
         if (queryInfo.Result != ResultType.Success)
         {

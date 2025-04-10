@@ -20,28 +20,31 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly SavedSearchesPage _savedSearchesPage;
 
-    private readonly IDeveloperIdProvider _developerIdProvider;
+    private readonly IAccountProvider _accountProvider;
 
     private readonly IResources _resources;
 
-    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IDeveloperIdProvider developerIdProvider, SavedSearchesPage savedSearchesPage, IResources resources)
+    private readonly AzureClientHelpers _azureClientHelpers;
+
+    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedSearchesPage savedSearchesPage, IResources resources, AzureClientHelpers azureClientHelpers)
     {
         _signInPage = signInPage;
         _signOutPage = signOutPage;
-        _developerIdProvider = developerIdProvider;
+        _accountProvider = accountProvider;
         _savedSearchesPage = savedSearchesPage;
         _resources = resources;
+        _azureClientHelpers = azureClientHelpers;
         DisplayName = "Azure Extension";
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);
 
-        var authenticationHelper = new AuthenticationHelper();
+        _azureClientHelpers = azureClientHelpers;
     }
 
     public override ICommandItem[] TopLevelCommands()
     {
-        if (!_developerIdProvider.IsSignedIn())
+        if (!_accountProvider.IsSignedIn())
         {
             return new ICommandItem[]
             {
@@ -55,9 +58,9 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         }
         else
         {
-            var developerId = _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault();
+            var account = _accountProvider.GetDefaultAccount();
             var selectedQueryUrl = new AzureUri("https://microsoft.visualstudio.com/OS/_queries/query-edit/fd7ad0f5-17b0-46be-886a-92e4043c1c4f/");
-            var queryInfo = AzureClientHelpers.GetQueryInfo(selectedQueryUrl, developerId!);
+            var queryInfo = _azureClientHelpers.GetQueryInfo(selectedQueryUrl, account);
 
             var defaultCommands = new List<CommandItem>
             {

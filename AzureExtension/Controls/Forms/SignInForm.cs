@@ -4,7 +4,6 @@
 
 using System.Globalization;
 using AzureExtension.Client;
-using AzureExtension.DataModel;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -20,7 +19,8 @@ public partial class SignInForm : FormContent, IAzureForm
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
-    private readonly IDeveloperIdProvider _developerIdProvider;
+    private readonly IAccountProvider _accountProvider;
+    private readonly AzureClientHelpers _azureClientHelpers;
 
     private bool _isButtonEnabled = true;
 
@@ -29,12 +29,12 @@ public partial class SignInForm : FormContent, IAzureForm
 
     private Page? page;
 
-    public SignInForm(IDeveloperIdProvider developerIdProvider)
+    public SignInForm(IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers)
     {
-        _developerIdProvider = developerIdProvider;
-        _developerIdProvider.OAuthRedirected += DeveloperIdProvider_OAuthRedirected;
+        _accountProvider = accountProvider;
         SignOutForm.SignOutAction += SignOutForm_SignOutAction;
         page = null;
+        _azureClientHelpers = azureClientHelpers;
     }
 
     public void SetPage(Page page)
@@ -104,24 +104,18 @@ public partial class SignInForm : FormContent, IAzureForm
 
     private async Task<bool> HandleSignIn()
     {
-        var numPreviousDevIds = _developerIdProvider.GetLoggedInDeveloperIdsInternal().Count();
-
-        var developerIdResult = await _developerIdProvider.ShowLogonSession();
-
-        if (developerIdResult.Result.Status == ProviderOperationStatus.Failure)
+        try
         {
-            var errorMessage = $"{developerIdResult.Result.DisplayMessage} - {developerIdResult.Result.DiagnosticText}";
-            throw new InvalidOperationException(developerIdResult.Result.DisplayMessage);
-        }
-
-        if (developerIdResult.Result.Status == ProviderOperationStatus.Success)
-        {
-            var developerId = developerIdResult.DeveloperId;
+            var account = await _accountProvider.ShowLogonSession();
             var selectedQueryUrl = new AzureUri("https://microsoft.visualstudio.com/OS/_queries/query-edit/fd7ad0f5-17b0-46be-886a-92e4043c1c4f/");
-            var queryInfo = AzureClientHelpers.GetQueryInfo(selectedQueryUrl, developerId!);
+            var queryInfo = _azureClientHelpers.GetQueryInfo(selectedQueryUrl, account);
             var selectedQueryId = queryInfo.AzureUri.Query;
+            return true;
         }
-
-        return developerIdResult.Result.Status == ProviderOperationStatus.Success;
+        catch (Exception ex)
+        {
+            var errorMessage = $"{ex.Message}";
+            throw new InvalidOperationException(errorMessage);
+        }
     }
 }

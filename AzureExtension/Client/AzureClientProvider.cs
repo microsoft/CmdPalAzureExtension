@@ -16,7 +16,14 @@ public class AzureClientProvider
 
     private static readonly ILogger _log = _logger.Value;
 
-    private static VssConnection? CreateConnection(Uri uri, IDeveloperId developerId)
+    private readonly IAccountProvider _accountProvider;
+
+    public AzureClientProvider(IAccountProvider accountProvider)
+    {
+        _accountProvider = accountProvider;
+    }
+
+    private VssConnection? CreateConnection(Uri uri, IAccount account)
     {
         var azureUri = new AzureUri(uri);
         if (!azureUri.IsValid)
@@ -25,7 +32,7 @@ public class AzureClientProvider
             return null;
         }
 
-        if (developerId == null)
+        if (account == null)
         {
             _log.Information($"Cannot Create Connection: null developer id argument");
             return null;
@@ -36,7 +43,7 @@ public class AzureClientProvider
             VssCredentials? credentials;
             try
             {
-                credentials = developerId.GetCredentials();
+                credentials = _accountProvider.GetCredentials(account);
 
                 if (credentials == null)
                 {
@@ -80,7 +87,7 @@ public class AzureClientProvider
         return null;
     }
 
-    public static ConnectionResult CreateVssConnection(Uri uri, IDeveloperId developerId)
+    public ConnectionResult CreateVssConnection(Uri uri, IAccount account)
     {
         var azureUri = new AzureUri(uri);
         if (!azureUri.IsValid)
@@ -89,7 +96,7 @@ public class AzureClientProvider
             return new ConnectionResult(ResultType.Failure, ErrorType.InvalidArgument, false);
         }
 
-        if (developerId == null)
+        if (account == null)
         {
             _log.Information($"Cannot Create Connection: invalid developer id argument");
             return new ConnectionResult(ResultType.Failure, ErrorType.InvalidArgument, false);
@@ -98,7 +105,7 @@ public class AzureClientProvider
         VssCredentials? credentials;
         try
         {
-            credentials = developerId.GetCredentials();
+            credentials = _accountProvider.GetCredentials(account);
             if (credentials == null)
             {
                 _log.Error($"Unable to get credentials for developerId");
@@ -136,7 +143,7 @@ public class AzureClientProvider
 
             if (connection != null)
             {
-                _log.Debug($"Created new connection to {azureUri.Connection} for {developerId.LoginId}");
+                _log.Debug($"Created new connection to {azureUri.Connection} for {account.Username}");
                 return new ConnectionResult(azureUri.Connection, null, connection);
             }
             else
@@ -156,12 +163,12 @@ public class AzureClientProvider
     /// Gets the Azure DevOps connection for the specified developer id.
     /// </summary>
     /// <param name="uri">The uri to an Azure DevOps resource.</param>
-    /// <param name="developerId">The developer to authenticate with.</param>
+    /// <param name="account">The developer to authenticate with.</param>
     /// <returns>An authorized connection to the resource.</returns>
     /// <exception cref="ArgumentException">If the azure uri is not valid.</exception>
     /// <exception cref="ArgumentNullException">If developerId is null.</exception>
     /// <exception cref="AzureClientException">If a connection can't be made.</exception>
-    public static VssConnection GetConnectionForLoggedInDeveloper(Uri uri, IDeveloperId developerId)
+    public VssConnection GetConnection(Uri uri, IAccount account)
     {
         var azureUri = new AzureUri(uri);
         if (!azureUri.IsValid)
@@ -170,34 +177,34 @@ public class AzureClientProvider
             throw new ArgumentException(uri.ToString());
         }
 
-        if (developerId == null)
+        if (account == null)
         {
             _log.Error($"No logged in developer for which connection needs to be retrieved");
             throw new ArgumentNullException(null);
         }
 
-        var connection = CreateConnection(azureUri.Connection, developerId);
+        var connection = CreateConnection(azureUri.Connection, account);
         if (connection == null)
         {
             _log.Error($"Failed creating connection for developer id");
-            throw new AzureClientException($"Failed creating Vss connection: {azureUri.Connection} for {developerId.LoginId}");
+            throw new AzureClientException($"Failed creating Vss connection: {azureUri.Connection} for {account.Username}");
         }
 
         return connection;
     }
 
-    public static ConnectionResult GetVssConnectionForLoggedInDeveloper(Uri uri, DeveloperId.DeveloperId developerId)
+    public ConnectionResult GetVssConnection(Uri uri, IAccount account)
     {
-        if (developerId == null)
+        if (account == null)
         {
             _log.Error($"No logged in developer for which connection needs to be retrieved");
             return new ConnectionResult(ResultType.Failure, ErrorType.InvalidDeveloperId, false);
         }
 
-        return CreateVssConnection(uri, developerId);
+        return CreateVssConnection(uri, account);
     }
 
-    public static T? GetClient<T>(string uri, DeveloperId.DeveloperId developerId)
+    public T? GetClient<T>(string uri, IAccount account)
        where T : VssHttpClientBase
     {
         if (string.IsNullOrEmpty(uri))
@@ -213,13 +220,13 @@ public class AzureClientProvider
             return null;
         }
 
-        return GetClient<T>(azureUri.Connection, developerId);
+        return GetClient<T>(azureUri.Connection, account);
     }
 
-    public static T? GetClient<T>(Uri uri, DeveloperId.DeveloperId developerId)
+    public T? GetClient<T>(Uri uri, IAccount account)
        where T : VssHttpClientBase
     {
-        var connection = GetConnectionForLoggedInDeveloper(uri, developerId);
+        var connection = GetConnection(uri, account);
         if (connection == null)
         {
             return null;
@@ -228,7 +235,7 @@ public class AzureClientProvider
         return connection.GetClient<T>();
     }
 
-    public static ConnectionResult GetAzureDevOpsClient<T>(string uri, DeveloperId.DeveloperId developerId)
+    public ConnectionResult GetAzureDevOpsClient<T>(string uri, IAccount account)
         where T : VssHttpClientBase
     {
         var azureUri = new AzureUri(uri);
@@ -238,13 +245,13 @@ public class AzureClientProvider
             return new ConnectionResult(ResultType.Failure, ErrorType.InvalidArgument, false);
         }
 
-        return GetAzureDevOpsClient<T>(azureUri.Uri, developerId);
+        return GetAzureDevOpsClient<T>(azureUri.Uri, account);
     }
 
-    public static ConnectionResult GetAzureDevOpsClient<T>(Uri uri, DeveloperId.DeveloperId developerId)
+    public ConnectionResult GetAzureDevOpsClient<T>(Uri uri, IAccount account)
        where T : VssHttpClientBase
     {
-        var connectionResult = GetVssConnectionForLoggedInDeveloper(uri, developerId);
+        var connectionResult = GetVssConnection(uri, account);
         if (connectionResult.Result == ResultType.Failure)
         {
             return connectionResult;

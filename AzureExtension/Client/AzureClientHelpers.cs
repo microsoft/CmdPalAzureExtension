@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.DeveloperId;
+using Microsoft.Identity.Client;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
@@ -12,13 +13,20 @@ namespace AzureExtension.Client;
 
 public class AzureClientHelpers
 {
+    private readonly AzureClientProvider _azureClientProvider;
+
+    public AzureClientHelpers(AzureClientProvider azureClientProvider)
+    {
+        _azureClientProvider = azureClientProvider;
+    }
+
     // This validates the Query Uri authenticates and receives a response from the server.
     // It is used for validating an input Uri is actually valid to the server and adds information
     // about it from the server.
-    public static InfoResult GetQueryInfo(AzureUri azureUri, IDeveloperId devId)
+    public InfoResult GetQueryInfo(AzureUri azureUri, IAccount account)
     {
         var log = Log.ForContext("SourceContext", nameof(InfoResult));
-        if (devId == null)
+        if (account == null)
         {
             return new InfoResult(azureUri, InfoType.Query, ResultType.Failure, ErrorType.NullDeveloperId);
         }
@@ -35,7 +43,7 @@ public class AzureClientHelpers
 
         try
         {
-            var connectionResult = AzureDataManager.GetConnection(azureUri.Connection, devId);
+            var connectionResult = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
             if (connectionResult.Result != ResultType.Success)
             {
                 return new InfoResult(azureUri, InfoType.Query, ResultType.Failure, connectionResult.Error, connectionResult.Exception);
@@ -70,23 +78,23 @@ public class AzureClientHelpers
         }
     }
 
-    public static InfoResult GetQueryInfo(string uri, IDeveloperId devId)
+    public InfoResult GetQueryInfo(string uri, IAccount account)
     {
-        return GetQueryInfo(new AzureUri(uri), devId);
+        return GetQueryInfo(new AzureUri(uri), account);
     }
 
-    public static InfoResult GetQueryInfo(Uri uri, IDeveloperId devId)
+    public InfoResult GetQueryInfo(Uri uri, IAccount account)
     {
-        return GetQueryInfo(new AzureUri(uri), devId);
+        return GetQueryInfo(new AzureUri(uri), account);
     }
 
     // This validates the Repository Uri authenticates and receives a response from the server.
     // It is used for validating an input Uri is actually valid to the server and adds information
     // about the target repository from the server.
-    public static InfoResult GetRepositoryInfo(AzureUri azureUri, DeveloperId.DeveloperId devId)
+    public InfoResult GetRepositoryInfo(AzureUri azureUri, IAccount account)
     {
         var log = Log.ForContext("SourceContext", nameof(InfoResult));
-        if (devId == null)
+        if (account == null)
         {
             return new InfoResult(azureUri, InfoType.Repository, ResultType.Failure, ErrorType.NullDeveloperId);
         }
@@ -103,7 +111,7 @@ public class AzureClientHelpers
 
         try
         {
-            var connectionResult = AzureDataManager.GetConnection(azureUri.Connection, devId);
+            var connectionResult = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
             if (connectionResult.Result != ResultType.Success)
             {
                 return new InfoResult(azureUri, InfoType.Repository, ResultType.Failure, connectionResult.Error, connectionResult.Exception);
@@ -138,13 +146,13 @@ public class AzureClientHelpers
         }
     }
 
-    public static InfoResult GetRepositoryInfo(string uri, DeveloperId.DeveloperId devId)
+    public InfoResult GetRepositoryInfo(string uri, IAccount account)
     {
-        return GetRepositoryInfo(new AzureUri(uri), devId);
+        return GetRepositoryInfo(new AzureUri(uri), account);
     }
 
-    public static InfoResult GetRepositoryInfo(Uri uri, DeveloperId.DeveloperId devId)
+    public InfoResult GetRepositoryInfo(Uri uri, IAccount account)
     {
-        return GetRepositoryInfo(new AzureUri(uri), devId);
+        return GetRepositoryInfo(new AzureUri(uri), account);
     }
 }
