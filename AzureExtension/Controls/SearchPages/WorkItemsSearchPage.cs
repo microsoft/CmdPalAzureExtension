@@ -39,7 +39,7 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
     private readonly IDeveloperId _developerId;
 
-    private readonly Query _queryObject;
+    private readonly Query _query;
 
     private readonly IResources _resources;
 
@@ -47,13 +47,13 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public WorkItemsSearchPage(Query queryObject, IDeveloperId developerId, IResources resources, AzureDataManager azureDataManager, TimeSpanHelper timeSpanHelper)
+    public WorkItemsSearchPage(Query query, IDeveloperId developerId, IResources resources, AzureDataManager azureDataManager, TimeSpanHelper timeSpanHelper)
     {
         _developerId = developerId;
-        _queryObject = queryObject;
+        _query = query;
         _resources = resources;
         Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
-        Name = queryObject.Name;
+        Name = query.Name;
         _azureDataManager = azureDataManager;
         _timeSpanHelper = timeSpanHelper;
     }
@@ -121,7 +121,7 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
     private async Task<IEnumerable<WorkItem>> GetWorkItems()
     {
-        var result = AzureDataManager.GetConnection(_queryObject.AzureUri.Connection, _developerId);
+        var result = AzureDataManager.GetConnection(_query.AzureUri.Connection, _developerId);
 
         if (result.Result != ResultType.Success)
         {
@@ -131,7 +131,7 @@ public sealed partial class WorkItemsSearchPage : ListPage
             }
             else
             {
-                throw new AzureAuthorizationException($"Failed getting connection: {_queryObject.AzureUri.Connection} with {result.Error}");
+                throw new AzureAuthorizationException($"Failed getting connection: {_query.AzureUri.Connection} with {result.Error}");
             }
         }
 
@@ -143,24 +143,24 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
         // Good practice to only create data after we know the client is valid, but any exceptions
         // will roll back the transaction.
-        var org = DataModel.Organization.Create(_queryObject.AzureUri.Connection);
+        var org = DataModel.Organization.Create(_query.AzureUri.Connection);
 
-        var teamProject = AzureDataManager.GetTeamProject(_queryObject.AzureUri.Project, _developerId, _queryObject.AzureUri.Connection);
+        var teamProject = AzureDataManager.GetTeamProject(_query.AzureUri.Project, _developerId, _query.AzureUri.Connection);
 
         var project = DataModel.Project.CreateFromTeamProject(teamProject, org.Id);
 
-        var getQueryResult = await witClient.GetQueryAsync(project.InternalId, _queryObject.AzureUri.Query);
+        var getQueryResult = await witClient.GetQueryAsync(project.InternalId, _query.AzureUri.Query);
         if (getQueryResult == null)
         {
-            throw new AzureClientException($"GetQueryAsync failed for {_queryObject.AzureUri.Connection}, {project.InternalId}, {_queryObject.AzureUri.Query}");
+            throw new AzureClientException($"GetQueryAsync failed for {_query.AzureUri.Connection}, {project.InternalId}, {_query.AzureUri.Query}");
         }
 
-        var queryId = new Guid(_queryObject.AzureUri.Query);
+        var queryId = new Guid(_query.AzureUri.Query);
         var count = await witClient.GetQueryResultCountAsync(project.Name, queryId);
         var queryResult = await witClient.QueryByIdAsync(project.InternalId, queryId);
         if (queryResult == null)
         {
-            throw new AzureClientException($"QueryByIdAsync failed for {_queryObject.AzureUri.Connection}, {project.InternalId}, {queryId}");
+            throw new AzureClientException($"QueryByIdAsync failed for {_query.AzureUri.Connection}, {project.InternalId}, {queryId}");
         }
 
         var workItemIds = new List<int>();
@@ -224,7 +224,7 @@ public sealed partial class WorkItemsSearchPage : ListPage
             workItems = await witClient.GetWorkItemsAsync(project.InternalId, workItemIds, null, null, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit);
             if (workItems == null)
             {
-                throw new AzureClientException($"GetWorkItemsAsync failed for {_queryObject.AzureUri.Connection}, {project.InternalId}, Ids: {string.Join(",", workItemIds.ToArray())}");
+                throw new AzureClientException($"GetWorkItemsAsync failed for {_query.AzureUri.Connection}, {project.InternalId}, Ids: {string.Join(",", workItemIds.ToArray())}");
             }
         }
 

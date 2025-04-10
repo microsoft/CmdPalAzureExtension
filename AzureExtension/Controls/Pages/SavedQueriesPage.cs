@@ -13,15 +13,15 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension;
 
-public partial class SavedSearchesPage : ListPage
+public partial class SavedQueriesPage : ListPage
 {
-    private readonly IListItem _addSearchListItem;
+    private readonly IListItem _addQueryListItem;
 
     private readonly IResources _resources;
 
-    private readonly SavedSearchesMediator _savedSearchesMediator;
+    private readonly SavedQueriesMediator _savedQueriesMediator;
 
-    private List<Query> _searches = new List<Query>();
+    private List<Query> _queryes = new List<Query>();
 
     private IDeveloperIdProvider? _developerIdProvider;
 
@@ -29,10 +29,10 @@ public partial class SavedSearchesPage : ListPage
 
     private TimeSpanHelper _timeSpanHelper;
 
-    public SavedSearchesPage(
+    public SavedQueriesPage(
        IResources resources,
-       IListItem addSearchListItem,
-       SavedSearchesMediator savedSearchesMediator,
+       IListItem addQueryListItem,
+       SavedQueriesMediator savedQueriesMediator,
        IDeveloperIdProvider developerIdProvider,
        AzureDataManager azureDataManager,
        TimeSpanHelper timeSpanHelper)
@@ -40,18 +40,18 @@ public partial class SavedSearchesPage : ListPage
         _resources = resources;
 
         Icon = new IconInfo("\ue721");
-        Name = _resources.GetResource("Pages_Saved_Searches");
-        _savedSearchesMediator = savedSearchesMediator;
-        _savedSearchesMediator.SearchRemoved += OnSearchRemoved;
-        _savedSearchesMediator.SearchRemoving += OnSearchRemoving;
-        _addSearchListItem = addSearchListItem;
-        _savedSearchesMediator.SearchSaved += OnSearchSaved;
+        Name = _resources.GetResource("Pages_Saved_Queries");
+        _savedQueriesMediator = savedQueriesMediator;
+        _savedQueriesMediator.QueryRemoved += OnQueryRemoved;
+        _savedQueriesMediator.QueryRemoving += OnQueryRemoving;
+        _addQueryListItem = addQueryListItem;
+        _savedQueriesMediator.QuerySaved += OnQuerySaved;
         _developerIdProvider = developerIdProvider;
         _azureDataManager = azureDataManager;
         _timeSpanHelper = timeSpanHelper;
     }
 
-    private void OnSearchRemoved(object? sender, object? args)
+    private void OnQueryRemoved(object? sender, object? args)
     {
         IsLoading = false;
 
@@ -59,7 +59,7 @@ public partial class SavedSearchesPage : ListPage
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = $"{_resources.GetResource("Pages_Saved_Searches_Error")} {e.Message}",
+                Message = $"{_resources.GetResource("Pages_Saved_Queries_Error")} {e.Message}",
                 State = MessageState.Error,
             });
 
@@ -67,7 +67,7 @@ public partial class SavedSearchesPage : ListPage
         }
         else if (args != null && args is Query query)
         {
-            _searches.Remove(query);
+            _queryes.Remove(query);
             RaiseItemsChanged(0);
 
             // no toast yet
@@ -76,7 +76,7 @@ public partial class SavedSearchesPage : ListPage
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = _resources.GetResource("Pages_Saved_Searches_Failure"),
+                Message = _resources.GetResource("Pages_Saved_Queries_Failure"),
                 State = MessageState.Error,
             });
 
@@ -84,71 +84,71 @@ public partial class SavedSearchesPage : ListPage
         }
     }
 
-    private void OnSearchRemoving(object? sender, object? e)
+    private void OnQueryRemoving(object? sender, object? e)
     {
         IsLoading = true;
     }
 
     public override IListItem[] GetItems()
     {
-        if (_searches.Count != 0)
+        if (_queryes.Count != 0)
         {
-            var searchPages = _searches.Select(savedSearch => CreateItemForSearch(savedSearch)).ToList();
+            var queryPages = _queryes.Select(savedQuery => CreateItemForQuery(savedQuery)).ToList();
 
-            searchPages.Add(_addSearchListItem);
+            queryPages.Add(_addQueryListItem);
 
-            return searchPages.ToArray();
+            return queryPages.ToArray();
         }
         else
         {
-            return [_addSearchListItem];
+            return [_addQueryListItem];
         }
     }
 
-    public void OnSearchSaved(object? sender, object? args)
+    public void OnQuerySaved(object? sender, object? args)
     {
         IsLoading = false;
 
         if (args != null && args is Query query)
         {
-            _searches.Add(query);
+            _queryes.Add(query);
             RaiseItemsChanged(0);
         }
 
-        // errors are handled in SaveSearchPage
+        // errors are handled in SaveQueryPage
     }
 
-    public IListItem CreateItemForSearch(Query search)
+    public IListItem CreateItemForQuery(Query query)
     {
-        return new ListItem(CreatePageForSearch(search))
+        return new ListItem(CreatePageForQuery(query))
         {
-            Title = search.Name,
-            Subtitle = search.AzureUri.ToString(),
+            Title = query.Name,
+            Subtitle = query.AzureUri.ToString(),
             Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(search.AzureUri.ToString(), _resources)),
-                new(new RemoveSavedSearchCommand(search, _resources, _savedSearchesMediator)),
-                new(new EditSearchPage(
+                new(new LinkCommand(query.AzureUri.ToString(), _resources)),
+                new(new RemoveQueryCommand(query, _resources, _savedQueriesMediator)),
+                new(new EditQueryPage(
                     _resources,
-                    new SaveSearchForm(
-                        search,
+                    new SaveQueryForm(
+                        query,
                         _resources,
-                        _savedSearchesMediator,
+                        _savedQueriesMediator,
                         _developerIdProvider!),
                     new StatusMessage(),
-                    _resources.GetResource("Pages_Search_Edited_Success"),
-                    _resources.GetResource("Pages_Search_Edited_Failed"))),
+                    _resources.GetResource("Pages_Query_Edited_Success"),
+                    _resources.GetResource("Pages_Query_Edited_Failed"))),
             },
         };
     }
 
-    private ListPage CreatePageForSearch(Query search)
+    private ListPage CreatePageForQuery(Query query)
     {
-        return new WorkItemsSearchPage(search, _developerIdProvider!.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!, _resources, _azureDataManager, _timeSpanHelper)
+        return new WorkItemsSearchPage(query, _developerIdProvider!.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault()!, _resources, _azureDataManager, _timeSpanHelper)
         {
             Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-            Name = search.Name,
+            Name = query.Name,
             IsLoading = true,
         };
     }
