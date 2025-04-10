@@ -38,8 +38,6 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);
-
-        _azureClientHelpers = azureClientHelpers;
     }
 
     public override ICommandItem[] TopLevelCommands()
