@@ -10,8 +10,10 @@ using AzureExtension.Controls.Pages;
 using AzureExtension.DataManager;
 using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
+using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Query = AzureExtension.Controls.Query;
 
 namespace AzureExtension;
 
@@ -20,11 +22,11 @@ public partial class SavedSearchesPage : ListPage
     private readonly IListItem _addSearchListItem;
     private readonly IResources _resources;
     private readonly SavedSearchesMediator _savedSearchesMediator;
-    private readonly List<Query> _searches = new List<Query>();
     private readonly TimeSpanHelper _timeSpanHelper;
     private readonly IDataProvider _dataProvider;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly IQueryRepository _queryRepository;
 
     public SavedSearchesPage(
        IResources resources,
@@ -33,6 +35,7 @@ public partial class SavedSearchesPage : ListPage
        IDataProvider dataProvider,
        IAccountProvider accountProvider,
        AzureClientHelpers azureClientHelpers,
+       IQueryRepository queryRepository,
        TimeSpanHelper timeSpanHelper)
     {
         _resources = resources;
@@ -48,6 +51,7 @@ public partial class SavedSearchesPage : ListPage
         _dataProvider = dataProvider;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
+        _queryRepository = queryRepository;
     }
 
     private void OnSearchRemoved(object? sender, object? args)
@@ -66,7 +70,6 @@ public partial class SavedSearchesPage : ListPage
         }
         else if (args != null && args is Query query)
         {
-            _searches.Remove(query);
             RaiseItemsChanged(0);
 
             // no toast yet
@@ -90,9 +93,11 @@ public partial class SavedSearchesPage : ListPage
 
     public override IListItem[] GetItems()
     {
-        if (_searches.Count != 0)
+        var searches = _queryRepository.GetSavedQueries().Result;
+
+        if (searches.Any())
         {
-            var searchPages = _searches.Select(savedSearch => CreateItemForSearch(savedSearch)).ToList();
+            var searchPages = searches.Select(savedSearch => CreateItemForSearch(savedSearch)).ToList();
 
             searchPages.Add(_addSearchListItem);
 
@@ -110,24 +115,23 @@ public partial class SavedSearchesPage : ListPage
 
         if (args != null && args is Query query)
         {
-            _searches.Add(query);
             RaiseItemsChanged(0);
         }
 
         // errors are handled in SaveSearchPage
     }
 
-    public IListItem CreateItemForSearch(Query search)
+    public IListItem CreateItemForSearch(IQuery search)
     {
         return new ListItem(CreatePageForSearch(search))
         {
             Title = search.Name,
-            Subtitle = search.AzureUri.ToString(),
+            Subtitle = search.Url,
             Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(search.AzureUri.ToString(), _resources)),
-                new(new RemoveSavedSearchCommand(search, _resources, _savedSearchesMediator)),
+                new(new LinkCommand(search.Url, _resources)),
+                new(new RemoveSavedSearchCommand(search, _resources, _savedSearchesMediator, _queryRepository)),
                 new(new EditSearchPage(
                     _resources,
                     new SaveSearchForm(
@@ -135,7 +139,8 @@ public partial class SavedSearchesPage : ListPage
                         _resources,
                         _savedSearchesMediator,
                         _accountProvider,
-                        _azureClientHelpers),
+                        _azureClientHelpers,
+                        _queryRepository),
                     new StatusMessage(),
                     _resources.GetResource("Pages_Search_Edited_Success"),
                     _resources.GetResource("Pages_Search_Edited_Failed"))),
@@ -143,7 +148,7 @@ public partial class SavedSearchesPage : ListPage
         };
     }
 
-    private ListPage CreatePageForSearch(Query search)
+    private ListPage CreatePageForSearch(IQuery search)
     {
         return new WorkItemsSearchPage(search, _resources, _dataProvider, _timeSpanHelper)
         {

@@ -34,10 +34,11 @@ public class DataProvider : IDataProvider
         _azureClientProvider = azureClientProvider;
     }
 
-    public async Task<IEnumerable<WorkItem>> GetWorkItems(Query query)
+    public async Task<IEnumerable<WorkItem>> GetWorkItems(IQuery query)
     {
+        var azureUri = new AzureUri(query.Url);
         var account = _accountProvider.GetDefaultAccount();
-        var result = _azureClientProvider.GetVssConnection(query.AzureUri.Connection, account);
+        var result = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
 
         if (result.Result != ResultType.Success)
         {
@@ -47,7 +48,7 @@ public class DataProvider : IDataProvider
             }
             else
             {
-                throw new AzureAuthorizationException($"Failed getting connection: {query.AzureUri.Connection} with {result.Error}");
+                throw new AzureAuthorizationException($"Failed getting connection: {azureUri.Connection} with {result.Error}");
             }
         }
 
@@ -59,24 +60,24 @@ public class DataProvider : IDataProvider
 
         // Good practice to only create data after we know the client is valid, but any exceptions
         // will roll back the transaction.
-        var org = DataModel.Organization.Create(query.AzureUri.Connection);
+        var org = DataModel.Organization.Create(azureUri.Connection);
 
-        var teamProject = GetTeamProject(query.AzureUri.Project, account, query.AzureUri.Connection);
+        var teamProject = GetTeamProject(azureUri.Project, account, azureUri.Connection);
 
         var project = DataModel.Project.CreateFromTeamProject(teamProject, org.Id);
 
-        var getQueryResult = await witClient.GetQueryAsync(project.InternalId, query.AzureUri.Query);
+        var getQueryResult = await witClient.GetQueryAsync(project.InternalId, azureUri.Query);
         if (getQueryResult == null)
         {
-            throw new AzureClientException($"GetQueryAsync failed for {query.AzureUri.Connection}, {project.InternalId}, {query.AzureUri.Query}");
+            throw new AzureClientException($"GetQueryAsync failed for {azureUri.Connection}, {project.InternalId}, {azureUri.Query}");
         }
 
-        var queryId = new Guid(query.AzureUri.Query);
+        var queryId = new Guid(azureUri.Query);
         var count = await witClient.GetQueryResultCountAsync(project.Name, queryId);
         var queryResult = await witClient.QueryByIdAsync(project.InternalId, queryId);
         if (queryResult == null)
         {
-            throw new AzureClientException($"QueryByIdAsync failed for {query.AzureUri.Connection}, {project.InternalId}, {queryId}");
+            throw new AzureClientException($"QueryByIdAsync failed for {azureUri.Connection}, {project.InternalId}, {queryId}");
         }
 
         var workItemIds = new List<int>();
@@ -142,7 +143,7 @@ public class DataProvider : IDataProvider
             workItems = await witClient.GetWorkItemsAsync(project.InternalId, workItemIds, null, null, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit);
             if (workItems == null)
             {
-                throw new AzureClientException($"GetWorkItemsAsync failed for {query.AzureUri.Connection}, {project.InternalId}, Ids: {string.Join(",", workItemIds.ToArray())}");
+                throw new AzureClientException($"GetWorkItemsAsync failed for {azureUri.Connection}, {project.InternalId}, Ids: {string.Join(",", workItemIds.ToArray())}");
             }
         }
 

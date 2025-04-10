@@ -5,15 +5,13 @@
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.DataModel;
-using AzureExtension.DeveloperId;
 using Microsoft.Identity.Client;
 using Serilog;
-using Windows.Devices;
 using Windows.Storage;
 
 namespace AzureExtension.PersistentData;
 
-public class PersistentDataManager : IDisposable
+public class PersistentDataManager : IDisposable, IQueryRepository
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", nameof(PersistentDataManager)));
 

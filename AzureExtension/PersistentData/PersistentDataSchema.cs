@@ -13,7 +13,7 @@ public sealed class PersistentDataSchema : IDataStoreSchema
     public List<string> SchemaSqls => _schemaSqlsValue;
 
     private const string Query =
-        @"CREATE TABLE IF NOT EXISTS Search (
+        @"CREATE TABLE IF NOT EXISTS Query (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
             Name TEXT NOT NULL,
             Url TEXT NOT NULL,
