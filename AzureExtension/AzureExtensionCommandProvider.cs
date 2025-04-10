@@ -58,7 +58,6 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             var developerId = _developerIdProvider.GetLoggedInDeveloperIds().DeveloperIds.FirstOrDefault();
             var selectedQueryUrl = new AzureUri("https://microsoft.visualstudio.com/OS/_queries/query-edit/fd7ad0f5-17b0-46be-886a-92e4043c1c4f/");
             var queryInfo = AzureClientHelpers.GetQueryInfo(selectedQueryUrl, developerId!);
-            var selectedQueryId = queryInfo.AzureUri.Query;
 
             var defaultCommands = new List<CommandItem>
             {
