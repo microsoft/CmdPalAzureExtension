@@ -17,9 +17,11 @@ public class SavePullRequestForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
+        { "${url}", string.Empty },
+        { "${widgetTitle}", string.Empty },
     };
 
-    public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SaveSearch", TemplateSubstitutions);
+    public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequest", TemplateSubstitutions);
 
     public SavePullRequestForm(IResources resources)
     {
