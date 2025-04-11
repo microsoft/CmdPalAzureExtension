@@ -10,25 +10,25 @@ namespace AzureExtension.Controls.Commands;
 
 public partial class RemoveQueryCommand : InvokableCommand
 {
-    private readonly IQuery savedSearch;
+    private readonly IQuery savedQuery;
     private readonly IResources _resources;
-    private readonly SavedQueriesMediator _savedSearchesMediator;
+    private readonly SavedQueriesMediator _savedQueriesMediator;
     private readonly IQueryRepository _queryRepository;
 
-    public RemoveQueryCommand(IQuery search, IResources resources, SavedQueriesMediator savedSearchesMediator, IQueryRepository queryRepository)
+    public RemoveQueryCommand(IQuery query, IResources resources, SavedQueriesMediator savedQueriesMediator, IQueryRepository queryRepository)
     {
         _resources = resources;
-        _savedSearchesMediator = savedSearchesMediator;
+        _savedQueriesMediator = savedQueriesMediator;
         _queryRepository = queryRepository;
-        savedSearch = search;
+        savedQuery = query;
         Name = _resources.GetResource("Commands_Remove_Saved_Search");
         Icon = new IconInfo("\uecc9");
     }
 
     public override CommandResult Invoke()
     {
-        _queryRepository.RemoveSavedQueryAsync(savedSearch).Wait();
-        _savedSearchesMediator.RemoveSearch(savedSearch);
+        _queryRepository.RemoveSavedQueryAsync(savedQuery).Wait();
+        _savedQueriesMediator.RemoveQuery(savedQuery);
 
         return CommandResult.KeepOpen();
     }

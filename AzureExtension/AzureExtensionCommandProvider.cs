@@ -18,7 +18,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly SignOutPage _signOutPage;
 
-    private readonly SavedQueriesPage _savedSearchesPage;
+    private readonly SavedQueriesPage _savedQueriesPage;
 
     private readonly IAccountProvider _accountProvider;
 
@@ -26,12 +26,12 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly AzureClientHelpers _azureClientHelpers;
 
-    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedSearchesPage, IResources resources, AzureClientHelpers azureClientHelpers)
+    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedQueriesPage, IResources resources, AzureClientHelpers azureClientHelpers)
     {
         _signInPage = signInPage;
         _signOutPage = signOutPage;
         _accountProvider = accountProvider;
-        _savedSearchesPage = savedSearchesPage;
+        _savedQueriesPage = savedQueriesPage;
         _resources = resources;
         _azureClientHelpers = azureClientHelpers;
         DisplayName = "Azure Extension";
@@ -62,7 +62,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
             var defaultCommands = new List<CommandItem>
             {
-                new(_savedSearchesPage)
+                new(_savedQueriesPage)
                 {
                     Title = _resources.GetResource("Pages_Saved_Searches"),
                     Icon = new IconInfo("\ue721"),

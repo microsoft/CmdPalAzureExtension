@@ -19,9 +19,9 @@ namespace AzureExtension;
 
 public partial class SavedQueriesPage : ListPage
 {
-    private readonly IListItem _addSearchListItem;
+    private readonly IListItem _addQueryListItem;
     private readonly IResources _resources;
-    private readonly SavedQueriesMediator _savedSearchesMediator;
+    private readonly SavedQueriesMediator _savedQueriesMediator;
     private readonly TimeSpanHelper _timeSpanHelper;
     private readonly IDataProvider _dataProvider;
     private readonly IAccountProvider _accountProvider;
@@ -30,8 +30,8 @@ public partial class SavedQueriesPage : ListPage
 
     public SavedQueriesPage(
        IResources resources,
-       IListItem addSearchListItem,
-       SavedQueriesMediator savedSearchesMediator,
+       IListItem addQueryListItem,
+       SavedQueriesMediator savedQueriesMediator,
        IDataProvider dataProvider,
        IAccountProvider accountProvider,
        AzureClientHelpers azureClientHelpers,
@@ -42,11 +42,11 @@ public partial class SavedQueriesPage : ListPage
 
         Icon = new IconInfo("\ue721");
         Name = _resources.GetResource("Pages_Saved_Searches");
-        _savedSearchesMediator = savedSearchesMediator;
-        _savedSearchesMediator.SearchRemoved += OnSearchRemoved;
-        _savedSearchesMediator.SearchRemoving += OnSearchRemoving;
-        _addSearchListItem = addSearchListItem;
-        _savedSearchesMediator.SearchSaved += OnSearchSaved;
+        _savedQueriesMediator = savedQueriesMediator;
+        _savedQueriesMediator.QueryRemoved += OnQueryRemoved;
+        _savedQueriesMediator.QueryRemoving += OnQueryRemoving;
+        _addQueryListItem = addQueryListItem;
+        _savedQueriesMediator.QuerySaved += OnQuerySaved;
         _timeSpanHelper = timeSpanHelper;
         _dataProvider = dataProvider;
         _accountProvider = accountProvider;
@@ -54,7 +54,7 @@ public partial class SavedQueriesPage : ListPage
         _queryRepository = queryRepository;
     }
 
-    private void OnSearchRemoved(object? sender, object? args)
+    private void OnQueryRemoved(object? sender, object? args)
     {
         IsLoading = false;
 
@@ -86,7 +86,7 @@ public partial class SavedQueriesPage : ListPage
         }
     }
 
-    private void OnSearchRemoving(object? sender, object? e)
+    private void OnQueryRemoving(object? sender, object? e)
     {
         IsLoading = true;
     }
@@ -97,19 +97,19 @@ public partial class SavedQueriesPage : ListPage
 
         if (searches.Any())
         {
-            var searchPages = searches.Select(savedSearch => CreateItemForSearch(savedSearch)).ToList();
+            var searchPages = searches.Select(savedSearch => CreateItemForQuery(savedSearch)).ToList();
 
-            searchPages.Add(_addSearchListItem);
+            searchPages.Add(_addQueryListItem);
 
             return searchPages.ToArray();
         }
         else
         {
-            return [_addSearchListItem];
+            return [_addQueryListItem];
         }
     }
 
-    public void OnSearchSaved(object? sender, object? args)
+    public void OnQuerySaved(object? sender, object? args)
     {
         IsLoading = false;
 
@@ -118,26 +118,26 @@ public partial class SavedQueriesPage : ListPage
             RaiseItemsChanged(0);
         }
 
-        // errors are handled in SaveSearchPage
+        // errors are handled in SaveQueryPage
     }
 
-    public IListItem CreateItemForSearch(IQuery search)
+    public IListItem CreateItemForQuery(IQuery query)
     {
-        return new ListItem(CreatePageForSearch(search))
+        return new ListItem(CreatePageForQuery(query))
         {
-            Title = search.Name,
-            Subtitle = search.Url,
+            Title = query.Name,
+            Subtitle = query.Url,
             Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(search.Url, _resources)),
-                new(new RemoveQueryCommand(search, _resources, _savedSearchesMediator, _queryRepository)),
+                new(new LinkCommand(query.Url, _resources)),
+                new(new RemoveQueryCommand(query, _resources, _savedQueriesMediator, _queryRepository)),
                 new(new EditQueryPage(
                     _resources,
                     new SaveQueryForm(
-                        search,
+                        query,
                         _resources,
-                        _savedSearchesMediator,
+                        _savedQueriesMediator,
                         _accountProvider,
                         _azureClientHelpers,
                         _queryRepository),
@@ -148,7 +148,7 @@ public partial class SavedQueriesPage : ListPage
         };
     }
 
-    private ListPage CreatePageForSearch(IQuery search)
+    private ListPage CreatePageForQuery(IQuery search)
     {
         return new WorkItemsSearchPage(search, _resources, _dataProvider, _timeSpanHelper)
         {

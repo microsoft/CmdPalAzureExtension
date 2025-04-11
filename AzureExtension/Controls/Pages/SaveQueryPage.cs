@@ -12,22 +12,22 @@ namespace AzureExtension.Controls.Pages;
 
 public sealed partial class SaveQueryPage : ContentPage
 {
-    private readonly SaveQueryForm _saveSearchForm;
+    private readonly SaveQueryForm _saveQueryForm;
     private readonly StatusMessage _statusMessage;
     private readonly string _successMessage;
     private readonly string _errorMessage;
 
-    public SaveQueryPage(SaveQueryForm saveSearchForm, StatusMessage statusMessage, string successMessage, string errorMessage, string saveSearchPageTitle)
+    public SaveQueryPage(SaveQueryForm saveQueryForm, StatusMessage statusMessage, string successMessage, string errorMessage, string saveQueryPageTitle)
     {
-        _saveSearchForm = saveSearchForm;
+        _saveQueryForm = saveQueryForm;
         _statusMessage = statusMessage;
         _successMessage = successMessage;
         _errorMessage = errorMessage;
         Icon = new IconInfo("\uecc8");
-        Title = saveSearchPageTitle;
+        Title = saveQueryPageTitle;
 
         // Wire up events using the helper
-        FormEventHelper.WireFormEvents(_saveSearchForm, this, _statusMessage, _successMessage, _errorMessage);
+        FormEventHelper.WireFormEvents(_saveQueryForm, this, _statusMessage, _successMessage, _errorMessage);
 
         // Hide status message initially
         ExtensionHost.HideStatus(_statusMessage);
@@ -36,6 +36,6 @@ public sealed partial class SaveQueryPage : ContentPage
     public override IContent[] GetContent()
     {
         ExtensionHost.HideStatus(_statusMessage);
-        return [_saveSearchForm];
+        return [_saveQueryForm];
     }
 }

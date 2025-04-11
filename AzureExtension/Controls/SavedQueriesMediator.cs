@@ -6,28 +6,28 @@ namespace AzureExtension.Controls;
 
 public class SavedQueriesMediator
 {
-    public event EventHandler<object?>? SearchRemoving;
+    public event EventHandler<object?>? QueryRemoving;
 
-    public event EventHandler<object?>? SearchRemoved;
+    public event EventHandler<object?>? QueryRemoved;
 
-    public event EventHandler<object?>? SearchSaved;
+    public event EventHandler<object?>? QuerySaved;
 
     public SavedQueriesMediator()
     {
     }
 
-    public void RemovingSearch(object args)
+    public void RemovingQuery(object args)
     {
-        SearchRemoving?.Invoke(this, args);
+        QueryRemoving?.Invoke(this, args);
     }
 
-    public void RemoveSearch(object args)
+    public void RemoveQuery(object args)
     {
-        SearchRemoved?.Invoke(this, args);
+        QueryRemoved?.Invoke(this, args);
     }
 
-    public void AddSearch(object args)
+    public void AddQuery(object args)
     {
-        SearchSaved?.Invoke(this, args);
+        QuerySaved?.Invoke(this, args);
     }
 }

@@ -15,9 +15,9 @@ namespace AzureExtension.Controls.Forms;
 
 public sealed partial class SaveQueryForm : FormContent, IAzureForm
 {
-    private readonly IQuery _savedSearch;
+    private readonly IQuery _savedQuery;
     private readonly IResources _resources;
-    private readonly SavedQueriesMediator _savedSearchesMediator;
+    private readonly SavedQueriesMediator _savedQueriesMediator;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
     private readonly IQueryRepository _queryRepository;
@@ -30,9 +30,9 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "{{SaveSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedSearch.Name) ? "Forms_Save_Search" : "Forms_Edit_Search") },
-        { "{{SavedSearchString}}", _savedSearch.Url },
-        { "{{SavedSearchName}}", _savedSearch.Name },
+        { "{{SaveSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Search" : "Forms_Edit_Search") },
+        { "{{SavedSearchString}}", _savedQuery.Url },
+        { "{{SavedSearchName}}", _savedQuery.Name },
         { "{{IsTopLevel}}", isTopLevelChecked },
         { "{{EnteredSearchErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchError") },
         { "{{EnteredSearchLabel}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchLabel") },
@@ -43,22 +43,22 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     };
 
     // for saving a new query
-    public SaveQueryForm(IResources resources, SavedQueriesMediator savedSearchesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
+    public SaveQueryForm(IResources resources, SavedQueriesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
     {
         _resources = resources;
-        _savedSearch = new Query();
-        _savedSearchesMediator = savedSearchesMediator;
+        _savedQuery = new Query();
+        _savedQueriesMediator = savedQueriesMediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
         _queryRepository = queryRepository;
     }
 
     // for editing an existing query
-    public SaveQueryForm(IQuery savedSearch, IResources resources, SavedQueriesMediator savedSearchesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
+    public SaveQueryForm(IQuery savedQuery, IResources resources, SavedQueriesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
     {
         _resources = resources;
-        _savedSearch = savedSearch;
-        _savedSearchesMediator = savedSearchesMediator;
+        _savedQuery = savedQuery;
+        _savedQueriesMediator = savedQueriesMediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
         _queryRepository = queryRepository;
@@ -71,14 +71,14 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
         LoadingStateChanged?.Invoke(this, true);
         Task.Run(() =>
         {
-            var search = GetSearch(inputs);
-            ExtensionHost.LogMessage(new LogMessage() { Message = $"Search: {search}" });
+            var query = GetQuery(inputs);
+            ExtensionHost.LogMessage(new LogMessage() { Message = $"Query: {query}" });
         });
 
         return CommandResult.KeepOpen();
     }
 
-    public Query GetSearch(string payload)
+    public Query GetQuery(string payload)
     {
         try
         {
@@ -88,23 +88,23 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
-            if (_savedSearch.Url != string.Empty)
+            if (_savedQuery.Url != string.Empty)
             {
-                Log.Information($"Removing outdated search {_savedSearch.Name}, {_savedSearch.Url}");
+                Log.Information($"Removing outdated search {_savedQuery.Name}, {_savedQuery.Url}");
 
-                _savedSearchesMediator.RemoveSearch(_savedSearch);
+                _savedQueriesMediator.RemoveQuery(_savedQuery);
             }
 
             LoadingStateChanged?.Invoke(this, false);
             _queryRepository.AddSavedQueryAsync(query).Wait();
-            _savedSearchesMediator.AddSearch(query);
+            _savedQueriesMediator.AddQuery(query);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
             return query;
         }
         catch (Exception ex)
         {
             LoadingStateChanged?.Invoke(this, false);
-            _savedSearchesMediator.AddSearch(ex);
+            _savedQueriesMediator.AddQuery(ex);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
         }
 

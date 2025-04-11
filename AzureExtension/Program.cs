@@ -141,13 +141,13 @@ public sealed class Program
         var signOutForm = new SignOutForm(accountProvider, resources);
         var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"));
 
-        var savedSearchesMediator = new SavedQueriesMediator();
+        var savedQueriesMediator = new SavedQueriesMediator();
 
-        var addSearchForm = new SaveQueryForm(resources, savedSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager);
-        var addSearchListItem = new AddQueryListItem(new SaveQueryPage(addSearchForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
-        var savedSearchesPage = new SavedQueriesPage(resources, addSearchListItem, savedSearchesMediator, dataProvider, accountProvider, azureClientHelpers, persistentDataManager, timeSpanHelper);
+        var addQueryForm = new SaveQueryForm(resources, savedQueriesMediator, accountProvider, azureClientHelpers, persistentDataManager);
+        var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
+        var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedQueriesMediator, dataProvider, accountProvider, azureClientHelpers, persistentDataManager, timeSpanHelper);
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedSearchesPage, resources, azureClientHelpers);
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, azureClientHelpers);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 
