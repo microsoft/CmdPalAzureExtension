@@ -64,7 +64,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
         _queryRepository = queryRepository;
     }
 
-    public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SaveSearch", TemplateSubstitutions);
+    public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SaveQuery", TemplateSubstitutions);
 
     public override ICommandResult SubmitForm(string inputs, string data)
     {
