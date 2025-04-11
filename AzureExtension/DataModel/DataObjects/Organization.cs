@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Client;
+using AzureExtension.Data;
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
