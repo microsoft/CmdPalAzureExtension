@@ -3,20 +3,23 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Helpers;
+using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Commands;
 
 public partial class RemoveSavedSearchCommand : InvokableCommand
 {
-    private readonly Query savedSearch;
+    private readonly IQuery savedSearch;
     private readonly IResources _resources;
     private readonly SavedSearchesMediator _savedSearchesMediator;
+    private readonly IQueryRepository _queryRepository;
 
-    public RemoveSavedSearchCommand(Query search, IResources resources, SavedSearchesMediator savedSearchesMediator)
+    public RemoveSavedSearchCommand(IQuery search, IResources resources, SavedSearchesMediator savedSearchesMediator, IQueryRepository queryRepository)
     {
         _resources = resources;
         _savedSearchesMediator = savedSearchesMediator;
+        _queryRepository = queryRepository;
         savedSearch = search;
         Name = _resources.GetResource("Commands_Remove_Saved_Search");
         Icon = new IconInfo("\uecc9");
@@ -24,8 +27,9 @@ public partial class RemoveSavedSearchCommand : InvokableCommand
 
     public override CommandResult Invoke()
     {
-       _savedSearchesMediator.RemoveSearch(savedSearch);
+        _queryRepository.RemoveSavedQueryAsync(savedSearch).Wait();
+        _savedSearchesMediator.RemoveSearch(savedSearch);
 
-       return CommandResult.KeepOpen();
+        return CommandResult.KeepOpen();
     }
 }

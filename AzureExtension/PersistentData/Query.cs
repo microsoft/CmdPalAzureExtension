@@ -2,10 +2,9 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.DataModel;
-using AzureExtension.DeveloperId;
-using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Serilog;
@@ -13,152 +12,99 @@ using Serilog;
 namespace AzureExtension.PersistentData;
 
 [Table("Query")]
-public class Query : ISearch
+public class Query : IQuery
 {
-    private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", $"DataModel/{nameof(Query)}"));
+    private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", $"PersistentData/{nameof(Query)}"));
 
     private static readonly ILogger _log = _logger.Value;
-
-    // This is the time between seeing a search and updating it's TimeUpdated.
-    private static readonly long _updateThreshold = TimeSpan.FromMinutes(2).Ticks;
 
     [Key]
     public long Id { get; set; } = DataStore.NoForeignKey;
 
-    // Guid
-    public string QueryId { get; set; } = string.Empty;
-
     // SearchString to satisfy ISearch interface
-    public string SearchString { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
 
-    public string DisplayName { get; set; } = string.Empty;
-
-    // Key in Project table
-    public long ProjectId { get; set; } = DataStore.NoForeignKey;
-
-    // We need developer id because query results may be different depending on the user.
-    public string DeveloperLogin { get; set; } = string.Empty;
-
-    // Query results will be a JSON string.
-    public string QueryResults { get; set; } = string.Empty;
-
-    // Result count for quick access.
-    public long QueryResultCount { get; set; } = DataStore.NoForeignKey;
-
-    public long TimeUpdated { get; set; } = DataStore.NoForeignKey;
+    public string Name { get; set; } = string.Empty;
 
     public bool IsTopLevel { get; set; }
 
-    public override string ToString() => QueryId;
+    [Computed]
+    [Write(false)]
+    public AzureUri AzureUri
+    {
+        get
+        {
+            return new AzureUri(Url);
+        }
+    }
 
     [Write(false)]
     private DataStore? DataStore { get; set; }
 
-    [Write(false)]
-    [Computed]
-    public Project Project => Project.Get(DataStore, ProjectId);
-
-    [Write(false)]
-    [Computed]
-    public DateTime UpdatedAt => TimeUpdated.ToDateTime();
-
-    // Implement ISearch interface
-    public string Name => DisplayName;
-
-    private static Query Create(string queryId, long projectId, string developerLogin, string displayName, string queryResults, long queryResultCount, string searchString)
+    public static Query Add(string name, string url, bool isTopLevel)
     {
         return new Query
         {
-            QueryId = queryId,
-            ProjectId = projectId,
-            DeveloperLogin = developerLogin,
-            DisplayName = displayName,
-            QueryResults = queryResults,
-            QueryResultCount = queryResultCount,
-            TimeUpdated = DateTime.UtcNow.ToDataStoreInteger(),
-            SearchString = searchString,
+            Name = name,
+            Url = url,
+            IsTopLevel = isTopLevel,
         };
     }
 
-    private static Query AddOrUpdate(DataStore dataStore, Query query)
+    public static Query? Get(DataStore datastore, string name, string url)
     {
-        var existing = Get(dataStore, query.QueryId, query.DeveloperLogin);
-        if (existing is not null)
-        {
-            if ((query.TimeUpdated - existing.TimeUpdated) > _updateThreshold)
-            {
-                query.Id = existing.Id;
-                dataStore.Connection!.Update(query);
-                return query;
-            }
-            else
-            {
-                return existing;
-            }
-        }
-
-        // No existing search, add it.
-        query.Id = dataStore.Connection!.Insert(query);
+        var sql = "SELECT * FROM Query WHERE Name = @Name AND Url = @Url";
+        var query = datastore.Connection.QueryFirstOrDefault<Query>(sql, new { Name = name, Url = url });
         return query;
     }
 
-    // Direct Get always returns a non-null object for reference in other objects.
-    public static Query Get(DataStore dataStore, long id)
+    public static Query Add(DataStore datastore, string name, string url, bool isTopLevel)
     {
-        if (dataStore == null)
+        var query = new Query
         {
-            return new Query();
-        }
-
-        var query = dataStore.Connection!.Get<Query>(id);
-        if (query != null)
-        {
-            query.DataStore = dataStore;
-        }
-
-        return query ?? new Query();
-    }
-
-    // Query is unique on queryId and developerId
-    public static Query? Get(DataStore dataStore, string queryId, string developerLogin)
-    {
-        var sql = @"SELECT * FROM Query WHERE QueryId = @QueryId AND DeveloperLogin = @DeveloperLogin;";
-        var param = new
-        {
-            QueryId = queryId,
-            DeveloperLogin = developerLogin,
+            Name = name,
+            Url = url,
+            IsTopLevel = isTopLevel,
         };
 
-        var query = dataStore.Connection!.QueryFirstOrDefault<Query>(sql, param, null);
-        if (query is not null)
-        {
-            query.DataStore = dataStore;
-        }
-
+        datastore.Connection.Insert(query);
         return query;
     }
 
-    public static Query GetOrCreate(DataStore dataStore, string queryId, long projectId, string developerId, string displayName, string queryResults, long queryResultCount, string searchString)
+    public static void Remove(DataStore datastore, string name, string url)
     {
-        var newQuery = Create(queryId, projectId, developerId, displayName, queryResults, queryResultCount, searchString);
-        return AddOrUpdate(dataStore, newQuery);
-    }
-
-    // Overload that uses queryId as searchString for backward compatibility
-    public static Query GetOrCreate(DataStore dataStore, string queryId, long projectId, string developerId, string displayName, string queryResults, long queryResultCount)
-    {
-        return GetOrCreate(dataStore, queryId, projectId, developerId, displayName, queryResults, queryResultCount, queryId);
-    }
-
-    public static void DeleteBefore(DataStore dataStore, DateTime date)
-    {
-        // Delete queries older than the date listed.
-        var sql = @"DELETE FROM Query WHERE TimeUpdated < $Time;";
-        var command = dataStore.Connection!.CreateCommand();
+        var sql = "DELETE FROM Query WHERE Name = @Name AND Url = @Url";
+        var command = datastore.Connection!.CreateCommand();
         command.CommandText = sql;
-        command.Parameters.AddWithValue("$Time", date.ToDataStoreInteger());
-        _log.Debug(DataStore.GetCommandLogMessage(sql, command));
-        var rowsDeleted = command.ExecuteNonQuery();
-        _log.Debug(DataStore.GetDeletedLogMessage(rowsDeleted));
+        command.Parameters.AddWithValue("@Name", name);
+        command.Parameters.AddWithValue("@Url", url);
+        _log.Verbose(DataStore.GetCommandLogMessage(sql, command));
+        var deleted = command.ExecuteNonQuery();
+        _log.Verbose($"Deleted {deleted} rows from Query table.");
+    }
+
+    public static IEnumerable<IQuery> GetAll(DataStore datastore)
+    {
+        var sql = "SELECT * FROM Query";
+        var query = datastore.Connection.Query<Query>(sql);
+        return query;
+    }
+
+    public static IEnumerable<IQuery> GetTopLevel(DataStore datastore)
+    {
+        var sql = "SELECT * FROM Query WHERE IsTopLevel = 1";
+        var query = datastore.Connection.Query<Query>(sql);
+        return query;
+    }
+
+    public static void AddOrUpdate(DataStore datastore, string name, string url, bool isTopLevel)
+    {
+        var query = Get(datastore, name, url);
+
+        query ??= Add(datastore, name, url, isTopLevel);
+
+        query.IsTopLevel = isTopLevel;
+
+        datastore.Connection.Update(query);
     }
 }

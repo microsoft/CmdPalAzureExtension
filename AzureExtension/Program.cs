@@ -2,14 +2,13 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.ListItems;
 using AzureExtension.Controls.Pages;
 using AzureExtension.DataManager;
-using AzureExtension.DataModel;
-using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
@@ -42,7 +41,6 @@ public sealed class Program
             .CreateLogger();
 
         Log.Information($"Launched with args: {string.Join(' ', args.ToArray())}");
-        LogPackageInformation();
         LogPackageInformation();
 
         // Force the app to be single instanced.
@@ -82,7 +80,7 @@ public sealed class Program
             var d = activationArgs.Data as ILaunchActivatedEventArgs;
             var args = d?.Arguments.Split();
 
-            if (args?.Length > 1 && args[1] == "-RegisterProcessAsComServer")
+            if (args?.Length > 1 && args.Contains("-RegisterProcessAsComServer"))
             {
                 Log.Information($"Activation COM Registration Redirect: {string.Join(' ', args.ToList())}");
                 await HandleCOMServerActivation();
@@ -115,31 +113,23 @@ public sealed class Program
         await using global::Shmuelie.WinRTServer.ComServer server = new();
         var extensionDisposedEvent = new ManualResetEvent(false);
 
-        // We may have received an event on previous launch that the datastore should be recreated.
-        // It should be recreated now before anything else tries to use it.
-
-        // In the case that this is the first launch we will try to automatically connect the default Windows account
         var authenticationSettings = new AuthenticationSettings();
         authenticationSettings.InitializeSettings();
 
         var accountProvider = new AccountProvider(authenticationSettings);
+
+        // In the case that this is the first launch we will try to automatically connect the default Windows account
         await accountProvider.EnableSSOForAzureExtensionAsync();
 
         var azureClientProvider = new AzureClientProvider(accountProvider);
         var azureClientHelpers = new AzureClientHelpers(azureClientProvider);
 
+        var azureValidator = new AzureValidatorAdapter(azureClientHelpers);
+
+        var persistentDataManager = new PersistentDataManager(azureValidator);
+
         var dataProvider = new DataProvider(accountProvider, azureClientProvider);
 
-        // Cache manager updates account data.
-        // using var cacheManager = new CacheManager(azureDataManager, devIdProvider);
-        // cacheManager.Start();
-
-        // Set up the data updater. This will schedule updating the Developer Pull Requests.
-        // using var dataUpdater = new DataUpdater(azureDataManager.Update);
-        // _ = dataUpdater.Start();
-
-        // Add an update whenever CacheManager is updated.
-        // cacheManager.OnUpdate += HandleCacheUpdate;
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);
         var resources = new Resources(resourceLoader);
@@ -153,9 +143,9 @@ public sealed class Program
 
         var savedSearchesMediator = new SavedSearchesMediator();
 
-        var addSearchForm = new SaveSearchForm(resources, savedSearchesMediator, accountProvider, azureClientHelpers);
+        var addSearchForm = new SaveSearchForm(resources, savedSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager);
         var addSearchListItem = new AddSearchListItem(new SaveSearchPage(addSearchForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
-        var savedSearchesPage = new SavedSearchesPage(resources, addSearchListItem, savedSearchesMediator, dataProvider, accountProvider, azureClientHelpers, timeSpanHelper);
+        var savedSearchesPage = new SavedSearchesPage(resources, addSearchListItem, savedSearchesMediator, dataProvider, accountProvider, azureClientHelpers, persistentDataManager, timeSpanHelper);
 
         var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedSearchesPage, resources, azureClientHelpers);
 
