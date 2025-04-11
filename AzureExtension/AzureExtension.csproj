@@ -81,9 +81,6 @@
 		<PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.322" />
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="Controls\Templates\" />
-	</ItemGroup>
-	<ItemGroup>
 	  <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" />
 	</ItemGroup>
 

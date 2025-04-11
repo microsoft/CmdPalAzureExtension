@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Helpers;
+using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Serilog;
@@ -14,15 +15,12 @@ namespace AzureExtension.Controls.Forms;
 
 public sealed partial class SaveQueryForm : FormContent, IAzureForm
 {
-    private readonly Query _savedQuery;
-
+    private readonly IQuery _savedQuery;
     private readonly IResources _resources;
-
     private readonly SavedQueriesMediator _savedQueriesMediator;
-
     private readonly IAccountProvider _accountProvider;
-
     private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly IQueryRepository _queryRepository;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
@@ -32,36 +30,38 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "{{SaveQueryFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Query" : "Forms_Edit_Query") },
-        { "{{SavedQueryString}}", _savedQuery.AzureUri.ToString() },
-        { "{{SavedQueryName}}", _savedQuery.Name },
+        { "{{SaveSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Search" : "Forms_Edit_Search") },
+        { "{{SavedSearchString}}", _savedQuery.Url },
+        { "{{SavedSearchName}}", _savedQuery.Name },
         { "{{IsTopLevel}}", isTopLevelChecked },
-        { "{{EnteredQueryErrorMessage}}", _resources.GetResource("Forms_SaveQueryTemplateEnteredQueryError") },
-        { "{{EnteredQueryLabel}}", _resources.GetResource("Forms_SaveQueryTemplateEnteredQueryLabel") },
-        { "{{NameLabel}}", _resources.GetResource("Forms_SaveQueryTemplateNameLabel") },
-        { "{{NameErrorMessage}}", _resources.GetResource("Forms_SaveQueryTemplateNameError") },
-        { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveQueryTemplateIsTopLevelTitle") },
-        { "{{SaveQueryActionTitle}}", _resources.GetResource("Forms_SaveQueryTemplateSaveQueryActionTitle") },
+        { "{{EnteredSearchErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchError") },
+        { "{{EnteredSearchLabel}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchLabel") },
+        { "{{NameLabel}}", _resources.GetResource("Forms_SaveSearchTemplateNameLabel") },
+        { "{{NameErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateNameError") },
+        { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveSearchTemplateIsTopLevelTitle") },
+        { "{{SaveSearchActionTitle}}", _resources.GetResource("Forms_SaveSearchTemplateSaveSearchActionTitle") },
     };
 
     // for saving a new query
-    public SaveQueryForm(IResources resources, SavedQueriesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers)
+    public SaveQueryForm(IResources resources, SavedQueriesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
     {
         _resources = resources;
         _savedQuery = new Query();
         _savedQueriesMediator = savedQueriesMediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
+        _queryRepository = queryRepository;
     }
 
     // for editing an existing query
-    public SaveQueryForm(Query savedQuery, IResources resources, SavedQueriesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers)
+    public SaveQueryForm(IQuery savedQuery, IResources resources, SavedQueriesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
     {
         _resources = resources;
         _savedQuery = savedQuery;
         _savedQueriesMediator = savedQueriesMediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
+        _queryRepository = queryRepository;
     }
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SaveQuery", TemplateSubstitutions);
@@ -82,20 +82,21 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     {
         try
         {
-            var payloadJson = JsonNode.Parse(payload) ?? throw new InvalidOperationException("No query found");
+            var payloadJson = JsonNode.Parse(payload) ?? throw new InvalidOperationException("No search found");
 
             var query = CreateQueryFromJson(payloadJson);
 
-            // if editing the query, delete the old one
+            // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
-            if (_savedQuery.AzureUri.ToString() != string.Empty)
+            if (_savedQuery.Url != string.Empty)
             {
-                Log.Information($"Removing outdated query {_savedQuery.Name}, {_savedQuery.AzureUri.ToString()}");
+                Log.Information($"Removing outdated search {_savedQuery.Name}, {_savedQuery.Url}");
 
                 _savedQueriesMediator.RemoveQuery(_savedQuery);
             }
 
             LoadingStateChanged?.Invoke(this, false);
+            _queryRepository.AddSavedQueryAsync(query).Wait();
             _savedQueriesMediator.AddQuery(query);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
             return query;
@@ -112,7 +113,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
     public Query CreateQueryFromJson(JsonNode? jsonNode)
     {
-        var queryUrl = jsonNode?["EnteredQuery"]?.ToString() ?? string.Empty;
+        var queryUrl = jsonNode?["EnteredSearch"]?.ToString() ?? string.Empty;
         var name = jsonNode?["Name"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 

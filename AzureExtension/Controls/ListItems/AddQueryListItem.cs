@@ -8,9 +8,9 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.ListItems;
 
-public partial class AddSearchListItem : ListItem
+public partial class AddQueryListItem : ListItem
 {
-    public AddSearchListItem(SaveSearchPage page, IResources resources)
+    public AddQueryListItem(SaveQueryPage page, IResources resources)
     : base(page)
     {
         Title = resources.GetResource("ListItems_AddSearch");

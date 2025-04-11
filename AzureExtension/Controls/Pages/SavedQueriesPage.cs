@@ -10,8 +10,10 @@ using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.Pages;
 using AzureExtension.DataManager;
 using AzureExtension.Helpers;
+using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Query = AzureExtension.Controls.Query;
 
 namespace AzureExtension;
 
@@ -19,38 +21,37 @@ public partial class SavedQueriesPage : ListPage
 {
     private readonly IListItem _addQueryListItem;
     private readonly IResources _resources;
+    private readonly SavedQueriesMediator _savedQueriesMediator;
+    private readonly TimeSpanHelper _timeSpanHelper;
     private readonly IDataProvider _dataProvider;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
-
-    private readonly SavedQueriesMediator _savedQueriesMediator;
-
-    private readonly List<Query> _queryes = new List<Query>();
-
-    private readonly TimeSpanHelper _timeSpanHelper;
+    private readonly IQueryRepository _queryRepository;
 
     public SavedQueriesPage(
        IResources resources,
        IListItem addQueryListItem,
        SavedQueriesMediator savedQueriesMediator,
        IDataProvider dataProvider,
-       TimeSpanHelper timeSpanHelper,
        IAccountProvider accountProvider,
-       AzureClientHelpers azureClientHelpers)
+       AzureClientHelpers azureClientHelpers,
+       IQueryRepository queryRepository,
+       TimeSpanHelper timeSpanHelper)
     {
         _resources = resources;
 
         Icon = new IconInfo("\ue721");
-        Name = _resources.GetResource("Pages_Saved_Queries");
+        Name = _resources.GetResource("Pages_Saved_Searches");
         _savedQueriesMediator = savedQueriesMediator;
         _savedQueriesMediator.QueryRemoved += OnQueryRemoved;
         _savedQueriesMediator.QueryRemoving += OnQueryRemoving;
         _addQueryListItem = addQueryListItem;
         _savedQueriesMediator.QuerySaved += OnQuerySaved;
-        _dataProvider = dataProvider;
         _timeSpanHelper = timeSpanHelper;
+        _dataProvider = dataProvider;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
+        _queryRepository = queryRepository;
     }
 
     private void OnQueryRemoved(object? sender, object? args)
@@ -61,7 +62,7 @@ public partial class SavedQueriesPage : ListPage
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = $"{_resources.GetResource("Pages_Saved_Queries_Error")} {e.Message}",
+                Message = $"{_resources.GetResource("Pages_Saved_Searches_Error")} {e.Message}",
                 State = MessageState.Error,
             });
 
@@ -69,7 +70,6 @@ public partial class SavedQueriesPage : ListPage
         }
         else if (args != null && args is Query query)
         {
-            _queryes.Remove(query);
             RaiseItemsChanged(0);
 
             // no toast yet
@@ -78,7 +78,7 @@ public partial class SavedQueriesPage : ListPage
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = _resources.GetResource("Pages_Saved_Queries_Failure"),
+                Message = _resources.GetResource("Pages_Saved_Searches_Failure"),
                 State = MessageState.Error,
             });
 
@@ -93,13 +93,15 @@ public partial class SavedQueriesPage : ListPage
 
     public override IListItem[] GetItems()
     {
-        if (_queryes.Count != 0)
+        var searches = _queryRepository.GetSavedQueries().Result;
+
+        if (searches.Any())
         {
-            var queryPages = _queryes.Select(savedQuery => CreateItemForQuery(savedQuery)).ToList();
+            var searchPages = searches.Select(savedSearch => CreateItemForQuery(savedSearch)).ToList();
 
-            queryPages.Add(_addQueryListItem);
+            searchPages.Add(_addQueryListItem);
 
-            return queryPages.ToArray();
+            return searchPages.ToArray();
         }
         else
         {
@@ -113,24 +115,23 @@ public partial class SavedQueriesPage : ListPage
 
         if (args != null && args is Query query)
         {
-            _queryes.Add(query);
             RaiseItemsChanged(0);
         }
 
         // errors are handled in SaveQueryPage
     }
 
-    public IListItem CreateItemForQuery(Query query)
+    public IListItem CreateItemForQuery(IQuery query)
     {
         return new ListItem(CreatePageForQuery(query))
         {
             Title = query.Name,
-            Subtitle = query.AzureUri.ToString(),
+            Subtitle = query.Url,
             Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(query.AzureUri.ToString(), _resources)),
-                new(new RemoveQueryCommand(query, _resources, _savedQueriesMediator)),
+                new(new LinkCommand(query.Url, _resources)),
+                new(new RemoveQueryCommand(query, _resources, _savedQueriesMediator, _queryRepository)),
                 new(new EditQueryPage(
                     _resources,
                     new SaveQueryForm(
@@ -138,20 +139,21 @@ public partial class SavedQueriesPage : ListPage
                         _resources,
                         _savedQueriesMediator,
                         _accountProvider,
-                        _azureClientHelpers),
+                        _azureClientHelpers,
+                        _queryRepository),
                     new StatusMessage(),
-                    _resources.GetResource("Pages_Query_Edited_Success"),
-                    _resources.GetResource("Pages_Query_Edited_Failed"))),
+                    _resources.GetResource("Pages_Search_Edited_Success"),
+                    _resources.GetResource("Pages_Search_Edited_Failed"))),
             },
         };
     }
 
-    private ListPage CreatePageForQuery(Query query)
+    private ListPage CreatePageForQuery(IQuery search)
     {
-        return new WorkItemsSearchPage(query, _resources, _dataProvider, _timeSpanHelper)
+        return new WorkItemsSearchPage(search, _resources, _dataProvider, _timeSpanHelper)
         {
             Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-            Name = query.Name,
+            Name = search.Name,
             IsLoading = true,
         };
     }
