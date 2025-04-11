@@ -7,7 +7,7 @@ using Microsoft.Identity.Client;
 using Microsoft.VisualStudio.Services.Common;
 using Windows.Foundation;
 
-namespace AzureExtension.DeveloperId;
+namespace AzureExtension.Account;
 
 public interface IAccountProvider
 {

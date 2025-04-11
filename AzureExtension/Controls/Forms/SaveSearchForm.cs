@@ -3,8 +3,8 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Text.Json.Nodes;
+using AzureExtension.Account;
 using AzureExtension.Client;
-using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;

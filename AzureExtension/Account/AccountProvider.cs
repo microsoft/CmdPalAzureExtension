@@ -3,8 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
-using System.Threading.Tasks;
-using AzureExtension.Controls.Pages;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Broker;
 using Microsoft.Identity.Client.Extensions.Msal;
@@ -12,9 +10,8 @@ using Microsoft.IdentityModel.Abstractions;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Common;
 using Serilog;
-using Windows.Foundation;
 
-namespace AzureExtension.DeveloperId;
+namespace AzureExtension.Account;
 
 public class AccountProvider : IAccountProvider
 {
@@ -66,7 +63,7 @@ public class AccountProvider : IAccountProvider
             PublicClientApplicationBuilder.WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows)
             {
                 MsaPassthrough = true,
-                Title = "DevHomeAzureExtension",
+                Title = "Command Palette Azure Extension",
             });
 
             PublicClientApplication = PublicClientApplicationBuilder.Build();
@@ -92,7 +89,7 @@ public class AccountProvider : IAccountProvider
             builder = builder.WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows)
             {
                 MsaPassthrough = true,
-                Title = "Dev Home Azure Extension",
+                Title = "Command Palette Azure Extension",
             });
 
             PublicClientApplication = PublicClientApplicationBuilder.Build();

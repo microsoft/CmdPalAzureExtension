@@ -81,9 +81,7 @@
 		<PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.322" />
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="Contracts\" />
 		<Folder Include="Controls\Templates\" />
-		<Folder Include="DataManager\Data\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" />
@@ -98,10 +96,24 @@
 		<HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Remove="Contracts\**" />
+	  <Compile Remove="DataManager\Data\**" />
+	  <EmbeddedResource Remove="Contracts\**" />
+	  <EmbeddedResource Remove="DataManager\Data\**" />
+	  <None Remove="Contracts\**" />
+	  <None Remove="DataManager\Data\**" />
+	  <Page Remove="Contracts\**" />
+	  <Page Remove="DataManager\Data\**" />
 	  <PRIResource Remove="Services\**" />
 	</ItemGroup>
 	<ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 	<ItemGroup>
 	  <PRIResource Remove="Data\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PRIResource Remove="Contracts\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PRIResource Remove="DataManager\Data\**" />
 	</ItemGroup>
 </Project>

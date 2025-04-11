@@ -2,14 +2,13 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.ListItems;
 using AzureExtension.Controls.Pages;
 using AzureExtension.DataManager;
-using AzureExtension.DataModel;
-using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
@@ -42,7 +41,6 @@ public sealed class Program
             .CreateLogger();
 
         Log.Information($"Launched with args: {string.Join(' ', args.ToArray())}");
-        LogPackageInformation();
         LogPackageInformation();
 
         // Force the app to be single instanced.
@@ -82,7 +80,7 @@ public sealed class Program
             var d = activationArgs.Data as ILaunchActivatedEventArgs;
             var args = d?.Arguments.Split();
 
-            if (args?.Length > 1 && args[1] == "-RegisterProcessAsComServer")
+            if (args?.Length > 1 && args.Contains("-RegisterProcessAsComServer"))
             {
                 Log.Information($"Activation COM Registration Redirect: {string.Join(' ', args.ToList())}");
                 await HandleCOMServerActivation();

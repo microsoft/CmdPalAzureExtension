@@ -2,10 +2,10 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.DataModel;
-using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
 using Microsoft.Identity.Client;
 using Microsoft.TeamFoundation.Core.WebApi;
@@ -60,24 +60,20 @@ public class DataProvider : IDataProvider
 
         // Good practice to only create data after we know the client is valid, but any exceptions
         // will roll back the transaction.
-        var org = DataModel.Organization.Create(azureUri.Connection);
-
         var teamProject = GetTeamProject(azureUri.Project, account, azureUri.Connection);
 
-        var project = DataModel.Project.CreateFromTeamProject(teamProject, org.Id);
-
-        var getQueryResult = await witClient.GetQueryAsync(project.InternalId, azureUri.Query);
+        var getQueryResult = await witClient.GetQueryAsync(teamProject.Id, azureUri.Query);
         if (getQueryResult == null)
         {
-            throw new AzureClientException($"GetQueryAsync failed for {azureUri.Connection}, {project.InternalId}, {azureUri.Query}");
+            throw new AzureClientException($"GetQueryAsync failed for {azureUri.Connection}, {teamProject.Id}, {azureUri.Query}");
         }
 
         var queryId = new Guid(azureUri.Query);
-        var count = await witClient.GetQueryResultCountAsync(project.Name, queryId);
-        var queryResult = await witClient.QueryByIdAsync(project.InternalId, queryId);
+        var queryResult = await witClient.QueryByIdAsync(teamProject.Id, queryId);
+
         if (queryResult == null)
         {
-            throw new AzureClientException($"QueryByIdAsync failed for {azureUri.Connection}, {project.InternalId}, {queryId}");
+            throw new AzureClientException($"QueryByIdAsync failed for {azureUri.Connection}, {teamProject.Id}, {queryId}");
         }
 
         var workItemIds = new List<int>();
@@ -140,10 +136,10 @@ public class DataProvider : IDataProvider
         var workItems = new List<TFModels.WorkItem>();
         if (workItemIds.Count > 0)
         {
-            workItems = await witClient.GetWorkItemsAsync(project.InternalId, workItemIds, null, null, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit);
+            workItems = await witClient.GetWorkItemsAsync(teamProject.Id, workItemIds, null, null, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit);
             if (workItems == null)
             {
-                throw new AzureClientException($"GetWorkItemsAsync failed for {azureUri.Connection}, {project.InternalId}, Ids: {string.Join(",", workItemIds.ToArray())}");
+                throw new AzureClientException($"GetWorkItemsAsync failed for {azureUri.Connection}, {teamProject.Id}, Ids: {string.Join(",", workItemIds.ToArray())}");
             }
         }
 
@@ -209,8 +205,8 @@ public class DataProvider : IDataProvider
                 if (field == WorkItemTypeFieldName)
                 {
                     // Need a separate query to create WorkItemType object.
-                    var workItemTypeInfo = await witClient!.GetWorkItemTypeAsync(project.InternalId, fieldValue);
-                    var workItemType = WorkItemType.CreateFromTeamWorkItemType(workItemTypeInfo, project.Id);
+                    var workItemTypeInfo = await witClient!.GetWorkItemTypeAsync(teamProject.Id, fieldValue);
+                    var workItemType = WorkItemType.CreateFromTeamWorkItemType(workItemTypeInfo, 1);
 
                     cmdPalWorkItem.SystemWorkItemType = workItemType;
                     continue;
