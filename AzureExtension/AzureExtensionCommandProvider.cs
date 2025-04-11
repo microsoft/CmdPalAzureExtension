@@ -56,10 +56,6 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         }
         else
         {
-            var account = _accountProvider.GetDefaultAccount();
-            var selectedQueryUrl = new AzureUri("https://microsoft.visualstudio.com/OS/_queries/query-edit/fd7ad0f5-17b0-46be-886a-92e4043c1c4f/");
-            var queryInfo = _azureClientHelpers.GetQueryInfo(selectedQueryUrl, account);
-
             var defaultCommands = new List<CommandItem>
             {
                 new(_savedSearchesPage)

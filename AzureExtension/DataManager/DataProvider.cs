@@ -22,17 +22,19 @@ public class DataProvider : IDataProvider
     private readonly ILogger _log;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientProvider _azureClientProvider;
+    private readonly Cache _cache;
 
     public static readonly string IdentityRefFieldValueName = "Microsoft.VisualStudio.Services.WebApi.IdentityRef";
     public static readonly string SystemIdFieldName = "System.Id";
     public static readonly string WorkItemHtmlUrlFieldName = "DevHome.AzureExtension.WorkItemHtmlUrl";
     public static readonly string WorkItemTypeFieldName = "System.WorkItemType";
 
-    public DataProvider(IAccountProvider accountProvider, AzureClientProvider azureClientProvider)
+    public DataProvider(IAccountProvider accountProvider, AzureClientProvider azureClientProvider, Cache cache)
     {
         _log = Log.ForContext("SourceContext", nameof(IDataProvider));
         _accountProvider = accountProvider;
         _azureClientProvider = azureClientProvider;
+        _cache = cache;
     }
 
     public async Task<IEnumerable<WorkItem>> GetWorkItems(IQuery query)
@@ -189,7 +191,7 @@ public class DataProvider : IDataProvider
                 var fieldIdentityRef = workItem.Fields[field] as IdentityRef;
                 if (fieldValue == IdentityRefFieldValueName && fieldIdentityRef != null)
                 {
-                    var identity = Identity.CreateFromIdentityRef(fieldIdentityRef, result.Connection);
+                    var identity = C(fieldIdentityRef, result.Connection);
 
                     if (field == "System.CreatedBy")
                     {

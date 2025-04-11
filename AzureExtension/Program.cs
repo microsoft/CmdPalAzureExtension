@@ -8,7 +8,9 @@ using AzureExtension.Controls;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.ListItems;
 using AzureExtension.Controls.Pages;
+using AzureExtension.Data;
 using AzureExtension.DataManager;
+using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
@@ -113,6 +115,15 @@ public sealed class Program
         await using global::Shmuelie.WinRTServer.ComServer server = new();
         var extensionDisposedEvent = new ManualResetEvent(false);
 
+        var dataStoreFolderPath = ApplicationData.Current.LocalFolder.Path;
+
+        var combinedCachePath = Path.Combine(dataStoreFolderPath, "AzureData.db");
+        var cacheDataStoreSchema = new AzureDataStoreSchema();
+        using var cacheDataStore = new DataStore("DataStore", combinedCachePath, cacheDataStoreSchema);
+        cacheDataStore.Create();
+
+        var cache = new Cache(cacheDataStore);
+
         var authenticationSettings = new AuthenticationSettings();
         authenticationSettings.InitializeSettings();
 
@@ -126,9 +137,14 @@ public sealed class Program
 
         var azureValidator = new AzureValidatorAdapter(azureClientHelpers);
 
-        var persistentDataManager = new PersistentDataManager(azureValidator);
+        var combinedPersistendDataStorePath = Path.Combine(dataStoreFolderPath, "PersistentAzureData.db");
+        var persistentDataStoreSchema = new PersistentDataSchema();
+        using var persistentDataStore = new DataStore("PersistentDataStore", combinedPersistendDataStorePath, persistentDataStoreSchema);
+        persistentDataStore.Create();
 
-        var dataProvider = new DataProvider(accountProvider, azureClientProvider);
+        var persistentDataManager = new PersistentDataManager(persistentDataStore, azureValidator);
+
+        var dataProvider = new DataProvider(accountProvider, azureClientProvider, cache);
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);

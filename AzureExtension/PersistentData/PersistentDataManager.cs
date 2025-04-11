@@ -11,82 +11,27 @@ using Windows.Storage;
 
 namespace AzureExtension.PersistentData;
 
-public class PersistentDataManager : IDisposable, IQueryRepository
+public class PersistentDataManager : IQueryRepository
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", nameof(PersistentDataManager)));
 
     private static readonly ILogger _log = _logger.Value;
 
-    private const string DataStoreFileName = "PersistentAzureData.db";
-
     private readonly IAzureValidator _azureValidator;
-
-    private DataStore DataStore { get; set; }
-
-    public DataStoreOptions DataStoreOpions { get; set; }
+    private readonly DataStore _dataStore;
 
     private void ValidateDataStore()
     {
-        if (DataStore == null || !DataStore.IsConnected)
+        if (_dataStore == null || !_dataStore.IsConnected)
         {
-            throw new DataStoreInaccessibleException("DataStore is not available.");
+            throw new DataStoreInaccessibleException("Peristent DataStore is not available.");
         }
     }
 
-    private static readonly Lazy<DataStoreOptions> _lazyDataStoreOptions = new(DefaultOptionsInit);
-
-    private static DataStoreOptions DefaultOptions => _lazyDataStoreOptions.Value;
-
-    private static DataStoreOptions DefaultOptionsInit()
-    {
-        return new DataStoreOptions
-        {
-            DataStoreFolderPath = ApplicationData.Current.LocalFolder.Path,
-            DataStoreSchema = new PersistentDataSchema(),
-        };
-    }
-
-    public PersistentDataManager(IAzureValidator azureValidator, DataStoreOptions? dataStoreOptions = null)
+    public PersistentDataManager(DataStore dataStore, IAzureValidator azureValidator)
     {
         _azureValidator = azureValidator;
-
-        dataStoreOptions ??= DefaultOptions;
-
-        if (dataStoreOptions.DataStoreSchema is null)
-        {
-            throw new ArgumentNullException(nameof(dataStoreOptions), "DataStoreSchema cannot be null.");
-        }
-
-        DataStoreOpions = dataStoreOptions;
-
-        DataStore = new DataStore(
-            "PersistentDataStore",
-            Path.Combine(dataStoreOptions.DataStoreFolderPath, DataStoreFileName),
-            dataStoreOptions.DataStoreSchema);
-
-        DataStore.Create(false);
-    }
-
-    private bool _disposed;
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        if (disposing)
-        {
-            DataStore?.Dispose();
-            _disposed = true;
-        }
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        _dataStore = dataStore;
     }
 
     public Task AddSavedQueryAsync(IQuery query)
@@ -97,12 +42,12 @@ public class PersistentDataManager : IDisposable, IQueryRepository
         var url = query.Url;
 
         _log.Information($"Adding query: {name} - {url}.");
-        if (Query.Get(DataStore, name, url) != null)
+        if (Query.Get(_dataStore, name, url) != null)
         {
             throw new InvalidOperationException($"Search {name} - {url} already exists.");
         }
 
-        Query.Add(DataStore, name, url, false);
+        Query.Add(_dataStore, name, url, false);
 
         return Task.CompletedTask;
     }
@@ -115,12 +60,12 @@ public class PersistentDataManager : IDisposable, IQueryRepository
         var url = query.Url;
 
         _log.Information($"Removing query: {name} - {url}.");
-        if (Query.Get(DataStore, name, url) == null)
+        if (Query.Get(_dataStore, name, url) == null)
         {
             throw new InvalidOperationException($"Search {name} - {url} not found.");
         }
 
-        Query.Remove(DataStore, name, url);
+        Query.Remove(_dataStore, name, url);
 
         return Task.CompletedTask;
     }
@@ -130,17 +75,17 @@ public class PersistentDataManager : IDisposable, IQueryRepository
         ValidateDataStore();
         if (isTopLevel)
         {
-            return Task.FromResult(Query.GetTopLevel(DataStore));
+            return Task.FromResult(Query.GetTopLevel(_dataStore));
         }
 
-        return Task.FromResult(Query.GetAll(DataStore));
+        return Task.FromResult(Query.GetAll(_dataStore));
     }
 
     // ISearchRepository implementation
     public IQuery GetQuery(string name, string url)
     {
         ValidateDataStore();
-        return Query.Get(DataStore, name, url) ?? throw new InvalidOperationException($"Search {name} - {url} not found.");
+        return Query.Get(_dataStore, name, url) ?? throw new InvalidOperationException($"Search {name} - {url} not found.");
     }
 
     public Task<IEnumerable<IQuery>> GetSavedQueries()
@@ -156,7 +101,7 @@ public class PersistentDataManager : IDisposable, IQueryRepository
     public Task<bool> IsTopLevel(IQuery query)
     {
         ValidateDataStore();
-        var dsQuery = Query.Get(DataStore, query.Name, query.Url);
+        var dsQuery = Query.Get(_dataStore, query.Name, query.Url);
         return dsQuery != null ? Task.FromResult(dsQuery.IsTopLevel) : Task.FromResult(false);
     }
 
@@ -164,7 +109,7 @@ public class PersistentDataManager : IDisposable, IQueryRepository
     {
         ValidateQuery(query, account);
         ValidateDataStore();
-        Query.AddOrUpdate(DataStore, query.Name, query.Url, isTopLevel);
+        Query.AddOrUpdate(_dataStore, query.Name, query.Url, isTopLevel);
     }
 
     private readonly object _insertLock = new();
@@ -190,7 +135,7 @@ public class PersistentDataManager : IDisposable, IQueryRepository
                 {
                     _log.Information($"Adding search: {query.Name}  -  {query.Url}.");
                     ValidateDataStore();
-                    Query.AddOrUpdate(DataStore, query.Name, query.Url, true);
+                    Query.AddOrUpdate(_dataStore, query.Name, query.Url, true);
                 }
             });
 
