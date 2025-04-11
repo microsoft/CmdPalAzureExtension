@@ -3,9 +3,10 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Text.Json.Nodes;
+using AzureExtension.Account;
 using AzureExtension.Client;
-using AzureExtension.DeveloperId;
 using AzureExtension.Helpers;
+using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Serilog;
@@ -14,15 +15,12 @@ namespace AzureExtension.Controls.Forms;
 
 public sealed partial class SaveSearchForm : FormContent, IAzureForm
 {
-    private readonly Query _savedSearch;
-
+    private readonly IQuery _savedSearch;
     private readonly IResources _resources;
-
     private readonly SavedSearchesMediator _savedSearchesMediator;
-
     private readonly IAccountProvider _accountProvider;
-
     private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly IQueryRepository _queryRepository;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
@@ -33,7 +31,7 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{SaveSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedSearch.Name) ? "Forms_Save_Search" : "Forms_Edit_Search") },
-        { "{{SavedSearchString}}", _savedSearch.AzureUri.ToString() },
+        { "{{SavedSearchString}}", _savedSearch.Url },
         { "{{SavedSearchName}}", _savedSearch.Name },
         { "{{IsTopLevel}}", isTopLevelChecked },
         { "{{EnteredSearchErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchError") },
@@ -45,23 +43,25 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
     };
 
     // for saving a new query
-    public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers)
+    public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
     {
         _resources = resources;
         _savedSearch = new Query();
         _savedSearchesMediator = savedSearchesMediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
+        _queryRepository = queryRepository;
     }
 
     // for editing an existing query
-    public SaveSearchForm(Query savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers)
+    public SaveSearchForm(IQuery savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
     {
         _resources = resources;
         _savedSearch = savedSearch;
         _savedSearchesMediator = savedSearchesMediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
+        _queryRepository = queryRepository;
     }
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SaveSearch", TemplateSubstitutions);
@@ -88,14 +88,15 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
 
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
-            if (_savedSearch.AzureUri.ToString() != string.Empty)
+            if (_savedSearch.Url != string.Empty)
             {
-                Log.Information($"Removing outdated search {_savedSearch.Name}, {_savedSearch.AzureUri.ToString()}");
+                Log.Information($"Removing outdated search {_savedSearch.Name}, {_savedSearch.Url}");
 
                 _savedSearchesMediator.RemoveSearch(_savedSearch);
             }
 
             LoadingStateChanged?.Invoke(this, false);
+            _queryRepository.AddSavedQueryAsync(query).Wait();
             _savedSearchesMediator.AddSearch(query);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
             return query;

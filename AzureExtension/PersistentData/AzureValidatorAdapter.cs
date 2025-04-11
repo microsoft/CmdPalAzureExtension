@@ -3,8 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Client;
-using AzureExtension.Controls;
-using AzureExtension.DeveloperId;
 using Microsoft.Identity.Client;
 
 namespace AzureExtension.PersistentData;
@@ -18,7 +16,7 @@ public class AzureValidatorAdapter : IAzureValidator
         _azureClientHelpers = azureClientHelpers;
     }
 
-    public InfoResult GetQueryInfo(string queryUrl, string queryName, IAccount account)
+    public InfoResult GetQueryInfo(string queryUrl, IAccount account)
     {
         if (string.IsNullOrEmpty(queryUrl))
         {

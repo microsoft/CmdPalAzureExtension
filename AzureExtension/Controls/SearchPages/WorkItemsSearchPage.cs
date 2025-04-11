@@ -20,7 +20,7 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
     private ILogger Log => _log.Value;
 
-    private readonly Query _query;
+    private readonly IQuery _query;
 
     private readonly IResources _resources;
 
@@ -28,7 +28,7 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public WorkItemsSearchPage(Query query, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+    public WorkItemsSearchPage(IQuery query, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
     {
         _query = query;
         _resources = resources;

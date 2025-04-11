@@ -7,7 +7,7 @@ using AzureExtension.Controls;
 
 namespace AzureExtension.Helpers;
 
-public class QueryCandidate : ISearch
+public class QueryCandidate : IQuery
 {
     public string DisplayName { get; set; } = string.Empty;
 
@@ -30,9 +30,7 @@ public class QueryCandidate : ISearch
     // Implement ISearch interface
     public string Name => DisplayName;
 
-    public QueryCandidate()
-    {
-    }
+    public string Url => Uri?.OriginalString ?? string.Empty;
 
     public QueryCandidate(string displayName, string queryId, string searchString)
     {

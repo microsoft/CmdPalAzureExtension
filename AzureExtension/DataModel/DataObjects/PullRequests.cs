@@ -6,7 +6,7 @@ using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Serilog;
-using DevId = AzureExtension.DeveloperId;
+using DevId = AzureExtension.Account;
 
 namespace AzureExtension.DataModel;
 
