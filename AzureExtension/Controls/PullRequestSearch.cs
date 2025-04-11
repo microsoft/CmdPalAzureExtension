@@ -7,7 +7,7 @@ using AzureExtension.DataModel;
 
 namespace AzureExtension.Controls
 {
-    public class PullRequest
+    public class PullRequestSearch
     {
         public string Title { get; set; } = string.Empty;
 
@@ -31,13 +31,13 @@ namespace AzureExtension.Controls
 
         public long CreationDate { get; set; }
 
-        public PullRequest()
+        public PullRequestSearch()
         {
             AzureUri = new AzureUri();
             Title = string.Empty;
         }
 
-        public PullRequest(AzureUri azureUri, string title, string description)
+        public PullRequestSearch(AzureUri azureUri, string title, string description)
         {
             AzureUri = azureUri;
             Title = title;

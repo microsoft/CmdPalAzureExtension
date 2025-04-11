@@ -68,9 +68,9 @@ public partial class AzureExtensionCommandProvider : CommandProvider
                     Title = _resources.GetResource("Pages_Saved_Searches"),
                     Icon = new IconInfo("\ue721"),
                 },
-                new CommandItem(new SavePullRequestPage(new SavePullRequestForm(_resources)))
+                new CommandItem(new SavePullRequestSearchPage(new SavePullRequestSearchForm(_resources)))
                 {
-                    Title = "Save Pull Request",
+                    Title = "Save Pull Request Search",
                     Icon = new IconInfo("\ue721"),
                 },
                 new(_signOutPage)

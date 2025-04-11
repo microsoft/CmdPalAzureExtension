@@ -18,9 +18,9 @@
                 },
                 {
                     "type": "Input.Text",
-                    "placeholder": "Pull Request Title",
+                    "placeholder": "Pull Request Search Title",
                     "id": "widgetTitle",
-                    "label": "Pull Request Title",
+                    "label": "Pull Request Search Title",
                     "value": "${widgetTitle}"
                 },
                 {

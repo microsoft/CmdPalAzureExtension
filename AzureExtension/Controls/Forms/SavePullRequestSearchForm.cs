@@ -7,7 +7,7 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Forms;
 
-public class SavePullRequestForm : FormContent, IAzureForm
+public class SavePullRequestSearchForm : FormContent, IAzureForm
 {
     private readonly IResources _resources;
 
@@ -21,9 +21,9 @@ public class SavePullRequestForm : FormContent, IAzureForm
         { "${widgetTitle}", string.Empty },
     };
 
-    public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequest", TemplateSubstitutions);
+    public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequestSearch", TemplateSubstitutions);
 
-    public SavePullRequestForm(IResources resources)
+    public SavePullRequestSearchForm(IResources resources)
     {
         LoadingStateChanged?.Invoke(this, false);
         FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));

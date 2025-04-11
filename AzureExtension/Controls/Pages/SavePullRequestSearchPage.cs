@@ -8,22 +8,22 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages
 {
-    public class SavePullRequestPage : ContentPage
+    public class SavePullRequestSearchPage : ContentPage
     {
-        private SavePullRequestForm _savePullRequestForm;
+        private SavePullRequestSearchForm _savePullRequestSearchForm;
 
-        public SavePullRequestPage(SavePullRequestForm savePullRequestForm)
+        public SavePullRequestSearchPage(SavePullRequestSearchForm savePullRequestSearchForm)
         {
             Title = "Save Pull Request";
             Icon = new IconInfo("\uecc8");
-            _savePullRequestForm = savePullRequestForm;
+            _savePullRequestSearchForm = savePullRequestSearchForm;
         }
 
         public override IContent[] GetContent()
         {
             return new IContent[]
             {
-                _savePullRequestForm,
+                _savePullRequestSearchForm,
             };
         }
     }
