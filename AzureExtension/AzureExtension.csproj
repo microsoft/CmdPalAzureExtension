@@ -108,9 +108,6 @@
 	</ItemGroup>
 	<ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 	<ItemGroup>
-	  <PRIResource Remove="Data\**" />
-	</ItemGroup>
-	<ItemGroup>
 	  <PRIResource Remove="Contracts\**" />
 	</ItemGroup>
 	<ItemGroup>

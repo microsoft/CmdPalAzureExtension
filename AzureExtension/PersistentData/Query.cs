@@ -4,7 +4,7 @@
 
 using AzureExtension.Client;
 using AzureExtension.Controls;
-using AzureExtension.DataModel;
+using AzureExtension.Data;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Serilog;

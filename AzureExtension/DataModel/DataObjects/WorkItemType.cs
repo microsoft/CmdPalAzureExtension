@@ -4,6 +4,7 @@
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AzureExtension.Data;
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;

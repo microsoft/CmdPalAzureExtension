@@ -4,7 +4,7 @@
 
 using AzureExtension.Client;
 using AzureExtension.Controls;
-using AzureExtension.DataModel;
+using AzureExtension.Data;
 using Microsoft.Identity.Client;
 using Serilog;
 using Windows.Storage;

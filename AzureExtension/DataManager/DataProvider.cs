@@ -7,6 +7,7 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.DataModel;
 using AzureExtension.Helpers;
+using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Identity.Client;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
