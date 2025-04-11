@@ -8,14 +8,14 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Commands;
 
-public partial class RemoveSavedSearchCommand : InvokableCommand
+public partial class RemoveQueryCommand : InvokableCommand
 {
     private readonly IQuery savedSearch;
     private readonly IResources _resources;
-    private readonly SavedSearchesMediator _savedSearchesMediator;
+    private readonly SavedQueriesMediator _savedSearchesMediator;
     private readonly IQueryRepository _queryRepository;
 
-    public RemoveSavedSearchCommand(IQuery search, IResources resources, SavedSearchesMediator savedSearchesMediator, IQueryRepository queryRepository)
+    public RemoveQueryCommand(IQuery search, IResources resources, SavedQueriesMediator savedSearchesMediator, IQueryRepository queryRepository)
     {
         _resources = resources;
         _savedSearchesMediator = savedSearchesMediator;

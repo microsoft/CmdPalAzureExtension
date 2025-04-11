@@ -4,7 +4,7 @@
 
 namespace AzureExtension.Controls;
 
-public class SavedSearchesMediator
+public class SavedQueriesMediator
 {
     public event EventHandler<object?>? SearchRemoving;
 
@@ -12,7 +12,7 @@ public class SavedSearchesMediator
 
     public event EventHandler<object?>? SearchSaved;
 
-    public SavedSearchesMediator()
+    public SavedQueriesMediator()
     {
     }
 

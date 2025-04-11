@@ -5,7 +5,7 @@
 using AzureExtension.DataModel;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
-namespace AzureExtension;
+namespace AzureExtension.Controls;
 
 public class WorkItem
 {

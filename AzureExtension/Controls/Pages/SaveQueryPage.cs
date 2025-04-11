@@ -10,14 +10,14 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public sealed partial class SaveSearchPage : ContentPage
+public sealed partial class SaveQueryPage : ContentPage
 {
-    private readonly SaveSearchForm _saveSearchForm;
+    private readonly SaveQueryForm _saveSearchForm;
     private readonly StatusMessage _statusMessage;
     private readonly string _successMessage;
     private readonly string _errorMessage;
 
-    public SaveSearchPage(SaveSearchForm saveSearchForm, StatusMessage statusMessage, string successMessage, string errorMessage, string saveSearchPageTitle)
+    public SaveQueryPage(SaveQueryForm saveSearchForm, StatusMessage statusMessage, string successMessage, string errorMessage, string saveSearchPageTitle)
     {
         _saveSearchForm = saveSearchForm;
         _statusMessage = statusMessage;

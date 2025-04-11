@@ -13,11 +13,11 @@ using Serilog;
 
 namespace AzureExtension.Controls.Forms;
 
-public sealed partial class SaveSearchForm : FormContent, IAzureForm
+public sealed partial class SaveQueryForm : FormContent, IAzureForm
 {
     private readonly IQuery _savedSearch;
     private readonly IResources _resources;
-    private readonly SavedSearchesMediator _savedSearchesMediator;
+    private readonly SavedQueriesMediator _savedSearchesMediator;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
     private readonly IQueryRepository _queryRepository;
@@ -43,7 +43,7 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
     };
 
     // for saving a new query
-    public SaveSearchForm(IResources resources, SavedSearchesMediator savedSearchesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
+    public SaveQueryForm(IResources resources, SavedQueriesMediator savedSearchesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
     {
         _resources = resources;
         _savedSearch = new Query();
@@ -54,7 +54,7 @@ public sealed partial class SaveSearchForm : FormContent, IAzureForm
     }
 
     // for editing an existing query
-    public SaveSearchForm(IQuery savedSearch, IResources resources, SavedSearchesMediator savedSearchesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
+    public SaveQueryForm(IQuery savedSearch, IResources resources, SavedQueriesMediator savedSearchesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
     {
         _resources = resources;
         _savedSearch = savedSearch;

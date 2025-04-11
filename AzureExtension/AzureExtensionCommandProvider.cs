@@ -18,7 +18,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly SignOutPage _signOutPage;
 
-    private readonly SavedSearchesPage _savedSearchesPage;
+    private readonly SavedQueriesPage _savedSearchesPage;
 
     private readonly IAccountProvider _accountProvider;
 
@@ -26,7 +26,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly AzureClientHelpers _azureClientHelpers;
 
-    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedSearchesPage savedSearchesPage, IResources resources, AzureClientHelpers azureClientHelpers)
+    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedSearchesPage, IResources resources, AzureClientHelpers azureClientHelpers)
     {
         _signInPage = signInPage;
         _signOutPage = signOutPage;

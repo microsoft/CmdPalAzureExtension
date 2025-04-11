@@ -9,15 +9,15 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls;
 
-internal sealed partial class EditSearchPage : ContentPage
+internal sealed partial class EditQueryPage : ContentPage
 {
     private readonly IResources _resources;
-    private readonly SaveSearchForm _saveSearchForm;
+    private readonly SaveQueryForm _saveSearchForm;
     private readonly StatusMessage _statusMessage;
     private readonly string _successMessage;
     private readonly string _errorMessage;
 
-    public EditSearchPage(IResources resources, SaveSearchForm saveSearchForm, StatusMessage statusMessage, string successMessage, string errorMessage)
+    public EditQueryPage(IResources resources, SaveQueryForm saveSearchForm, StatusMessage statusMessage, string successMessage, string errorMessage)
     {
         _resources = resources;
         _saveSearchForm = saveSearchForm;

@@ -17,21 +17,21 @@ using Query = AzureExtension.Controls.Query;
 
 namespace AzureExtension;
 
-public partial class SavedSearchesPage : ListPage
+public partial class SavedQueriesPage : ListPage
 {
     private readonly IListItem _addSearchListItem;
     private readonly IResources _resources;
-    private readonly SavedSearchesMediator _savedSearchesMediator;
+    private readonly SavedQueriesMediator _savedSearchesMediator;
     private readonly TimeSpanHelper _timeSpanHelper;
     private readonly IDataProvider _dataProvider;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
     private readonly IQueryRepository _queryRepository;
 
-    public SavedSearchesPage(
+    public SavedQueriesPage(
        IResources resources,
        IListItem addSearchListItem,
-       SavedSearchesMediator savedSearchesMediator,
+       SavedQueriesMediator savedSearchesMediator,
        IDataProvider dataProvider,
        IAccountProvider accountProvider,
        AzureClientHelpers azureClientHelpers,
@@ -131,10 +131,10 @@ public partial class SavedSearchesPage : ListPage
             MoreCommands = new CommandContextItem[]
             {
                 new(new LinkCommand(search.Url, _resources)),
-                new(new RemoveSavedSearchCommand(search, _resources, _savedSearchesMediator, _queryRepository)),
-                new(new EditSearchPage(
+                new(new RemoveQueryCommand(search, _resources, _savedSearchesMediator, _queryRepository)),
+                new(new EditQueryPage(
                     _resources,
-                    new SaveSearchForm(
+                    new SaveQueryForm(
                         search,
                         _resources,
                         _savedSearchesMediator,
