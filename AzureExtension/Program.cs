@@ -147,7 +147,12 @@ public sealed class Program
         var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
         var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedQueriesMediator, dataProvider, accountProvider, azureClientHelpers, persistentDataManager, timeSpanHelper);
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, azureClientHelpers);
+        var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedQueriesMediator, accountProvider, azureClientHelpers);
+        var savePullRequestSearchPage = new SavePullRequestSearchPage(savePullRequestSearchForm, new StatusMessage());
+        var addPullRequestSearchListItem = new AddPullRequestSearchListItem(savePullRequestSearchPage, resources);
+        var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedQueriesMediator);
+
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, azureClientHelpers, savedPullRequestSearchesPage);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 

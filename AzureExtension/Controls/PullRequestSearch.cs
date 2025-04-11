@@ -31,16 +31,19 @@ namespace AzureExtension.Controls
 
         public long CreationDate { get; set; }
 
+        public string View { get; set; } = string.Empty;
+
         public PullRequestSearch()
         {
             AzureUri = new AzureUri();
             Title = string.Empty;
         }
 
-        public PullRequestSearch(AzureUri azureUri, string title, string description)
+        public PullRequestSearch(AzureUri azureUri, string title, string view)
         {
             AzureUri = azureUri;
             Title = title;
+            View = view;
         }
     }
 }
