@@ -13,7 +13,7 @@ public static class TemplateHelper
         return page switch
         {
             "AuthTemplate" => "Controls\\Templates\\AuthTemplate.json",
-            "SaveSearch" => "Controls\\Templates\\SaveSearchTemplate.json",
+            "SaveQuery" => "Controls\\Templates\\SaveQueryTemplate.json",
             _ => throw new NotImplementedException($"Template for page '{page}' is not implemented."),
         };
     }
