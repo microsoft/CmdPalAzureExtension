@@ -4,6 +4,7 @@
 
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.Pages;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -65,6 +66,11 @@ public partial class AzureExtensionCommandProvider : CommandProvider
                 new(_savedQueriesPage)
                 {
                     Title = _resources.GetResource("Pages_Saved_Searches"),
+                    Icon = new IconInfo("\ue721"),
+                },
+                new CommandItem(new SavePullRequestPage(new SavePullRequestForm(_resources)))
+                {
+                    Title = "Save Pull Request",
                     Icon = new IconInfo("\ue721"),
                 },
                 new(_signOutPage)
