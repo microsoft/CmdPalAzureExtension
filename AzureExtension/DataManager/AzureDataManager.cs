@@ -173,20 +173,7 @@ public class AzureDataManager
     private async Task<TeamProject> GetTeamProject(string projectName, IAccount account, Uri uri)
     {
         var connection = _azureClientProvider.GetVssConnection(uri, account);
-
-        // How can we new something and it return null????????
         var projectClient = new ProjectHttpClient(connection.Uri, connection.Credentials);
-        if (projectClient == null)
-        {
-            throw new AzureClientException($"Failed getting ProjectHttpClient for {uri}");
-        }
-
-        var project = await projectClient.GetProject(projectName);
-        if (project == null)
-        {
-            throw new AzureClientException($"Project reference was null for {uri} and Project: {projectName}");
-        }
-
-        return project;
+        return await projectClient.GetProject(projectName);
     }
 }
