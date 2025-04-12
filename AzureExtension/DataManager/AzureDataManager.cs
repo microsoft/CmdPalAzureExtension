@@ -54,40 +54,19 @@ public class AzureDataManager
         return WorkItem.Get(_dataStore, workItemId);
     }
 
-    public async Task<IEnumerable<WorkItem>> UpdateWorkItems(IQuery query)
+    public async Task UpdateWorkItems(IQuery query)
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew(); // Start measuring time
 
         var azureUri = new AzureUri(query.Url);
         var account = _accountProvider.GetDefaultAccount();
-        var result = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
+        var connection = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
 
-        if (result.Result != ResultType.Success)
-        {
-            if (result.Exception != null)
-            {
-                throw result.Exception;
-            }
-            else
-            {
-                throw new AzureAuthorizationException($"Failed getting connection: {azureUri.Connection} with {result.Error}");
-            }
-        }
-
-        var witClient = result.Connection!.GetClient<WorkItemTrackingHttpClient>();
-        if (witClient == null)
-        {
-            throw new AzureClientException($"Failed getting WorkItemTrackingHttpClient");
-        }
+        var witClient = connection.GetClient<WorkItemTrackingHttpClient>();
 
         // Good practice to only create data after we know the client is valid, but any exceptions
         // will roll back the transaction.
         var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
-
-        if (org == null)
-        {
-            throw new AzureClientException($"Failed getting Organization for {azureUri.Connection}");
-        }
 
         var project = Project.Get(_dataStore, azureUri.Project, org.Id);
         if (project is null)
@@ -96,19 +75,8 @@ public class AzureDataManager
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
 
-        var getQueryResult = await witClient.GetQueryAsync(project.InternalId, azureUri.Query);
-        if (getQueryResult == null)
-        {
-            throw new AzureClientException($"GetQueryAsync failed for {azureUri.Connection}, {project.InternalId}, {azureUri.Query}");
-        }
-
         var queryId = new Guid(azureUri.Query);
         var queryResult = await witClient.QueryByIdAsync(project.InternalId, queryId);
-
-        if (queryResult == null)
-        {
-            throw new AzureClientException($"QueryByIdAsync failed for {azureUri.Connection}, {project.InternalId}, {queryId}");
-        }
 
         var workItemIds = new List<int>();
 
@@ -171,10 +139,6 @@ public class AzureDataManager
         if (workItemIds.Count > 0)
         {
             workItems = await witClient.GetWorkItemsAsync(project.InternalId, workItemIds, null, null, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit);
-            if (workItems == null)
-            {
-                throw new AzureClientException($"GetWorkItemsAsync failed for {azureUri.Connection}, {project.InternalId}, Ids: {string.Join(",", workItemIds.ToArray())}");
-            }
         }
 
         var workItemsList = new List<WorkItem>();
@@ -183,16 +147,14 @@ public class AzureDataManager
         foreach (var workItem in workItems)
         {
             var fieldValue = workItem.Fields["System.WorkItemType"].ToString();
-            var workItemTypeInfo = await witClient!.GetWorkItemTypeAsync(project.InternalId, fieldValue);
-            var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, result.Connection, project.Id, workItemTypeInfo);
+            var workItemTypeInfo = await witClient.GetWorkItemTypeAsync(project.InternalId, fieldValue);
+            var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, connection, project.Id, workItemTypeInfo);
             QueryWorkItem.AddWorkItemToQuery(_dataStore, dsQuery.Id, cmdPalWorkItem.Id);
             workItemsList.Add(cmdPalWorkItem);
         }
 
         stopwatch.Stop(); // Stop measuring time
-        _log.Information($"GetWorkItems took {stopwatch.ElapsedMilliseconds} ms to complete.");
-
-        return workItemsList;
+        _log.Information($"UpdateWorkItems took {stopwatch.ElapsedMilliseconds} ms to complete.");
     }
 
     private string GetId(IQuery query)
@@ -208,32 +170,21 @@ public class AzureDataManager
         return DataModel.Query.Get(_dataStore, GetId(query), account.Username);
     }
 
-    private async Task<TeamProject> GetTeamProject(string projectName, IAccount account, Uri connection)
+    private async Task<TeamProject> GetTeamProject(string projectName, IAccount account, Uri uri)
     {
-        var result = _azureClientProvider.GetVssConnection(connection, account);
+        var connection = _azureClientProvider.GetVssConnection(uri, account);
 
-        if (result.Result != ResultType.Success)
-        {
-            if (result.Exception != null)
-            {
-                throw result.Exception;
-            }
-            else
-            {
-                throw new AzureAuthorizationException($"Failed getting connection: {connection} for {account.Username} with {result.Error}");
-            }
-        }
-
-        var projectClient = new ProjectHttpClient(result.Connection!.Uri, result.Connection!.Credentials);
+        // How can we new something and it return null????????
+        var projectClient = new ProjectHttpClient(connection.Uri, connection.Credentials);
         if (projectClient == null)
         {
-            throw new AzureClientException($"Failed getting ProjectHttpClient for {connection}");
+            throw new AzureClientException($"Failed getting ProjectHttpClient for {uri}");
         }
 
         var project = await projectClient.GetProject(projectName);
         if (project == null)
         {
-            throw new AzureClientException($"Project reference was null for {connection} and Project: {projectName}");
+            throw new AzureClientException($"Project reference was null for {uri} and Project: {projectName}");
         }
 
         return project;
