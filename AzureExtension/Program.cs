@@ -150,7 +150,7 @@ public sealed class Program
         var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedQueriesMediator, accountProvider, azureClientHelpers);
         var savePullRequestSearchPage = new SavePullRequestSearchPage(savePullRequestSearchForm, new StatusMessage());
         var addPullRequestSearchListItem = new AddPullRequestSearchListItem(savePullRequestSearchPage, resources);
-        var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedQueriesMediator);
+        var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedQueriesMediator, dataProvider, timeSpanHelper);
 
         var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, azureClientHelpers, savedPullRequestSearchesPage);
 

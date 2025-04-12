@@ -6,6 +6,7 @@ using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.ListItems;
+using AzureExtension.DataManager;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
@@ -23,7 +24,11 @@ public class SavedPullRequestSearchesPage : ListPage
 
     private SavedQueriesMediator _mediator;
 
-    public SavedPullRequestSearchesPage(IResources resources, AddPullRequestSearchListItem addPullRequestSearchListItem, SavedQueriesMediator mediator)
+    private IDataProvider _dataProvider;
+
+    private TimeSpanHelper _timeSpanHelper;
+
+    public SavedPullRequestSearchesPage(IResources resources, AddPullRequestSearchListItem addPullRequestSearchListItem, SavedQueriesMediator mediator, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
     {
         _resources = resources;
         _searches = new List<PullRequestSearch>();
@@ -32,6 +37,8 @@ public class SavedPullRequestSearchesPage : ListPage
         _mediator.PullRequestSearchRemoved += OnPullRequestSearchRemoved;
         _mediator.PullRequestSearchRemoving += OnPullRequestSearchRemoving;
         _mediator.PullRequestSearchSaved += OnPullRequestSearchSaved;
+        _dataProvider = dataProvider;
+        _timeSpanHelper = timeSpanHelper;
     }
 
     private void OnPullRequestSearchRemoved(object? sender, object? args)
@@ -113,6 +120,10 @@ public class SavedPullRequestSearchesPage : ListPage
 
     private ListPage CreatePageForPullRequestSearch(PullRequestSearch search)
     {
-        return new ListPage();
+        return new PullRequestSearchPage(search, _resources, _dataProvider, _timeSpanHelper)
+        {
+            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+            Name = search.Title,
+        };
     }
 }
