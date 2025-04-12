@@ -8,5 +8,5 @@ namespace AzureExtension.DataManager;
 
 public interface IDataProvider
 {
-    Task<IEnumerable<WorkItem>> GetWorkItems(IQuery query);
+    Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query);
 }

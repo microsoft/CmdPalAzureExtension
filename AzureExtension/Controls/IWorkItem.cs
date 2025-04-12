@@ -6,9 +6,9 @@ namespace AzureExtension.Controls;
 
 public interface IWorkItem
 {
-    string Title { get; }
+    string SystemTitle { get; }
 
     long Id { get; }
 
-    string Url { get; }
+    string HtmlUrl { get; }
 }
