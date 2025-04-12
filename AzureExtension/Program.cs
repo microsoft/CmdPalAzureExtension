@@ -115,18 +115,8 @@ public sealed class Program
         await using global::Shmuelie.WinRTServer.ComServer server = new();
         var extensionDisposedEvent = new ManualResetEvent(false);
 
-        var dataStoreFolderPath = ApplicationData.Current.LocalFolder.Path;
-
-        var combinedCachePath = Path.Combine(dataStoreFolderPath, "AzureData.db");
-        var cacheDataStoreSchema = new AzureDataStoreSchema();
-        using var cacheDataStore = new DataStore("DataStore", combinedCachePath, cacheDataStoreSchema);
-        cacheDataStore.Create();
-
-        var cache = new Cache(cacheDataStore);
-
         var authenticationSettings = new AuthenticationSettings();
         authenticationSettings.InitializeSettings();
-
         var accountProvider = new AccountProvider(authenticationSettings);
 
         // In the case that this is the first launch we will try to automatically connect the default Windows account
@@ -134,6 +124,16 @@ public sealed class Program
 
         var azureClientProvider = new AzureClientProvider(accountProvider);
         var azureClientHelpers = new AzureClientHelpers(azureClientProvider);
+
+        var dataStoreFolderPath = ApplicationData.Current.LocalFolder.Path;
+
+        var combinedCachePath = Path.Combine(dataStoreFolderPath, "AzureData.db");
+        var cacheDataStoreSchema = new AzureDataStoreSchema();
+        using var cacheDataStore = new DataStore("DataStore", combinedCachePath, cacheDataStoreSchema);
+        cacheDataStore.Create();
+
+        var cache = new AzureDataManager(cacheDataStore, accountProvider, azureClientProvider);
+        var dataProvider = new DataProvider(cache, cacheDataStore);
 
         var azureValidator = new AzureValidatorAdapter(azureClientHelpers);
 
@@ -143,8 +143,6 @@ public sealed class Program
         persistentDataStore.Create();
 
         var persistentDataManager = new PersistentDataManager(persistentDataStore, azureValidator);
-
-        var dataProvider = new DataProvider(accountProvider, azureClientProvider, cache);
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);
