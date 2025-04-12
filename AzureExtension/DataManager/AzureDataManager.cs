@@ -42,16 +42,12 @@ public class AzureDataManager
         }
     }
 
-    public Identity GetIdentity(IdentityRef identityRef, VssConnection connection)
+    public DataModel.Query? GetQuery(IQuery query)
     {
         ValidateDataStore();
-        return Identity.GetOrCreateIdentity(_dataStore, identityRef, connection);
-    }
-
-    public WorkItem? GetWorkItem(long workItemId, VssConnection connection, Project project)
-    {
-        ValidateDataStore();
-        return WorkItem.Get(_dataStore, workItemId);
+        var account = _accountProvider.GetDefaultAccount();
+        var azureUri = new AzureUri(query.Url);
+        return DataModel.Query.Get(_dataStore, azureUri.Query, account.Username);
     }
 
     public async Task UpdateWorkItems(IQuery query)
@@ -71,7 +67,8 @@ public class AzureDataManager
         var project = Project.Get(_dataStore, azureUri.Project, org.Id);
         if (project is null)
         {
-            var teamProject = await GetTeamProject(azureUri.Project, account, azureUri.Connection);
+            var projectClient = new ProjectHttpClient(connection.Uri, connection.Credentials);
+            var teamProject = await projectClient.GetProject(azureUri.Project);
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
 
@@ -95,12 +92,6 @@ public class AzureDataManager
                         }
 
                         workItemIds.Add(workItemRelation.Target.Id);
-
-                        // Query result limit
-                        if (workItemIds.Count >= 25)
-                        {
-                            break;
-                        }
                     }
                 }
 
@@ -117,10 +108,6 @@ public class AzureDataManager
                         }
 
                         workItemIds.Add(item.Id);
-                        if (workItemIds.Count >= 25)
-                        {
-                            break;
-                        }
                     }
                 }
 
@@ -155,25 +142,5 @@ public class AzureDataManager
 
         stopwatch.Stop(); // Stop measuring time
         _log.Information($"UpdateWorkItems took {stopwatch.ElapsedMilliseconds} ms to complete.");
-    }
-
-    private string GetId(IQuery query)
-    {
-        var azureUri = new AzureUri(query.Url);
-        return azureUri.Query;
-    }
-
-    public DataModel.Query? GetQuery(IQuery query)
-    {
-        ValidateDataStore();
-        var account = _accountProvider.GetDefaultAccount();
-        return DataModel.Query.Get(_dataStore, GetId(query), account.Username);
-    }
-
-    private async Task<TeamProject> GetTeamProject(string projectName, IAccount account, Uri uri)
-    {
-        var connection = _azureClientProvider.GetVssConnection(uri, account);
-        var projectClient = new ProjectHttpClient(connection.Uri, connection.Credentials);
-        return await projectClient.GetProject(projectName);
     }
 }
