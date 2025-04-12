@@ -33,6 +33,8 @@ namespace AzureExtension.Controls
 
         public string View { get; set; } = string.Empty;
 
+        public string PullRequestUrl { get; set; } = string.Empty;
+
         public PullRequestSearch()
         {
             AzureUri = new AzureUri();
@@ -44,6 +46,15 @@ namespace AzureExtension.Controls
             AzureUri = azureUri;
             Title = title;
             View = view;
+            PullRequestUrl = CreatePullRequestUrl(azureUri.OriginalString);
+        }
+
+        public string CreatePullRequestUrl(string url)
+        {
+            // The AzureUri url is the repo url
+            // As a default link, set the PR url to the active pull requests
+            var pullRequestUrl = url + "/pullrequests?_a=active";
+            return pullRequestUrl;
         }
     }
 }

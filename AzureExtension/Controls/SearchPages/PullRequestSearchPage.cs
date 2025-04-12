@@ -64,7 +64,7 @@ public sealed partial class PullRequestSearchPage : ListPage
         var title = item.Title;
         var url = item.Url;
 
-        return new ListItem(new NoOpCommand())
+        return new ListItem(new LinkCommand(url, _resources))
         {
             Title = title,
             Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),

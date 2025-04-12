@@ -115,6 +115,10 @@ public class SavedPullRequestSearchesPage : ListPage
             Title = search.Title,
             Subtitle = search.Url,
             Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
+            MoreCommands = new CommandContextItem[]
+            {
+                new(new LinkCommand(search.PullRequestUrl, _resources)),
+            },
         };
     }
 
