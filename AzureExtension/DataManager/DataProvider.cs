@@ -25,11 +25,13 @@ public class DataProvider : IDataProvider
     public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
     {
         var dsQuery = _cache.GetQuery(query);
-        if (dsQuery != null)
+        if (dsQuery == null)
         {
-            return WorkItem.GetForQuery(_dataStore, dsQuery);
+            await _cache.UpdateWorkItems(query);
         }
 
-        return await _cache.UpdateWorkItems(query);
+        dsQuery = _cache.GetQuery(query);
+
+        return WorkItem.GetForQuery(_dataStore, dsQuery!);
     }
 }

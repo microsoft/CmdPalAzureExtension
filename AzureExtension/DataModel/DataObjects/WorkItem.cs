@@ -227,7 +227,7 @@ public class WorkItem : IWorkItem
         DataStore dataStore,
         Query query)
     {
-        var sql = @"SELECT * FROM WorkItem WHERE Id IN (SELECT WorkItemId FROM QueryWorkItem WHERE Query = @QueryId ORDER BY TimeUpdated ASC)";
+        var sql = @"SELECT * FROM WorkItem WHERE Id IN (SELECT WorkItem FROM QueryWorkItem WHERE Query = @QueryId ORDER BY TimeUpdated ASC)";
         var param = new
         {
             QueryId = query.Id,

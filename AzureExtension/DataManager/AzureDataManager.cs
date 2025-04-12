@@ -7,7 +7,6 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
-using AzureExtension.Helpers;
 using Microsoft.Identity.Client;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
@@ -179,12 +178,14 @@ public class AzureDataManager
         }
 
         var workItemsList = new List<WorkItem>();
+        var dsQuery = DataModel.Query.GetOrCreate(_dataStore, azureUri.Query, project.Id, account.Username, query.Name);
 
         foreach (var workItem in workItems)
         {
             var fieldValue = workItem.Fields["System.WorkItemType"].ToString();
             var workItemTypeInfo = await witClient!.GetWorkItemTypeAsync(project.InternalId, fieldValue);
             var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, result.Connection, project.Id, workItemTypeInfo);
+            QueryWorkItem.AddWorkItemToQuery(_dataStore, dsQuery.Id, cmdPalWorkItem.Id);
             workItemsList.Add(cmdPalWorkItem);
         }
 
@@ -194,11 +195,17 @@ public class AzureDataManager
         return workItemsList;
     }
 
+    private string GetId(IQuery query)
+    {
+        var azureUri = new AzureUri(query.Url);
+        return azureUri.Query;
+    }
+
     public DataModel.Query? GetQuery(IQuery query)
     {
         ValidateDataStore();
         var account = _accountProvider.GetDefaultAccount();
-        return DataModel.Query.Get(_dataStore, query.Url, account.Username);
+        return DataModel.Query.Get(_dataStore, GetId(query), account.Username);
     }
 
     private async Task<TeamProject> GetTeamProject(string projectName, IAccount account, Uri connection)

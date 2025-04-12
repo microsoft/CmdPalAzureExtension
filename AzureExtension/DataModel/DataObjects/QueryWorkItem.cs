@@ -6,10 +6,10 @@ using AzureExtension.Data;
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using Microsoft.TeamFoundation.Build.WebApi;
 
-namespace AzureExtension.DataModel.DataObjects;
+namespace AzureExtension.DataModel;
 
+[Table("QueryWorkItem")]
 public class QueryWorkItem
 {
     [Key]

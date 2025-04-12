@@ -58,7 +58,7 @@ public class Query : IQuery
     [Computed]
     public string Url => QueryId;
 
-    private static Query Create(string queryId, long projectId, string username, string displayName, string queryResults, long queryResultCount)
+    private static Query Create(string queryId, long projectId, string username, string displayName)
     {
         return new Query
         {
@@ -128,9 +128,9 @@ public class Query : IQuery
         return query;
     }
 
-    public static Query GetOrCreate(DataStore dataStore, string queryId, long projectId, string username, string displayName, string queryResults, long queryResultCount)
+    public static Query GetOrCreate(DataStore dataStore, string queryId, long projectId, string username, string displayName)
     {
-        var newQuery = Create(queryId, projectId, username, displayName, queryResults, queryResultCount);
+        var newQuery = Create(queryId, projectId, username, displayName);
         return AddOrUpdate(dataStore, newQuery);
     }
 
