@@ -36,7 +36,7 @@ public class AccountProvider : IAccountProvider
         var builder = InitializePublicClientApplicationBuilder();
         _publicClientApplication = builder.Build();
 
-        InitializePublicClientApp();
+        InitializePublicClientApp().Wait();
     }
 
     private PublicClientApplicationBuilder InitializePublicClientApplicationBuilder()
@@ -59,7 +59,7 @@ public class AccountProvider : IAccountProvider
         return builder;
     }
 
-    public async void InitializePublicClientApp()
+    public async Task InitializePublicClientApp()
     {
         await TokenCacheRegistration(_publicClientApplication);
     }
