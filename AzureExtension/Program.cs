@@ -10,6 +10,7 @@ using AzureExtension.Controls.ListItems;
 using AzureExtension.Controls.Pages;
 using AzureExtension.Data;
 using AzureExtension.DataManager;
+using AzureExtension.DataManager.Cache;
 using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
@@ -132,8 +133,9 @@ public sealed class Program
         using var cacheDataStore = new DataStore("DataStore", combinedCachePath, cacheDataStoreSchema);
         cacheDataStore.Create();
 
-        var cache = new AzureDataManager(cacheDataStore, accountProvider, azureClientProvider);
-        var dataProvider = new DataProvider(cache, cacheDataStore);
+        var azureDataManager = new AzureDataManager(cacheDataStore, accountProvider, azureClientProvider);
+        var cacheManager = new CacheManager(azureDataManager, azureDataManager);
+        var dataProvider = new DataProvider(azureDataManager, cacheManager);
 
         var azureValidator = new AzureValidatorAdapter(azureClientHelpers);
 

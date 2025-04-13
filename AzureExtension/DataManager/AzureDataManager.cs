@@ -75,6 +75,13 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         return Query.Get(_dataStore, azureUri.Query, account.Username);
     }
 
+    public IEnumerable<IWorkItem> GetWorkItems(IQuery query)
+    {
+        ValidateDataStore();
+        var dsQuery = GetQuery(query);
+        return WorkItem.GetForQuery(_dataStore, dsQuery!);
+    }
+
     private async Task UpdateQueryAsync(IQuery query)
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew(); // Start measuring time

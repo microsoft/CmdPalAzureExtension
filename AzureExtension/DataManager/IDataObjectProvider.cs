@@ -10,4 +10,6 @@ namespace AzureExtension.DataManager;
 public interface IDataObjectProvider
 {
     Query? GetQuery(IQuery query);
+
+    IEnumerable<IWorkItem> GetWorkItems(IQuery query);
 }

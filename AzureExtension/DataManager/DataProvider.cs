@@ -4,6 +4,7 @@
 
 using AzureExtension.Controls;
 using AzureExtension.Data;
+using AzureExtension.DataManager.Cache;
 using AzureExtension.DataModel;
 using Serilog;
 
@@ -12,19 +13,19 @@ namespace AzureExtension.DataManager;
 public class DataProvider : IDataProvider
 {
     private readonly ILogger _log;
-    private readonly AzureDataManager _cache;
-    private readonly DataStore _dataStore;
+    private readonly IDataObjectProvider _dataObjectProvider;
+    private readonly ICacheManager _cacheManager;
 
-    public DataProvider(AzureDataManager cache, DataStore dataStore)
+    public DataProvider(IDataObjectProvider dataObjectProvider, ICacheManager cacheManager)
     {
         _log = Log.ForContext("SourceContext", nameof(IDataProvider));
-        _cache = cache;
-        _dataStore = dataStore;
+        _cacheManager = cacheManager;
+        _dataObjectProvider = dataObjectProvider;
     }
 
     public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
     {
-        var dsQuery = _cache.GetQuery(query);
+        var dsQuery = _dataObjectProvider.GetQuery(query);
         if (dsQuery == null)
         {
             var parameters = new DataUpdateParameters
@@ -32,10 +33,9 @@ public class DataProvider : IDataProvider
                 UpdateType = DataUpdateType.Query,
                 UpdateObject = query,
             };
-            await _cache.UpdateData(parameters);
-            dsQuery = _cache.GetQuery(query);
+            await _cacheManager.RequestRefresh(parameters);
         }
 
-        return WorkItem.GetForQuery(_dataStore, dsQuery!);
+        return _dataObjectProvider.GetWorkItems(query);
     }
 }
