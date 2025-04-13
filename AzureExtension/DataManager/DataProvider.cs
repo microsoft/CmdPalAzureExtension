@@ -16,11 +16,15 @@ public class DataProvider : IDataProvider
     private readonly IDataObjectProvider _dataObjectProvider;
     private readonly ICacheManager _cacheManager;
 
+    public event CacheManagerUpdateEventHandler? OnUpdate;
+
     public DataProvider(IDataObjectProvider dataObjectProvider, ICacheManager cacheManager)
     {
         _log = Log.ForContext("SourceContext", nameof(IDataProvider));
         _cacheManager = cacheManager;
         _dataObjectProvider = dataObjectProvider;
+
+        _cacheManager.OnUpdate += OnCacheManagerUpdate;
     }
 
     public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
@@ -37,5 +41,10 @@ public class DataProvider : IDataProvider
         }
 
         return _dataObjectProvider.GetWorkItems(query);
+    }
+
+    public void OnCacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
+    {
+        OnUpdate?.Invoke(source, e);
     }
 }

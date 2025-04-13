@@ -143,7 +143,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
 
     private void HandleDataManagerUpdate(object? source, DataManagerUpdateEventArgs e)
     {
-        _logger.Information($"DataManager update: {e.Kind}, {e.UpdateType}");
+        _logger.Information($"DataManager update: {e.Kind}, {e.Parameters.UpdateType}");
         State.HandleDataManagerUpdate(source, e);
 
         switch (e.Kind)
@@ -155,7 +155,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
                 SendUpdateEvent(this, CacheManagerUpdateKind.Cancel);
                 break;
             case DataManagerUpdateKind.Error:
-                SendUpdateEvent(this, CacheManagerUpdateKind.Error);
+                SendUpdateEvent(this, CacheManagerUpdateKind.Error, e.Exception);
                 break;
         }
     }

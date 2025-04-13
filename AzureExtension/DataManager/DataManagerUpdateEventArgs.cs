@@ -15,28 +15,20 @@ public enum DataManagerUpdateKind
 
 public class DataManagerUpdateEventArgs : EventArgs
 {
-    private readonly string _description;
-    private readonly string[] _context;
     private readonly DataManagerUpdateKind _kind;
-    private readonly DataUpdateType _updateType;
+    private readonly DataUpdateParameters _parameters;
     private readonly Exception? _exception;
 
-    public DataManagerUpdateEventArgs(DataManagerUpdateKind updateKind, DataUpdateType updateType, string updateDescription, string[] updateContext, Exception? exception = null)
+    public DataManagerUpdateEventArgs(DataManagerUpdateKind updateKind, DataUpdateParameters parameters, Exception? exception = null)
     {
         _kind = updateKind;
-        _description = updateDescription;
-        _context = updateContext;
-        _updateType = updateType;
+        _parameters = parameters;
         _exception = exception;
     }
 
     public DataManagerUpdateKind Kind => _kind;
 
-    public string Description => _description;
-
-    public string[] Context => _context;
-
-    public DataUpdateType UpdateType => _updateType;
+    public DataUpdateParameters Parameters => _parameters;
 
     public Exception? Exception => _exception;
 }

@@ -82,7 +82,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         return WorkItem.GetForQuery(_dataStore, dsQuery!);
     }
 
-    private async Task UpdateQueryAsync(IQuery query)
+    private async Task UpdateQueryAsync(IQuery query, CancellationToken cancellationToken)
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew(); // Start measuring time
 
@@ -105,7 +105,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         }
 
         var queryId = new Guid(azureUri.Query);
-        var queryResult = await witClient.QueryByIdAsync(project.InternalId, queryId);
+        var queryResult = await witClient.QueryByIdAsync(project.InternalId, queryId, cancellationToken: cancellationToken);
 
         var workItemIds = new List<int>();
 
@@ -157,7 +157,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         var workItems = new List<TFModels.WorkItem>();
         if (workItemIds.Count > 0)
         {
-            workItems = await witClient.GetWorkItemsAsync(project.InternalId, workItemIds, null, null, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit);
+            workItems = await witClient.GetWorkItemsAsync(project.InternalId, workItemIds, null, null, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit, cancellationToken: cancellationToken);
         }
 
         var workItemsList = new List<WorkItem>();
@@ -166,7 +166,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         foreach (var workItem in workItems)
         {
             var fieldValue = workItem.Fields["System.WorkItemType"].ToString();
-            var workItemTypeInfo = await witClient.GetWorkItemTypeAsync(project.InternalId, fieldValue);
+            var workItemTypeInfo = await witClient.GetWorkItemTypeAsync(project.InternalId, fieldValue, cancellationToken: cancellationToken);
             var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, connection, project.Id, workItemTypeInfo);
             QueryWorkItem.AddWorkItemToQuery(_dataStore, dsQuery.Id, cmdPalWorkItem.Id);
             workItemsList.Add(cmdPalWorkItem);
@@ -195,6 +195,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         catch (Exception ex) when (IsCancelException(ex))
         {
             tx.Rollback();
+            OnUpdate?.Invoke(this, new DataManagerUpdateEventArgs(DataManagerUpdateKind.Cancel, parameters, ex));
             _log.Information($"Update cancelled: {parameters}");
             return;
         }
@@ -215,12 +216,12 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
 
         Func<Task> operation = type switch
         {
-            DataUpdateType.Query => async () => await UpdateQueryAsync((parameters.UpdateObject as IQuery)!),
+            DataUpdateType.Query => async () => await UpdateQueryAsync((parameters.UpdateObject as IQuery)!, parameters.CancellationToken.GetValueOrDefault()),
             _ => throw new NotImplementedException($"Update type {type} not implemented."),
         };
 
         await PerformUpdateAsync(parameters, operation);
 
-        OnUpdate?.Invoke(this, new DataManagerUpdateEventArgs(DataManagerUpdateKind.Success, DataUpdateType.All, "test", []));
+        OnUpdate?.Invoke(this, new DataManagerUpdateEventArgs(DataManagerUpdateKind.Success, parameters));
     }
 }
