@@ -27,10 +27,14 @@ public class DataProvider : IDataProvider
         var dsQuery = _cache.GetQuery(query);
         if (dsQuery == null)
         {
-            await _cache.UpdateWorkItems(query);
+            var parameters = new DataUpdateParameters
+            {
+                UpdateType = DataUpdateType.Query,
+                UpdateObject = query,
+            };
+            await _cache.UpdateData(parameters);
+            dsQuery = _cache.GetQuery(query);
         }
-
-        dsQuery = _cache.GetQuery(query);
 
         return WorkItem.GetForQuery(_dataStore, dsQuery!);
     }

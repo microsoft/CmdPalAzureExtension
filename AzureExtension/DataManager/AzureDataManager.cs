@@ -50,7 +50,7 @@ public class AzureDataManager
         return DataModel.Query.Get(_dataStore, azureUri.Query, account.Username);
     }
 
-    public async Task UpdateWorkItems(IQuery query)
+    private async Task UpdateQueryAsync(IQuery query)
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew(); // Start measuring time
 
@@ -142,5 +142,51 @@ public class AzureDataManager
 
         stopwatch.Stop(); // Stop measuring time
         _log.Information($"UpdateWorkItems took {stopwatch.ElapsedMilliseconds} ms to complete.");
+    }
+
+    private static bool IsCancelException(Exception ex)
+    {
+        return (ex is OperationCanceledException) || (ex is TaskCanceledException);
+    }
+
+    private async Task PerformUpdateAsync(DataUpdateParameters parameters, Func<Task> asyncOperation)
+    {
+        using var tx = _dataStore.Connection!.BeginTransaction();
+
+        try
+        {
+            await asyncOperation();
+
+            // PruneObsoleteData();
+            // SetLastUpdatedInMetaData();
+        }
+        catch (Exception ex) when (IsCancelException(ex))
+        {
+            tx.Rollback();
+            _log.Information($"Update cancelled: {parameters}");
+            return;
+        }
+        catch (Exception ex)
+        {
+            tx.Rollback();
+            _log.Error(ex, $"Error during update: {ex.Message}");
+            return;
+        }
+
+        tx.Commit();
+        _log.Information($"Update complete: {parameters}");
+    }
+
+    public async Task UpdateData(DataUpdateParameters parameters)
+    {
+        var type = parameters.UpdateType;
+
+        Func<Task> operation = type switch
+        {
+            DataUpdateType.Query => async () => await UpdateQueryAsync((parameters.UpdateObject as IQuery)!),
+            _ => throw new NotImplementedException($"Update type {type} not implemented."),
+        };
+
+        await PerformUpdateAsync(parameters, operation);
     }
 }
