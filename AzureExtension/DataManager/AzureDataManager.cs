@@ -7,16 +7,16 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
-using Microsoft.Identity.Client;
+using AzureExtension.Helpers;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
-using Microsoft.VisualStudio.Services.WebApi;
 using Serilog;
+using Query = AzureExtension.DataModel.Query;
 using TFModels = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataManager
+public class AzureDataManager : IDataUpdateService, IDataObjectProvider
 {
     private readonly ILogger _log;
     private readonly DataStore _dataStore;
@@ -42,12 +42,37 @@ public class AzureDataManager
         }
     }
 
-    public DataModel.Query? GetQuery(IQuery query)
+    private const string LastUpdatedKeyName = "LastUpdated";
+
+    public event DataManagerUpdateEventHandler? OnUpdate;
+
+    public DateTime LastUpdated
+    {
+        get
+        {
+            ValidateDataStore();
+            var lastUpdated = MetaData.Get(_dataStore, LastUpdatedKeyName);
+            if (lastUpdated == null)
+            {
+                return DateTime.MinValue;
+            }
+
+            return lastUpdated.ToDateTime();
+        }
+
+        set
+        {
+            ValidateDataStore();
+            MetaData.AddOrUpdate(_dataStore, LastUpdatedKeyName, value.ToDataStoreString());
+        }
+    }
+
+    public Query? GetQuery(IQuery query)
     {
         ValidateDataStore();
         var account = _accountProvider.GetDefaultAccount();
         var azureUri = new AzureUri(query.Url);
-        return DataModel.Query.Get(_dataStore, azureUri.Query, account.Username);
+        return Query.Get(_dataStore, azureUri.Query, account.Username);
     }
 
     private async Task UpdateQueryAsync(IQuery query)
@@ -129,7 +154,7 @@ public class AzureDataManager
         }
 
         var workItemsList = new List<WorkItem>();
-        var dsQuery = DataModel.Query.GetOrCreate(_dataStore, azureUri.Query, project.Id, account.Username, query.Name);
+        var dsQuery = Query.GetOrCreate(_dataStore, azureUri.Query, project.Id, account.Username, query.Name);
 
         foreach (var workItem in workItems)
         {
@@ -188,5 +213,7 @@ public class AzureDataManager
         };
 
         await PerformUpdateAsync(parameters, operation);
+
+        OnUpdate?.Invoke(this, new DataManagerUpdateEventArgs(DataManagerUpdateKind.Success, DataUpdateType.All, "test", []));
     }
 }
