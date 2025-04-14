@@ -57,7 +57,7 @@ public class PullRequestSearch
     [Computed]
     public DateTime UpdatedAt => TimeUpdated.ToDateTime();
 
-    private static PullRequestSearch Create(long repositoryId, long projectId, string developerLogin, PullRequestView view, string pullRequests)
+    private static PullRequestSearch Create(long repositoryId, long projectId, string developerLogin, PullRequestView view)
     {
         return new PullRequestSearch
         {
@@ -165,9 +165,9 @@ public class PullRequestSearch
         return pullRequestsSet;
     }
 
-    public static PullRequestSearch GetOrCreate(DataStore dataStore, long repositoryId, long projectId, string developerId, PullRequestView view, string pullRequests)
+    public static PullRequestSearch GetOrCreate(DataStore dataStore, long repositoryId, long projectId, string developerId, PullRequestView view)
     {
-        var newDeveloperPullRequests = Create(repositoryId, projectId, developerId, view, pullRequests);
+        var newDeveloperPullRequests = Create(repositoryId, projectId, developerId, view);
         return AddOrUpdate(dataStore, newDeveloperPullRequests);
     }
 

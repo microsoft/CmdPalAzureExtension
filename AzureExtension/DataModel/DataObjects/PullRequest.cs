@@ -52,11 +52,14 @@ public class PullRequest : IPullRequest
         DataStore dataStore,
         GitPullRequest gitPullRequest,
         long repositoryId,
+        long creatorId,
         string statusReason)
     {
         var pullRequest = new PullRequest
         {
             InternalId = gitPullRequest.PullRequestId,
+            RepositoryId = repositoryId,
+            CreatorId = creatorId,
             Title = gitPullRequest.Title,
             Status = gitPullRequest.Status.ToString(),
             PolicyStatus = statusReason,
@@ -107,9 +110,9 @@ public class PullRequest : IPullRequest
         return pullRequest;
     }
 
-    public static PullRequest GetOrCreate(DataStore dataStore, GitPullRequest gitPullRequest, long repositoryId, string statusReason)
+    public static PullRequest GetOrCreate(DataStore dataStore, GitPullRequest gitPullRequest, long repositoryId, long creatorId, string statusReason)
     {
-        var pullRequest = Create(dataStore, gitPullRequest, repositoryId, statusReason);
+        var pullRequest = Create(dataStore, gitPullRequest, repositoryId, creatorId, statusReason);
         return AddOrUpdate(dataStore, pullRequest);
     }
 }

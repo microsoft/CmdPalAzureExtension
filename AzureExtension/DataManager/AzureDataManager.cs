@@ -7,12 +7,14 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
+using AzureExtension.DataModel.DataObjects;
 using AzureExtension.Helpers;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Serilog;
+using PullRequestSearch = AzureExtension.DataModel.PullRequestSearch;
 using Query = AzureExtension.DataModel.Query;
 using TFModels = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using WorkItem = AzureExtension.DataModel.WorkItem;
@@ -183,7 +185,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         _log.Information($"UpdateWorkItems took {stopwatch.ElapsedMilliseconds} ms to complete.");
     }
 
-    public async Task<IEnumerable<IPullRequest>> UpdatePullRequestsAsync(IPullRequestSearch pullRequestSearch)
+    public async Task UpdatePullRequestsAsync(IPullRequestSearch pullRequestSearch)
     {
         var azureUri = new AzureUri(pullRequestSearch.Url);
         var account = _accountProvider.GetDefaultAccount();
@@ -195,10 +197,17 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
             throw new AzureClientException($"Failed getting GitHttpClient");
         }
 
-        var projectClient = new ProjectHttpClient(connection.Uri, connection.Credentials);
-        var teamProject = await projectClient.GetProject(azureUri.Project);
+        var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
 
-        var gitRepository = await gitClient.GetRepositoryAsync(teamProject.Id, azureUri.Repository);
+        var project = Project.Get(_dataStore, azureUri.Project, org.Id);
+        if (project is null)
+        {
+            var projectClient = new ProjectHttpClient(connection.Uri, connection.Credentials);
+            var teamProject = await projectClient.GetProject(azureUri.Project);
+            project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
+        }
+
+        var gitRepository = await gitClient.GetRepositoryAsync(project.InternalId, azureUri.Repository);
 
         var searchCriteria = new GitPullRequestSearchCriteria
         {
@@ -222,12 +231,15 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         }
 
         // Get the pull requests with those criteria: (do we need internal id)
-        var pullRequests = await gitClient.GetPullRequestsAsync(teamProject.Id, gitRepository.Id, searchCriteria);
+        var pullRequests = await gitClient.GetPullRequestsAsync(project.InternalId, gitRepository.Id, searchCriteria);
 
         // Get the PullRequest PolicyClient. This client provides the State and Reason fields for each pull request
         var policyClient = connection.GetClient<PolicyHttpClient>();
 
-        var pullRequestList = new List<IPullRequest>();
+        var repository = Repository.GetOrCreate(_dataStore, gitRepository, project.Id);
+
+        var dsPullRequestSearch = PullRequestSearch.GetOrCreate(_dataStore, repository.Id, project.Id, account.Username, GetPullRequestView(pullRequestSearch.View));
+
         foreach (var pullRequest in pullRequests)
         {
             var status = PolicyStatus.Unknown;
@@ -237,11 +249,11 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
             // Policy Evaluations API is this:
             //     vstfs:///CodeReview/CodeReviewId/{projectId}/{pullRequestId}
             // Documentation: https://learn.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.policy.webapi.policyevaluationrecord.artifactid
-            var artifactId = $"vstfs:///CodeReview/CodeReviewId/{teamProject.Id}/{pullRequest.PullRequestId}";
+            var artifactId = $"vstfs:///CodeReview/CodeReviewId/{project.InternalId}/{pullRequest.PullRequestId}";
 
             try
             {
-                var policyEvaluations = await policyClient.GetPolicyEvaluationsAsync(teamProject.Id, artifactId);
+                var policyEvaluations = await policyClient.GetPolicyEvaluationsAsync(project.InternalId, artifactId);
                 GetPolicyStatus(policyEvaluations, out status, out statusReason);
             }
             catch (Exception ex)
@@ -258,24 +270,11 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
                 }
             }
 
-            var pullRequestObject = new IPullRequest();
-            pullRequestObject.Id = pullRequest.PullRequestId;
-            pullRequestObject.Title = pullRequest.Title;
-            pullRequestObject.Status = pullRequest.Status.ToString();
-            pullRequestObject.PolicyStatus = status.ToString();
-            pullRequestObject.PolicyStatusReason = statusReason;
-            pullRequestObject.TargetBranch = pullRequest.TargetRefName;
-            pullRequestObject.CreationDate = pullRequest.CreationDate.Ticks;
-            pullRequestObject.HtmlUrl = htmlUrl;
-            pullRequestObject.RepositoryGuid = gitRepository.Id;
+            var creator = Identity.GetOrCreateIdentity(_dataStore, pullRequest.CreatedBy, connection);
+            var dsPullRequest = PullRequest.GetOrCreate(_dataStore, pullRequest, repository.Id, creator.Id, statusReason);
 
-            var creator = DataModel.Identity.CreateFromIdentityRef(pullRequest.CreatedBy, connection);
-            pullRequestObject.Creator = creator;
-
-            pullRequestList.Add(pullRequestObject);
+            PullRequestSearchPullRequest.AddPullRequestToSearch(_dataStore, dsPullRequestSearch.Id, dsPullRequest.Id);
         }
-
-        return pullRequestList;
     }
 
     // Helper methods
