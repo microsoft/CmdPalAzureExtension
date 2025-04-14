@@ -63,6 +63,11 @@ public partial class AzureExtensionCommandProvider : CommandProvider
                     Title = _resources.GetResource("Pages_Saved_Searches"),
                     Icon = new IconInfo("\ue721"),
                 },
+                new CommandItem(new PipelineListPage())
+                {
+                    Title = "View Pipelines",
+                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                },
                 new(_signOutPage)
                 {
                     Title = _resources.GetResource("ExtensionTitle"),
