@@ -8,7 +8,10 @@ using AzureExtension.Controls;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.ListItems;
 using AzureExtension.Controls.Pages;
+using AzureExtension.Data;
 using AzureExtension.DataManager;
+using AzureExtension.DataManager.Cache;
+using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
@@ -115,7 +118,6 @@ public sealed class Program
 
         var authenticationSettings = new AuthenticationSettings();
         authenticationSettings.InitializeSettings();
-
         var accountProvider = new AccountProvider(authenticationSettings);
 
         // In the case that this is the first launch we will try to automatically connect the default Windows account
@@ -124,11 +126,25 @@ public sealed class Program
         var azureClientProvider = new AzureClientProvider(accountProvider);
         var azureClientHelpers = new AzureClientHelpers(azureClientProvider);
 
+        var dataStoreFolderPath = ApplicationData.Current.LocalFolder.Path;
+
+        var combinedCachePath = Path.Combine(dataStoreFolderPath, "AzureData.db");
+        var cacheDataStoreSchema = new AzureDataStoreSchema();
+        using var cacheDataStore = new DataStore("DataStore", combinedCachePath, cacheDataStoreSchema);
+        cacheDataStore.Create();
+
+        var azureDataManager = new AzureDataManager(cacheDataStore, accountProvider, azureClientProvider);
+        var cacheManager = new CacheManager(azureDataManager, azureDataManager);
+        var dataProvider = new DataProvider(azureDataManager, cacheManager);
+
         var azureValidator = new AzureValidatorAdapter(azureClientHelpers);
 
-        var persistentDataManager = new PersistentDataManager(azureValidator);
+        var combinedPersistendDataStorePath = Path.Combine(dataStoreFolderPath, "PersistentAzureData.db");
+        var persistentDataStoreSchema = new PersistentDataSchema();
+        using var persistentDataStore = new DataStore("PersistentDataStore", combinedPersistendDataStorePath, persistentDataStoreSchema);
+        persistentDataStore.Create();
 
-        var dataProvider = new DataProvider(accountProvider, azureClientProvider);
+        var persistentDataManager = new PersistentDataManager(persistentDataStore, azureValidator);
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);

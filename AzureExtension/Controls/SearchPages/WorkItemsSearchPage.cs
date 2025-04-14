@@ -67,7 +67,7 @@ public sealed partial class WorkItemsSearchPage : ListPage
         }
     }
 
-    public ListItem GetListItem(WorkItem item)
+    public ListItem GetListItem(IWorkItem item)
     {
         var title = item.SystemTitle;
         var url = item.HtmlUrl;
@@ -103,7 +103,7 @@ public sealed partial class WorkItemsSearchPage : ListPage
         };
     }
 
-    public Task<IEnumerable<WorkItem>> LoadContentData()
+    public Task<IEnumerable<IWorkItem>> LoadContentData()
     {
         return _dataProvider.GetWorkItems(_query);
     }

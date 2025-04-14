@@ -4,11 +4,13 @@
 
 using AzureExtension.Controls;
 
-namespace AzureExtension.DataManager;
+namespace AzureExtension.DataManager.Cache;
 
-public interface IDataProvider
+public interface ICacheManager
 {
-    Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query);
+    event CacheManagerUpdateEventHandler? OnUpdate;
 
-    Task<IEnumerable<PullRequest>> GetPullRequests(PullRequestSearch pullRequestSearch);
+    Task RequestRefresh(DataUpdateParameters parameters);
+
+    void CancelUpdateInProgress();
 }

@@ -42,7 +42,7 @@ public class AzureClientHelpers
 
         try
         {
-            var connectionResult = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
+            var connectionResult = _azureClientProvider.GetVssConnectionResult(azureUri.Connection, account);
             if (connectionResult.Result != ResultType.Success)
             {
                 return new InfoResult(azureUri, InfoType.Query, ResultType.Failure, connectionResult.Error, connectionResult.Exception);
@@ -110,7 +110,7 @@ public class AzureClientHelpers
 
         try
         {
-            var connectionResult = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
+            var connectionResult = _azureClientProvider.GetVssConnectionResult(azureUri.Connection, account);
             if (connectionResult.Result != ResultType.Success)
             {
                 return new InfoResult(azureUri, InfoType.Repository, ResultType.Failure, connectionResult.Error, connectionResult.Exception);

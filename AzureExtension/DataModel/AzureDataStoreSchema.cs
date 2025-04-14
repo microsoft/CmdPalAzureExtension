@@ -2,6 +2,8 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Data;
+
 namespace AzureExtension.DataModel;
 
 public class AzureDataStoreSchema : IDataStoreSchema
@@ -113,9 +115,7 @@ public class AzureDataStoreSchema : IDataStoreSchema
         "Id INTEGER PRIMARY KEY NOT NULL," +
         "QueryId TEXT NOT NULL COLLATE NOCASE," +
         "DisplayName TEXT NOT NULL," +
-        "DeveloperLogin TEXT NOT NULL COLLATE NOCASE," +
-        "QueryResults TEXT NOT NULL," +
-        "QueryResultCount INTEGER NOT NULL," +
+        "Username TEXT NOT NULL COLLATE NOCASE," +
         "ProjectId INTEGER NOT NULL," +
         "TimeUpdated INTEGER NOT NULL" +
     ");" +
@@ -123,7 +123,34 @@ public class AzureDataStoreSchema : IDataStoreSchema
     // Queries can differ in their results by developerId, so while QueryId is
     // a guid, the result information could depend on which developer is making
     // the query. Therefore we make unique constraint on QueryId AND DeveloperLogin.
-    "CREATE UNIQUE INDEX IDX_Query_QueryIdDeveloperLogin ON Query (QueryId, DeveloperLogin);";
+    "CREATE UNIQUE INDEX IDX_Query_QueryIdUsername ON Query (QueryId, Username);";
+
+    private const string WorkItem =
+    @"CREATE TABLE WorkItem (" +
+        "Id INTEGER PRIMARY KEY NOT NULL," +
+        "InternalId INTEGER NOT NULL," +
+        "SystemTitle TEXT NOT NULL COLLATE NOCASE," +
+        "HtmlUrl TEXT NOT NULL COLLATE NOCASE," +
+        "SystemState TEXT NOT NULL COLLATE NOCASE," +
+        "SystemReason TEXT NOT NULL COLLATE NOCASE," +
+        "SystemAssignedToId INTEGER NOT NULL," +
+        "SystemCreatedDate INTEGER NOT NULL," +
+        "SystemCreatedById INTEGER NOT NULL," +
+        "SystemChangedDate INTEGER NOT NULL," +
+        "SystemChangedById INTEGER NOT NULL," +
+        "SystemWorkItemTypeId INTEGER NOT NULL" +
+    ");";
+
+    private const string QueryWorkItem =
+    @"CREATE TABLE QueryWorkItem (" +
+        "Id INTEGER PRIMARY KEY NOT NULL," +
+        "Query INTEGER NOT NULL," +
+        "WorkItem INTEGER NOT NULL," +
+        "TimeUpdated INTEGER NOT NULL" +
+    ");" +
+
+    // QueryWorkItem is unique by QueryId and WorkItemId
+    "CREATE UNIQUE INDEX IDX_QueryWorkItem_QueryWorkItem ON QueryWorkItem (Query, WorkItem);";
 
     private const string WorkItemType =
     @"CREATE TABLE WorkItemType (" +
@@ -199,6 +226,8 @@ public class AzureDataStoreSchema : IDataStoreSchema
         Repository,
         RepositoryReference,
         Query,
+        WorkItem,
+        QueryWorkItem,
         WorkItemType,
         PullRequests,
         PullRequestPolicyStatus,

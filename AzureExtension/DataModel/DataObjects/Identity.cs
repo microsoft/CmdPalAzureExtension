@@ -5,6 +5,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AzureExtension.Account;
+using AzureExtension.Data;
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;

@@ -25,15 +25,7 @@ public class AccountProvider : IAccountProvider
 
     private readonly ILogger _log = Log.ForContext("SourceContext", nameof(IAccountProvider));
 
-    private PublicClientApplicationBuilder? PublicClientApplicationBuilder
-    {
-        get; set;
-    }
-
-    public IPublicClientApplication? PublicClientApplication
-    {
-        get; private set;
-    }
+    private readonly IPublicClientApplication _publicClientApplication;
 
     public string DisplayName => "Azure";
 
@@ -41,67 +33,35 @@ public class AccountProvider : IAccountProvider
     {
         _microsoftEntraIdSettings = microsoftEntraIdSettings;
 
-        InitializePublicClientApplicationBuilder();
+        var builder = InitializePublicClientApplicationBuilder();
+        _publicClientApplication = builder.Build();
 
-        InitializePublicClientAppForWAMBrokerAsync();
+        InitializePublicClientApp().Wait();
     }
 
-    public void InitializePublicClientApplicationBuilder()
+    private PublicClientApplicationBuilder InitializePublicClientApplicationBuilder()
     {
-        PublicClientApplicationBuilder = PublicClientApplicationBuilder.Create(_microsoftEntraIdSettings.ClientId)
+        var windowHandle = Windows.Win32.PInvoke.FindWindow(null, "Microsoft Teams");
+
+        var builder = PublicClientApplicationBuilder.Create(_microsoftEntraIdSettings.ClientId)
            .WithAuthority(string.Format(CultureInfo.InvariantCulture, _microsoftEntraIdSettings.Authority, _microsoftEntraIdSettings.TenantId))
            .WithRedirectUri(string.Format(CultureInfo.InvariantCulture, _microsoftEntraIdSettings.RedirectURI, _microsoftEntraIdSettings.ClientId))
            .WithLogging(new MSALLogger(EventLogLevel.Warning), enablePiiLogging: false)
-           .WithClientCapabilities(_capabilities);
+           .WithClientCapabilities(_capabilities)
+           .WithParentActivityOrWindow(() => { return windowHandle; })
+           .WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows)
+            {
+                MsaPassthrough = true,
+                Title = "Command Palette Azure Extension",
+            });
+
         _log.Debug($"Created PublicClientApplicationBuilder");
+        return builder;
     }
 
-    public async void InitializePublicClientAppForWAMBrokerAsync()
+    public async Task InitializePublicClientApp()
     {
-        if (PublicClientApplicationBuilder != null)
-        {
-            PublicClientApplicationBuilder.WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows)
-            {
-                MsaPassthrough = true,
-                Title = "Command Palette Azure Extension",
-            });
-
-            PublicClientApplication = PublicClientApplicationBuilder.Build();
-            _log.Debug($"PublicClientApplication is instantiated");
-        }
-        else
-        {
-            _log.Error($"PublicClientApplicationBuilder is not initialized");
-            throw new ArgumentNullException(null);
-        }
-
-        await TokenCacheRegistration(PublicClientApplication);
-    }
-
-    public async Task InitializePublicClientAppForWAMBrokerAsyncWithParentWindow()
-    {
-        if (PublicClientApplicationBuilder != null)
-        {
-            var windowHandle = Windows.Win32.PInvoke.FindWindow(null, "Microsoft Teams");
-            var builder = PublicClientApplicationBuilder
-                .WithParentActivityOrWindow(() => { return windowHandle; });
-
-            builder = builder.WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows)
-            {
-                MsaPassthrough = true,
-                Title = "Command Palette Azure Extension",
-            });
-
-            PublicClientApplication = PublicClientApplicationBuilder.Build();
-            _log.Debug($"PublicClientApplication is instantiated for interactive UI capability");
-        }
-        else
-        {
-            _log.Error($"Incorrect parameters to instantiate PublicClientApplication with interactive UI capability");
-            throw new ArgumentNullException(null);
-        }
-
-        await TokenCacheRegistration(PublicClientApplication);
+        await TokenCacheRegistration(_publicClientApplication);
     }
 
     private async Task<IEnumerable<IAccount>> TokenCacheRegistration(IPublicClientApplication publicClientApplication)
@@ -125,11 +85,11 @@ public class AccountProvider : IAccountProvider
         _log.Debug($"Enable SSO for Azure Extension by connecting the Windows's default account");
         try
         {
-            var accounts = await PublicClientApplication!.GetAccountsAsync().ConfigureAwait(false);
+            var accounts = await _publicClientApplication.GetAccountsAsync().ConfigureAwait(false);
             if (!accounts.Any())
             {
-                var silentTokenAcquisitionBuilder = PublicClientApplication.AcquireTokenSilent(_microsoftEntraIdSettings.ScopesArray, Microsoft.Identity.Client.PublicClientApplication.OperatingSystemAccount);
-                if (Guid.TryParse(Microsoft.Identity.Client.PublicClientApplication.OperatingSystemAccount.HomeAccountId.TenantId, out var homeTenantId) && homeTenantId == MSATenetId)
+                var silentTokenAcquisitionBuilder = _publicClientApplication.AcquireTokenSilent(_microsoftEntraIdSettings.ScopesArray, PublicClientApplication.OperatingSystemAccount);
+                if (Guid.TryParse(PublicClientApplication.OperatingSystemAccount.HomeAccountId.TenantId, out var homeTenantId) && homeTenantId == MSATenetId)
                 {
                     silentTokenAcquisitionBuilder = silentTokenAcquisitionBuilder.WithTenantId(TransferTenetId.ToString("D"));
                 }
@@ -147,18 +107,17 @@ public class AccountProvider : IAccountProvider
 
     public IAccount GetDefaultAccount()
     {
-        var accounts = PublicClientApplication!.GetAccountsAsync().Result;
+        var accounts = _publicClientApplication!.GetAccountsAsync().Result;
         return accounts.FirstOrDefault()!;
     }
 
     public async Task<IEnumerable<IAccount>> GetLoggedInAccounts()
     {
-        return await PublicClientApplication!.GetAccountsAsync();
+        return await _publicClientApplication!.GetAccountsAsync();
     }
 
     public async Task<IAccount> ShowLogonSession()
     {
-        await InitializePublicClientAppForWAMBrokerAsyncWithParentWindow();
         var account = await LoginDeveloperAccount();
 
         if (account == null)
@@ -179,11 +138,11 @@ public class AccountProvider : IAccountProvider
     private async Task<AuthenticationResult?> InitiateAuthenticationFlowAsync()
     {
         AuthenticationResult? authenticationResult = null;
-        if (PublicClientApplication.IsUserInteractive() && PublicClientApplication != null)
+        if (_publicClientApplication.IsUserInteractive())
         {
             try
             {
-                authenticationResult = await PublicClientApplication.AcquireTokenInteractive(_microsoftEntraIdSettings.ScopesArray).ExecuteAsync();
+                authenticationResult = await _publicClientApplication.AcquireTokenInteractive(_microsoftEntraIdSettings.ScopesArray).ExecuteAsync();
             }
             catch (MsalClientException msalClientEx)
             {
@@ -213,13 +172,13 @@ public class AccountProvider : IAccountProvider
 
     public async Task<bool> LogoutAccount(string username)
     {
-        var accounts = await PublicClientApplication!.GetAccountsAsync().ConfigureAwait(false);
+        var accounts = await _publicClientApplication!.GetAccountsAsync().ConfigureAwait(false);
 
         foreach (var account in accounts)
         {
             if (account.Username == username)
             {
-                await PublicClientApplication.RemoveAsync(account).ConfigureAwait(false);
+                await _publicClientApplication.RemoveAsync(account).ConfigureAwait(false);
                 _log.Information($"MSAL: Signed out user.");
             }
             else
@@ -231,7 +190,7 @@ public class AccountProvider : IAccountProvider
         return true;
     }
 
-    public VssCredentials? GetCredentials(IAccount account)
+    public VssCredentials GetCredentials(IAccount account)
     {
         var authResult = ObtainTokenForLoggedInDeveloperAccount(account.Username).Result;
         return new VssAadCredential(new VssAadToken("Bearer", authResult.AccessToken));
@@ -243,7 +202,7 @@ public class AccountProvider : IAccountProvider
 
         var existingAccount = await GetDeveloperAccountFromCache(loginId);
 
-        var silentTokenAcquisitionBuilder = PublicClientApplication!.AcquireTokenSilent(_microsoftEntraIdSettings.ScopesArray, existingAccount);
+        var silentTokenAcquisitionBuilder = _publicClientApplication.AcquireTokenSilent(_microsoftEntraIdSettings.ScopesArray, existingAccount);
         if (Guid.TryParse(existingAccount!.HomeAccountId.TenantId, out var homeTenantId) && homeTenantId == MSATenetId)
         {
             silentTokenAcquisitionBuilder = silentTokenAcquisitionBuilder.WithTenantId(TransferTenetId.ToString("D"));
@@ -277,12 +236,7 @@ public class AccountProvider : IAccountProvider
 
     public async Task<IAccount?> GetDeveloperAccountFromCache(string loginId)
     {
-        IEnumerable<IAccount> accounts = new List<IAccount>();
-
-        if (PublicClientApplication != null)
-        {
-            accounts = await PublicClientApplication.GetAccountsAsync().ConfigureAwait(false);
-        }
+        var accounts = await _publicClientApplication.GetAccountsAsync().ConfigureAwait(false);
 
         foreach (var account in accounts)
         {

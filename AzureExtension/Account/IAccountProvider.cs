@@ -17,7 +17,7 @@ public interface IAccountProvider
 
     Task<IEnumerable<IAccount>> GetLoggedInAccounts();
 
-    VssCredentials? GetCredentials(IAccount account);
+    VssCredentials GetCredentials(IAccount account);
 
     IAccount GetDefaultAccount();
 
