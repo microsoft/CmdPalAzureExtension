@@ -68,7 +68,7 @@ public sealed partial class PullRequestSearchPage : ListPage
         }
     }
 
-    public ListItem GetListItem(PullRequest item)
+    public ListItem GetListItem(IPullRequest item)
     {
         var title = item.Title;
         var url = item.Url;
@@ -80,7 +80,7 @@ public sealed partial class PullRequestSearchPage : ListPage
         };
     }
 
-    public Task<IEnumerable<PullRequest>> LoadContentData()
+    public Task<IEnumerable<IPullRequest>> LoadContentData()
     {
         return _dataProvider.GetPullRequests(_search);
     }

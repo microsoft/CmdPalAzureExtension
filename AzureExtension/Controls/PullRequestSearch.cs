@@ -5,56 +5,39 @@
 using AzureExtension.Client;
 using AzureExtension.DataModel;
 
-namespace AzureExtension.Controls
+namespace AzureExtension.Controls;
+
+public class PullRequestSearch : IPullRequestSearch
 {
-    public class PullRequestSearch
+    public string Title { get; set; } = string.Empty;
+
+    public string Url => AzureUri.OriginalString;
+
+    public AzureUri AzureUri { get; set; }
+
+    public string View { get; set; } = string.Empty;
+
+    public string PullRequestUrl { get; set; } = string.Empty;
+
+    public PullRequestSearch()
     {
-        public string Title { get; set; } = string.Empty;
+        AzureUri = new AzureUri();
+        Title = string.Empty;
+    }
 
-        public string Url => AzureUri.OriginalString;
+    public PullRequestSearch(AzureUri azureUri, string title, string view)
+    {
+        AzureUri = azureUri;
+        Title = title;
+        View = view;
+        PullRequestUrl = CreatePullRequestUrl(azureUri.OriginalString, view);
+    }
 
-        public AzureUri AzureUri { get; set; }
-
-        public long Id { get; set; }
-
-        public long RepositoryId { get; set; }
-
-        public string Status { get; set; } = string.Empty;
-
-        public string PolicyStatus { get; set; } = string.Empty;
-
-        public string PolicyStatusReason { get; set; } = string.Empty;
-
-        public Identity? Creator { get; set; }
-
-        public string TargetBranch { get; set; } = string.Empty;
-
-        public long CreationDate { get; set; }
-
-        public string View { get; set; } = string.Empty;
-
-        public string PullRequestUrl { get; set; } = string.Empty;
-
-        public PullRequestSearch()
-        {
-            AzureUri = new AzureUri();
-            Title = string.Empty;
-        }
-
-        public PullRequestSearch(AzureUri azureUri, string title, string view)
-        {
-            AzureUri = azureUri;
-            Title = title;
-            View = view;
-            PullRequestUrl = CreatePullRequestUrl(azureUri.OriginalString, view);
-        }
-
-        public string CreatePullRequestUrl(string url, string? view)
-        {
-            // The AzureUri url is the repo url
-            var pullRequestView = string.IsNullOrEmpty(view) ? "active" : view;
-            var pullRequestUrl = url + $"/pullrequests?_a={pullRequestView}";
-            return pullRequestUrl;
-        }
+    public string CreatePullRequestUrl(string url, string? view)
+    {
+        // The AzureUri url is the repo url
+        var pullRequestView = string.IsNullOrEmpty(view) ? "active" : view;
+        var pullRequestUrl = url + $"/pullrequests?_a={pullRequestView}";
+        return pullRequestUrl;
     }
 }
