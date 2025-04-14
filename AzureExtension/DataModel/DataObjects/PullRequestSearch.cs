@@ -109,14 +109,14 @@ public class PullRequestSearch
         return pullRequests ?? new PullRequestSearch();
     }
 
-    public static PullRequestSearch? Get(DataStore dataStore, long projectId, long repositoryId, string developerLogin, PullRequestView view)
+    public static PullRequestSearch? Get(DataStore dataStore, long projectId, long repositoryId, string username, PullRequestView view)
     {
-        var sql = @"SELECT * FROM PullRequests WHERE ProjectId = @ProjectId AND RepositoryId = @RepositoryId AND DeveloperLogin = @DeveloperLogin AND ViewId = @ViewId;";
+        var sql = @"SELECT * FROM PullRequestSearch WHERE ProjectId = @ProjectId AND RepositoryId = @RepositoryId AND Username = @Username AND ViewId = @ViewId;";
         var param = new
         {
             ProjectId = projectId,
             RepositoryId = repositoryId,
-            DeveloperLogin = developerLogin,
+            Username = username,
             ViewId = (long)view,
         };
 
@@ -150,7 +150,7 @@ public class PullRequestSearch
 
     public static IEnumerable<PullRequestSearch> GetAllForDeveloper(DataStore dataStore)
     {
-        var sql = @"SELECT * FROM PullRequests WHERE ViewId = @ViewId;";
+        var sql = @"SELECT * FROM PullRequestSearch WHERE ViewId = @ViewId;";
         var param = new
         {
             ViewId = (long)PullRequestView.Mine,
@@ -174,7 +174,7 @@ public class PullRequestSearch
     public static void DeleteBefore(DataStore dataStore, DateTime date)
     {
         // Delete queries older than the date listed.
-        var sql = @"DELETE FROM PullRequests WHERE TimeUpdated < $Time;";
+        var sql = @"DELETE FROM PullRequestSearch WHERE TimeUpdated < $Time;";
         var command = dataStore.Connection!.CreateCommand();
         command.CommandText = sql;
         command.Parameters.AddWithValue("$Time", date.ToDataStoreInteger());
