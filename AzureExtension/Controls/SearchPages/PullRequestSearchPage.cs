@@ -55,8 +55,17 @@ public sealed partial class PullRequestSearchPage : ListPage
 
             return listItems.ToArray();
         }
-
-        return Array.Empty<IListItem>();
+        else
+        {
+            return new IListItem[]
+            {
+                new ListItem(new NoOpCommand())
+                {
+                    Title = "No pull requests found for search",
+                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                },
+            };
+        }
     }
 
     public ListItem GetListItem(PullRequest item)

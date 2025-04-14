@@ -54,8 +54,17 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
             return listItems.ToArray();
         }
-
-        return Array.Empty<IListItem>();
+        else
+        {
+            return new IListItem[]
+            {
+                new ListItem(new NoOpCommand())
+                {
+                    Title = "No work items found for search",
+                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                },
+            };
+        }
     }
 
     public ListItem GetListItem(WorkItem item)
