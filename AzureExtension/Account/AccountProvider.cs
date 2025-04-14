@@ -190,7 +190,7 @@ public class AccountProvider : IAccountProvider
         return true;
     }
 
-    public VssCredentials? GetCredentials(IAccount account)
+    public VssCredentials GetCredentials(IAccount account)
     {
         var authResult = ObtainTokenForLoggedInDeveloperAccount(account.Username).Result;
         return new VssAadCredential(new VssAadToken("Bearer", authResult.AccessToken));

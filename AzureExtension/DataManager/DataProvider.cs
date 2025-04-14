@@ -4,6 +4,7 @@
 
 using AzureExtension.Controls;
 using AzureExtension.Data;
+using AzureExtension.DataManager.Cache;
 using AzureExtension.DataModel;
 using Serilog;
 
@@ -12,26 +13,38 @@ namespace AzureExtension.DataManager;
 public class DataProvider : IDataProvider
 {
     private readonly ILogger _log;
-    private readonly AzureDataManager _cache;
-    private readonly DataStore _dataStore;
+    private readonly IDataObjectProvider _dataObjectProvider;
+    private readonly ICacheManager _cacheManager;
 
-    public DataProvider(AzureDataManager cache, DataStore dataStore)
+    public event CacheManagerUpdateEventHandler? OnUpdate;
+
+    public DataProvider(IDataObjectProvider dataObjectProvider, ICacheManager cacheManager)
     {
         _log = Log.ForContext("SourceContext", nameof(IDataProvider));
-        _cache = cache;
-        _dataStore = dataStore;
+        _cacheManager = cacheManager;
+        _dataObjectProvider = dataObjectProvider;
+
+        _cacheManager.OnUpdate += OnCacheManagerUpdate;
     }
 
     public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
     {
-        var dsQuery = _cache.GetQuery(query);
+        var dsQuery = _dataObjectProvider.GetQuery(query);
         if (dsQuery == null)
         {
-            await _cache.UpdateWorkItems(query);
+            var parameters = new DataUpdateParameters
+            {
+                UpdateType = DataUpdateType.Query,
+                UpdateObject = query,
+            };
+            await _cacheManager.RequestRefresh(parameters);
         }
 
-        dsQuery = _cache.GetQuery(query);
+        return _dataObjectProvider.GetWorkItems(query);
+    }
 
-        return WorkItem.GetForQuery(_dataStore, dsQuery!);
+    public void OnCacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
+    {
+        OnUpdate?.Invoke(source, e);
     }
 }
