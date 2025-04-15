@@ -122,32 +122,30 @@ public class AzureClientProvider
         return CreateVssConnectionResult(uri, account);
     }
 
-    public T? GetClient<T>(string uri, IAccount account)
+    public T GetClient<T>(string uri, IAccount account)
        where T : VssHttpClientBase
     {
         if (string.IsNullOrEmpty(uri))
         {
-            _log.Information($"Cannot GetClient: invalid uri argument value i.e. {uri}");
-            return null;
+            throw new ArgumentException($"Cannot GetClient: invalid uri argument value i.e. {uri}");
         }
 
         var azureUri = new AzureUri(uri);
         if (!azureUri.IsValid)
         {
-            _log.Information($"Cannot GetClient as uri validation failed: value of uri {uri}");
-            return null;
+            throw new ArgumentException($"Cannot GetClient as uri validation failed: value of uri {uri}");
         }
 
         return GetClient<T>(azureUri.Connection, account);
     }
 
-    public T? GetClient<T>(Uri uri, IAccount account)
+    public T GetClient<T>(Uri uri, IAccount account)
        where T : VssHttpClientBase
     {
         var connection = GetVssConnection(uri, account);
         if (connection == null)
         {
-            return null;
+            throw new AzureClientException($"Cannot get connection for uri: value of uri {uri}");
         }
 
         return connection.GetClient<T>();

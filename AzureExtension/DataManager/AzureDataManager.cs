@@ -116,11 +116,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         var account = _accountProvider.GetDefaultAccount();
         var connection = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
 
-        var witClient = connection.GetClient<WorkItemTrackingHttpClient>();
-        if (witClient == null)
-        {
-            throw new AzureClientException($"Failed getting WorkItemTrackingHttpClient");
-        }
+        var witClient = _azureClientProvider.GetClient<WorkItemTrackingHttpClient>(azureUri.Connection, account);
 
         // Good practice to only create data after we know the client is valid, but any exceptions
         // will roll back the transaction.
@@ -129,7 +125,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         var project = Project.Get(_dataStore, azureUri.Project, org.Id);
         if (project is null)
         {
-            var projectClient = new ProjectHttpClient(connection.Uri, connection.Credentials);
+            var projectClient = _azureClientProvider.GetClient<ProjectHttpClient>(azureUri.Connection, account);
             var teamProject = await projectClient.GetProject(azureUri.Project);
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
@@ -212,20 +208,16 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         var account = _accountProvider.GetDefaultAccount();
         var connection = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
 
-        var gitClient = connection.GetClient<GitHttpClient>();
-        if (gitClient == null)
-        {
-            throw new AzureClientException($"Failed getting GitHttpClient");
-        }
+        var gitClient = _azureClientProvider.GetClient<GitHttpClient>(azureUri.Connection, account);
 
         var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
 
         var project = Project.Get(_dataStore, azureUri.Project, org.Id);
 
-        var projectClient = new ProjectHttpClient(connection.Uri, connection.Credentials);
-        var teamProject = await projectClient.GetProject(azureUri.Project);
         if (project is null)
         {
+            var projectClient = _azureClientProvider.GetClient<ProjectHttpClient>(azureUri.Connection, account);
+            var teamProject = await projectClient.GetProject(azureUri.Project);
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
 
@@ -256,7 +248,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         var pullRequests = await gitClient.GetPullRequestsAsync(project.InternalId,  gitRepository.Id, searchCriteria, cancellationToken: cancellationToken);
 
         // Get the PullRequest PolicyClient. This client provides the State and Reason fields for each pull request
-        var policyClient = connection.GetClient<PolicyHttpClient>();
+        var policyClient = _azureClientProvider.GetClient<PolicyHttpClient>(azureUri.Connection, account);
 
         var repository = Repository.GetOrCreate(_dataStore, gitRepository, project.Id);
 
