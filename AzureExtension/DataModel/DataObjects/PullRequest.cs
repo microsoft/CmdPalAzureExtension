@@ -61,6 +61,7 @@ public class PullRequest : IPullRequest
             RepositoryId = repositoryId,
             CreatorId = creatorId,
             Title = gitPullRequest.Title,
+            Url = gitPullRequest.Url,
             Status = gitPullRequest.Status.ToString(),
             PolicyStatus = statusReason,
             TargetBranch = gitPullRequest.TargetRefName,
@@ -114,5 +115,22 @@ public class PullRequest : IPullRequest
     {
         var pullRequest = Create(dataStore, gitPullRequest, repositoryId, creatorId, statusReason);
         return AddOrUpdate(dataStore, pullRequest);
+    }
+
+    public static IEnumerable<PullRequest> GetForPullRequestSearch(DataStore dataStore, PullRequestSearch pullRequestSearch)
+    {
+        var sql = @"SELECT * FROM PullRequest WHERE Id IN (SELECT PullRequest FROM PullRequestSearchPullRequest WHERE PullRequest = @PullRequestId ORDER BY TimeUpdated ASC)";
+        var param = new
+        {
+            PullRequestId = pullRequestSearch.Id,
+        };
+
+        var pullRequests = dataStore.Connection!.Query<PullRequest>(sql, param, null);
+        foreach (var pullRequest in pullRequests)
+        {
+            pullRequest.DataStore = dataStore;
+        }
+
+        return pullRequests;
     }
 }

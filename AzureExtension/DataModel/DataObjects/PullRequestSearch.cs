@@ -130,7 +130,7 @@ public class PullRequestSearch
     }
 
     // DeveloperPullRequests is unique on developerId, repositoryName, project, and organization.
-    public static PullRequestSearch? Get(DataStore dataStore, string organizationName, string projectName, string repositoryName, string developerLogin, PullRequestView view)
+    public static PullRequestSearch? Get(DataStore dataStore, string organizationName, string projectName, string repositoryName, string username, PullRequestView view)
     {
         // Since this also requires organization information and project is referenced by Id, we must first look up the project.
         var project = Project.Get(dataStore, projectName, organizationName);
@@ -145,7 +145,7 @@ public class PullRequestSearch
             return null;
         }
 
-        return Get(dataStore, project.Id, repository.Id, developerLogin, view);
+        return Get(dataStore, project.Id, repository.Id, username, view);
     }
 
     public static IEnumerable<PullRequestSearch> GetAllForDeveloper(DataStore dataStore)

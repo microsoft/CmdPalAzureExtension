@@ -2,23 +2,9 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Account;
-using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.DataManager.Cache;
-using AzureExtension.DataModel;
-using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
-using Microsoft.Identity.Client;
-using Microsoft.TeamFoundation.Core.WebApi;
-using Microsoft.TeamFoundation.Policy.WebApi;
-using Microsoft.TeamFoundation.SourceControl.WebApi;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
-using Microsoft.VisualStudio.Services.Identity;
-using Microsoft.VisualStudio.Services.WebApi;
 using Serilog;
-using Windows.UI.Notifications;
-using TFModels = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 namespace AzureExtension.DataManager;
 
@@ -70,6 +56,19 @@ public class DataProvider : IDataProvider
 
     public async Task<IEnumerable<IPullRequest>> GetPullRequests(IPullRequestSearch pullRequestSearch)
     {
+        var dsPullRequestSearch = _dataObjectProvider.GetPullRequestSearch(pullRequestSearch);
 
+        if (dsPullRequestSearch == null)
+        {
+            var parameters = new DataUpdateParameters
+            {
+                UpdateType = DataUpdateType.PullRequests,
+                UpdateObject = pullRequestSearch,
+            };
+
+            await _cacheManager.RequestRefresh(parameters);
+        }
+
+        return _dataObjectProvider.GetPullRequests(pullRequestSearch);
     }
 }

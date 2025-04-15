@@ -167,11 +167,11 @@ public class AzureDataStoreSchema : IDataStoreSchema
     // constraint on Name and ProjectId is consistent and safe.
     "CREATE UNIQUE INDEX IDX_WorkItemType_NameProjectId ON WorkItemType (Name, ProjectId);";
 
-    private const string PullRequests =
+    private const string PullRequestSearch =
     @"CREATE TABLE PullRequests (" +
         "Id INTEGER PRIMARY KEY NOT NULL," +
         "RepositoryId INTEGER NOT NULL," +
-        "DeveloperLogin TEXT NOT NULL COLLATE NOCASE," +
+        "Username TEXT NOT NULL COLLATE NOCASE," +
         "Results TEXT NOT NULL," +
         "ProjectId INTEGER NOT NULL," +
         "ViewId INTEGER NOT NULL," +
@@ -180,7 +180,23 @@ public class AzureDataStoreSchema : IDataStoreSchema
 
     // Developer Pull requests are unique on Org / Project / Repository and
     // the developer login, and the view.
-    "CREATE UNIQUE INDEX IDX_PullRequests_ProjectIdRepositoryIdDeveloperLoginViewId ON PullRequests (ProjectId, RepositoryId, DeveloperLogin, ViewId);";
+    "CREATE UNIQUE INDEX IDX_PullRequestSearch_ProjectIdRepositoryIdDeveloperLoginViewId ON PullRequestSearch (ProjectId, RepositoryId, Username, ViewId);";
+
+    private const string PullRequest =
+    @"CREATE TABLE PullRequest (" +
+        "Id INTEGER PRIMARY KEY NOT NULL," +
+        "InternalId INTEGER NOT NULL," +
+        "Title TEXT NOT NULL COLLATE NOCASE," +
+        "Url TEXT NOT NULL COLLATE NOCASE," +
+        "RepositoryId INTEGER NOT NULL," +
+        "CreatorId INTEGER NOT NULL," +
+        "Status TEXT NOT NULL COLLATE NOCASE," +
+        "PolicyStatus TEXT NOT NULL COLLATE NOCASE," +
+        "PolicyStatusReason TEXT NOT NULL COLLATE NOCASE," +
+        "TargetBranch TEXT NOT NULL COLLATE NOCASE," +
+        "CreationDate INTEGER NOT NULL," +
+        "HtmlUrl TEXT NOT NULL COLLATE NOCASE" +
+    ");";
 
     // PullRequsetPolicyStatus is a snapshot of a developer's Pull Requests.
     private const string PullRequestPolicyStatus =
@@ -229,7 +245,8 @@ public class AzureDataStoreSchema : IDataStoreSchema
         WorkItem,
         QueryWorkItem,
         WorkItemType,
-        PullRequests,
+        PullRequestSearch,
+        PullRequest,
         PullRequestPolicyStatus,
         Notification,
     ];

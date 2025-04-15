@@ -80,11 +80,32 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         return Query.Get(_dataStore, azureUri.Query, account.Username);
     }
 
+    public PullRequestSearch? GetPullRequestSearch(IPullRequestSearch pullRequestSearch)
+    {
+        ValidateDataStore();
+        var account = _accountProvider.GetDefaultAccount();
+        var azureUri = new AzureUri(pullRequestSearch.Url);
+        return PullRequestSearch.Get(
+            _dataStore,
+            azureUri.Organization,
+            azureUri.Project,
+            azureUri.Repository,
+            account.Username,
+            GetPullRequestView(pullRequestSearch.View));
+    }
+
     public IEnumerable<IWorkItem> GetWorkItems(IQuery query)
     {
         ValidateDataStore();
         var dsQuery = GetQuery(query);
         return WorkItem.GetForQuery(_dataStore, dsQuery!);
+    }
+
+    public IEnumerable<IPullRequest> GetPullRequests(IPullRequestSearch pullRequestSearch)
+    {
+        ValidateDataStore();
+        var dsPullRequestSearch = GetPullRequestSearch(pullRequestSearch);
+        return PullRequest.GetForPullRequestSearch(_dataStore, dsPullRequestSearch!);
     }
 
     private async Task UpdateQueryAsync(IQuery query, CancellationToken cancellationToken)
