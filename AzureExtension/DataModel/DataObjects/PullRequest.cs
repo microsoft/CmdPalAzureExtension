@@ -119,10 +119,10 @@ public class PullRequest : IPullRequest
 
     public static IEnumerable<PullRequest> GetForPullRequestSearch(DataStore dataStore, PullRequestSearch pullRequestSearch)
     {
-        var sql = @"SELECT * FROM PullRequest WHERE Id IN (SELECT PullRequest FROM PullRequestSearchPullRequest WHERE PullRequest = @PullRequestId ORDER BY TimeUpdated ASC)";
+        var sql = @"SELECT * FROM PullRequest WHERE Id IN (SELECT PullRequest FROM PullRequestSearchPullRequest WHERE PullRequestSearch = @PullRequestSearchId ORDER BY TimeUpdated ASC)";
         var param = new
         {
-            PullRequestId = pullRequestSearch.Id,
+            PullRequestSearchId = pullRequestSearch.Id,
         };
 
         var pullRequests = dataStore.Connection!.Query<PullRequest>(sql, param, null);
