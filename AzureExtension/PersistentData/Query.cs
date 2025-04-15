@@ -38,9 +38,6 @@ public class Query : IQuery
         }
     }
 
-    [Write(false)]
-    private DataStore? DataStore { get; set; }
-
     public static Query Add(string name, string url, bool isTopLevel)
     {
         return new Query
