@@ -98,14 +98,14 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
     {
         ValidateDataStore();
         var dsQuery = GetQuery(query);
-        return WorkItem.GetForQuery(_dataStore, dsQuery!);
+        return dsQuery != null ? WorkItem.GetForQuery(_dataStore, dsQuery) : [];
     }
 
     public IEnumerable<IPullRequest> GetPullRequests(IPullRequestSearch pullRequestSearch)
     {
         ValidateDataStore();
         var dsPullRequestSearch = GetPullRequestSearch(pullRequestSearch);
-        return PullRequest.GetForPullRequestSearch(_dataStore, dsPullRequestSearch!);
+        return dsPullRequestSearch != null ? PullRequest.GetForPullRequestSearch(_dataStore, dsPullRequestSearch!) : [];
     }
 
     private async Task UpdateQueryAsync(IQuery query, CancellationToken cancellationToken)
@@ -206,7 +206,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         _log.Information($"UpdateWorkItems took {stopwatch.ElapsedMilliseconds} ms to complete.");
     }
 
-    public async Task UpdatePullRequestsAsync(IPullRequestSearch pullRequestSearch)
+    public async Task UpdatePullRequestsAsync(IPullRequestSearch pullRequestSearch, CancellationToken cancellationToken)
     {
         var azureUri = new AzureUri(pullRequestSearch.Url);
         var account = _accountProvider.GetDefaultAccount();
@@ -229,7 +229,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
 
-        var gitRepository = await gitClient.GetRepositoryAsync(project.InternalId, azureUri.Repository);
+        var gitRepository = await gitClient.GetRepositoryAsync(project.InternalId, azureUri.Repository, cancellationToken: cancellationToken);
 
         var searchCriteria = new GitPullRequestSearchCriteria
         {
@@ -253,7 +253,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         }
 
         // Get the pull requests with those criteria: (do we need internal id)
-        var pullRequests = await gitClient.GetPullRequestsAsync(project.InternalId,  gitRepository.Id, searchCriteria);
+        var pullRequests = await gitClient.GetPullRequestsAsync(project.InternalId,  gitRepository.Id, searchCriteria, cancellationToken: cancellationToken);
 
         // Get the PullRequest PolicyClient. This client provides the State and Reason fields for each pull request
         var policyClient = connection.GetClient<PolicyHttpClient>();
@@ -275,7 +275,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
 
             try
             {
-                var policyEvaluations = await policyClient.GetPolicyEvaluationsAsync(project.InternalId, artifactId);
+                var policyEvaluations = await policyClient.GetPolicyEvaluationsAsync(project.InternalId, artifactId, cancellationToken: cancellationToken);
                 GetPolicyStatus(policyEvaluations, out status, out statusReason);
             }
             catch (Exception ex)
@@ -285,7 +285,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
 
             if (pullRequest.LastMergeSourceCommit is not null)
             {
-                var commitRef = await gitClient.GetCommitAsync(pullRequest.LastMergeSourceCommit.CommitId, gitRepository.Id);
+                var commitRef = await gitClient.GetCommitAsync(pullRequest.LastMergeSourceCommit.CommitId, gitRepository.Id, cancellationToken: cancellationToken);
                 if (commitRef is not null)
                 {
                     pullRequest.LastMergeSourceCommit = commitRef;
@@ -385,7 +385,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         Func<Task> operation = type switch
         {
             DataUpdateType.Query => async () => await UpdateQueryAsync((parameters.UpdateObject as IQuery)!, parameters.CancellationToken.GetValueOrDefault()),
-            DataUpdateType.PullRequests => async () => await UpdatePullRequestsAsync((parameters.UpdateObject as IPullRequestSearch)!),
+            DataUpdateType.PullRequests => async () => await UpdatePullRequestsAsync((parameters.UpdateObject as IPullRequestSearch)!, parameters.CancellationToken.GetValueOrDefault()),
             _ => throw new NotImplementedException($"Update type {type} not implemented."),
         };
 
