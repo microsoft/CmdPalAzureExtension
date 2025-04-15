@@ -223,9 +223,7 @@ public class WorkItem : IWorkItem
         return workItem;
     }
 
-    public static IEnumerable<WorkItem> GetForQuery(
-        DataStore dataStore,
-        Query query)
+    public static IEnumerable<WorkItem> GetForQuery(DataStore dataStore, Query query)
     {
         var sql = @"SELECT * FROM WorkItem WHERE Id IN (SELECT WorkItem FROM QueryWorkItem WHERE Query = @QueryId ORDER BY TimeUpdated ASC)";
         var param = new

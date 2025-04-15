@@ -20,8 +20,18 @@ public sealed class PersistentDataSchema : IDataStoreSchema
             IsTopLevel INTEGER NOT NULL CHECK (IsTopLevel IN (0, 1))
         )";
 
+    private const string PullRequestSearch =
+        @"CREATE TABLE IF NOT EXISTS PullRequestSearch (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Url TEXT NOT NULL,
+            Title TEXT NOT NULL,
+            View TEXT NOT NULL,
+            IsTopLevel INTEGER NOT NULL CHECK (IsTopLevel IN (0, 1))
+        )";
+
     private static readonly List<string> _schemaSqlsValue = new()
     {
         Query,
+        PullRequestSearch,
     };
 }

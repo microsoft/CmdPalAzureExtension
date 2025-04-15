@@ -9,4 +9,6 @@ namespace AzureExtension.DataManager;
 public interface IDataProvider
 {
     Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query);
+
+    Task<IEnumerable<IPullRequest>> GetPullRequests(IPullRequestSearch pullRequestSearch);
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation
+// Copyright (c) Microsoft Corporation
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -7,7 +7,7 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls;
 
-public class WorkItemCandidate
+public class WorkItem
 {
     public int Id { get; set; }
 
@@ -35,7 +35,7 @@ public class WorkItemCandidate
 
     public IconInfo StatusIcon { get; set; }
 
-    public WorkItemCandidate()
+    public WorkItem()
     {
         SystemAssignedTo = new Identity();
         SystemCreatedBy = new Identity();

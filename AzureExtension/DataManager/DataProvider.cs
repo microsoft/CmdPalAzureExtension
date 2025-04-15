@@ -1,11 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation
+// Copyright (c) Microsoft Corporation
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Controls;
-using AzureExtension.Data;
 using AzureExtension.DataManager.Cache;
-using AzureExtension.DataModel;
 using Serilog;
 
 namespace AzureExtension.DataManager;
@@ -13,8 +11,16 @@ namespace AzureExtension.DataManager;
 public class DataProvider : IDataProvider
 {
     private readonly ILogger _log;
+
     private readonly IDataObjectProvider _dataObjectProvider;
     private readonly ICacheManager _cacheManager;
+
+    public static readonly string IdentityRefFieldValueName = "Microsoft.VisualStudio.Services.WebApi.IdentityRef";
+    public static readonly string SystemIdFieldName = "System.Id";
+    public static readonly string WorkItemHtmlUrlFieldName = "DevHome.AzureExtension.WorkItemHtmlUrl";
+    public static readonly string WorkItemTypeFieldName = "System.WorkItemType";
+
+    public static readonly int PullRequestResultLimit = 25;
 
     public event CacheManagerUpdateEventHandler? OnUpdate;
 
@@ -25,6 +31,11 @@ public class DataProvider : IDataProvider
         _dataObjectProvider = dataObjectProvider;
 
         _cacheManager.OnUpdate += OnCacheManagerUpdate;
+    }
+
+    public void OnCacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
+    {
+        OnUpdate?.Invoke(source, e);
     }
 
     public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
@@ -43,8 +54,21 @@ public class DataProvider : IDataProvider
         return _dataObjectProvider.GetWorkItems(query);
     }
 
-    public void OnCacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
+    public async Task<IEnumerable<IPullRequest>> GetPullRequests(IPullRequestSearch pullRequestSearch)
     {
-        OnUpdate?.Invoke(source, e);
+        var dsPullRequestSearch = _dataObjectProvider.GetPullRequestSearch(pullRequestSearch);
+
+        if (dsPullRequestSearch == null)
+        {
+            var parameters = new DataUpdateParameters
+            {
+                UpdateType = DataUpdateType.PullRequests,
+                UpdateObject = pullRequestSearch,
+            };
+
+            await _cacheManager.RequestRefresh(parameters);
+        }
+
+        return _dataObjectProvider.GetPullRequests(pullRequestSearch);
     }
 }

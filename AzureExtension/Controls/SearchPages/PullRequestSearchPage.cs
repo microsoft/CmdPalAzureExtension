@@ -1,7 +1,8 @@
-// Copyright (c) Microsoft Corporation
+﻿// Copyright (c) Microsoft Corporation
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.DataManager;
 using AzureExtension.Helpers;
@@ -11,7 +12,7 @@ using Serilog;
 
 namespace AzureExtension.Controls.Pages;
 
-public sealed partial class WorkItemsSearchPage : ListPage
+public sealed partial class PullRequestSearchPage : ListPage
 {
     // Max number of query results to fetch for a given query.
     public static readonly int QueryResultLimit = 25;
@@ -20,7 +21,7 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
     private ILogger Log => _log.Value;
 
-    private readonly IQuery _query;
+    private readonly IPullRequestSearch _search;
 
     private readonly IResources _resources;
 
@@ -28,13 +29,13 @@ public sealed partial class WorkItemsSearchPage : ListPage
 
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public WorkItemsSearchPage(IQuery query, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+    public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
     {
-        _query = query;
+        _search = search;
         _resources = resources;
         _dataProvider = dataProvider;
         Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
-        Name = query.Name;
+        Name = search.Title;
         _timeSpanHelper = timeSpanHelper;
     }
 
@@ -60,16 +61,16 @@ public sealed partial class WorkItemsSearchPage : ListPage
             {
                 new ListItem(new NoOpCommand())
                 {
-                    Title = "No work items found for search",
+                    Title = "No pull requests found for search",
                     Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
                 },
             };
         }
     }
 
-    public ListItem GetListItem(IWorkItem item)
+    public ListItem GetListItem(IPullRequest item)
     {
-        var title = item.SystemTitle;
+        var title = item.Title;
         var url = item.HtmlUrl;
 
         return new ListItem(new LinkCommand(url, _resources))
@@ -79,32 +80,8 @@ public sealed partial class WorkItemsSearchPage : ListPage
         };
     }
 
-    private string GetIconForType(string? workItemType)
+    public Task<IEnumerable<IPullRequest>> LoadContentData()
     {
-        return workItemType switch
-        {
-            "Bug" => IconLoader.GetIconAsBase64("Bug.png"),
-            "Feature" => IconLoader.GetIconAsBase64("Feature.png"),
-            "Issue" => IconLoader.GetIconAsBase64("Issue.png"),
-            "Impediment" => IconLoader.GetIconAsBase64("Impediment.png"),
-            "Pull Request" => IconLoader.GetIconAsBase64("PullRequest.png"),
-            "Task" => IconLoader.GetIconAsBase64("Task.png"),
-            _ => IconLoader.GetIconAsBase64("ADO.png"),
-        };
-    }
-
-    private string GetIconForStatusState(string? statusState)
-    {
-        return statusState switch
-        {
-            "Closed" or "Completed" => IconLoader.GetIconAsBase64("StatusGreen.png"),
-            "Committed" or "Resolved" or "Started" => IconLoader.GetIconAsBase64("StatusBlue.png"),
-            _ => IconLoader.GetIconAsBase64("StatusGray.png"),
-        };
-    }
-
-    public Task<IEnumerable<IWorkItem>> LoadContentData()
-    {
-        return _dataProvider.GetWorkItems(_query);
+        return _dataProvider.GetPullRequests(_search);
     }
 }

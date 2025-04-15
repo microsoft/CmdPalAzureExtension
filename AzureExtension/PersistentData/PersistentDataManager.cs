@@ -7,11 +7,10 @@ using AzureExtension.Controls;
 using AzureExtension.Data;
 using Microsoft.Identity.Client;
 using Serilog;
-using Windows.Storage;
 
 namespace AzureExtension.PersistentData;
 
-public class PersistentDataManager : IQueryRepository
+public partial class PersistentDataManager : IQueryRepository
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", nameof(PersistentDataManager)));
 
@@ -66,7 +65,6 @@ public class PersistentDataManager : IQueryRepository
         }
 
         Query.Remove(_dataStore, name, url);
-
         return Task.CompletedTask;
     }
 

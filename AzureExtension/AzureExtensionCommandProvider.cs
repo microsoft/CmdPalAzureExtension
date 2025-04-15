@@ -4,6 +4,7 @@
 
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.Pages;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -26,7 +27,9 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly AzureClientHelpers _azureClientHelpers;
 
-    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedQueriesPage, IResources resources, AzureClientHelpers azureClientHelpers)
+    private readonly SavedPullRequestSearchesPage _savedPullRequestSearchesPage;
+
+    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedQueriesPage, IResources resources, AzureClientHelpers azureClientHelpers, SavedPullRequestSearchesPage savedPullRequestSearchesPage)
     {
         _signInPage = signInPage;
         _signOutPage = signOutPage;
@@ -34,6 +37,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _savedQueriesPage = savedQueriesPage;
         _resources = resources;
         _azureClientHelpers = azureClientHelpers;
+        _savedPullRequestSearchesPage = savedPullRequestSearchesPage;
         DisplayName = "Azure Extension";
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
@@ -61,6 +65,11 @@ public partial class AzureExtensionCommandProvider : CommandProvider
                 new(_savedQueriesPage)
                 {
                     Title = _resources.GetResource("Pages_Saved_Searches"),
+                    Icon = new IconInfo("\ue721"),
+                },
+                new CommandItem(_savedPullRequestSearchesPage)
+                {
+                    Title = "Save Pull Request Search",
                     Icon = new IconInfo("\ue721"),
                 },
                 new(_signOutPage)

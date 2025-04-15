@@ -12,6 +12,12 @@ public class SavedQueriesMediator
 
     public event EventHandler<object?>? QuerySaved;
 
+    public event EventHandler<object?>? PullRequestSearchSaved;
+
+    public event EventHandler<object?>? PullRequestSearchRemoved;
+
+    public event EventHandler<object?>? PullRequestSearchRemoving;
+
     public SavedQueriesMediator()
     {
     }
@@ -29,5 +35,20 @@ public class SavedQueriesMediator
     public void AddQuery(object args)
     {
         QuerySaved?.Invoke(this, args);
+    }
+
+    public void AddPullRequestSearch(object args)
+    {
+        PullRequestSearchSaved?.Invoke(this, args);
+    }
+
+    public void RemovingPullRequestSearch(object args)
+    {
+        PullRequestSearchRemoving?.Invoke(this, args);
+    }
+
+    public void RemovePullRequestSearch(object args)
+    {
+        PullRequestSearchRemoved?.Invoke(this, args);
     }
 }
