@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Helpers;
+using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Identity.Client;
@@ -15,11 +16,8 @@ namespace AzureExtension.Controls.Forms;
 public class SavePullRequestSearchForm : FormContent, IAzureForm
 {
     private readonly IResources _resources;
-
     private readonly SavedQueriesMediator _mediator;
-
     private readonly IAccountProvider _accountProvider;
-
     private readonly AzureClientHelpers _azureClientHelpers;
 
     public event EventHandler<bool>? LoadingStateChanged;

@@ -7,32 +7,31 @@ using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
-namespace AzureExtension.Controls.Pages
+namespace AzureExtension.Controls.Pages;
+
+public class SavePullRequestSearchPage : ContentPage
 {
-    public class SavePullRequestSearchPage : ContentPage
+    private readonly StatusMessage _statusMessage;
+
+    private readonly SavePullRequestSearchForm _savePullRequestSearchForm;
+
+    public SavePullRequestSearchPage(SavePullRequestSearchForm savePullRequestSearchForm, StatusMessage statusMessage)
     {
-        private readonly StatusMessage _statusMessage;
+        Title = "Save Pull Request";
+        Icon = new IconInfo("\uecc8");
+        _savePullRequestSearchForm = savePullRequestSearchForm;
+        _statusMessage = statusMessage;
 
-        private SavePullRequestSearchForm _savePullRequestSearchForm;
+        // Wire up events using the helper
+        FormEventHelper.WireFormEvents(_savePullRequestSearchForm, this, _statusMessage, "success!", "failure");
 
-        public SavePullRequestSearchPage(SavePullRequestSearchForm savePullRequestSearchForm, StatusMessage statusMessage)
-        {
-            Title = "Save Pull Request";
-            Icon = new IconInfo("\uecc8");
-            _savePullRequestSearchForm = savePullRequestSearchForm;
-            _statusMessage = statusMessage;
+        // Hide status message initially
+        ExtensionHost.HideStatus(_statusMessage);
+    }
 
-            // Wire up events using the helper
-            FormEventHelper.WireFormEvents(_savePullRequestSearchForm, this, _statusMessage, "success!", "failure");
-
-            // Hide status message initially
-            ExtensionHost.HideStatus(_statusMessage);
-        }
-
-        public override IContent[] GetContent()
-        {
-            ExtensionHost.HideStatus(_statusMessage);
-            return [_savePullRequestSearchForm];
-        }
+    public override IContent[] GetContent()
+    {
+        ExtensionHost.HideStatus(_statusMessage);
+        return [_savePullRequestSearchForm];
     }
 }

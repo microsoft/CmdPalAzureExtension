@@ -2,9 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
-using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.ListItems;
 using AzureExtension.DataManager;
 using AzureExtension.Helpers;
@@ -17,21 +15,22 @@ namespace AzureExtension.Controls.Pages;
 public class SavedPullRequestSearchesPage : ListPage
 {
     private readonly IResources _resources;
+    private readonly AddPullRequestSearchListItem _addPullRequestSearchListItem;
+    private readonly SavedQueriesMediator _mediator;
+    private readonly IDataProvider _dataProvider;
+    private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
+    private readonly TimeSpanHelper _timeSpanHelper;
 
-    private List<PullRequestSearch> _searches;
-
-    private AddPullRequestSearchListItem _addPullRequestSearchListItem;
-
-    private SavedQueriesMediator _mediator;
-
-    private IDataProvider _dataProvider;
-
-    private TimeSpanHelper _timeSpanHelper;
-
-    public SavedPullRequestSearchesPage(IResources resources, AddPullRequestSearchListItem addPullRequestSearchListItem, SavedQueriesMediator mediator, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+    public SavedPullRequestSearchesPage(
+        IResources resources,
+        AddPullRequestSearchListItem addPullRequestSearchListItem,
+        SavedQueriesMediator mediator,
+        IDataProvider dataProvider,
+        ISavedPullRequestSearchRepository pullRequestSearchRepository,
+        TimeSpanHelper timeSpanHelper)
     {
         _resources = resources;
-        _searches = new List<PullRequestSearch>();
+        _pullRequestSearchRepository = pullRequestSearchRepository;
         _addPullRequestSearchListItem = addPullRequestSearchListItem;
         _mediator = mediator;
         _mediator.PullRequestSearchRemoved += OnPullRequestSearchRemoved;
@@ -57,7 +56,7 @@ public class SavedPullRequestSearchesPage : ListPage
         }
         else if (args != null && args is PullRequestSearch search)
         {
-            _searches.Remove(search);
+            _pullRequestSearchRepository.RemoveSavedPullRequestSearch(search).Wait();
             RaiseItemsChanged(0);
 
             // no toast yet
@@ -81,9 +80,11 @@ public class SavedPullRequestSearchesPage : ListPage
 
     public override IListItem[] GetItems()
     {
-        if (_searches.Count > 0)
+        var searches = _pullRequestSearchRepository.GetSavedPullRequestSearches().Result;
+
+        if (searches.Any())
         {
-            var searchPages = _searches.Select(savedSearch => CreateItemForPullRequestSearch(savedSearch)).ToList();
+            var searchPages = searches.Select(savedSearch => CreateItemForPullRequestSearch(savedSearch)).ToList();
 
             searchPages.Add(_addPullRequestSearchListItem);
 
@@ -101,14 +102,14 @@ public class SavedPullRequestSearchesPage : ListPage
 
         if (args != null && args is PullRequestSearch search)
         {
-            _searches.Add(search);
+            _pullRequestSearchRepository.AddSavedPullRequestSearch(search).Wait();
             RaiseItemsChanged(0);
         }
 
         // errors are handled in SavePullRequestSearchPage
     }
 
-    public IListItem CreateItemForPullRequestSearch(PullRequestSearch search)
+    public IListItem CreateItemForPullRequestSearch(IPullRequestSearch search)
     {
         return new ListItem(CreatePageForPullRequestSearch(search))
         {
@@ -117,12 +118,12 @@ public class SavedPullRequestSearchesPage : ListPage
             Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(search.PullRequestUrl, _resources)),
+                new(new LinkCommand(search.Url, _resources)),
             },
         };
     }
 
-    private ListPage CreatePageForPullRequestSearch(PullRequestSearch search)
+    private ListPage CreatePageForPullRequestSearch(IPullRequestSearch search)
     {
         return new PullRequestSearchPage(search, _resources, _dataProvider, _timeSpanHelper)
         {

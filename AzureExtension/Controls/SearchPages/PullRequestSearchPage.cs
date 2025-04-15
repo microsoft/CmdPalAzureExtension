@@ -21,7 +21,7 @@ public sealed partial class PullRequestSearchPage : ListPage
 
     private ILogger Log => _log.Value;
 
-    private readonly PullRequestSearch _search;
+    private readonly IPullRequestSearch _search;
 
     private readonly IResources _resources;
 
@@ -29,7 +29,7 @@ public sealed partial class PullRequestSearchPage : ListPage
 
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public PullRequestSearchPage(PullRequestSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+    public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
     {
         _search = search;
         _resources = resources;

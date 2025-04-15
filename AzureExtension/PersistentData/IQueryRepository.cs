@@ -13,13 +13,13 @@ public interface IQueryRepository
 
     Task RemoveSavedQueryAsync(IQuery query);
 
-    public IQuery GetQuery(string name, string url);
+    IQuery GetQuery(string name, string url);
 
-    public Task<IEnumerable<IQuery>> GetSavedQueries();
+    Task<IEnumerable<IQuery>> GetSavedQueries();
 
-    public Task<IEnumerable<IQuery>> GetTopLevelQueries();
+    Task<IEnumerable<IQuery>> GetTopLevelQueries();
 
-    public Task<bool> IsTopLevel(IQuery query);
+    Task<bool> IsTopLevel(IQuery query);
 
-    public void UpdateQueryTopLevelStatus(IQuery query, bool isTopLevel, IAccount account);
+    void UpdateQueryTopLevelStatus(IQuery query, bool isTopLevel, IAccount account);
 }
