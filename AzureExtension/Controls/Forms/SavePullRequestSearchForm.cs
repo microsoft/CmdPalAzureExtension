@@ -19,6 +19,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     private readonly SavedQueriesMediator _mediator;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
@@ -32,7 +33,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequestSearch", TemplateSubstitutions);
 
-    public SavePullRequestSearchForm(IResources resources, SavedQueriesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers)
+    public SavePullRequestSearchForm(IResources resources, SavedQueriesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
     {
         LoadingStateChanged?.Invoke(this, false);
         FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
@@ -40,6 +41,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
         _mediator = mediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
+        _pullRequestSearchRepository = pullRequestSearchRepository;
     }
 
     public override ICommandResult SubmitForm(string inputs, string data)
@@ -63,6 +65,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             var pullRequestSearch = CreatePullRequestSearchFromJson(payloadJson);
 
             LoadingStateChanged?.Invoke(this, false);
+            _pullRequestSearchRepository.AddSavedPullRequestSearch(pullRequestSearch).Wait();
             _mediator.AddPullRequestSearch(pullRequestSearch);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
             return pullRequestSearch;

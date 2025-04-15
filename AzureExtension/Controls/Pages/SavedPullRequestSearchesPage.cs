@@ -102,8 +102,6 @@ public class SavedPullRequestSearchesPage : ListPage
 
         if (args != null && args is PullRequestSearch search)
         {
-            // Maybe this should be in the form?
-            _pullRequestSearchRepository.AddSavedPullRequestSearch(search).Wait();
             RaiseItemsChanged(0);
         }
 
