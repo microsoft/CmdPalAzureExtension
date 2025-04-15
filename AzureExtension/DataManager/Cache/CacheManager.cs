@@ -124,6 +124,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
 
         switch (parameters.UpdateType)
         {
+            case DataUpdateType.PullRequests:
             case DataUpdateType.Query:
                 await _dataUpdateService.UpdateData(parameters);
                 break;
