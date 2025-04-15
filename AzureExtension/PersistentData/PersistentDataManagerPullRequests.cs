@@ -17,13 +17,13 @@ public partial class PersistentDataManager : ISavedPullRequestSearchRepository
         var view = pullRequestSearch.View;
 
         _log.Information($"Adding pull request search: {title} - {url} - {view}.");
-        if (PullRequestSearch.Get(_dataStore, title, url, view) != null)
+        if (PullRequestSearch.Get(_dataStore, url, title, view) != null)
         {
             _log.Error($"Pull request search {title} - {url} - {view} already exists.");
             return Task.CompletedTask;
         }
 
-        PullRequestSearch.Add(_dataStore, title, url, view);
+        PullRequestSearch.Add(_dataStore, url, title, view);
 
         return Task.CompletedTask;
     }
@@ -31,7 +31,7 @@ public partial class PersistentDataManager : ISavedPullRequestSearchRepository
     public IPullRequestSearch GetPullRequestSearch(string title, string url, string view)
     {
         ValidateDataStore();
-        return PullRequestSearch.Get(_dataStore, title, url, view) ?? throw new InvalidOperationException($"Pull request search {title} - {url} - {view} not found.");
+        return PullRequestSearch.Get(_dataStore, url, title, view) ?? throw new InvalidOperationException($"Pull request search {title} - {url} - {view} not found.");
     }
 
     public Task<IEnumerable<IPullRequestSearch>> GetAllPullRequestSearchesAsync(bool includeTopLevel)
@@ -58,7 +58,7 @@ public partial class PersistentDataManager : ISavedPullRequestSearchRepository
     public Task<bool> IsTopLevel(IPullRequestSearch pullRequestSearch)
     {
         ValidateDataStore();
-        var dstorePullRequestSearch = PullRequestSearch.Get(_dataStore, pullRequestSearch.Title, pullRequestSearch.Url, pullRequestSearch.View);
+        var dstorePullRequestSearch = PullRequestSearch.Get(_dataStore, pullRequestSearch.Url, pullRequestSearch.Title, pullRequestSearch.View);
         return dstorePullRequestSearch != null ? Task.FromResult(dstorePullRequestSearch.IsTopLevel) : Task.FromResult(false);
     }
 
@@ -71,12 +71,12 @@ public partial class PersistentDataManager : ISavedPullRequestSearchRepository
         var view = pullRequestSearch.View;
 
         _log.Information($"Removing pull request search: {title} - {url} - {view}.");
-        if (PullRequestSearch.Get(_dataStore, title, url, view) == null)
+        if (PullRequestSearch.Get(_dataStore, url, title, view) == null)
         {
             throw new InvalidOperationException($"Pull request search {title} - {url} - {view} not found.");
         }
 
-        PullRequestSearch.Remove(_dataStore, title, url, view);
+        PullRequestSearch.Remove(_dataStore, url, title, view);
         return Task.CompletedTask;
     }
 
