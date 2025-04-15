@@ -221,10 +221,11 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
 
         var project = Project.Get(_dataStore, azureUri.Project, org.Id);
+
+        var projectClient = new ProjectHttpClient(connection.Uri, connection.Credentials);
+        var teamProject = await projectClient.GetProject(azureUri.Project);
         if (project is null)
         {
-            var projectClient = new ProjectHttpClient(connection.Uri, connection.Credentials);
-            var teamProject = await projectClient.GetProject(azureUri.Project);
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
 
@@ -252,7 +253,7 @@ public class AzureDataManager : IDataUpdateService, IDataObjectProvider
         }
 
         // Get the pull requests with those criteria: (do we need internal id)
-        var pullRequests = await gitClient.GetPullRequestsAsync(project.InternalId, gitRepository.Id, searchCriteria);
+        var pullRequests = await gitClient.GetPullRequestsAsync(project.InternalId,  gitRepository.Id, searchCriteria);
 
         // Get the PullRequest PolicyClient. This client provides the State and Reason fields for each pull request
         var policyClient = connection.GetClient<PolicyHttpClient>();

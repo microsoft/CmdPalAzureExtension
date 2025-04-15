@@ -17,7 +17,7 @@ public class AzureDataStoreSchema : IDataStoreSchema
     }
 
     // Update this anytime incompatible changes happen with a released version.
-    private const long SchemaVersionValue = 0x0007;
+    private const long SchemaVersionValue = 0x0008;
 
     private const string Metadata =
     @"CREATE TABLE Metadata (" +
@@ -168,11 +168,10 @@ public class AzureDataStoreSchema : IDataStoreSchema
     "CREATE UNIQUE INDEX IDX_WorkItemType_NameProjectId ON WorkItemType (Name, ProjectId);";
 
     private const string PullRequestSearch =
-    @"CREATE TABLE PullRequests (" +
+    @"CREATE TABLE PullRequestSearch (" +
         "Id INTEGER PRIMARY KEY NOT NULL," +
         "RepositoryId INTEGER NOT NULL," +
         "Username TEXT NOT NULL COLLATE NOCASE," +
-        "Results TEXT NOT NULL," +
         "ProjectId INTEGER NOT NULL," +
         "ViewId INTEGER NOT NULL," +
         "TimeUpdated INTEGER NOT NULL" +
@@ -197,6 +196,17 @@ public class AzureDataStoreSchema : IDataStoreSchema
         "CreationDate INTEGER NOT NULL," +
         "HtmlUrl TEXT NOT NULL COLLATE NOCASE" +
     ");";
+
+    private const string PullRequestSearchPullRequest =
+    @"CREATE TABLE PullRequestSearchPullRequest (" +
+        "Id INTEGER PRIMARY KEY NOT NULL," +
+        "PullRequestSearch INTEGER NOT NULL," +
+        "PullRequest INTEGER NOT NULL," +
+        "TimeUpdated INTEGER NOT NULL" +
+    ");" +
+
+    // PullRequestSearchPullRequest is unique by PullRequestSearch and PullRequest
+    "CREATE UNIQUE INDEX IDX_PullRequestSearchPullRequest_PullRequestSearchPullRequest ON PullRequestSearchPullRequest (PullRequestSearch, PullRequest);";
 
     // PullRequsetPolicyStatus is a snapshot of a developer's Pull Requests.
     private const string PullRequestPolicyStatus =
@@ -247,6 +257,7 @@ public class AzureDataStoreSchema : IDataStoreSchema
         WorkItemType,
         PullRequestSearch,
         PullRequest,
+        PullRequestSearchPullRequest,
         PullRequestPolicyStatus,
         Notification,
     ];
