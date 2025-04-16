@@ -48,9 +48,8 @@ public class DataProvider : IDataProvider
             UpdateObject = query,
         };
 
-        var refreshTask = _cacheManager.RequestRefresh(parameters);
-
         var dsQuery = _queryProvider.GetQuery(query);
+        var refreshTask = _cacheManager.RequestRefresh(parameters);
         if (dsQuery == null)
         {
             await refreshTask;
@@ -66,9 +65,9 @@ public class DataProvider : IDataProvider
             UpdateType = DataUpdateType.PullRequests,
             UpdateObject = pullRequestSearch,
         };
-        var refreshTask = _cacheManager.RequestRefresh(parameters);
 
         var dsPullRequestSearch = _pullRequestSearchProvider.GetPullRequestSearch(pullRequestSearch);
+        var refreshTask = _cacheManager.RequestRefresh(parameters);
         if (dsPullRequestSearch == null)
         {
             await refreshTask;

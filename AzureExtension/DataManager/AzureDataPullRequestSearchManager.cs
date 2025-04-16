@@ -71,7 +71,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         var account = _accountProvider.GetDefaultAccount();
         var connection = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
 
-        var gitClient = _azureClientProvider.GetClient<GitHttpClient>(azureUri.Connection, account);
+        using var gitClient = _azureClientProvider.GetClient<GitHttpClient>(azureUri.Connection, account);
 
         var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
 
@@ -79,7 +79,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
 
         if (project is null)
         {
-            var projectClient = _azureClientProvider.GetClient<ProjectHttpClient>(azureUri.Connection, account);
+            using var projectClient = _azureClientProvider.GetClient<ProjectHttpClient>(azureUri.Connection, account);
             var teamProject = await projectClient.GetProject(azureUri.Project);
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
@@ -111,7 +111,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         var pullRequests = await gitClient.GetPullRequestsAsync(project.InternalId,  gitRepository.Id, searchCriteria, cancellationToken: cancellationToken);
 
         // Get the PullRequest PolicyClient. This client provides the State and Reason fields for each pull request
-        var policyClient = _azureClientProvider.GetClient<PolicyHttpClient>(azureUri.Connection, account);
+        using var policyClient = _azureClientProvider.GetClient<PolicyHttpClient>(azureUri.Connection, account);
 
         var repository = Repository.GetOrCreate(_dataStore, gitRepository, project.Id);
 

@@ -70,7 +70,7 @@ public class Identity
     {
         try
         {
-            var client = connection.GetClient<ProfileHttpClient>();
+            using var client = connection.GetClient<ProfileHttpClient>();
             var avatar = client.GetAvatarAsync(identity, AvatarSize.Small).Result;
             _log.Debug($"Avatar found: {avatar.Value.Length} bytes.");
             return Convert.ToBase64String(avatar.Value);

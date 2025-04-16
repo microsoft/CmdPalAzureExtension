@@ -68,7 +68,7 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
         var account = _accountProvider.GetDefaultAccount();
         var connection = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
 
-        var witClient = _azureClientProvider.GetClient<WorkItemTrackingHttpClient>(azureUri.Connection, account);
+        using var witClient = _azureClientProvider.GetClient<WorkItemTrackingHttpClient>(azureUri.Connection, account);
 
         // Good practice to only create data after we know the client is valid, but any exceptions
         // will roll back the transaction.
@@ -77,7 +77,7 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
         var project = Project.Get(_dataStore, azureUri.Project, org.Id);
         if (project is null)
         {
-            var projectClient = _azureClientProvider.GetClient<ProjectHttpClient>(azureUri.Connection, account);
+            using var projectClient = _azureClientProvider.GetClient<ProjectHttpClient>(azureUri.Connection, account);
             var teamProject = await projectClient.GetProject(azureUri.Project);
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
