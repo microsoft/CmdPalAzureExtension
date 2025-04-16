@@ -35,8 +35,6 @@ public sealed class CacheManager : IDisposable, ICacheManager
 
     private readonly IDataUpdateService _dataUpdateService;
 
-    private readonly IDataObjectProvider _dataObjectProvider;
-
     private CancellationTokenSource _cancelSource;
 
     // Variables to control the state of the CacheManager
@@ -55,9 +53,8 @@ public sealed class CacheManager : IDisposable, ICacheManager
 
     public DateTime LastUpdateTime { get; set; } = DateTime.MinValue;
 
-    public CacheManager(IDataUpdateService dataUpdateService, IDataObjectProvider dataObjectProvider)
+    public CacheManager(IDataUpdateService dataUpdateService)
     {
-        _dataObjectProvider = dataObjectProvider;
         _dataUpdateService = dataUpdateService;
         _dataUpdateService.OnUpdate += HandleDataManagerUpdate;
 
@@ -97,7 +94,11 @@ public sealed class CacheManager : IDisposable, ICacheManager
 
     public async Task RequestRefresh(DataUpdateParameters parameters)
     {
-        await Refresh(parameters);
+        if (_dataUpdateService.IsNewOrStaleData(parameters, RefreshCooldown))
+        {
+            _logger.Information($"Data is new or stale. Requesting refresh.");
+            await Refresh(parameters);
+        }
     }
 
     // This method is called by the pages to request

@@ -9,7 +9,7 @@ using Dapper.Contrib.Extensions;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 
-namespace AzureExtension.DataModel.DataObjects;
+namespace AzureExtension.DataModel;
 
 [Table("PullRequest")]
 public class PullRequest : IPullRequest

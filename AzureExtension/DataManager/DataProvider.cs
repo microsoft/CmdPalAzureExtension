@@ -12,8 +12,9 @@ public class DataProvider : IDataProvider
 {
     private readonly ILogger _log;
 
-    private readonly IDataObjectProvider _dataObjectProvider;
     private readonly ICacheManager _cacheManager;
+    private readonly IDataQueryProvider _queryProvider;
+    private readonly IDataPullRequestSearchProvider _pullRequestSearchProvider;
 
     public static readonly string IdentityRefFieldValueName = "Microsoft.VisualStudio.Services.WebApi.IdentityRef";
     public static readonly string SystemIdFieldName = "System.Id";
@@ -24,11 +25,12 @@ public class DataProvider : IDataProvider
 
     public event CacheManagerUpdateEventHandler? OnUpdate;
 
-    public DataProvider(IDataObjectProvider dataObjectProvider, ICacheManager cacheManager)
+    public DataProvider(ICacheManager cacheManager, IDataQueryProvider queryProvider, IDataPullRequestSearchProvider pullRequestSearchProvider)
     {
         _log = Log.ForContext("SourceContext", nameof(IDataProvider));
         _cacheManager = cacheManager;
-        _dataObjectProvider = dataObjectProvider;
+        _queryProvider = queryProvider;
+        _pullRequestSearchProvider = pullRequestSearchProvider;
 
         _cacheManager.OnUpdate += OnCacheManagerUpdate;
     }
@@ -40,7 +42,7 @@ public class DataProvider : IDataProvider
 
     public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
     {
-        var dsQuery = _dataObjectProvider.GetQuery(query);
+        var dsQuery = _queryProvider.GetQuery(query);
         if (dsQuery == null)
         {
             var parameters = new DataUpdateParameters
@@ -51,12 +53,12 @@ public class DataProvider : IDataProvider
             await _cacheManager.RequestRefresh(parameters);
         }
 
-        return _dataObjectProvider.GetWorkItems(query);
+        return _queryProvider.GetWorkItems(query);
     }
 
     public async Task<IEnumerable<IPullRequest>> GetPullRequests(IPullRequestSearch pullRequestSearch)
     {
-        var dsPullRequestSearch = _dataObjectProvider.GetPullRequestSearch(pullRequestSearch);
+        var dsPullRequestSearch = _pullRequestSearchProvider.GetPullRequestSearch(pullRequestSearch);
 
         if (dsPullRequestSearch == null)
         {
@@ -69,6 +71,6 @@ public class DataProvider : IDataProvider
             await _cacheManager.RequestRefresh(parameters);
         }
 
-        return _dataObjectProvider.GetPullRequests(pullRequestSearch);
+        return _pullRequestSearchProvider.GetPullRequests(pullRequestSearch);
     }
 }

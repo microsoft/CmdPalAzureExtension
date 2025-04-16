@@ -133,9 +133,12 @@ public sealed class Program
         using var cacheDataStore = new DataStore("DataStore", combinedCachePath, cacheDataStoreSchema);
         cacheDataStore.Create();
 
-        var azureDataManager = new AzureDataManager(cacheDataStore, accountProvider, azureClientProvider);
-        var cacheManager = new CacheManager(azureDataManager, azureDataManager);
-        var dataProvider = new DataProvider(azureDataManager, cacheManager);
+        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureClientProvider);
+        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureClientProvider);
+
+        var azureDataManager = new AzureDataManager(cacheDataStore, queryManager, pullRequestSearchManager);
+        var cacheManager = new CacheManager(azureDataManager);
+        var dataProvider = new DataProvider(cacheManager, queryManager, pullRequestSearchManager);
 
         var azureValidator = new AzureValidatorAdapter(azureClientHelpers);
 

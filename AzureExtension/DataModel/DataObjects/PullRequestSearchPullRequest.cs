@@ -7,7 +7,7 @@ using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
 
-namespace AzureExtension.DataModel.DataObjects;
+namespace AzureExtension.DataModel;
 
 [Table("PullRequestSearchPullRequest")]
 public class PullRequestSearchPullRequest
