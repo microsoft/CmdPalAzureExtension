@@ -239,4 +239,10 @@ public class WorkItem : IWorkItem
 
         return workItems;
     }
+
+    public static void DeleteNotReferencedByQuery(DataStore dataStore)
+    {
+        var sql = @"DELETE FROM WorkItem WHERE Id NOT IN (SELECT WorkItem FROM QueryWorkItem)";
+        var rowsDeleted = dataStore.Connection!.Execute(sql);
+    }
 }

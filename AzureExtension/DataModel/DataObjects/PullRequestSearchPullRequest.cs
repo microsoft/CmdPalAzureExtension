@@ -7,7 +7,7 @@ using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
 
-namespace AzureExtension.DataModel.DataObjects;
+namespace AzureExtension.DataModel;
 
 [Table("PullRequestSearchPullRequest")]
 public class PullRequestSearchPullRequest
@@ -65,6 +65,16 @@ public class PullRequestSearchPullRequest
         var sql = "DELETE FROM PullRequestSearchPullRequest WHERE (PullRequestSearch NOT IN (SELECT Id FROM PullRequestSearch)) OR (PullRequest NOT IN (SELECT Id FROM PullRequest))";
         var command = dataStore.Connection!.CreateCommand();
         command.CommandText = sql;
+        var rowsDeleted = command.ExecuteNonQuery();
+    }
+
+    public static void DeleteBefore(DataStore dataStore, PullRequestSearch pullRequestSearch, DateTime date)
+    {
+        var sql = "DELETE FROM PullRequestSearchPullRequest WHERE PullRequestSearch = $PullRequestSearchId AND TimeUpdated < $Time";
+        var command = dataStore.Connection!.CreateCommand();
+        command.CommandText = sql;
+        command.Parameters.AddWithValue("$PullRequestSearchId", pullRequestSearch.Id);
+        command.Parameters.AddWithValue("$Time", date.ToDataStoreInteger());
         var rowsDeleted = command.ExecuteNonQuery();
     }
 }

@@ -63,4 +63,14 @@ public class QueryWorkItem
         command.CommandText = sql;
         var rowsDeleted = command.ExecuteNonQuery();
     }
+
+    public static void DeleteBefore(DataStore dataStore, Query query, DateTime date)
+    {
+        var sql = "DELETE FROM QueryWorkItem WHERE Query = $QueryId AND TimeUpdated < $Time";
+        var command = dataStore.Connection!.CreateCommand();
+        command.CommandText = sql;
+        command.Parameters.AddWithValue("$QueryId", query.Id);
+        command.Parameters.AddWithValue("$Time", date.ToDataStoreInteger());
+        var rowsDeleted = command.ExecuteNonQuery();
+    }
 }

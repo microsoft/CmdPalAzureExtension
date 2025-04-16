@@ -9,7 +9,7 @@ using Dapper.Contrib.Extensions;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 
-namespace AzureExtension.DataModel.DataObjects;
+namespace AzureExtension.DataModel;
 
 [Table("PullRequest")]
 public class PullRequest : IPullRequest
@@ -132,5 +132,11 @@ public class PullRequest : IPullRequest
         }
 
         return pullRequests;
+    }
+
+    public static void DeleteNotReferencedBySearch(DataStore dataStore)
+    {
+        var sql = @"DELETE FROM PullRequest WHERE Id NOT IN (SELECT PullRequest FROM PullRequestSearchPullRequest)";
+        var rowsDeleted = dataStore.Connection!.Execute(sql);
     }
 }

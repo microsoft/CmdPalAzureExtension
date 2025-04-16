@@ -12,8 +12,9 @@ public class DataProvider : IDataProvider
 {
     private readonly ILogger _log;
 
-    private readonly IDataObjectProvider _dataObjectProvider;
     private readonly ICacheManager _cacheManager;
+    private readonly IDataQueryProvider _queryProvider;
+    private readonly IDataPullRequestSearchProvider _pullRequestSearchProvider;
 
     public static readonly string IdentityRefFieldValueName = "Microsoft.VisualStudio.Services.WebApi.IdentityRef";
     public static readonly string SystemIdFieldName = "System.Id";
@@ -24,11 +25,12 @@ public class DataProvider : IDataProvider
 
     public event CacheManagerUpdateEventHandler? OnUpdate;
 
-    public DataProvider(IDataObjectProvider dataObjectProvider, ICacheManager cacheManager)
+    public DataProvider(ICacheManager cacheManager, IDataQueryProvider queryProvider, IDataPullRequestSearchProvider pullRequestSearchProvider)
     {
         _log = Log.ForContext("SourceContext", nameof(IDataProvider));
         _cacheManager = cacheManager;
-        _dataObjectProvider = dataObjectProvider;
+        _queryProvider = queryProvider;
+        _pullRequestSearchProvider = pullRequestSearchProvider;
 
         _cacheManager.OnUpdate += OnCacheManagerUpdate;
     }
@@ -40,35 +42,37 @@ public class DataProvider : IDataProvider
 
     public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
     {
-        var dsQuery = _dataObjectProvider.GetQuery(query);
+        var parameters = new DataUpdateParameters
+        {
+            UpdateType = DataUpdateType.Query,
+            UpdateObject = query,
+        };
+
+        var dsQuery = _queryProvider.GetQuery(query);
+        var refreshTask = _cacheManager.RequestRefresh(parameters);
         if (dsQuery == null)
         {
-            var parameters = new DataUpdateParameters
-            {
-                UpdateType = DataUpdateType.Query,
-                UpdateObject = query,
-            };
-            await _cacheManager.RequestRefresh(parameters);
+            await refreshTask;
         }
 
-        return _dataObjectProvider.GetWorkItems(query);
+        return _queryProvider.GetWorkItems(query);
     }
 
     public async Task<IEnumerable<IPullRequest>> GetPullRequests(IPullRequestSearch pullRequestSearch)
     {
-        var dsPullRequestSearch = _dataObjectProvider.GetPullRequestSearch(pullRequestSearch);
+        var parameters = new DataUpdateParameters
+        {
+            UpdateType = DataUpdateType.PullRequests,
+            UpdateObject = pullRequestSearch,
+        };
 
+        var dsPullRequestSearch = _pullRequestSearchProvider.GetPullRequestSearch(pullRequestSearch);
+        var refreshTask = _cacheManager.RequestRefresh(parameters);
         if (dsPullRequestSearch == null)
         {
-            var parameters = new DataUpdateParameters
-            {
-                UpdateType = DataUpdateType.PullRequests,
-                UpdateObject = pullRequestSearch,
-            };
-
-            await _cacheManager.RequestRefresh(parameters);
+            await refreshTask;
         }
 
-        return _dataObjectProvider.GetPullRequests(pullRequestSearch);
+        return _pullRequestSearchProvider.GetPullRequests(pullRequestSearch);
     }
 }
