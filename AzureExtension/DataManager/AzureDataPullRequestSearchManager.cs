@@ -152,6 +152,8 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
 
             PullRequestSearchPullRequest.AddPullRequestToSearch(_dataStore, dsPullRequestSearch.Id, dsPullRequest.Id);
         }
+
+        PullRequestSearchPullRequest.DeleteBefore(_dataStore, dsPullRequestSearch, DateTime.UtcNow - TimeSpan.FromMinutes(2));
     }
 
     // Helper methods

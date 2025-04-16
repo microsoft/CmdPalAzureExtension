@@ -133,4 +133,10 @@ public class PullRequest : IPullRequest
 
         return pullRequests;
     }
+
+    public static void DeleteNotReferencedBySearch(DataStore dataStore)
+    {
+        var sql = @"DELETE FROM PullRequest WHERE Id NOT IN (SELECT PullRequest FROM PullRequestSearchPullRequest)";
+        var rowsDeleted = dataStore.Connection!.Execute(sql);
+    }
 }

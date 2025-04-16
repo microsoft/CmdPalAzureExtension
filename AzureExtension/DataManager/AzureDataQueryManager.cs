@@ -150,6 +150,8 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
             workItemsList.Add(cmdPalWorkItem);
         }
 
+        QueryWorkItem.DeleteBefore(_dataStore, dsQuery, DateTime.UtcNow - TimeSpan.FromMinutes(2));
+
         stopwatch.Stop(); // Stop measuring time
         _log.Information($"UpdateWorkItems took {stopwatch.ElapsedMilliseconds} ms to complete.");
     }

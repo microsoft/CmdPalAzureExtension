@@ -67,4 +67,14 @@ public class PullRequestSearchPullRequest
         command.CommandText = sql;
         var rowsDeleted = command.ExecuteNonQuery();
     }
+
+    public static void DeleteBefore(DataStore dataStore, PullRequestSearch pullRequestSearch, DateTime date)
+    {
+        var sql = "DELETE FROM PullRequestSearchPullRequest WHERE PullRequestSearch = $PullRequestSearchId AND TimeUpdated < $Time";
+        var command = dataStore.Connection!.CreateCommand();
+        command.CommandText = sql;
+        command.Parameters.AddWithValue("$PullRequestSearchId", pullRequestSearch.Id);
+        command.Parameters.AddWithValue("$Time", date.ToDataStoreInteger());
+        var rowsDeleted = command.ExecuteNonQuery();
+    }
 }
