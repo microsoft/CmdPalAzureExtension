@@ -42,15 +42,18 @@ public class DataProvider : IDataProvider
 
     public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
     {
+        var parameters = new DataUpdateParameters
+        {
+            UpdateType = DataUpdateType.Query,
+            UpdateObject = query,
+        };
+
+        var refreshTask = _cacheManager.RequestRefresh(parameters);
+
         var dsQuery = _queryProvider.GetQuery(query);
         if (dsQuery == null)
         {
-            var parameters = new DataUpdateParameters
-            {
-                UpdateType = DataUpdateType.Query,
-                UpdateObject = query,
-            };
-            await _cacheManager.RequestRefresh(parameters);
+            await refreshTask;
         }
 
         return _queryProvider.GetWorkItems(query);
@@ -58,17 +61,17 @@ public class DataProvider : IDataProvider
 
     public async Task<IEnumerable<IPullRequest>> GetPullRequests(IPullRequestSearch pullRequestSearch)
     {
-        var dsPullRequestSearch = _pullRequestSearchProvider.GetPullRequestSearch(pullRequestSearch);
+        var parameters = new DataUpdateParameters
+        {
+            UpdateType = DataUpdateType.PullRequests,
+            UpdateObject = pullRequestSearch,
+        };
+        var refreshTask = _cacheManager.RequestRefresh(parameters);
 
+        var dsPullRequestSearch = _pullRequestSearchProvider.GetPullRequestSearch(pullRequestSearch);
         if (dsPullRequestSearch == null)
         {
-            var parameters = new DataUpdateParameters
-            {
-                UpdateType = DataUpdateType.PullRequests,
-                UpdateObject = pullRequestSearch,
-            };
-
-            await _cacheManager.RequestRefresh(parameters);
+            await refreshTask;
         }
 
         return _pullRequestSearchProvider.GetPullRequests(pullRequestSearch);
