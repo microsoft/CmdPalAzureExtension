@@ -39,8 +39,6 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     // for saving a new pull request search
     public SavePullRequestSearchForm(IResources resources, SavedQueriesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
     {
-        LoadingStateChanged?.Invoke(this, false);
-        FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         _resources = resources;
         _mediator = mediator;
         _accountProvider = accountProvider;
@@ -52,8 +50,6 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     // for editing an existing pull request search
     public SavePullRequestSearchForm(IPullRequestSearch savedPullRequestSearch, IResources resources, SavedQueriesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
     {
-        LoadingStateChanged?.Invoke(this, false);
-        FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         _resources = resources;
         _mediator = mediator;
         _accountProvider = accountProvider;
