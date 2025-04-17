@@ -29,9 +29,9 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "{{url}}", string.IsNullOrEmpty(_savedPullRequestSearch.Url) ? _savedPullRequestSearch.Url : string.Empty },
-        { "{{enteredTitle}}", string.IsNullOrEmpty(_savedPullRequestSearch.Title) ? _savedPullRequestSearch.Title : string.Empty },
-        { "{{selectedView}}", string.IsNullOrEmpty(_savedPullRequestSearch.View) ? _savedPullRequestSearch.View : "Mine" },
+        { "{{url}}", _savedPullRequestSearch.Url },
+        { "{{enteredTitle}}", _savedPullRequestSearch.Title },
+        { "{{selectedView}}", string.IsNullOrEmpty(_savedPullRequestSearch.View) ? "Mine" : _savedPullRequestSearch.View },
     };
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequestSearch", TemplateSubstitutions);
