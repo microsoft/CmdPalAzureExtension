@@ -54,9 +54,8 @@ public class SavedPullRequestSearchesPage : ListPage
 
             toast.Show();
         }
-        else if (args != null && args is PullRequestSearch search)
+        else if (args != null && args is IPullRequestSearch search)
         {
-            _pullRequestSearchRepository.RemoveSavedPullRequestSearch(search).Wait();
             RaiseItemsChanged(0);
 
             // no toast yet
@@ -118,6 +117,7 @@ public class SavedPullRequestSearchesPage : ListPage
             MoreCommands = new CommandContextItem[]
             {
                 new(new LinkCommand(search.Url, _resources)),
+                new(new RemovePullRequestSearchCommand(search, _resources, _mediator, _pullRequestSearchRepository)),
             },
         };
     }
