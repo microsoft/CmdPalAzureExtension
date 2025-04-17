@@ -39,6 +39,7 @@ public partial class PersistentDataManager : IQueryRepository
 
         var name = query.Name;
         var url = query.Url;
+        var isTopLevel = query.IsTopLevel;
 
         _log.Information($"Adding query: {name} - {url}.");
         if (Query.Get(_dataStore, name, url) != null)
@@ -46,7 +47,7 @@ public partial class PersistentDataManager : IQueryRepository
             throw new InvalidOperationException($"Search {name} - {url} already exists.");
         }
 
-        Query.Add(_dataStore, name, url, false);
+        Query.Add(_dataStore, name, url, isTopLevel);
 
         return Task.CompletedTask;
     }

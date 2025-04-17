@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
@@ -24,7 +25,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
     public event EventHandler<bool>? LoadingStateChanged;
 
-    private readonly string isTopLevelChecked = "false";
+    private string IsTopLevelChecked => GetIsTopLevel().Result.ToString().ToLower(CultureInfo.InvariantCulture);
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
@@ -33,7 +34,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
         { "{{SaveSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Search" : "Forms_Edit_Search") },
         { "{{SavedSearchString}}", _savedQuery.Url },
         { "{{SavedSearchName}}", _savedQuery.Name },
-        { "{{IsTopLevel}}", isTopLevelChecked },
+        { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{EnteredSearchErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchError") },
         { "{{EnteredSearchLabel}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchLabel") },
         { "{{NameLabel}}", _resources.GetResource("Forms_SaveSearchTemplateNameLabel") },
@@ -131,6 +132,11 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             name = queryInfo.Name;
         }
 
-        return new Query(queryInfo.AzureUri, name, queryInfo.Description);
+        return new Query(queryInfo.AzureUri, name, queryInfo.Description, isTopLevel);
+    }
+
+    public async Task<bool> GetIsTopLevel()
+    {
+        return await _queryRepository.IsTopLevel(_savedQuery);
     }
 }

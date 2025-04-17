@@ -9,4 +9,6 @@ public interface IQuery
     string Name { get; }
 
     string Url { get; }
+
+    bool IsTopLevel { get; }
 }
