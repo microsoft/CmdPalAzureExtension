@@ -4,11 +4,7 @@
 
 namespace AzureExtension.Controls;
 
-public interface IQuery
+public interface IQuery : IAzureSearch
 {
-    string Name { get; }
-
-    string Url { get; }
-
-    bool IsTopLevel { get; }
+    // there are currently no query-specific properties
 }
