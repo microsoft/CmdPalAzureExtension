@@ -80,7 +80,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
-            if (_savedPullRequestSearch.Url != string.Empty)
+            if (!string.IsNullOrEmpty(_savedPullRequestSearch.Url))
             {
                 Log.Information($"Removing outdated search {_savedPullRequestSearch.Title}, {_savedPullRequestSearch.Url}");
 
