@@ -9,7 +9,7 @@
                 {
                     "type": "Input.Text",
                     "placeholder": "Enter Repository URL",
-                    "id": "query",
+                    "id": "url",
                     "value": "${url}",
                     "label": "Enter Repository URL",
                     "style": "Url",
@@ -19,7 +19,7 @@
                 {
                     "type": "Input.Text",
                     "placeholder": "Pull Request Search Title",
-                    "id": "widgetTitle",
+                    "id": "name",
                     "label": "Pull Request Search Title",
                     "value": "${widgetTitle}"
                 },
