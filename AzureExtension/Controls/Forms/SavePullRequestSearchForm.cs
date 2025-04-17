@@ -10,6 +10,7 @@ using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Identity.Client;
+using Serilog;
 
 namespace AzureExtension.Controls.Forms;
 
@@ -20,6 +21,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
     private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
+    private readonly IPullRequestSearch _savedPullRequestSearch;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
@@ -27,21 +29,33 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "${url}", string.Empty },
-        { "${widgetTitle}", string.Empty },
+        { "{{url}}", _savedPullRequestSearch.Url },
+        { "{{enteredTitle}}", _savedPullRequestSearch.Title },
+        { "{{selectedView}}", string.IsNullOrEmpty(_savedPullRequestSearch.View) ? "Mine" : _savedPullRequestSearch.View },
     };
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequestSearch", TemplateSubstitutions);
 
+    // for saving a new pull request search
     public SavePullRequestSearchForm(IResources resources, SavedQueriesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
     {
-        LoadingStateChanged?.Invoke(this, false);
-        FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         _resources = resources;
         _mediator = mediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
         _pullRequestSearchRepository = pullRequestSearchRepository;
+        _savedPullRequestSearch = new PullRequestSearch();
+    }
+
+    // for editing an existing pull request search
+    public SavePullRequestSearchForm(IPullRequestSearch savedPullRequestSearch, IResources resources, SavedQueriesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
+    {
+        _resources = resources;
+        _mediator = mediator;
+        _accountProvider = accountProvider;
+        _azureClientHelpers = azureClientHelpers;
+        _pullRequestSearchRepository = pullRequestSearchRepository;
+        _savedPullRequestSearch = savedPullRequestSearch;
     }
 
     public override ICommandResult SubmitForm(string inputs, string data)
@@ -64,6 +78,15 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
             var pullRequestSearch = CreatePullRequestSearchFromJson(payloadJson);
 
+            // if editing the search, delete the old one
+            // it is safe to do as the new one is already validated
+            if (!string.IsNullOrEmpty(_savedPullRequestSearch.Url))
+            {
+                Log.Information($"Removing outdated search {_savedPullRequestSearch.Title}, {_savedPullRequestSearch.Url}");
+
+                _pullRequestSearchRepository.RemoveSavedPullRequestSearch(_savedPullRequestSearch).Wait();
+            }
+
             LoadingStateChanged?.Invoke(this, false);
             _pullRequestSearchRepository.AddSavedPullRequestSearch(pullRequestSearch).Wait();
             _mediator.AddPullRequestSearch(pullRequestSearch);
@@ -82,8 +105,8 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
     public PullRequestSearch CreatePullRequestSearchFromJson(JsonNode? jsonNode)
     {
-        var searchUrl = jsonNode?["query"]?.ToString() ?? string.Empty;
-        var name = jsonNode?["widgetTitle"]?.ToString() ?? string.Empty;
+        var searchUrl = jsonNode?["url"]?.ToString() ?? string.Empty;
+        var name = jsonNode?["title"]?.ToString() ?? string.Empty;
         var view = jsonNode?["view"]?.ToString() ?? string.Empty;
 
         if (string.IsNullOrEmpty(name))

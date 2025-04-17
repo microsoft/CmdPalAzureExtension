@@ -68,7 +68,7 @@ public partial class SavedQueriesPage : ListPage
 
             toast.Show();
         }
-        else if (args != null && args is Query query)
+        else if (args != null && args is IQuery query)
         {
             RaiseItemsChanged(0);
 

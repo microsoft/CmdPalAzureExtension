@@ -92,7 +92,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             {
                 Log.Information($"Removing outdated search {_savedQuery.Name}, {_savedQuery.Url}");
 
-                _savedQueriesMediator.RemoveQuery(_savedQuery);
+                _queryRepository.RemoveSavedQueryAsync(_savedQuery).Wait();
             }
 
             LoadingStateChanged?.Invoke(this, false);

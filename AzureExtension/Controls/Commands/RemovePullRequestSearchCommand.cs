@@ -8,27 +8,27 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Commands;
 
-public partial class RemoveQueryCommand : InvokableCommand
+public partial class RemovePullRequestSearchCommand : InvokableCommand
 {
-    private readonly IQuery _savedQuery;
+    private readonly IPullRequestSearch _savedPullRequestSearch;
     private readonly IResources _resources;
     private readonly SavedQueriesMediator _savedQueriesMediator;
-    private readonly IQueryRepository _queryRepository;
+    private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
 
-    public RemoveQueryCommand(IQuery query, IResources resources, SavedQueriesMediator savedQueriesMediator, IQueryRepository queryRepository)
+    public RemovePullRequestSearchCommand(IPullRequestSearch pullRequestSearch, IResources resources, SavedQueriesMediator savedQueriesMediator, ISavedPullRequestSearchRepository pullRequestSearchRepository)
     {
         _resources = resources;
         _savedQueriesMediator = savedQueriesMediator;
-        _queryRepository = queryRepository;
-        _savedQuery = query;
+        _pullRequestSearchRepository = pullRequestSearchRepository;
+        _savedPullRequestSearch = pullRequestSearch;
         Name = _resources.GetResource("Commands_Remove_Saved_Search");
         Icon = new IconInfo("\uecc9");
     }
 
     public override CommandResult Invoke()
     {
-        _queryRepository.RemoveSavedQueryAsync(_savedQuery).Wait();
-        _savedQueriesMediator.RemoveQuery(_savedQuery);
+        _pullRequestSearchRepository.RemoveSavedPullRequestSearch(_savedPullRequestSearch).Wait();
+        _savedQueriesMediator.RemovePullRequestSearch(_savedPullRequestSearch);
 
         return CommandResult.KeepOpen();
     }

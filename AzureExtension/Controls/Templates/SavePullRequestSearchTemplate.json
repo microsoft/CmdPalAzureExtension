@@ -1,100 +1,72 @@
 ﻿{
-    "type": "AdaptiveCard",
-    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-    "version": "1.6",
-    "body": [
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.6",
+  "body": [
+    {
+      "type": "Container",
+      "items": [
         {
-            "type": "Container",
-            "items": [
-                {
-                    "type": "Input.Text",
-                    "placeholder": "Enter Repository URL",
-                    "id": "query",
-                    "value": "${url}",
-                    "label": "Enter Repository URL",
-                    "style": "Url",
-                    "isRequired": true,
-                    "errorMessage": "Must enter repository URL"
-                },
-                {
-                    "type": "Input.Text",
-                    "placeholder": "Pull Request Search Title",
-                    "id": "widgetTitle",
-                    "label": "Pull Request Search Title",
-                    "value": "${widgetTitle}"
-                },
-                {
-                    "type": "Input.ChoiceSet",
-                    "choices": [
-                        {
-                            "title": "Mine",
-                            "value": "Mine"
-                        },
-                        {
-                            "title": "Assigned to Me",
-                            "value": "Assigned"
-                        },
-                        {
-                            "title": "All",
-                            "value": "All"
-                        }
-                    ],
-                    "label": "View",
-                    "value": "${selectedView}",
-                    "id": "view",
-                    "isRequired": true
-                },
-                {
-                    "type": "Container",
-                    "$when": "${message != null}",
-                    "items": [
-                        {
-                            "type": "TextBlock",
-                            "text": "${message}",
-                            "wrap": true,
-                            "size": "Small"
-                        }
-                    ],
-                    "style": "warning"
-                },
-                {
-                    "type": "ColumnSet",
-                    "spacing": "Medium",
-                    "columns": [
-                        {
-                            "type": "Column",
-                            "width": "stretch"
-                        },
-                        {
-                            "type": "Column",
-                            "width": "auto",
-                            "items": [
-                                {
-                                    "type": "Container",
-                                    "items": [
-                                        {
-                                            "type": "ActionSet",
-                                            "actions": [
-                                                {
-                                                    "type": "Action.Execute",
-                                                    "title": "Save",
-                                                    "verb": "Save",
-                                                    "role": "Button",
-                                                    "associatedInputs": "auto"
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "type": "Column",
-                            "width": "stretch"
-                        }
-                    ]
-                }
-            ]
+          "type": "Input.Text",
+          "placeholder": "Enter Repository URL",
+          "id": "url",
+          "value": "{{url}}",
+          "label": "Enter Repository URL",
+          "style": "Url",
+          "isRequired": true,
+          "errorMessage": "Must enter repository URL"
+        },
+        {
+          "type": "Input.Text",
+          "placeholder": "Pull Request Search Title",
+          "id": "title",
+          "label": "Pull Request Search Title",
+          "value": "{{enteredTitle}}"
+        },
+        {
+          "type": "Input.ChoiceSet",
+          "choices": [
+            {
+              "title": "Mine",
+              "value": "Mine"
+            },
+            {
+              "title": "Assigned to Me",
+              "value": "Assigned"
+            },
+            {
+              "title": "All",
+              "value": "All"
+            }
+          ],
+          "label": "View",
+          "value": "{{selectedView}}",
+          "id": "view",
+          "isRequired": true
+        },
+        {
+          "type": "Container",
+          "$when": "${message != null}",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "${message}",
+              "wrap": true,
+              "size": "Small"
+            }
+          ],
+          "style": "warning"
         }
-    ]
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Save",
+      "data": {
+        "id": "SavePullRequestSearchAction"
+      }
+    }
+  ]
 }
