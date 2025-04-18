@@ -12,7 +12,7 @@ using Serilog;
 
 namespace AzureExtension.Controls.SearchPages;
 
-public sealed partial class PullRequestSearchPage : ListPage
+public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
 {
     // Max number of query results to fetch for a given query.
     public static readonly int QueryResultLimit = 25;
@@ -30,6 +30,7 @@ public sealed partial class PullRequestSearchPage : ListPage
     private readonly TimeSpanHelper _timeSpanHelper;
 
     public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+        : base(search)
     {
         _search = search;
         _resources = resources;
@@ -68,7 +69,7 @@ public sealed partial class PullRequestSearchPage : ListPage
         }
     }
 
-    public ListItem GetListItem(IPullRequest item)
+    protected override ListItem GetListItem(IPullRequest item)
     {
         var title = item.Title;
         var url = item.HtmlUrl;
@@ -80,7 +81,7 @@ public sealed partial class PullRequestSearchPage : ListPage
         };
     }
 
-    public Task<IEnumerable<IPullRequest>> LoadContentData()
+    protected override Task<IEnumerable<IPullRequest>> LoadContentData()
     {
         return _dataProvider.GetPullRequests(_search);
     }
