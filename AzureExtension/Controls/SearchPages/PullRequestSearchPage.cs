@@ -2,11 +2,9 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.DataManager;
 using AzureExtension.Helpers;
-using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Serilog;
 
@@ -14,9 +12,6 @@ namespace AzureExtension.Controls.SearchPages;
 
 public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
 {
-    // Max number of query results to fetch for a given query.
-    public static readonly int QueryResultLimit = 25;
-
     private readonly Lazy<ILogger> _log = new(() => Serilog.Log.ForContext("SourceContext", $"Pages/WorkItemsSearchPage"));
 
     private ILogger Log => _log.Value;
