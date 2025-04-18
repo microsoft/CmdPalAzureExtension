@@ -10,7 +10,7 @@ using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Serilog;
 
-namespace AzureExtension.Controls.Pages;
+namespace AzureExtension.Controls.SearchPages;
 
 public sealed partial class PullRequestSearchPage : ListPage
 {
