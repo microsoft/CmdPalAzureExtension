@@ -4,7 +4,7 @@
 
 namespace AzureExtension.Controls;
 
-public class SavedQueriesMediator
+public class SavedAzureSearchesMediator
 {
     public event EventHandler<object?>? QueryRemoving;
 
@@ -18,18 +18,28 @@ public class SavedQueriesMediator
 
     public event EventHandler<object?>? PullRequestSearchRemoving;
 
-    public SavedQueriesMediator()
+    public SavedAzureSearchesMediator()
     {
+    }
+
+    public void Remove(IAzureSearch azureSearch)
+    {
+        switch (azureSearch.Type)
+        {
+            case AzureSearchType.Query:
+                QueryRemoved?.Invoke(this, azureSearch);
+                break;
+            case AzureSearchType.PullRequestSearch:
+                PullRequestSearchRemoved?.Invoke(this, azureSearch);
+                break;
+            default:
+                throw new InvalidOperationException($"Azure search type {azureSearch.Type} is not supported.");
+        }
     }
 
     public void RemovingQuery(object args)
     {
         QueryRemoving?.Invoke(this, args);
-    }
-
-    public void RemoveQuery(object args)
-    {
-        QueryRemoved?.Invoke(this, args);
     }
 
     public void AddQuery(object args)
@@ -45,10 +55,5 @@ public class SavedQueriesMediator
     public void RemovingPullRequestSearch(object args)
     {
         PullRequestSearchRemoving?.Invoke(this, args);
-    }
-
-    public void RemovePullRequestSearch(object args)
-    {
-        PullRequestSearchRemoved?.Invoke(this, args);
     }
 }

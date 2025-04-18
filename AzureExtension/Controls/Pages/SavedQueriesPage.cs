@@ -21,7 +21,7 @@ public partial class SavedQueriesPage : ListPage
 {
     private readonly IListItem _addQueryListItem;
     private readonly IResources _resources;
-    private readonly SavedQueriesMediator _savedQueriesMediator;
+    private readonly SavedAzureSearchesMediator _savedQueriesMediator;
     private readonly TimeSpanHelper _timeSpanHelper;
     private readonly IDataProvider _dataProvider;
     private readonly IAccountProvider _accountProvider;
@@ -32,7 +32,7 @@ public partial class SavedQueriesPage : ListPage
     public SavedQueriesPage(
        IResources resources,
        IListItem addQueryListItem,
-       SavedQueriesMediator savedQueriesMediator,
+       SavedAzureSearchesMediator savedQueriesMediator,
        IDataProvider dataProvider,
        IAccountProvider accountProvider,
        AzureClientHelpers azureClientHelpers,

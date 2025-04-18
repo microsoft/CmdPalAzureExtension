@@ -160,7 +160,7 @@ public sealed class Program
         var signOutForm = new SignOutForm(accountProvider, resources);
         var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"));
 
-        var savedQueriesMediator = new SavedQueriesMediator();
+        var savedQueriesMediator = new SavedAzureSearchesMediator();
 
         var searchPageFactory = new SearchPageFactory(resources, dataProvider);
 

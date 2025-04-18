@@ -19,7 +19,7 @@ public class SavedPullRequestSearchesPage : ListPage
 {
     private readonly IResources _resources;
     private readonly AddPullRequestSearchListItem _addPullRequestSearchListItem;
-    private readonly SavedQueriesMediator _mediator;
+    private readonly SavedAzureSearchesMediator _mediator;
     private readonly IDataProvider _dataProvider;
     private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
     private readonly TimeSpanHelper _timeSpanHelper;
@@ -30,7 +30,7 @@ public class SavedPullRequestSearchesPage : ListPage
     public SavedPullRequestSearchesPage(
         IResources resources,
         AddPullRequestSearchListItem addPullRequestSearchListItem,
-        SavedQueriesMediator mediator,
+        SavedAzureSearchesMediator mediator,
         IDataProvider dataProvider,
         ISavedPullRequestSearchRepository pullRequestSearchRepository,
         TimeSpanHelper timeSpanHelper,

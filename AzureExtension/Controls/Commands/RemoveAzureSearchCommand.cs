@@ -8,17 +8,17 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Commands;
 
-public partial class RemoveQueryCommand : InvokableCommand
+public partial class RemoveAzureSearchCommand : InvokableCommand
 {
     private readonly IAzureSearch _savedAzureSearch;
     private readonly IResources _resources;
-    private readonly SavedQueriesMediator _savedQueriesMediator;
+    private readonly SavedAzureSearchesMediator _savedAzureSearchesMediator;
     private readonly IAzureSearchRepository _azureSearchRepository;
 
-    public RemoveQueryCommand(IAzureSearch azureSearch, IResources resources, SavedQueriesMediator savedQueriesMediator, IAzureSearchRepository azureSearchRepository)
+    public RemoveAzureSearchCommand(IAzureSearch azureSearch, IResources resources, SavedAzureSearchesMediator savedAzureSearchesMediator, IAzureSearchRepository azureSearchRepository)
     {
         _resources = resources;
-        _savedQueriesMediator = savedQueriesMediator;
+        _savedAzureSearchesMediator = savedAzureSearchesMediator;
         _azureSearchRepository = azureSearchRepository;
         _savedAzureSearch = azureSearch;
         Name = _resources.GetResource("Commands_Remove_Saved_Search");
@@ -28,7 +28,7 @@ public partial class RemoveQueryCommand : InvokableCommand
     public override CommandResult Invoke()
     {
         _azureSearchRepository.Remove(_savedAzureSearch).Wait();
-        _savedQueriesMediator.RemoveQuery(_savedAzureSearch);
+        _savedAzureSearchesMediator.Remove(_savedAzureSearch);
 
         return CommandResult.KeepOpen();
     }

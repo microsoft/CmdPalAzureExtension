@@ -18,7 +18,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 {
     private readonly IQuery _savedQuery;
     private readonly IResources _resources;
-    private readonly SavedQueriesMediator _savedQueriesMediator;
+    private readonly SavedAzureSearchesMediator _savedQueriesMediator;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
     private readonly IQueryRepository _queryRepository;
@@ -44,7 +44,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     };
 
     // for saving a new query
-    public SaveQueryForm(IResources resources, SavedQueriesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
+    public SaveQueryForm(IResources resources, SavedAzureSearchesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
     {
         _resources = resources;
         _savedQuery = new Query();
@@ -55,7 +55,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     }
 
     // for editing an existing query
-    public SaveQueryForm(IQuery savedQuery, IResources resources, SavedQueriesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
+    public SaveQueryForm(IQuery savedQuery, IResources resources, SavedAzureSearchesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
     {
         _resources = resources;
         _savedQuery = savedQuery;
