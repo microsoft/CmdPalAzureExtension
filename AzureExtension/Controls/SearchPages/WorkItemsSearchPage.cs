@@ -69,30 +69,6 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         }
     }
 
-    private string GetIconForType(string? workItemType)
-    {
-        return workItemType switch
-        {
-            "Bug" => IconLoader.GetIconAsBase64("Bug.png"),
-            "Feature" => IconLoader.GetIconAsBase64("Feature.png"),
-            "Issue" => IconLoader.GetIconAsBase64("Issue.png"),
-            "Impediment" => IconLoader.GetIconAsBase64("Impediment.png"),
-            "Pull Request" => IconLoader.GetIconAsBase64("PullRequest.png"),
-            "Task" => IconLoader.GetIconAsBase64("Task.png"),
-            _ => IconLoader.GetIconAsBase64("ADO.png"),
-        };
-    }
-
-    private string GetIconForStatusState(string? statusState)
-    {
-        return statusState switch
-        {
-            "Closed" or "Completed" => IconLoader.GetIconAsBase64("StatusGreen.png"),
-            "Committed" or "Resolved" or "Started" => IconLoader.GetIconAsBase64("StatusBlue.png"),
-            _ => IconLoader.GetIconAsBase64("StatusGray.png"),
-        };
-    }
-
     protected override ListItem GetListItem(IWorkItem item)
     {
         var title = item.SystemTitle;
