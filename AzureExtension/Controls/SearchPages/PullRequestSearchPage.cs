@@ -6,16 +6,11 @@ using AzureExtension.Controls.Commands;
 using AzureExtension.DataManager;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Serilog;
 
 namespace AzureExtension.Controls.SearchPages;
 
 public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
 {
-    private readonly Lazy<ILogger> _log = new(() => Serilog.Log.ForContext("SourceContext", $"Pages/WorkItemsSearchPage"));
-
-    private ILogger Log => _log.Value;
-
     private readonly IPullRequestSearch _search;
 
     private readonly IResources _resources;
