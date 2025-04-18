@@ -162,9 +162,11 @@ public sealed class Program
 
         var savedQueriesMediator = new SavedQueriesMediator();
 
+        var searchPageFactory = new SearchPageFactory(resources, dataProvider);
+
         var addQueryForm = new SaveQueryForm(resources, savedQueriesMediator, accountProvider, azureClientHelpers, persistentDataManager);
         var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
-        var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedQueriesMediator, dataProvider, accountProvider, azureClientHelpers, persistentDataManager, timeSpanHelper);
+        var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedQueriesMediator, dataProvider, accountProvider, azureClientHelpers, persistentDataManager, timeSpanHelper, searchPageFactory);
 
         var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedQueriesMediator, accountProvider, azureClientHelpers, persistentDataManager);
         var savePullRequestSearchPage = new SavePullRequestSearchPage(savePullRequestSearchForm, new StatusMessage());

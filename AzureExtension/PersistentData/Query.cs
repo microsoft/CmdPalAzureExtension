@@ -28,6 +28,7 @@ public class Query : IQuery
 
     public bool IsTopLevel { get; set; }
 
+    [Write(false)]
     public AzureSearchType Type => AzureSearchType.Query;
 
     [Computed]

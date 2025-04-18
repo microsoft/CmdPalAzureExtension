@@ -43,8 +43,8 @@ public class SearchPageFactory : ISearchPageFactory
             {
                 new(new LinkCommand(search.Url, _resources))
                 {
-                    Title = _resources.GetResource("Pages_Saved_Searches_Open"),
-                    Icon = new IconInfo(AzureIcon.IconDictionary["open"]),
+                    Title = search.Name,
+                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
                 },
             },
         };
