@@ -6,7 +6,6 @@ using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.SearchPages;
 using AzureExtension.DataManager;
 using AzureExtension.Helpers;
-using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Serilog;
 
@@ -14,22 +13,13 @@ namespace AzureExtension.Controls.Pages;
 
 public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
 {
-    // Max number of query results to fetch for a given query.
-    public static readonly int QueryResultLimit = 25;
-
-    private readonly Lazy<ILogger> _log = new(() => Serilog.Log.ForContext("SourceContext", $"Pages/WorkItemsSearchPage"));
-
-    private ILogger Log => _log.Value;
-
     private readonly IQuery _query;
 
     private readonly IResources _resources;
 
     private readonly IDataProvider _dataProvider;
 
-    private readonly TimeSpanHelper _timeSpanHelper;
-
-    public WorkItemsSearchPage(IQuery query, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+    public WorkItemsSearchPage(IQuery query, IResources resources, IDataProvider dataProvider)
         : base(query)
     {
         _query = query;
@@ -37,7 +27,6 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         _dataProvider = dataProvider;
         Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
         Name = query.Name;
-        _timeSpanHelper = timeSpanHelper;
     }
 
     protected override ListItem GetListItem(IWorkItem item)

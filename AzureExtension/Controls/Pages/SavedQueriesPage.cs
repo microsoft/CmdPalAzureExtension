@@ -150,7 +150,7 @@ public partial class SavedQueriesPage : ListPage
 
     private ListPage CreatePageForQuery(IQuery search)
     {
-        return new WorkItemsSearchPage(search, _resources, _dataProvider, _timeSpanHelper)
+        return new WorkItemsSearchPage(search, _resources, _dataProvider)
         {
             Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
             Name = search.Name,
