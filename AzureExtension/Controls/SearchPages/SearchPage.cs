@@ -41,11 +41,11 @@ public abstract partial class SearchPage<T> : ListPage
             {
                 return new IListItem[]
                 {
-                new ListItem(new NoOpCommand())
-                {
-                    Title = "No work items found for search",
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-                },
+                    new ListItem(new NoOpCommand())
+                    {
+                        Title = "No work items found for search",
+                        Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                    },
                 };
             }
         }

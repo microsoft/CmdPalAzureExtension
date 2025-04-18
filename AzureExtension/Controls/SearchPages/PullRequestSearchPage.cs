@@ -40,35 +40,6 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
         _timeSpanHelper = timeSpanHelper;
     }
 
-    public override IListItem[] GetItems() => DoGetItems(SearchText).GetAwaiter().GetResult();
-
-    private async Task<IListItem[]> DoGetItems(string query)
-    {
-        var items = await LoadContentData();
-        if (items != null && items.Any())
-        {
-            var listItems = new List<IListItem>();
-            foreach (var item in items)
-            {
-                var listItem = GetListItem(item);
-                listItems.Add(listItem);
-            }
-
-            return listItems.ToArray();
-        }
-        else
-        {
-            return new IListItem[]
-            {
-                new ListItem(new NoOpCommand())
-                {
-                    Title = "No pull requests found for search",
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-                },
-            };
-        }
-    }
-
     protected override ListItem GetListItem(IPullRequest item)
     {
         var title = item.Title;
