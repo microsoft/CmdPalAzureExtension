@@ -6,7 +6,7 @@ using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
-namespace AzureExtension.Controls.SearchPages;
+namespace AzureExtension.Controls.Pages;
 
 public abstract partial class SearchPage<T> : ListPage
 {
@@ -43,7 +43,7 @@ public abstract partial class SearchPage<T> : ListPage
                 {
                     new ListItem(new NoOpCommand())
                     {
-                        Title = "No work items found for search",
+                        Title = "No items found",
                         Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
                     },
                 };

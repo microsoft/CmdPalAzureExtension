@@ -7,7 +7,7 @@ using AzureExtension.DataManager;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
-namespace AzureExtension.Controls.SearchPages;
+namespace AzureExtension.Controls.Pages;
 
 public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
 {
