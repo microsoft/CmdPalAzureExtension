@@ -2,12 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Account;
-using AzureExtension.Client;
-using AzureExtension.Controls.Commands;
-using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.ListItems;
-using AzureExtension.DataManager;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
@@ -20,22 +15,14 @@ public class SavedPullRequestSearchesPage : ListPage
     private readonly IResources _resources;
     private readonly AddPullRequestSearchListItem _addPullRequestSearchListItem;
     private readonly SavedAzureSearchesMediator _mediator;
-    private readonly IDataProvider _dataProvider;
     private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
-    private readonly TimeSpanHelper _timeSpanHelper;
-    private readonly IAccountProvider _accountProvider;
-    private readonly AzureClientHelpers _azureClientHelpers;
     private readonly ISearchPageFactory _searchPageFactory;
 
     public SavedPullRequestSearchesPage(
         IResources resources,
         AddPullRequestSearchListItem addPullRequestSearchListItem,
         SavedAzureSearchesMediator mediator,
-        IDataProvider dataProvider,
         ISavedPullRequestSearchRepository pullRequestSearchRepository,
-        TimeSpanHelper timeSpanHelper,
-        IAccountProvider accountProvider,
-        AzureClientHelpers azureClientHelpers,
         ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
@@ -45,10 +32,6 @@ public class SavedPullRequestSearchesPage : ListPage
         _mediator.PullRequestSearchRemoved += OnPullRequestSearchRemoved;
         _mediator.PullRequestSearchRemoving += OnPullRequestSearchRemoving;
         _mediator.PullRequestSearchSaved += OnPullRequestSearchSaved;
-        _dataProvider = dataProvider;
-        _timeSpanHelper = timeSpanHelper;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
         _searchPageFactory = searchPageFactory;
     }
 

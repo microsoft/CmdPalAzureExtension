@@ -2,13 +2,8 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Account;
-using AzureExtension.Client;
 using AzureExtension.Controls;
-using AzureExtension.Controls.Commands;
-using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.Pages;
-using AzureExtension.DataManager;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
@@ -22,10 +17,6 @@ public partial class SavedQueriesPage : ListPage
     private readonly IListItem _addQueryListItem;
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _savedQueriesMediator;
-    private readonly TimeSpanHelper _timeSpanHelper;
-    private readonly IDataProvider _dataProvider;
-    private readonly IAccountProvider _accountProvider;
-    private readonly AzureClientHelpers _azureClientHelpers;
     private readonly IQueryRepository _queryRepository;
     private readonly ISearchPageFactory _searchPageFactory;
 
@@ -33,11 +24,7 @@ public partial class SavedQueriesPage : ListPage
        IResources resources,
        IListItem addQueryListItem,
        SavedAzureSearchesMediator savedQueriesMediator,
-       IDataProvider dataProvider,
-       IAccountProvider accountProvider,
-       AzureClientHelpers azureClientHelpers,
        IQueryRepository queryRepository,
-       TimeSpanHelper timeSpanHelper,
        ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
@@ -49,10 +36,6 @@ public partial class SavedQueriesPage : ListPage
         _savedQueriesMediator.QueryRemoving += OnQueryRemoving;
         _addQueryListItem = addQueryListItem;
         _savedQueriesMediator.QuerySaved += OnQuerySaved;
-        _timeSpanHelper = timeSpanHelper;
-        _dataProvider = dataProvider;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
         _queryRepository = queryRepository;
         _searchPageFactory = searchPageFactory;
     }
