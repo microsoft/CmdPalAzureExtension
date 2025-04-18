@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Client;
-using AzureExtension.DataModel;
 
 namespace AzureExtension.Controls;
 
@@ -20,6 +19,8 @@ public class PullRequestSearch : IPullRequestSearch
     public string PullRequestUrl { get; set; } = string.Empty;
 
     public bool IsTopLevel { get; set; }
+
+    public AzureSearchType Type { get; set; } = AzureSearchType.PullRequestSearch;
 
     public PullRequestSearch()
     {

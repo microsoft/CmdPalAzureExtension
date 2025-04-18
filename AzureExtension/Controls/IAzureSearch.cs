@@ -11,4 +11,6 @@ public interface IAzureSearch
     string Url { get; }
 
     bool IsTopLevel { get; }
+
+    AzureSearchType Type { get; }
 }

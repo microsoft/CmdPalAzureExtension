@@ -60,6 +60,8 @@ public class Query : IQuery
 
     public bool IsTopLevel { get; set; }
 
+    public AzureSearchType Type { get; set; } = AzureSearchType.Query;
+
     private static Query Create(string queryId, long projectId, string username, string displayName)
     {
         return new Query

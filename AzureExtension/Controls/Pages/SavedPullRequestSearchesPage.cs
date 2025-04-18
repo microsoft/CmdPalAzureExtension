@@ -7,7 +7,6 @@ using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.ListItems;
-using AzureExtension.Controls.SearchPages;
 using AzureExtension.DataManager;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
