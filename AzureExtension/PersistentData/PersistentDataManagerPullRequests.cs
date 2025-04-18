@@ -85,9 +85,4 @@ public partial class PersistentDataManager : ISavedPullRequestSearchRepository, 
         ValidateDataStore();
         PullRequestSearch.AddOrUpdate(_dataStore, pullRequestSearch.Url, pullRequestSearch.Name, pullRequestSearch.View, isTopLevel);
     }
-
-    public Task Remove(IPullRequestSearch pullRequestSearch)
-    {
-        return RemoveSavedPullRequestSearch(pullRequestSearch);
-    }
 }

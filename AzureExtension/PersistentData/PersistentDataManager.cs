@@ -150,8 +150,13 @@ public partial class PersistentDataManager : IQueryRepository, IAzureSearchRepos
         return queryInfo.Result == ResultType.Success;
     }
 
-    public Task Remove(IQuery query)
+    public Task Remove(IAzureSearch azureSearch)
     {
-        return RemoveSavedQueryAsync(query);
+        return azureSearch.Type switch
+        {
+            AzureSearchType.Query => RemoveSavedQueryAsync((IQuery)azureSearch),
+            AzureSearchType.PullRequestSearch => RemoveSavedPullRequestSearch((IPullRequestSearch)azureSearch),
+            _ => throw new NotSupportedException($"Azure search type {azureSearch.Type} is not supported."),
+        };
     }
 }
