@@ -140,7 +140,7 @@ public class SavedPullRequestSearchesPage : ListPage
 
     private ListPage CreatePageForPullRequestSearch(IPullRequestSearch search)
     {
-        return new PullRequestSearchPage(search, _resources, _dataProvider, _timeSpanHelper)
+        return new PullRequestSearchPage(search, _resources, _dataProvider)
         {
             Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
             Name = search.Name,

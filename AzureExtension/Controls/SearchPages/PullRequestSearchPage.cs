@@ -27,9 +27,7 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
 
     private readonly IDataProvider _dataProvider;
 
-    private readonly TimeSpanHelper _timeSpanHelper;
-
-    public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+    public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider)
         : base(search)
     {
         _search = search;
@@ -37,7 +35,6 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
         _dataProvider = dataProvider;
         Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
         Name = search.Name;
-        _timeSpanHelper = timeSpanHelper;
     }
 
     protected override ListItem GetListItem(IPullRequest item)
