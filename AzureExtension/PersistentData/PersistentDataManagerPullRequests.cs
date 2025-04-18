@@ -6,7 +6,7 @@ using AzureExtension.Controls;
 
 namespace AzureExtension.PersistentData;
 
-public partial class PersistentDataManager : ISavedPullRequestSearchRepository
+public partial class PersistentDataManager : ISavedPullRequestSearchRepository, IAzureSearchRepository
 {
     public Task AddSavedPullRequestSearch(IPullRequestSearch pullRequestSearch)
     {
@@ -84,5 +84,10 @@ public partial class PersistentDataManager : ISavedPullRequestSearchRepository
     {
         ValidateDataStore();
         PullRequestSearch.AddOrUpdate(_dataStore, pullRequestSearch.Url, pullRequestSearch.Name, pullRequestSearch.View, isTopLevel);
+    }
+
+    public Task Remove(IPullRequestSearch pullRequestSearch)
+    {
+        return RemoveSavedPullRequestSearch(pullRequestSearch);
     }
 }

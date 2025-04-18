@@ -10,7 +10,7 @@ using Serilog;
 
 namespace AzureExtension.PersistentData;
 
-public partial class PersistentDataManager : IQueryRepository
+public partial class PersistentDataManager : IQueryRepository, IAzureSearchRepository
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", nameof(PersistentDataManager)));
 
@@ -148,5 +148,10 @@ public partial class PersistentDataManager : IQueryRepository
     {
         var queryInfo = _azureValidator.GetQueryInfo(query.Url, account);
         return queryInfo.Result == ResultType.Success;
+    }
+
+    public Task Remove(IQuery query)
+    {
+        return RemoveSavedQueryAsync(query);
     }
 }
