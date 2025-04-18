@@ -25,6 +25,7 @@ public class SavedPullRequestSearchesPage : ListPage
     private readonly TimeSpanHelper _timeSpanHelper;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly ISearchPageFactory _searchPageFactory;
 
     public SavedPullRequestSearchesPage(
         IResources resources,
@@ -34,7 +35,8 @@ public class SavedPullRequestSearchesPage : ListPage
         ISavedPullRequestSearchRepository pullRequestSearchRepository,
         TimeSpanHelper timeSpanHelper,
         IAccountProvider accountProvider,
-        AzureClientHelpers azureClientHelpers)
+        AzureClientHelpers azureClientHelpers,
+        ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
         _pullRequestSearchRepository = pullRequestSearchRepository;
@@ -47,6 +49,7 @@ public class SavedPullRequestSearchesPage : ListPage
         _timeSpanHelper = timeSpanHelper;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
+        _searchPageFactory = searchPageFactory;
     }
 
     private void OnPullRequestSearchRemoved(object? sender, object? args)
@@ -92,7 +95,7 @@ public class SavedPullRequestSearchesPage : ListPage
 
         if (searches.Any())
         {
-            var searchPages = searches.Select(savedSearch => CreateItemForPullRequestSearch(savedSearch)).ToList();
+            var searchPages = searches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch)).ToList();
 
             searchPages.Add(_addPullRequestSearchListItem);
 
@@ -114,35 +117,5 @@ public class SavedPullRequestSearchesPage : ListPage
         }
 
         // errors are handled in SavePullRequestSearchPage
-    }
-
-    public IListItem CreateItemForPullRequestSearch(IPullRequestSearch search)
-    {
-        return new ListItem(CreatePageForPullRequestSearch(search))
-        {
-            Title = search.Name,
-            Subtitle = search.Url,
-            Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
-            MoreCommands = new CommandContextItem[]
-            {
-                new(new LinkCommand(search.Url, _resources)),
-                new(new EditPullRequestSearchPage(
-                    _resources,
-                    new SavePullRequestSearchForm(search, _resources, _mediator, _accountProvider, _azureClientHelpers, _pullRequestSearchRepository),
-                    new StatusMessage(),
-                    "Success",
-                    "Failure")),
-                new(new RemovePullRequestSearchCommand(search, _resources, _mediator, _pullRequestSearchRepository)),
-            },
-        };
-    }
-
-    private ListPage CreatePageForPullRequestSearch(IPullRequestSearch search)
-    {
-        return new PullRequestSearchPage(search, _resources, _dataProvider)
-        {
-            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-            Name = search.Name,
-        };
     }
 }
