@@ -30,7 +30,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{url}}", _savedPullRequestSearch.Url },
-        { "{{enteredTitle}}", _savedPullRequestSearch.Title },
+        { "{{enteredTitle}}", _savedPullRequestSearch.Name },
         { "{{selectedView}}", string.IsNullOrEmpty(_savedPullRequestSearch.View) ? "Mine" : _savedPullRequestSearch.View },
     };
 
@@ -82,7 +82,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             // it is safe to do as the new one is already validated
             if (!string.IsNullOrEmpty(_savedPullRequestSearch.Url))
             {
-                Log.Information($"Removing outdated search {_savedPullRequestSearch.Title}, {_savedPullRequestSearch.Url}");
+                Log.Information($"Removing outdated search {_savedPullRequestSearch.Name}, {_savedPullRequestSearch.Url}");
 
                 _pullRequestSearchRepository.RemoveSavedPullRequestSearch(_savedPullRequestSearch).Wait();
             }

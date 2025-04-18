@@ -120,7 +120,7 @@ public class SavedPullRequestSearchesPage : ListPage
     {
         return new ListItem(CreatePageForPullRequestSearch(search))
         {
-            Title = search.Title,
+            Title = search.Name,
             Subtitle = search.Url,
             Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
             MoreCommands = new CommandContextItem[]
@@ -142,7 +142,7 @@ public class SavedPullRequestSearchesPage : ListPage
         return new PullRequestSearchPage(search, _resources, _dataProvider, _timeSpanHelper)
         {
             Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-            Name = search.Title,
+            Name = search.Name,
         };
     }
 }

@@ -4,11 +4,7 @@
 
 namespace AzureExtension.Controls;
 
-public interface IPullRequestSearch
+public interface IPullRequestSearch : IAzureSearch
 {
-    string Url { get; }
-
-    string Title { get; }
-
     string View { get; }
 }

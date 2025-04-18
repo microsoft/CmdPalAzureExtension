@@ -35,7 +35,7 @@ public sealed partial class PullRequestSearchPage : ListPage
         _resources = resources;
         _dataProvider = dataProvider;
         Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
-        Name = search.Title;
+        Name = search.Name;
         _timeSpanHelper = timeSpanHelper;
     }
 

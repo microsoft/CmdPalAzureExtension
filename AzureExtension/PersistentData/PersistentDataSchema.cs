@@ -24,7 +24,7 @@ public sealed class PersistentDataSchema : IDataStoreSchema
         @"CREATE TABLE IF NOT EXISTS PullRequestSearch (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
             Url TEXT NOT NULL,
-            Title TEXT NOT NULL,
+            Name TEXT NOT NULL,
             View TEXT NOT NULL,
             IsTopLevel INTEGER NOT NULL CHECK (IsTopLevel IN (0, 1))
         )";
