@@ -70,7 +70,7 @@ public sealed partial class PullRequestSearchPage : ListPage
 
     public ListItem GetListItem(IPullRequest item)
     {
-        var title = item.Name;
+        var title = item.Title;
         var url = item.HtmlUrl;
 
         return new ListItem(new LinkCommand(url, _resources))

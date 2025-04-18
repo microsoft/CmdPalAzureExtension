@@ -19,7 +19,7 @@ public class PullRequest : IPullRequest
 
     public long InternalId { get; set; } = DataStore.NoForeignKey;
 
-    public string Name { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
     public string Url { get; set; } = string.Empty;
 
@@ -48,8 +48,6 @@ public class PullRequest : IPullRequest
     [Write(false)]
     public Identity? Creator => Identity.Get(DataStore, CreatorId);
 
-    public bool IsTopLevel => throw new NotImplementedException();
-
     private static PullRequest Create(
         DataStore dataStore,
         GitPullRequest gitPullRequest,
@@ -62,7 +60,7 @@ public class PullRequest : IPullRequest
             InternalId = gitPullRequest.PullRequestId,
             RepositoryId = repositoryId,
             CreatorId = creatorId,
-            Name = gitPullRequest.Title,
+            Title = gitPullRequest.Title,
             Url = gitPullRequest.Url,
             Status = gitPullRequest.Status.ToString(),
             PolicyStatus = statusReason,
