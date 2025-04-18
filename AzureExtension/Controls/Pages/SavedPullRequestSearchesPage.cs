@@ -95,7 +95,7 @@ public class SavedPullRequestSearchesPage : ListPage
 
         if (searches.Any())
         {
-            var searchPages = searches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch)).ToList();
+            var searchPages = searches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch, _pullRequestSearchRepository)).ToList();
 
             searchPages.Add(_addPullRequestSearchListItem);
 

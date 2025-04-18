@@ -6,7 +6,7 @@ using AzureExtension.Controls;
 
 namespace AzureExtension.PersistentData;
 
-public partial class PersistentDataManager : ISavedPullRequestSearchRepository, IAzureSearchRepository
+public partial class PersistentDataManager : ISavedPullRequestSearchRepository
 {
     public Task AddSavedPullRequestSearch(IPullRequestSearch pullRequestSearch)
     {

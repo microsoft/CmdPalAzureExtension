@@ -5,6 +5,7 @@
 using AzureExtension.Controls.Commands;
 using AzureExtension.DataManager;
 using AzureExtension.Helpers;
+using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
@@ -16,10 +17,13 @@ public class SearchPageFactory : ISearchPageFactory
 
     private readonly IDataProvider _dataProvider;
 
-    public SearchPageFactory(IResources resources, IDataProvider dataProvider)
+    private readonly SavedAzureSearchesMediator _mediator;
+
+    public SearchPageFactory(IResources resources, IDataProvider dataProvider, SavedAzureSearchesMediator mediator)
     {
         _resources = resources;
         _dataProvider = dataProvider;
+        _mediator = mediator;
     }
 
     public ListPage CreatePageForSearch(IAzureSearch search)
@@ -32,7 +36,7 @@ public class SearchPageFactory : ISearchPageFactory
         };
     }
 
-    public IListItem CreateItemForSearch(IAzureSearch search)
+    public IListItem CreateItemForSearch(IAzureSearch search, IAzureSearchRepository azureSearchRepository)
     {
         return new ListItem(CreatePageForSearch(search))
         {
@@ -45,6 +49,11 @@ public class SearchPageFactory : ISearchPageFactory
                 {
                     Title = search.Name,
                     Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                },
+                new(new RemoveAzureSearchCommand(search, _resources, _mediator, azureSearchRepository))
+                {
+                    Title = _resources.GetResource("Commands_Remove_Saved_Search"),
+                    Icon = new IconInfo("\uecc9"),
                 },
             },
         };
