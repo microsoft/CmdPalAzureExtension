@@ -25,35 +25,28 @@ public abstract partial class SearchPage<T> : ListPage
     {
         try
         {
-            var items = await GetSearchItemsAsync();
-
-            if (items.Any())
+            var items = await LoadContentData();
+            if (items != null && items.Any())
             {
-                return items.Select(item => GetListItem(item)).ToArray();
+                var listItems = new List<IListItem>();
+                foreach (var item in items)
+                {
+                    var listItem = GetListItem(item);
+                    listItems.Add(listItem);
+                }
+
+                return listItems.ToArray();
             }
             else
             {
-                return !items.Any()
-                    ? new ListItem[]
-                    {
-                        new(new NoOpCommand())
-                        {
-                            Title = "No items found for search",
-                            Icon = new IconInfo(string.Empty),
-                        },
-                    }
-                    :
-                    [
-                        new ListItem(new NoOpCommand())
-                        {
-                            Title = "An error occurred with search",
-                            Details = new Details()
-                            {
-                                Body = "Error message here",
-                            },
-                            Icon = new IconInfo(string.Empty),
-                        },
-                    ];
+                return new IListItem[]
+                {
+                new ListItem(new NoOpCommand())
+                {
+                    Title = "No work items found for search",
+                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                },
+                };
             }
         }
         catch (Exception ex)
@@ -71,13 +64,6 @@ public abstract partial class SearchPage<T> : ListPage
                 },
             };
         }
-    }
-
-    private async Task<IEnumerable<T>> GetSearchItemsAsync()
-    {
-        var items = await LoadContentData();
-
-        return items;
     }
 
     protected abstract ListItem GetListItem(T item);
