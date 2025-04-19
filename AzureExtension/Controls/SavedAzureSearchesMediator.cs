@@ -26,11 +26,11 @@ public class SavedAzureSearchesMediator
 
     public void Remove(IAzureSearch azureSearch)
     {
-        if (AzureSearchHelper.IsIQuery(azureSearch))
+        if (azureSearch is IQuery)
         {
             QueryRemoved?.Invoke(this, azureSearch);
         }
-        else if (AzureSearchHelper.IsIPullRequestSearch(azureSearch))
+        else if (azureSearch is IPullRequestSearch)
         {
             PullRequestSearchRemoved?.Invoke(this, azureSearch);
         }

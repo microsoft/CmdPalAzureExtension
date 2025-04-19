@@ -152,11 +152,11 @@ public partial class PersistentDataManager : IQueryRepository
 
     public Task Remove(IAzureSearch azureSearch)
     {
-        if (AzureSearchHelper.IsIQuery(azureSearch))
+        if (azureSearch is IQuery)
         {
             return RemoveSavedQueryAsync((IQuery)azureSearch);
         }
-        else if (AzureSearchHelper.IsIPullRequestSearch(azureSearch))
+        else if (azureSearch is IPullRequestSearch)
         {
             return RemoveSavedPullRequestSearch((IPullRequestSearch)azureSearch);
         }

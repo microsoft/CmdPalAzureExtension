@@ -28,11 +28,11 @@ public class SearchPageFactory : ISearchPageFactory
 
     public ListPage CreatePageForSearch(IAzureSearch search)
     {
-        if (AzureSearchHelper.IsIQuery(search))
+        if (search is IQuery)
         {
             return new WorkItemsSearchPage((IQuery)search, _resources, _dataProvider);
         }
-        else if (AzureSearchHelper.IsIPullRequestSearch(search))
+        else if (search is IPullRequestSearch)
         {
             return new PullRequestSearchPage((IPullRequestSearch)search, _resources, _dataProvider);
         }
