@@ -2,6 +2,8 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Helpers;
+
 namespace AzureExtension.Controls;
 
 public class SavedAzureSearchesMediator
@@ -24,16 +26,13 @@ public class SavedAzureSearchesMediator
 
     public void Remove(IAzureSearch azureSearch)
     {
-        switch (azureSearch.Type)
+        if (AzureSearchHelper.IsIQuery(azureSearch))
         {
-            case AzureSearchType.Query:
-                QueryRemoved?.Invoke(this, azureSearch);
-                break;
-            case AzureSearchType.PullRequestSearch:
-                PullRequestSearchRemoved?.Invoke(this, azureSearch);
-                break;
-            default:
-                throw new InvalidOperationException($"Azure search type {azureSearch.Type} is not supported.");
+            QueryRemoved?.Invoke(this, azureSearch);
+        }
+        else if (AzureSearchHelper.IsIPullRequestSearch(azureSearch))
+        {
+            PullRequestSearchRemoved?.Invoke(this, azureSearch);
         }
     }
 

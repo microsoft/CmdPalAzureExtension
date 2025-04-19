@@ -18,10 +18,6 @@ public class PullRequestSearch : IPullRequestSearch
 
     public string PullRequestUrl { get; set; } = string.Empty;
 
-    public bool IsTopLevel { get; set; }
-
-    public AzureSearchType Type { get; set; } = AzureSearchType.PullRequestSearch;
-
     public PullRequestSearch()
     {
         AzureUri = new AzureUri();

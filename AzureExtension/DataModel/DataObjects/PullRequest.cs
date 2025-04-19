@@ -6,7 +6,6 @@ using AzureExtension.Controls;
 using AzureExtension.Data;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using Microsoft.CommandPalette.Extensions;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 
 namespace AzureExtension.DataModel;

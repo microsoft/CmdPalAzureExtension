@@ -29,9 +29,6 @@ public class PullRequestSearch : IPullRequestSearch
 
     public bool IsTopLevel { get; set; }
 
-    [Write(false)]
-    public AzureSearchType Type { get; set; } = AzureSearchType.PullRequestSearch;
-
     [Computed]
     [Write(false)]
     public AzureUri AzureUri

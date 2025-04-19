@@ -58,11 +58,6 @@ public class Query : IQuery
     [Computed]
     public string Url => QueryId;
 
-    public bool IsTopLevel { get; set; }
-
-    [Write(false)]
-    public AzureSearchType Type { get; set; } = AzureSearchType.Query;
-
     private static Query Create(string queryId, long projectId, string username, string displayName)
     {
         return new Query

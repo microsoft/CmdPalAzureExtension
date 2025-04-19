@@ -18,8 +18,6 @@ public class Query : IQuery
 
     public bool IsTopLevel { get; set; }
 
-    public AzureSearchType Type => AzureSearchType.Query;
-
     public Query()
     {
         AzureUri = new AzureUri();

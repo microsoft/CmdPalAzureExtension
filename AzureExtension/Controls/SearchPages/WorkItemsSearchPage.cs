@@ -18,7 +18,7 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
     private readonly IDataProvider _dataProvider;
 
     public WorkItemsSearchPage(IQuery query, IResources resources, IDataProvider dataProvider)
-        : base(query)
+        : base(query, dataProvider)
     {
         _query = query;
         _resources = resources;

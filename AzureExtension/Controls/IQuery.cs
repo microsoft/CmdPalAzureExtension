@@ -6,5 +6,5 @@ namespace AzureExtension.Controls;
 
 public interface IQuery : IAzureSearch
 {
-    // there are currently no query-specific properties
+    // currently, there are no unique IQuery properties
 }

@@ -5,6 +5,7 @@
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
+using AzureExtension.Helpers;
 using Microsoft.Identity.Client;
 using Serilog;
 
@@ -39,7 +40,6 @@ public partial class PersistentDataManager : IQueryRepository
 
         var name = query.Name;
         var url = query.Url;
-        var isTopLevel = query.IsTopLevel;
 
         _log.Information($"Adding query: {name} - {url}.");
         if (Query.Get(_dataStore, name, url) != null)
@@ -47,7 +47,7 @@ public partial class PersistentDataManager : IQueryRepository
             throw new InvalidOperationException($"Search {name} - {url} already exists.");
         }
 
-        Query.Add(_dataStore, name, url, isTopLevel);
+        Query.Add(_dataStore, name, url, false);
 
         return Task.CompletedTask;
     }
@@ -152,11 +152,15 @@ public partial class PersistentDataManager : IQueryRepository
 
     public Task Remove(IAzureSearch azureSearch)
     {
-        return azureSearch.Type switch
+        if (AzureSearchHelper.IsIQuery(azureSearch))
         {
-            AzureSearchType.Query => RemoveSavedQueryAsync((IQuery)azureSearch),
-            AzureSearchType.PullRequestSearch => RemoveSavedPullRequestSearch((IPullRequestSearch)azureSearch),
-            _ => throw new NotSupportedException($"Azure search type {azureSearch.Type} is not supported."),
-        };
+            return RemoveSavedQueryAsync((IQuery)azureSearch);
+        }
+        else if (AzureSearchHelper.IsIPullRequestSearch(azureSearch))
+        {
+            return RemoveSavedPullRequestSearch((IPullRequestSearch)azureSearch);
+        }
+
+        throw new InvalidOperationException($"Unknown search type: {azureSearch.GetType()}");
     }
 }

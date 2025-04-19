@@ -28,12 +28,16 @@ public class SearchPageFactory : ISearchPageFactory
 
     public ListPage CreatePageForSearch(IAzureSearch search)
     {
-        return search.Type switch
+        if (AzureSearchHelper.IsIQuery(search))
         {
-            AzureSearchType.Query => new WorkItemsSearchPage((IQuery)search, _resources, _dataProvider),
-            AzureSearchType.PullRequestSearch => new PullRequestSearchPage((IPullRequestSearch)search, _resources, _dataProvider),
-            _ => throw new NotImplementedException($"No page for search type {search.Type}"),
-        };
+            return new WorkItemsSearchPage((IQuery)search, _resources, _dataProvider);
+        }
+        else if (AzureSearchHelper.IsIPullRequestSearch(search))
+        {
+            return new PullRequestSearchPage((IPullRequestSearch)search, _resources, _dataProvider);
+        }
+
+        throw new NotImplementedException($"No page for search type {search.GetType()}");
     }
 
     public IListItem CreateItemForSearch(IAzureSearch search, IAzureSearchRepository azureSearchRepository)

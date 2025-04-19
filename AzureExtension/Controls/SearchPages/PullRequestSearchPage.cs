@@ -18,7 +18,7 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
     private readonly IDataProvider _dataProvider;
 
     public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider)
-        : base(search)
+        : base(search, dataProvider)
     {
         _search = search;
         _resources = resources;
