@@ -50,10 +50,10 @@ public class AccountProvider : IAccountProvider
            .WithClientCapabilities(_capabilities)
            .WithParentActivityOrWindow(() => { return windowHandle; })
            .WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows)
-            {
-                MsaPassthrough = true,
-                Title = "Command Palette Azure Extension",
-            });
+           {
+               MsaPassthrough = true,
+               Title = "Command Palette Azure Extension",
+           });
 
         _log.Debug($"Created PublicClientApplicationBuilder");
         return builder;

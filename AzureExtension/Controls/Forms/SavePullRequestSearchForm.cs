@@ -9,7 +9,6 @@ using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Microsoft.Identity.Client;
 using Serilog;
 
 namespace AzureExtension.Controls.Forms;

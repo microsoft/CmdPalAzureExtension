@@ -108,7 +108,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         }
 
         // Get the pull requests with those criteria: (do we need internal id)
-        var pullRequests = await gitClient.GetPullRequestsAsync(project.InternalId,  gitRepository.Id, searchCriteria, cancellationToken: cancellationToken);
+        var pullRequests = await gitClient.GetPullRequestsAsync(project.InternalId, gitRepository.Id, searchCriteria, cancellationToken: cancellationToken);
 
         // Get the PullRequest PolicyClient. This client provides the State and Reason fields for each pull request
         using var policyClient = _azureClientProvider.GetClient<PolicyHttpClient>(azureUri.Connection, account);

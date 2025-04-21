@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Commands;

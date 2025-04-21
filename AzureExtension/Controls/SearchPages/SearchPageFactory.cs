@@ -6,7 +6,6 @@ using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.Forms;
-using AzureExtension.DataManager;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
