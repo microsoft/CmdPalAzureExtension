@@ -3,13 +3,12 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Client;
-using AzureExtension.DataModel;
 
 namespace AzureExtension.Controls;
 
 public class PullRequestSearch : IPullRequestSearch
 {
-    public string Title { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
     public string Url => AzureUri.OriginalString;
 
@@ -22,13 +21,13 @@ public class PullRequestSearch : IPullRequestSearch
     public PullRequestSearch()
     {
         AzureUri = new AzureUri();
-        Title = string.Empty;
+        Name = string.Empty;
     }
 
     public PullRequestSearch(AzureUri azureUri, string title, string view)
     {
         AzureUri = azureUri;
-        Title = title;
+        Name = title;
         View = view;
         PullRequestUrl = CreatePullRequestUrl(azureUri.OriginalString, view);
     }

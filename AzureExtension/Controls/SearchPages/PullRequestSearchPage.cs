@@ -2,73 +2,32 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.DataManager;
 using AzureExtension.Helpers;
-using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Serilog;
 
 namespace AzureExtension.Controls.Pages;
 
-public sealed partial class PullRequestSearchPage : ListPage
+public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
 {
-    // Max number of query results to fetch for a given query.
-    public static readonly int QueryResultLimit = 25;
-
-    private readonly Lazy<ILogger> _log = new(() => Serilog.Log.ForContext("SourceContext", $"Pages/WorkItemsSearchPage"));
-
-    private ILogger Log => _log.Value;
-
     private readonly IPullRequestSearch _search;
 
     private readonly IResources _resources;
 
     private readonly IDataProvider _dataProvider;
 
-    private readonly TimeSpanHelper _timeSpanHelper;
-
-    public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+    public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider)
+        : base(search, dataProvider)
     {
         _search = search;
         _resources = resources;
         _dataProvider = dataProvider;
         Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
-        Name = search.Title;
-        _timeSpanHelper = timeSpanHelper;
+        Name = search.Name;
     }
 
-    public override IListItem[] GetItems() => DoGetItems(SearchText).GetAwaiter().GetResult();
-
-    private async Task<IListItem[]> DoGetItems(string query)
-    {
-        var items = await LoadContentData();
-        if (items != null && items.Any())
-        {
-            var listItems = new List<IListItem>();
-            foreach (var item in items)
-            {
-                var listItem = GetListItem(item);
-                listItems.Add(listItem);
-            }
-
-            return listItems.ToArray();
-        }
-        else
-        {
-            return new IListItem[]
-            {
-                new ListItem(new NoOpCommand())
-                {
-                    Title = "No pull requests found for search",
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-                },
-            };
-        }
-    }
-
-    public ListItem GetListItem(IPullRequest item)
+    protected override ListItem GetListItem(IPullRequest item)
     {
         var title = item.Title;
         var url = item.HtmlUrl;
@@ -80,7 +39,7 @@ public sealed partial class PullRequestSearchPage : ListPage
         };
     }
 
-    public Task<IEnumerable<IPullRequest>> LoadContentData()
+    protected override Task<IEnumerable<IPullRequest>> LoadContentData()
     {
         return _dataProvider.GetPullRequests(_search);
     }

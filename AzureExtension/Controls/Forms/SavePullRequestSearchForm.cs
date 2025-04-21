@@ -17,7 +17,7 @@ namespace AzureExtension.Controls.Forms;
 public class SavePullRequestSearchForm : FormContent, IAzureForm
 {
     private readonly IResources _resources;
-    private readonly SavedQueriesMediator _mediator;
+    private readonly SavedAzureSearchesMediator _mediator;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
     private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
@@ -30,14 +30,14 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{url}}", _savedPullRequestSearch.Url },
-        { "{{enteredTitle}}", _savedPullRequestSearch.Title },
+        { "{{enteredTitle}}", _savedPullRequestSearch.Name },
         { "{{selectedView}}", string.IsNullOrEmpty(_savedPullRequestSearch.View) ? "Mine" : _savedPullRequestSearch.View },
     };
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequestSearch", TemplateSubstitutions);
 
     // for saving a new pull request search
-    public SavePullRequestSearchForm(IResources resources, SavedQueriesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
+    public SavePullRequestSearchForm(IResources resources, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
     {
         _resources = resources;
         _mediator = mediator;
@@ -48,7 +48,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     }
 
     // for editing an existing pull request search
-    public SavePullRequestSearchForm(IPullRequestSearch savedPullRequestSearch, IResources resources, SavedQueriesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
+    public SavePullRequestSearchForm(IPullRequestSearch savedPullRequestSearch, IResources resources, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
     {
         _resources = resources;
         _mediator = mediator;
@@ -82,7 +82,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             // it is safe to do as the new one is already validated
             if (!string.IsNullOrEmpty(_savedPullRequestSearch.Url))
             {
-                Log.Information($"Removing outdated search {_savedPullRequestSearch.Title}, {_savedPullRequestSearch.Url}");
+                Log.Information($"Removing outdated search {_savedPullRequestSearch.Name}, {_savedPullRequestSearch.Url}");
 
                 _pullRequestSearchRepository.RemoveSavedPullRequestSearch(_savedPullRequestSearch).Wait();
             }

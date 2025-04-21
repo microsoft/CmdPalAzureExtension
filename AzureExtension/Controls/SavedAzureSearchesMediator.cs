@@ -2,9 +2,11 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Helpers;
+
 namespace AzureExtension.Controls;
 
-public class SavedQueriesMediator
+public class SavedAzureSearchesMediator
 {
     public event EventHandler<object?>? QueryRemoving;
 
@@ -18,18 +20,25 @@ public class SavedQueriesMediator
 
     public event EventHandler<object?>? PullRequestSearchRemoving;
 
-    public SavedQueriesMediator()
+    public SavedAzureSearchesMediator()
     {
+    }
+
+    public void Remove(IAzureSearch azureSearch)
+    {
+        if (azureSearch is IQuery)
+        {
+            QueryRemoved?.Invoke(this, azureSearch);
+        }
+        else if (azureSearch is IPullRequestSearch)
+        {
+            PullRequestSearchRemoved?.Invoke(this, azureSearch);
+        }
     }
 
     public void RemovingQuery(object args)
     {
         QueryRemoving?.Invoke(this, args);
-    }
-
-    public void RemoveQuery(object args)
-    {
-        QueryRemoved?.Invoke(this, args);
     }
 
     public void AddQuery(object args)
@@ -45,10 +54,5 @@ public class SavedQueriesMediator
     public void RemovingPullRequestSearch(object args)
     {
         PullRequestSearchRemoving?.Invoke(this, args);
-    }
-
-    public void RemovePullRequestSearch(object args)
-    {
-        PullRequestSearchRemoved?.Invoke(this, args);
     }
 }

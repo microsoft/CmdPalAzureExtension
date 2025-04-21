@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
@@ -17,14 +18,14 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 {
     private readonly IQuery _savedQuery;
     private readonly IResources _resources;
-    private readonly SavedQueriesMediator _savedQueriesMediator;
+    private readonly SavedAzureSearchesMediator _savedQueriesMediator;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
     private readonly IQueryRepository _queryRepository;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
-    private readonly string isTopLevelChecked = "false";
+    private string IsTopLevelChecked => GetIsTopLevel().Result.ToString().ToLower(CultureInfo.InvariantCulture);
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
@@ -33,7 +34,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
         { "{{SaveSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Search" : "Forms_Edit_Search") },
         { "{{SavedSearchString}}", _savedQuery.Url },
         { "{{SavedSearchName}}", _savedQuery.Name },
-        { "{{IsTopLevel}}", isTopLevelChecked },
+        { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{EnteredSearchErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchError") },
         { "{{EnteredSearchLabel}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchLabel") },
         { "{{NameLabel}}", _resources.GetResource("Forms_SaveSearchTemplateNameLabel") },
@@ -43,7 +44,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     };
 
     // for saving a new query
-    public SaveQueryForm(IResources resources, SavedQueriesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
+    public SaveQueryForm(IResources resources, SavedAzureSearchesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
     {
         _resources = resources;
         _savedQuery = new Query();
@@ -54,7 +55,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     }
 
     // for editing an existing query
-    public SaveQueryForm(IQuery savedQuery, IResources resources, SavedQueriesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
+    public SaveQueryForm(IQuery savedQuery, IResources resources, SavedAzureSearchesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
     {
         _resources = resources;
         _savedQuery = savedQuery;
@@ -131,6 +132,11 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             name = queryInfo.Name;
         }
 
-        return new Query(queryInfo.AzureUri, name, queryInfo.Description);
+        return new Query(queryInfo.AzureUri, name, queryInfo.Description, isTopLevel);
+    }
+
+    public async Task<bool> GetIsTopLevel()
+    {
+        return await _queryRepository.IsTopLevel(_savedQuery);
     }
 }

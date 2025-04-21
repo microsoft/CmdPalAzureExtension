@@ -160,16 +160,18 @@ public sealed class Program
         var signOutForm = new SignOutForm(accountProvider, resources);
         var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"));
 
-        var savedQueriesMediator = new SavedQueriesMediator();
+        var savedAzureSearchesMediator = new SavedAzureSearchesMediator();
 
-        var addQueryForm = new SaveQueryForm(resources, savedQueriesMediator, accountProvider, azureClientHelpers, persistentDataManager);
+        var searchPageFactory = new SearchPageFactory(resources, dataProvider, savedAzureSearchesMediator);
+
+        var addQueryForm = new SaveQueryForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager);
         var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
-        var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedQueriesMediator, dataProvider, accountProvider, azureClientHelpers, persistentDataManager, timeSpanHelper);
+        var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedAzureSearchesMediator, persistentDataManager, searchPageFactory);
 
-        var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedQueriesMediator, accountProvider, azureClientHelpers, persistentDataManager);
+        var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager);
         var savePullRequestSearchPage = new SavePullRequestSearchPage(savePullRequestSearchForm, new StatusMessage());
         var addPullRequestSearchListItem = new AddPullRequestSearchListItem(savePullRequestSearchPage, resources);
-        var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedQueriesMediator, dataProvider, persistentDataManager, timeSpanHelper, accountProvider, azureClientHelpers);
+        var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedAzureSearchesMediator, persistentDataManager, searchPageFactory);
 
         var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, azureClientHelpers, savedPullRequestSearchesPage);
 

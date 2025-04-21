@@ -2,13 +2,8 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Account;
-using AzureExtension.Client;
 using AzureExtension.Controls;
-using AzureExtension.Controls.Commands;
-using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.Pages;
-using AzureExtension.DataManager;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
@@ -21,22 +16,16 @@ public partial class SavedQueriesPage : ListPage
 {
     private readonly IListItem _addQueryListItem;
     private readonly IResources _resources;
-    private readonly SavedQueriesMediator _savedQueriesMediator;
-    private readonly TimeSpanHelper _timeSpanHelper;
-    private readonly IDataProvider _dataProvider;
-    private readonly IAccountProvider _accountProvider;
-    private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly SavedAzureSearchesMediator _savedQueriesMediator;
     private readonly IQueryRepository _queryRepository;
+    private readonly ISearchPageFactory _searchPageFactory;
 
     public SavedQueriesPage(
        IResources resources,
        IListItem addQueryListItem,
-       SavedQueriesMediator savedQueriesMediator,
-       IDataProvider dataProvider,
-       IAccountProvider accountProvider,
-       AzureClientHelpers azureClientHelpers,
+       SavedAzureSearchesMediator savedQueriesMediator,
        IQueryRepository queryRepository,
-       TimeSpanHelper timeSpanHelper)
+       ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
 
@@ -47,11 +36,8 @@ public partial class SavedQueriesPage : ListPage
         _savedQueriesMediator.QueryRemoving += OnQueryRemoving;
         _addQueryListItem = addQueryListItem;
         _savedQueriesMediator.QuerySaved += OnQuerySaved;
-        _timeSpanHelper = timeSpanHelper;
-        _dataProvider = dataProvider;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
         _queryRepository = queryRepository;
+        _searchPageFactory = searchPageFactory;
     }
 
     private void OnQueryRemoved(object? sender, object? args)
@@ -97,7 +83,7 @@ public partial class SavedQueriesPage : ListPage
 
         if (searches.Any())
         {
-            var searchPages = searches.Select(savedSearch => CreateItemForQuery(savedSearch)).ToList();
+            var searchPages = searches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch, _queryRepository)).ToList();
 
             searchPages.Add(_addQueryListItem);
 
@@ -119,42 +105,5 @@ public partial class SavedQueriesPage : ListPage
         }
 
         // errors are handled in SaveQueryPage
-    }
-
-    public IListItem CreateItemForQuery(IQuery query)
-    {
-        return new ListItem(CreatePageForQuery(query))
-        {
-            Title = query.Name,
-            Subtitle = query.Url,
-            Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
-            MoreCommands = new CommandContextItem[]
-            {
-                new(new LinkCommand(query.Url, _resources)),
-                new(new RemoveQueryCommand(query, _resources, _savedQueriesMediator, _queryRepository)),
-                new(new EditQueryPage(
-                    _resources,
-                    new SaveQueryForm(
-                        query,
-                        _resources,
-                        _savedQueriesMediator,
-                        _accountProvider,
-                        _azureClientHelpers,
-                        _queryRepository),
-                    new StatusMessage(),
-                    _resources.GetResource("Pages_Search_Edited_Success"),
-                    _resources.GetResource("Pages_Search_Edited_Failed"))),
-            },
-        };
-    }
-
-    private ListPage CreatePageForQuery(IQuery search)
-    {
-        return new WorkItemsSearchPage(search, _resources, _dataProvider, _timeSpanHelper)
-        {
-            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-            Name = search.Name,
-            IsLoading = true,
-        };
     }
 }

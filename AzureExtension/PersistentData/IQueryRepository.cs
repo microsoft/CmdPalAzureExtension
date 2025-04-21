@@ -7,7 +7,7 @@ using Microsoft.Identity.Client;
 
 namespace AzureExtension.PersistentData;
 
-public interface IQueryRepository
+public interface IQueryRepository : IAzureSearchRepository
 {
     Task AddSavedQueryAsync(IQuery query);
 

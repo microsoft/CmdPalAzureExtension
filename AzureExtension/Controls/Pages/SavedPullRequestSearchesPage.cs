@@ -2,12 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Account;
-using AzureExtension.Client;
-using AzureExtension.Controls.Commands;
-using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.ListItems;
-using AzureExtension.DataManager;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
@@ -19,22 +14,16 @@ public class SavedPullRequestSearchesPage : ListPage
 {
     private readonly IResources _resources;
     private readonly AddPullRequestSearchListItem _addPullRequestSearchListItem;
-    private readonly SavedQueriesMediator _mediator;
-    private readonly IDataProvider _dataProvider;
+    private readonly SavedAzureSearchesMediator _mediator;
     private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
-    private readonly TimeSpanHelper _timeSpanHelper;
-    private readonly IAccountProvider _accountProvider;
-    private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly ISearchPageFactory _searchPageFactory;
 
     public SavedPullRequestSearchesPage(
         IResources resources,
         AddPullRequestSearchListItem addPullRequestSearchListItem,
-        SavedQueriesMediator mediator,
-        IDataProvider dataProvider,
+        SavedAzureSearchesMediator mediator,
         ISavedPullRequestSearchRepository pullRequestSearchRepository,
-        TimeSpanHelper timeSpanHelper,
-        IAccountProvider accountProvider,
-        AzureClientHelpers azureClientHelpers)
+        ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
         _pullRequestSearchRepository = pullRequestSearchRepository;
@@ -43,10 +32,7 @@ public class SavedPullRequestSearchesPage : ListPage
         _mediator.PullRequestSearchRemoved += OnPullRequestSearchRemoved;
         _mediator.PullRequestSearchRemoving += OnPullRequestSearchRemoving;
         _mediator.PullRequestSearchSaved += OnPullRequestSearchSaved;
-        _dataProvider = dataProvider;
-        _timeSpanHelper = timeSpanHelper;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
+        _searchPageFactory = searchPageFactory;
     }
 
     private void OnPullRequestSearchRemoved(object? sender, object? args)
@@ -92,7 +78,7 @@ public class SavedPullRequestSearchesPage : ListPage
 
         if (searches.Any())
         {
-            var searchPages = searches.Select(savedSearch => CreateItemForPullRequestSearch(savedSearch)).ToList();
+            var searchPages = searches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch, _pullRequestSearchRepository)).ToList();
 
             searchPages.Add(_addPullRequestSearchListItem);
 
@@ -114,35 +100,5 @@ public class SavedPullRequestSearchesPage : ListPage
         }
 
         // errors are handled in SavePullRequestSearchPage
-    }
-
-    public IListItem CreateItemForPullRequestSearch(IPullRequestSearch search)
-    {
-        return new ListItem(CreatePageForPullRequestSearch(search))
-        {
-            Title = search.Title,
-            Subtitle = search.Url,
-            Icon = new IconInfo(AzureIcon.IconDictionary[$"logo"]),
-            MoreCommands = new CommandContextItem[]
-            {
-                new(new LinkCommand(search.Url, _resources)),
-                new(new EditPullRequestSearchPage(
-                    _resources,
-                    new SavePullRequestSearchForm(search, _resources, _mediator, _accountProvider, _azureClientHelpers, _pullRequestSearchRepository),
-                    new StatusMessage(),
-                    "Success",
-                    "Failure")),
-                new(new RemovePullRequestSearchCommand(search, _resources, _mediator, _pullRequestSearchRepository)),
-            },
-        };
-    }
-
-    private ListPage CreatePageForPullRequestSearch(IPullRequestSearch search)
-    {
-        return new PullRequestSearchPage(search, _resources, _dataProvider, _timeSpanHelper)
-        {
-            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-            Name = search.Title,
-        };
     }
 }

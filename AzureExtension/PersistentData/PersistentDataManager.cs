@@ -5,6 +5,7 @@
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
+using AzureExtension.Helpers;
 using Microsoft.Identity.Client;
 using Serilog;
 
@@ -147,5 +148,19 @@ public partial class PersistentDataManager : IQueryRepository
     {
         var queryInfo = _azureValidator.GetQueryInfo(query.Url, account);
         return queryInfo.Result == ResultType.Success;
+    }
+
+    public Task Remove(IAzureSearch azureSearch)
+    {
+        if (azureSearch is IQuery)
+        {
+            return RemoveSavedQueryAsync((IQuery)azureSearch);
+        }
+        else if (azureSearch is IPullRequestSearch)
+        {
+            return RemoveSavedPullRequestSearch((IPullRequestSearch)azureSearch);
+        }
+
+        throw new InvalidOperationException($"Unknown search type: {azureSearch.GetType()}");
     }
 }

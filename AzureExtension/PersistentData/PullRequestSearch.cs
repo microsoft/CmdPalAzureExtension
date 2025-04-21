@@ -23,7 +23,7 @@ public class PullRequestSearch : IPullRequestSearch
 
     public string Url { get; set; } = string.Empty;
 
-    public string Title { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
     public string View { get; set; } = string.Empty;
 
@@ -39,19 +39,19 @@ public class PullRequestSearch : IPullRequestSearch
         }
     }
 
-    public static PullRequestSearch? Get(DataStore dataStore, string url, string title, string view)
+    public static PullRequestSearch? Get(DataStore dataStore, string url, string name, string view)
     {
-        var sql = "SELECT * FROM PullRequestSearch WHERE Url = @Url AND Title = @Title AND View = @View";
-        var pullRequestSearch = dataStore.Connection.QueryFirstOrDefault<PullRequestSearch>(sql, new { Url = url, Title = title, View = view });
+        var sql = "SELECT * FROM PullRequestSearch WHERE Url = @Url AND Name = @Name AND View = @View";
+        var pullRequestSearch = dataStore.Connection.QueryFirstOrDefault<PullRequestSearch>(sql, new { Url = url, Name = name, View = view });
         return pullRequestSearch;
     }
 
-    public static PullRequestSearch Add(DataStore dataStore, string url, string title, string view)
+    public static PullRequestSearch Add(DataStore dataStore, string url, string name, string view)
     {
         var pullRequestSearch = new PullRequestSearch
         {
             Url = url,
-            Title = title,
+            Name = name,
             View = view,
         };
 
@@ -59,13 +59,13 @@ public class PullRequestSearch : IPullRequestSearch
         return pullRequestSearch;
     }
 
-    public static void Remove(DataStore dataStore, string url, string title, string view)
+    public static void Remove(DataStore dataStore, string url, string name, string view)
     {
-        var sql = "DELETE FROM PullRequestSearch WHERE Url = @Url AND Title = @Title AND View = @View";
+        var sql = "DELETE FROM PullRequestSearch WHERE Url = @Url AND Name = @Name AND View = @View";
         var command = dataStore.Connection!.CreateCommand();
         command.CommandText = sql;
         command.Parameters.AddWithValue("@Url", url);
-        command.Parameters.AddWithValue("@Title", title);
+        command.Parameters.AddWithValue("@Name", name);
         command.Parameters.AddWithValue("@View", view);
         _log.Verbose(DataStore.GetCommandLogMessage(sql, command));
         var deleted = command.ExecuteNonQuery();

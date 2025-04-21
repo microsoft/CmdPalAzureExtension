@@ -12,7 +12,7 @@ public partial class PersistentDataManager : ISavedPullRequestSearchRepository
     {
         ValidateDataStore();
 
-        var title = pullRequestSearch.Title;
+        var title = pullRequestSearch.Name;
         var url = pullRequestSearch.Url;
         var view = pullRequestSearch.View;
 
@@ -58,7 +58,7 @@ public partial class PersistentDataManager : ISavedPullRequestSearchRepository
     public Task<bool> IsTopLevel(IPullRequestSearch pullRequestSearch)
     {
         ValidateDataStore();
-        var dstorePullRequestSearch = PullRequestSearch.Get(_dataStore, pullRequestSearch.Url, pullRequestSearch.Title, pullRequestSearch.View);
+        var dstorePullRequestSearch = PullRequestSearch.Get(_dataStore, pullRequestSearch.Url, pullRequestSearch.Name, pullRequestSearch.View);
         return dstorePullRequestSearch != null ? Task.FromResult(dstorePullRequestSearch.IsTopLevel) : Task.FromResult(false);
     }
 
@@ -66,7 +66,7 @@ public partial class PersistentDataManager : ISavedPullRequestSearchRepository
     {
         ValidateDataStore();
 
-        var title = pullRequestSearch.Title;
+        var title = pullRequestSearch.Name;
         var url = pullRequestSearch.Url;
         var view = pullRequestSearch.View;
 
@@ -83,6 +83,6 @@ public partial class PersistentDataManager : ISavedPullRequestSearchRepository
     public void UpdatePullRequestSearchTopLevelStatus(IPullRequestSearch pullRequestSearch, bool isTopLevel)
     {
         ValidateDataStore();
-        PullRequestSearch.AddOrUpdate(_dataStore, pullRequestSearch.Url, pullRequestSearch.Title, pullRequestSearch.View, isTopLevel);
+        PullRequestSearch.AddOrUpdate(_dataStore, pullRequestSearch.Url, pullRequestSearch.Name, pullRequestSearch.View, isTopLevel);
     }
 }

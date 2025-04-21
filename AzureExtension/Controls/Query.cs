@@ -16,17 +16,21 @@ public class Query : IQuery
 
     public string Description { get; set; } = string.Empty;
 
+    public bool IsTopLevel { get; set; }
+
     public Query()
     {
         AzureUri = new AzureUri();
         Name = string.Empty;
         Description = string.Empty;
+        IsTopLevel = false;
     }
 
-    public Query(AzureUri azureUri, string name, string description)
+    public Query(AzureUri azureUri, string name, string description, bool isTopLevel)
     {
         AzureUri = azureUri;
         Name = name;
         Description = description;
+        IsTopLevel = isTopLevel;
     }
 }
