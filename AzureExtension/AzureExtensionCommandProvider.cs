@@ -4,7 +4,6 @@
 
 using AzureExtension.Account;
 using AzureExtension.Client;
-using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.Pages;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;

@@ -2,10 +2,9 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Controls;
 using AzureExtension.DataManager.Cache;
 
-namespace AzureExtension.DataManager;
+namespace AzureExtension.Controls;
 
 public interface IDataProvider
 {

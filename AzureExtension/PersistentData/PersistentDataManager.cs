@@ -5,7 +5,6 @@
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
-using AzureExtension.Helpers;
 using Microsoft.Identity.Client;
 using Serilog;
 

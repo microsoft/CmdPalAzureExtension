@@ -2,8 +2,10 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Account;
+using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
-using AzureExtension.DataManager;
+using AzureExtension.Controls.Forms;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
@@ -19,11 +21,20 @@ public class SearchPageFactory : ISearchPageFactory
 
     private readonly SavedAzureSearchesMediator _mediator;
 
-    public SearchPageFactory(IResources resources, IDataProvider dataProvider, SavedAzureSearchesMediator mediator)
+    private readonly IAccountProvider _accountProvider;
+
+    private readonly AzureClientHelpers _azureClientHelpers;
+
+    private readonly IAzureSearchRepository _azureSearchRepository;
+
+    public SearchPageFactory(IResources resources, IDataProvider dataProvider, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IAzureSearchRepository azureSearchRepository)
     {
         _resources = resources;
         _dataProvider = dataProvider;
         _mediator = mediator;
+        _accountProvider = accountProvider;
+        _azureClientHelpers = azureClientHelpers;
+        _azureSearchRepository = azureSearchRepository;
     }
 
     public ListPage CreatePageForSearch(IAzureSearch search)
@@ -40,6 +51,24 @@ public class SearchPageFactory : ISearchPageFactory
         throw new NotImplementedException($"No page for search type {search.GetType()}");
     }
 
+    public ContentPage CreateEditPageForSearch(IAzureSearch search)
+    {
+        if (search is IQuery)
+        {
+            var saveQueryForm = new SaveQueryForm((IQuery)search, _resources, _mediator, _accountProvider, _azureClientHelpers, (IQueryRepository)_azureSearchRepository);
+            return new EditQueryPage(_resources, saveQueryForm, new StatusMessage(), "query edited successfully", "error in editing query");
+        }
+        else if (search is IPullRequestSearch)
+        {
+            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, (ISavedPullRequestSearchRepository)_azureSearchRepository);
+            return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, new StatusMessage(), "pull request search edited successfully", "error in editing pull request search");
+        }
+        else
+        {
+            throw new NotImplementedException($"No edit form for search type {search.GetType()}");
+        }
+    }
+
     public IListItem CreateItemForSearch(IAzureSearch search, IAzureSearchRepository azureSearchRepository)
     {
         return new ListItem(CreatePageForSearch(search))
@@ -53,6 +82,11 @@ public class SearchPageFactory : ISearchPageFactory
                 {
                     Title = search.Name,
                     Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                },
+                new(CreateEditPageForSearch(search))
+                {
+                    Title = _resources.GetResource("Pages_Edit"),
+                    Icon = new IconInfo("\uecc9"),
                 },
                 new(new RemoveAzureSearchCommand(search, _resources, _mediator, azureSearchRepository))
                 {
