@@ -17,12 +17,11 @@ public static class FormEventHelper
         string successMessage,
         string errorMessage)
     {
-        form.FormSubmitted += (sender, args) => OnFormSubmit(page, statusMessage, successMessage, errorMessage, args);
+        form.FormSubmitted += (sender, args) => OnFormSubmit(statusMessage, successMessage, errorMessage, args);
         form.LoadingStateChanged += (sender, isLoading) => OnLoadingStateChanged(page, isLoading);
     }
 
     public static void OnFormSubmit(
-        ContentPage page,
         StatusMessage statusMessage,
         string successMessage,
         string errorMessage,
@@ -31,11 +30,6 @@ public static class FormEventHelper
         if (args?.Exception != null)
         {
             var message = $"{errorMessage}: {args.Exception.Message}";
-            if (args.Exception is Octokit.ApiException)
-            {
-                Octokit.ApiException apiException = (Octokit.ApiException)args.Exception;
-                message += $" - {StringHelper.ParseHttpErrorMessage(apiException.HttpResponse?.Body?.ToString())}";
-            }
 
             ExtensionHost.LogMessage(new LogMessage() { Message = args.Exception.Message });
             SetStatusMessage(statusMessage, message, MessageState.Error);

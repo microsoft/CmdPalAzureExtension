@@ -59,12 +59,14 @@ public class SearchPageFactory : ISearchPageFactory
         if (search is IQuery)
         {
             var saveQueryForm = new SaveQueryForm((IQuery)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _queryRepository);
-            return new EditQueryPage(_resources, saveQueryForm, new StatusMessage(), "query edited successfully", "error in editing query");
+            var statusMessage = new StatusMessage();
+            return new EditQueryPage(_resources, saveQueryForm, statusMessage, "query edited successfully", "error in editing query");
         }
         else if (search is IPullRequestSearch)
         {
             var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _savedPullRequestSearchRepository);
-            return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, new StatusMessage(), "pull request search edited successfully", "error in editing pull request search");
+            var statusMessage = new StatusMessage();
+            return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage, "pull request search edited successfully", "error in editing pull request search");
         }
         else
         {
@@ -128,21 +130,21 @@ public class SearchPageFactory : ISearchPageFactory
         };
     }
 
-    public async Task<List<CommandItem>> CreateCommandsForTopLevelSearches()
+    public async Task<List<IListItem>> CreateCommandsForTopLevelSearches()
     {
-        var topLevelSearches = new List<CommandItem>();
+        var topLevelSearches = new List<IListItem>();
         var topLevelQueries = await _queryRepository.GetTopLevelQueries();
         var topLevelPullRequestSearches = await _savedPullRequestSearchRepository.GetTopLevelPullRequestSearches();
 
         foreach (var query in topLevelQueries)
         {
-            var commandItem = CreateCommandItemForSearch(query);
+            var commandItem = CreateItemForSearch(query, _queryRepository);
             topLevelSearches.Add(commandItem);
         }
 
         foreach (var pullRequestSearch in topLevelPullRequestSearches)
         {
-            var commandItem = CreateCommandItemForSearch(pullRequestSearch);
+            var commandItem = CreateItemForSearch(pullRequestSearch, _savedPullRequestSearchRepository);
             topLevelSearches.Add(commandItem);
         }
 

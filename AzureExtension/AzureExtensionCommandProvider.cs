@@ -5,8 +5,12 @@
 using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls;
+using AzureExtension.Controls.ListItems;
 using AzureExtension.Controls.Pages;
+using AzureExtension.DataManager;
+using AzureExtension.DataManager.Cache;
 using AzureExtension.Helpers;
+using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Windows.ApplicationModel.Resources;
@@ -55,7 +59,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private void OnSearchUpdated(object? sender, object? args)
     {
-        if (args is Query || args is PersistentData.Query)
+        if (args is Controls.Query || args is PersistentData.Query)
         {
             RaiseItemsChanged();
         }
@@ -78,14 +82,14 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         else
         {
             var topLevelCommands = GetTopLevelSearches().GetAwaiter().GetResult();
-            var defaultCommands = new List<CommandItem>
+            var defaultCommands = new List<ListItem>
             {
                 new(_savedQueriesPage)
                 {
                     Title = _resources.GetResource("Pages_Saved_Searches"),
                     Icon = new IconInfo("\ue721"),
                 },
-                new CommandItem(_savedPullRequestSearchesPage)
+                new ListItem(_savedPullRequestSearchesPage)
                 {
                     Title = "Save Pull Request Search",
                     Icon = new IconInfo("\ue721"),
@@ -104,7 +108,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         }
     }
 
-    private async Task<List<CommandItem>> GetTopLevelSearches()
+    private async Task<List<IListItem>> GetTopLevelSearches()
     {
         return await _searchPageFactory.CreateCommandsForTopLevelSearches();
     }

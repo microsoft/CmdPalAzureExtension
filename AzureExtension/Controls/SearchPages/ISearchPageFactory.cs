@@ -11,5 +11,5 @@ public interface ISearchPageFactory
 {
     IListItem CreateItemForSearch(IAzureSearch search, IAzureSearchRepository azureSearchRepository);
 
-    Task<List<CommandItem>> CreateCommandsForTopLevelSearches();
+    Task<List<IListItem>> CreateCommandsForTopLevelSearches();
 }
