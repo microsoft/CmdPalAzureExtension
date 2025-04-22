@@ -34,13 +34,13 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
         { "{{SaveQueryFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Query" : "Forms_Edit_Query") },
         { "{{SavedQueryString}}", _savedQuery.Url },
         { "{{SavedQueryName}}", _savedQuery.Name },
-        { "{{EnteredQueryErrorMessage}}", _resources.GetResource("Forms_SaveQueryTemplateEnteredQueryError") },
-        { "{{EnteredQueryLabel}}", _resources.GetResource("Forms_SaveQueryTemplateEnteredQueryLabel") },
-        { "{{NameLabel}}", _resources.GetResource("Forms_SaveQueryTemplateNameLabel") },
-        { "{{NameErrorMessage}}", _resources.GetResource("Forms_SaveQueryTemplateNameError") },
-        { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveQueryTemplateIsTopLevelTitle") },
+        { "{{EnteredQueryErrorMessage}}", _resources.GetResource("Forms_SaveQuery_TemplateEnteredQueryError") },
+        { "{{EnteredQueryLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateEnteredQueryLabel") },
+        { "{{NameLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateNameLabel") },
+        { "{{NameErrorMessage}}", _resources.GetResource("Forms_SaveQuery_TemplateNameError") },
+        { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveQueryTemplate_IsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
-        { "{{SaveQueryActionTitle}}", _resources.GetResource("Forms_SaveQueryTemplateSaveQueryActionTitle") },
+        { "{{SaveQueryActionTitle}}", _resources.GetResource("Forms_SaveQuery_TemplateSaveQueryActionTitle") },
     };
 
     // for saving a new query

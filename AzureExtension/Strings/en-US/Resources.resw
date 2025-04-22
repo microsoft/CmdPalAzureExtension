@@ -674,27 +674,27 @@
     <value>Save Query</value>
     <comment>Shown in form button to save a query</comment>
   </data>
-  <data name="Forms_SaveQueryTemplateEnteredQueryError" xml:space="preserve">
+  <data name="Forms_SaveQuery_TemplateEnteredQueryError" xml:space="preserve">
     <value>Query is required</value>
     <comment>Shown if the user submits the form without entering a query</comment>
   </data>
-  <data name="Forms_SaveQueryTemplateEnteredQueryLabel" xml:space="preserve">
+  <data name="Forms_SaveQuery_TemplateEnteredQueryLabel" xml:space="preserve">
     <value>Query string or URL:</value>
     <comment>Shown as the label for the input text box for the Azure query</comment>
   </data>
-  <data name="Forms_SaveQueryTemplateIsTopLevelTitle" xml:space="preserve">
+  <data name="Forms_SaveQuery_TemplateIsTopLevelTitle" xml:space="preserve">
     <value>Pin query to top-level commands</value>
     <comment>The label text for the checkbox that determines if the query should be pinned as a top level command</comment>
   </data>
-  <data name="Forms_SaveQueryTemplateNameError" xml:space="preserve">
+  <data name="Forms_SaveQuery_TemplateNameError" xml:space="preserve">
     <value>A query name is required</value>
     <comment>Shown if the user submits the SaveSearchForm without a name</comment>
   </data>
-  <data name="Forms_SaveQueryTemplateNameLabel" xml:space="preserve">
+  <data name="Forms_SaveQuery_TemplateNameLabel" xml:space="preserve">
     <value>Name:</value>
     <comment>Shown as the name for the saved query</comment>
   </data>
-  <data name="Forms_SaveQueryTemplateSaveQueryActionTitle" xml:space="preserve">
+  <data name="Forms_SaveQuery_TemplateSaveQueryActionTitle" xml:space="preserve">
     <value>Save</value>
     <comment>The title for the button that submits the form and saves the query</comment>
   </data>
@@ -868,7 +868,7 @@
   <data name="Forms_PullRequestSearch_TemplateViewMineTitle" xml:space="preserve">
     <value>Mine</value>
   </data>
-  <data name="Forms_PullRequestSearchViewAssignedToMeTitle" xml:space="preserve">
+  <data name="Forms_PullRequestSearch_TemplateViewAssignedToMeTitle" xml:space="preserve">
     <value>Assigned to Me</value>
   </data>
   <data name="Forms_PullRequestSearch_TemplatePullRequestSearchViewAllTitle" xml:space="preserve">
@@ -876,5 +876,17 @@
   </data>
   <data name="Forms_PullRequestSearch_TemplateSavePullRequestSearchActionTitle" xml:space="preserve">
     <value>Save</value>
+  </data>
+  <data name="Forms_SavePullRequestSearch_TemplateDefaultView" xml:space="preserve">
+    <value>Mine</value>
+  </data>
+  <data name="Forms_SavePullRequestSearch_TemplateIsTopLevelTitle" xml:space="preserve">
+    <value>Add pull request search to the top level</value>
+  </data>
+  <data name="Forms_SavePullRequestSearch_TemplateSavePullRequestSearchActionTitle" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Forms_SaveQueryTemplate_IsTopLevelTitle" xml:space="preserve">
+    <value>Add query to the top level</value>
   </data>
 </root>
