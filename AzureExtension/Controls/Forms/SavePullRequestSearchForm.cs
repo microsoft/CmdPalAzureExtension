@@ -65,16 +65,16 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     public override ICommandResult SubmitForm(string inputs, string data)
     {
         LoadingStateChanged?.Invoke(this, true);
-        Task.Run(() =>
+        Task.Run(async () =>
         {
-            var search = GetPullRequestSearch(inputs);
+            var search = await GetPullRequestSearch(inputs);
             ExtensionHost.LogMessage(new LogMessage() { Message = $"PullRequestSearch: {search}" });
         });
 
         return CommandResult.KeepOpen();
     }
 
-    private PullRequestSearch GetPullRequestSearch(string payload)
+    private async Task<PullRequestSearch> GetPullRequestSearch(string payload)
     {
         try
         {
@@ -88,7 +88,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             {
                 Log.Information($"Removing outdated search {_savedPullRequestSearch.Name}, {_savedPullRequestSearch.Url}");
 
-                _pullRequestSearchRepository.RemoveSavedPullRequestSearch(pullRequestSearch);
+                await _pullRequestSearchRepository.RemoveSavedPullRequestSearch(pullRequestSearch);
             }
 
             LoadingStateChanged?.Invoke(this, false);

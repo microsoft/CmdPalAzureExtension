@@ -70,16 +70,16 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     public override ICommandResult SubmitForm(string inputs, string data)
     {
         LoadingStateChanged?.Invoke(this, true);
-        Task.Run(() =>
+        Task.Run(async () =>
         {
-            var query = GetQuery(inputs);
+            var query = await GetQuery(inputs);
             ExtensionHost.LogMessage(new LogMessage() { Message = $"Query: {query}" });
         });
 
         return CommandResult.KeepOpen();
     }
 
-    public Query GetQuery(string payload)
+    public async Task<Query> GetQuery(string payload)
     {
         try
         {
@@ -93,7 +93,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             {
                 Log.Information($"Removing outdated search {_savedQuery.Name}, {_savedQuery.Url}");
 
-                _queryRepository.RemoveSavedQueryAsync(_savedQuery).Wait();
+                await _queryRepository.RemoveSavedQueryAsync(_savedQuery);
             }
 
             LoadingStateChanged?.Invoke(this, false);
