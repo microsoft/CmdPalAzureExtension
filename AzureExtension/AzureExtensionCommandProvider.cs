@@ -55,11 +55,14 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
         _mediator.QuerySaved += OnSearchUpdated;
         _mediator.QueryRemoved += OnSearchUpdated;
+        _mediator.PullRequestSearchSaved += OnSearchUpdated;
+        _mediator.PullRequestSearchRemoved += OnSearchUpdated;
     }
 
     private void OnSearchUpdated(object? sender, object? args)
     {
-        if (args is Controls.Query || args is PersistentData.Query)
+        if (args is Controls.Query || args is PersistentData.Query
+            || args is Controls.PullRequestSearch || args is PersistentData.PullRequestSearch)
         {
             RaiseItemsChanged();
         }
