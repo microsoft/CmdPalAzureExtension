@@ -63,7 +63,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             {
                 new(_savedQueriesPage)
                 {
-                    Title = _resources.GetResource("Pages_Saved_Searches"),
+                    Title = _resources.GetResource("Pages_Saved_Queries"),
                     Icon = new IconInfo("\ue721"),
                 },
                 new CommandItem(_savedPullRequestSearchesPage)

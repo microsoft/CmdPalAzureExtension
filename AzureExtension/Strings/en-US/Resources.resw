@@ -666,35 +666,35 @@
     <value>Azure Extension</value>
     <comment>Title for the extension</comment>
   </data>
-  <data name="Forms_Edit_Search" xml:space="preserve">
+  <data name="Forms_Edit_Query" xml:space="preserve">
     <value>Edit Query</value>
     <comment>Shown in form button to edit a query</comment>
   </data>
-  <data name="Forms_Save_Search" xml:space="preserve">
+  <data name="Forms_Save_Query" xml:space="preserve">
     <value>Save Query</value>
     <comment>Shown in form button to save a query</comment>
   </data>
-  <data name="Forms_SaveSearchTemplateEnteredSearchError" xml:space="preserve">
+  <data name="Forms_SaveQueryTemplateEnteredQueryError" xml:space="preserve">
     <value>Query is required</value>
     <comment>Shown if the user submits the form without entering a query</comment>
   </data>
-  <data name="Forms_SaveSearchTemplateEnteredSearchLabel" xml:space="preserve">
+  <data name="Forms_SaveQueryTemplateEnteredQueryLabel" xml:space="preserve">
     <value>Query string or URL:</value>
     <comment>Shown as the label for the input text box for the Azure query</comment>
   </data>
-  <data name="Forms_SaveSearchTemplateIsTopLevelTitle" xml:space="preserve">
+  <data name="Forms_SaveQueryTemplateIsTopLevelTitle" xml:space="preserve">
     <value>Pin query to top-level commands</value>
     <comment>The label text for the checkbox that determines if the query should be pinned as a top level command</comment>
   </data>
-  <data name="Forms_SaveSearchTemplateNameError" xml:space="preserve">
+  <data name="Forms_SaveQueryTemplateNameError" xml:space="preserve">
     <value>A query name is required</value>
     <comment>Shown if the user submits the SaveSearchForm without a name</comment>
   </data>
-  <data name="Forms_SaveSearchTemplateNameLabel" xml:space="preserve">
+  <data name="Forms_SaveQueryTemplateNameLabel" xml:space="preserve">
     <value>Name:</value>
     <comment>Shown as the name for the saved query</comment>
   </data>
-  <data name="Forms_SaveSearchTemplateSaveSearchActionTitle" xml:space="preserve">
+  <data name="Forms_SaveQueryTemplateSaveQueryActionTitle" xml:space="preserve">
     <value>Save</value>
     <comment>The title for the button that submits the form and saves the query</comment>
   </data>
@@ -718,15 +718,15 @@
     <value>Sign out from Azure extension</value>
     <comment>Tooltip for sign out button on sign out form</comment>
   </data>
-  <data name="ListItems_AddSearch" xml:space="preserve">
+  <data name="ListItems_AddQuery" xml:space="preserve">
     <value>Add a query</value>
     <comment>Title for Add query list item, shown in Add Queries page.</comment>
   </data>
-  <data name="Message_Search_Saved" xml:space="preserve">
+  <data name="Message_Query_Saved" xml:space="preserve">
     <value>Query saved successfully!</value>
     <comment>Shown in a toast when query is saved</comment>
   </data>
-  <data name="Message_Search_Saved_Error" xml:space="preserve">
+  <data name="Message_Query_Saved_Error" xml:space="preserve">
     <value>Error in saving query</value>
     <comment>Shown in a toast when there is an error saving a query</comment>
   </data>
@@ -802,23 +802,23 @@
     <value>pull request title</value>
     <comment>Shown in command to copy title of pull request on a page</comment>
   </data>
-  <data name="Pages_Saved_Searches" xml:space="preserve">
+  <data name="Pages_Saved_Queries" xml:space="preserve">
     <value>Saved ADO Queries</value>
     <comment>Name of page that shows list of saved github queries</comment>
   </data>
-  <data name="Pages_Saved_Searches_Error" xml:space="preserve">
+  <data name="Pages_Saved_Queries_Error" xml:space="preserve">
     <value>Error in removing query: </value>
     <comment>Shown in a toast when error happens when saving a query</comment>
   </data>
-  <data name="Pages_Saved_Searches_Failure" xml:space="preserve">
+  <data name="Pages_Saved_Queries_Failure" xml:space="preserve">
     <value>Failed to remove query.</value>
     <comment>Shown when failed to remove a search from saved queries page</comment>
   </data>
-  <data name="Pages_Search_Edited_Failed" xml:space="preserve">
+  <data name="Pages_Query_Edited_Failed" xml:space="preserve">
     <value>Error in editing query:</value>
     <comment>Shown in a toast when there is an error editing a query</comment>
   </data>
-  <data name="Pages_Search_Edited_Success" xml:space="preserve">
+  <data name="Pages_Query_Edited_Success" xml:space="preserve">
     <value>Query edited successfully!</value>
     <comment>Shown as a toast when a query is edited successfully</comment>
   </data>

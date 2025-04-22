@@ -30,7 +30,7 @@ public partial class SavedQueriesPage : ListPage
         _resources = resources;
 
         Icon = new IconInfo("\ue721");
-        Name = _resources.GetResource("Pages_Saved_Searches");
+        Name = _resources.GetResource("Pages_Saved_Queries");
         _savedQueriesMediator = savedQueriesMediator;
         _savedQueriesMediator.QueryRemoved += OnQueryRemoved;
         _savedQueriesMediator.QueryRemoving += OnQueryRemoving;
@@ -48,7 +48,7 @@ public partial class SavedQueriesPage : ListPage
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = $"{_resources.GetResource("Pages_Saved_Searches_Error")} {e.Message}",
+                Message = $"{_resources.GetResource("Pages_Saved_Queries_Error")} {e.Message}",
                 State = MessageState.Error,
             });
 
@@ -64,7 +64,7 @@ public partial class SavedQueriesPage : ListPage
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = _resources.GetResource("Pages_Saved_Searches_Failure"),
+                Message = _resources.GetResource("Pages_Saved_Queries_Failure"),
                 State = MessageState.Error,
             });
 
