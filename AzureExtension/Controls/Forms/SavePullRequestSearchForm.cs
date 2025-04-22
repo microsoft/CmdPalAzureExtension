@@ -4,7 +4,6 @@
 
 using System.Globalization;
 using System.Text.Json.Nodes;
-using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
@@ -18,8 +17,6 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 {
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _mediator;
-    private readonly IAccountProvider _accountProvider;
-    private readonly AzureClientHelpers _azureClientHelpers;
     private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
     private readonly IPullRequestSearch _savedPullRequestSearch;
 
@@ -41,23 +38,19 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequestSearch", TemplateSubstitutions);
 
     // for saving a new pull request search
-    public SavePullRequestSearchForm(IResources resources, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
+    public SavePullRequestSearchForm(IResources resources, SavedAzureSearchesMediator mediator, ISavedPullRequestSearchRepository pullRequestSearchRepository)
     {
         _resources = resources;
         _mediator = mediator;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
         _pullRequestSearchRepository = pullRequestSearchRepository;
         _savedPullRequestSearch = new PullRequestSearch();
     }
 
     // for editing an existing pull request search
-    public SavePullRequestSearchForm(IPullRequestSearch savedPullRequestSearch, IResources resources, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
+    public SavePullRequestSearchForm(IPullRequestSearch savedPullRequestSearch, IResources resources, SavedAzureSearchesMediator mediator, ISavedPullRequestSearchRepository pullRequestSearchRepository)
     {
         _resources = resources;
         _mediator = mediator;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
         _pullRequestSearchRepository = pullRequestSearchRepository;
         _savedPullRequestSearch = savedPullRequestSearch;
     }
