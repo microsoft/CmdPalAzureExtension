@@ -90,34 +90,6 @@ public class SearchPageFactory : ISearchPageFactory
         };
     }
 
-    public CommandItem CreateCommandItemForSearch(IAzureSearch azureSearch)
-    {
-        return new CommandItem(CreatePageForSearch(azureSearch))
-        {
-            Title = azureSearch.Name,
-            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-            Subtitle = azureSearch.Url,
-            MoreCommands = new CommandContextItem[]
-            {
-                new(new LinkCommand(azureSearch.Url, _resources))
-                {
-                    Title = azureSearch.Name,
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-                },
-                new(CreateEditPageForSearch(azureSearch))
-                {
-                    Title = _resources.GetResource("Pages_Edit"),
-                    Icon = new IconInfo("\uecc9"),
-                },
-                new(new RemoveAzureSearchCommand(azureSearch, _resources, _mediator, (IAzureSearchRepository)_savedPullRequestSearchRepository))
-                {
-                    Title = _resources.GetResource("Commands_Remove_Saved_Search"),
-                    Icon = new IconInfo("\uecc9"),
-                },
-            },
-        };
-    }
-
     public async Task<List<IListItem>> CreateCommandsForTopLevelSearches()
     {
         var topLevelSearches = new List<IListItem>();
