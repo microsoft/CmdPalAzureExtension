@@ -83,21 +83,9 @@ public class SearchPageFactory : ISearchPageFactory
             Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(search.Url, _resources))
-                {
-                    Title = search.Name,
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-                },
-                new(CreateEditPageForSearch(search))
-                {
-                    Title = _resources.GetResource("Pages_Edit"),
-                    Icon = new IconInfo("\uecc9"),
-                },
-                new(new RemoveAzureSearchCommand(search, _resources, _mediator, azureSearchRepository))
-                {
-                    Title = _resources.GetResource("Commands_Remove_Saved_Search"),
-                    Icon = new IconInfo("\uecc9"),
-                },
+                new(new LinkCommand(search.Url, _resources)),
+                new(CreateEditPageForSearch(search)),
+                new(new RemoveAzureSearchCommand(search, _resources, _mediator, azureSearchRepository)),
             },
         };
     }
