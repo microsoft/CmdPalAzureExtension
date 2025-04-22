@@ -4,6 +4,7 @@
 
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls;
 using AzureExtension.Controls.Pages;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -30,7 +31,9 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly ISearchPageFactory _searchPageFactory;
 
-    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedQueriesPage, IResources resources, AzureClientHelpers azureClientHelpers, SavedPullRequestSearchesPage savedPullRequestSearchesPage, ISearchPageFactory searchPageFactory)
+    private readonly SavedAzureSearchesMediator _mediator;
+
+    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedQueriesPage, IResources resources, AzureClientHelpers azureClientHelpers, SavedPullRequestSearchesPage savedPullRequestSearchesPage, ISearchPageFactory searchPageFactory, SavedAzureSearchesMediator mediator)
     {
         _signInPage = signInPage;
         _signOutPage = signOutPage;
@@ -40,14 +43,26 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _azureClientHelpers = azureClientHelpers;
         _savedPullRequestSearchesPage = savedPullRequestSearchesPage;
         _searchPageFactory = searchPageFactory;
+        _mediator = mediator;
         DisplayName = "Azure Extension";
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);
+
+        _mediator.QuerySaved += OnSearchSaved;
+    }
+
+    private void OnSearchSaved(object? sender, object? args)
+    {
+        if (args is Query)
+        {
+            RaiseItemsChanged(0);
+        }
     }
 
     public override ICommandItem[] TopLevelCommands()
     {
+        var topLevelCommands = new List<CommandItem>();
         if (!_accountProvider.IsSignedIn())
         {
             return new ICommandItem[]
@@ -83,9 +98,10 @@ public partial class AzureExtensionCommandProvider : CommandProvider
                 },
             };
 
-            topLevelSearchCommands.AddRange(defaultCommands);
+            topLevelCommands.AddRange(defaultCommands);
+            topLevelCommands.AddRange(topLevelSearchCommands);
 
-            return topLevelSearchCommands.ToArray();
+            return topLevelCommands.ToArray();
         }
     }
 
