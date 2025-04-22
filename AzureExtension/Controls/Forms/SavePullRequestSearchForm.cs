@@ -80,7 +80,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             {
                 Log.Information($"Removing outdated search {_savedPullRequestSearch.Name}, {_savedPullRequestSearch.Url}");
 
-                await _pullRequestSearchRepository.RemoveSavedPullRequestSearch(pullRequestSearch);
+                await _pullRequestSearchRepository.RemoveSavedPullRequestSearch(_savedPullRequestSearch);
             }
 
             LoadingStateChanged?.Invoke(this, false);
