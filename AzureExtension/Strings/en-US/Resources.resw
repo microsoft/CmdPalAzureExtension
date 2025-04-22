@@ -850,4 +850,31 @@
     <value>updated</value>
     <comment>Indicates when something was updated</comment>
   </data>
+  <data name="Forms_SavePullRequestSearch_TemplateRepositoryUrlLabel" xml:space="preserve">
+    <value>Enter Repository URL</value>
+  </data>
+  <data name="Forms_SavePullRequestSearch_TemplateRepositoryUrlPlaceholder" xml:space="preserve">
+    <value>Enter Repository URL</value>
+  </data>
+  <data name="Forms_SavePullRequestSearch_TemplateRepositoryUrlError" xml:space="preserve">
+    <value>Must enter repository URL</value>
+  </data>
+  <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchTitlePlaceholder" xml:space="preserve">
+    <value>My team's pull requests</value>
+  </data>
+  <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchTitleLabel" xml:space="preserve">
+    <value>Pull Request Search Title</value>
+  </data>
+  <data name="Forms_PullRequestSearch_TemplateViewMineTitle" xml:space="preserve">
+    <value>Mine</value>
+  </data>
+  <data name="Forms_PullRequestSearchViewAssignedToMeTitle" xml:space="preserve">
+    <value>Assigned to Me</value>
+  </data>
+  <data name="Forms_PullRequestSearch_TemplatePullRequestSearchViewAllTitle" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Forms_PullRequestSearch_TemplateSavePullRequestSearchActionTitle" xml:space="preserve">
+    <value>Save</value>
+  </data>
 </root>

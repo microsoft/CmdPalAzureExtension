@@ -8,54 +8,41 @@
       "items": [
         {
           "type": "Input.Text",
-          "placeholder": "Enter Repository URL",
+          "placeholder": "{{RepositoryUrlPlaceholder}}",
           "id": "url",
-          "value": "{{url}}",
-          "label": "Enter Repository URL",
+          "value": "{{PullRequestSearchRepositoryUrl}}",
+          "label": "{{RepositoryUrlLabel}}",
           "style": "Url",
           "isRequired": true,
-          "errorMessage": "Must enter repository URL"
+          "errorMessage": "{{RepositoryUrlError}}"
         },
         {
           "type": "Input.Text",
-          "placeholder": "Pull Request Search Title",
+          "placeholder": "{{PullRequestSearchTitlePlaceholder}}",
           "id": "title",
-          "label": "Pull Request Search Title",
-          "value": "{{enteredTitle}}"
+          "label": "{{PullRequestSearchTitleLabel}}",
+          "value": "{{EnteredPullRequestSearchTitle}}"
         },
         {
           "type": "Input.ChoiceSet",
           "choices": [
             {
-              "title": "Mine",
+              "title": "{{PullRequestSearchViewMineTitle}}",
               "value": "Mine"
             },
             {
-              "title": "Assigned to Me",
+              "title": "{{PullRequestSearchViewAssignedToMeTitle}}",
               "value": "Assigned"
             },
             {
-              "title": "All",
+              "title": "{{PullRequestSearchViewAllTitle}}",
               "value": "All"
             }
           ],
           "label": "View",
-          "value": "{{selectedView}}",
+          "value": "{{PullRequestSearchSelectedView}}",
           "id": "view",
           "isRequired": true
-        },
-        {
-          "type": "Container",
-          "$when": "${message != null}",
-          "items": [
-            {
-              "type": "TextBlock",
-              "text": "${message}",
-              "wrap": true,
-              "size": "Small"
-            }
-          ],
-          "style": "warning"
         }
       ]
     }
@@ -63,7 +50,7 @@
   "actions": [
     {
       "type": "Action.Submit",
-      "title": "Save",
+      "title": "{{SavePullRequestSearchActionTitle}}",
       "data": {
         "id": "SavePullRequestSearchAction"
       }

@@ -28,9 +28,18 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "{{url}}", _savedPullRequestSearch.Url },
-        { "{{enteredTitle}}", _savedPullRequestSearch.Name },
-        { "{{selectedView}}", string.IsNullOrEmpty(_savedPullRequestSearch.View) ? "Mine" : _savedPullRequestSearch.View },
+        { "{{RepositoryUrlPlaceholder}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateRepositoryUrlPlaceholder") },
+        { "{{RepositoryUrlLabel}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateRepositoryUrlLabel") },
+        { "{{PullRequestSearchRepositoryUrl}}", _savedPullRequestSearch.Url },
+        { "{{RepositoryUrlError}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateRepositoryUrlError") },
+        { "{{PullRequestSearchTitlePlaceholder}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplatePullRequestSearchTitlePlaceholder") },
+        { "{{PullRequestSearchTitleLabel}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplatePullRequestSearchTitleLabel") },
+        { "{{EnteredPullRequestSearchTitle}}", _savedPullRequestSearch.Name },
+        { "{{PullRequestSearchViewMineTitle}}", _resources.GetResource("Forms_PullRequestSearch_TemplateViewMineTitle") },
+        { "{{PullRequestSearchViewAssignedToMeTitle}}", _resources.GetResource("Forms_PullRequestSearchViewAssignedToMeTitle") },
+        { "{{PullRequestSearchViewAllTitle}}", _resources.GetResource("Forms_PullRequestSearch_TemplatePullRequestSearchViewAllTitle") },
+        { "{{PullRequestSearchSelectedView}}", string.IsNullOrEmpty(_savedPullRequestSearch.View) ? "Mine" : _savedPullRequestSearch.View },
+        { "{{SavePullRequestSearchActionTitle}}", _resources.GetResource("Forms_SaveQueryTemplateSaveQueryActionTitle") },
     };
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequestSearch", TemplateSubstitutions);
