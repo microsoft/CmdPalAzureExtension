@@ -67,14 +67,13 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
         LoadingStateChanged?.Invoke(this, true);
         Task.Run(async () =>
         {
-            var search = await GetPullRequestSearch(inputs);
-            ExtensionHost.LogMessage(new LogMessage() { Message = $"PullRequestSearch: {search}" });
+            await AddPullRequestSearch(inputs);
         });
 
         return CommandResult.KeepOpen();
     }
 
-    private async Task<PullRequestSearch> GetPullRequestSearch(string payload)
+    private async Task AddPullRequestSearch(string payload)
     {
         try
         {
@@ -95,7 +94,6 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             _pullRequestSearchRepository.UpdatePullRequestSearchTopLevelStatus(pullRequestSearch, pullRequestSearch.IsTopLevel);
             _mediator.AddPullRequestSearch(pullRequestSearch);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
-            return pullRequestSearch;
         }
         catch (Exception ex)
         {
@@ -103,8 +101,6 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             _mediator.AddPullRequestSearch(ex);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
         }
-
-        return new PullRequestSearch();
     }
 
     public PullRequestSearch CreatePullRequestSearchFromJson(JsonNode? jsonNode)
