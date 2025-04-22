@@ -185,7 +185,7 @@ public partial class DataStoreTests
         // Trailing slash on the org lookup by connection should give the same result.
         var orgLookup2 = Organization.Get(dataStore, "https://dev.azure.com/organization1/");
         Assert.IsNotNull(orgLookup2);
-        Assert.AreEqual("organization1", orgLookup.Name);
+        Assert.AreEqual("organization1", orgLookup2.Name);
     }
 
     [TestMethod]
