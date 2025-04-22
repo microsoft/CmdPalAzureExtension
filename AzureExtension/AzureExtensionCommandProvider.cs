@@ -28,7 +28,9 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly SavedPullRequestSearchesPage _savedPullRequestSearchesPage;
 
-    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedQueriesPage, IResources resources, AzureClientHelpers azureClientHelpers, SavedPullRequestSearchesPage savedPullRequestSearchesPage)
+    private readonly ISearchPageFactory _searchPageFactory;
+
+    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedQueriesPage, IResources resources, AzureClientHelpers azureClientHelpers, SavedPullRequestSearchesPage savedPullRequestSearchesPage, ISearchPageFactory searchPageFactory)
     {
         _signInPage = signInPage;
         _signOutPage = signOutPage;
@@ -37,6 +39,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _resources = resources;
         _azureClientHelpers = azureClientHelpers;
         _savedPullRequestSearchesPage = savedPullRequestSearchesPage;
+        _searchPageFactory = searchPageFactory;
         DisplayName = "Azure Extension";
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
@@ -59,6 +62,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         }
         else
         {
+            var topLevelSearchCommands = GetTopLevelSearches().Result;
             var defaultCommands = new List<CommandItem>
             {
                 new(_savedQueriesPage)
@@ -79,7 +83,14 @@ public partial class AzureExtensionCommandProvider : CommandProvider
                 },
             };
 
-            return defaultCommands.ToArray();
+            topLevelSearchCommands.AddRange(defaultCommands);
+
+            return topLevelSearchCommands.ToArray();
         }
+    }
+
+    private async Task<List<CommandItem>> GetTopLevelSearches()
+    {
+        return await _searchPageFactory.CreateCommandsForTopLevelSearches();
     }
 }

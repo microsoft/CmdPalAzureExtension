@@ -162,12 +162,9 @@ public sealed class Program
 
         var savedAzureSearchesMediator = new SavedAzureSearchesMediator();
 
-        // Currently, there is only one implementation of IAzureSearchRepository (PersistentDataManager)
-        // that inherits from both IQuerySearchRepository and ISavedPullRequestSearchRepository.
-        // This is why we're injecting the PersistentDataManager here. If we ever separate the implementations of
-        // IQuerySearchRepository and ISavedPullRequestSearchRepository, we will need to change the code to use
-        // the correct repository at runtime.
-        var searchPageFactory = new SearchPageFactory(resources, dataProvider, savedAzureSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager);
+        // The searchPageFactory requires an instance of IQueryRepository and ISavedPullRequestSearchRepository.
+        // Currently, the PersistentDataManager implements both interfaces, so it is passed in twice.
+        var searchPageFactory = new SearchPageFactory(resources, dataProvider, savedAzureSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager, persistentDataManager);
 
         var addQueryForm = new SaveQueryForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager);
         var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources.GetResource("Message_Search_Saved"), resources.GetResource("Message_Search_Saved_Error"), resources.GetResource("ListItems_AddSearch")), resources);
@@ -178,7 +175,7 @@ public sealed class Program
         var addPullRequestSearchListItem = new AddPullRequestSearchListItem(savePullRequestSearchPage, resources);
         var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedAzureSearchesMediator, persistentDataManager, searchPageFactory);
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, azureClientHelpers, savedPullRequestSearchesPage);
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, azureClientHelpers, savedPullRequestSearchesPage, searchPageFactory);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 

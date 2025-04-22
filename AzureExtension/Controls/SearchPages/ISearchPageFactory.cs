@@ -3,10 +3,13 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.CommandPalette.Extensions;
+using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
 public interface ISearchPageFactory
 {
     IListItem CreateItemForSearch(IAzureSearch search, IAzureSearchRepository azureSearchRepository);
+
+    Task<List<CommandItem>> CreateCommandsForTopLevelSearches();
 }
