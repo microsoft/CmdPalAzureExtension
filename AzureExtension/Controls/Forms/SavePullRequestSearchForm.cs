@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
@@ -26,11 +27,15 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
+    private string IsTopLevelChecked => GetIsTopLevel().Result.ToString().ToLower(CultureInfo.InvariantCulture);
+
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{url}}", _savedPullRequestSearch.Url },
         { "{{enteredTitle}}", _savedPullRequestSearch.Name },
         { "{{selectedView}}", string.IsNullOrEmpty(_savedPullRequestSearch.View) ? "Mine" : _savedPullRequestSearch.View },
+        { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveSearchTemplateIsTopLevelTitle") },
+        { "{{IsTopLevel}}", IsTopLevelChecked },
     };
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequestSearch", TemplateSubstitutions);
@@ -114,5 +119,10 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
         }
 
         return new PullRequestSearch(new AzureUri(searchUrl), name, view);
+    }
+
+    public async Task<bool> GetIsTopLevel()
+    {
+        return await _pullRequestSearchRepository.IsTopLevel(_savedPullRequestSearch);
     }
 }

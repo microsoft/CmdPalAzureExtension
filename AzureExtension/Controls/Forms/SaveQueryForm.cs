@@ -34,12 +34,12 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
         { "{{SaveSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Search" : "Forms_Edit_Search") },
         { "{{SavedSearchString}}", _savedQuery.Url },
         { "{{SavedSearchName}}", _savedQuery.Name },
-        { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{EnteredSearchErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchError") },
         { "{{EnteredSearchLabel}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchLabel") },
         { "{{NameLabel}}", _resources.GetResource("Forms_SaveSearchTemplateNameLabel") },
         { "{{NameErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateNameError") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveSearchTemplateIsTopLevelTitle") },
+        { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SaveSearchActionTitle}}", _resources.GetResource("Forms_SaveSearchTemplateSaveSearchActionTitle") },
     };
 
