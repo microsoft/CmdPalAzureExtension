@@ -56,13 +56,12 @@ public partial class AzureExtensionCommandProvider : CommandProvider
     {
         if (args is Query)
         {
-            RaiseItemsChanged(0);
+            RaiseItemsChanged();
         }
     }
 
     public override ICommandItem[] TopLevelCommands()
     {
-        var topLevelCommands = new List<CommandItem>();
         if (!_accountProvider.IsSignedIn())
         {
             return new ICommandItem[]
@@ -77,7 +76,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         }
         else
         {
-            var topLevelSearchCommands = GetTopLevelSearches().Result;
+            var topLevelCommands = GetTopLevelSearches().GetAwaiter().GetResult();
             var defaultCommands = new List<CommandItem>
             {
                 new(_savedQueriesPage)
@@ -99,7 +98,6 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             };
 
             topLevelCommands.AddRange(defaultCommands);
-            topLevelCommands.AddRange(topLevelSearchCommands);
 
             return topLevelCommands.ToArray();
         }
