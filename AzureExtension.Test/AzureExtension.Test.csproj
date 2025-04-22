@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\Common.Dotnet.CsWinRT.props" />
+
+  <PropertyGroup>
+	  <RootNamespace>AzureExtension.Test</RootNamespace>
+	  <Platforms>x64;arm64</Platforms>
+	  <IsPackable>false</IsPackable>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <UseWinUI>true</UseWinUI>
+	  <ProjectPriFileName>resources.pri</ProjectPriFileName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="MSTest" Version="3.6.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AzureExtension\AzureExtension.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+</Project>
