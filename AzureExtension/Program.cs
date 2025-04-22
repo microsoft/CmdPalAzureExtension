@@ -175,7 +175,7 @@ public sealed class Program
         var addPullRequestSearchListItem = new AddPullRequestSearchListItem(savePullRequestSearchPage, resources);
         var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedAzureSearchesMediator, persistentDataManager, searchPageFactory);
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, azureClientHelpers, savedPullRequestSearchesPage, searchPageFactory);
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, azureClientHelpers, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 

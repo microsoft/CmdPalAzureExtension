@@ -97,7 +97,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             }
 
             LoadingStateChanged?.Invoke(this, false);
-            _queryRepository.AddSavedQueryAsync(query).Wait();
+            _queryRepository.UpdateQueryTopLevelStatus(query, query.IsTopLevel, _accountProvider.GetDefaultAccount());
             _savedQueriesMediator.AddQuery(query);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
             return query;
@@ -132,7 +132,8 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             name = queryInfo.Name;
         }
 
-        return new Query(queryInfo.AzureUri, name, queryInfo.Description, isTopLevel);
+        var uri = queryInfo.AzureUri;
+        return new Query(uri, name, queryInfo.Description, isTopLevel);
     }
 
     public async Task<bool> GetIsTopLevel()
