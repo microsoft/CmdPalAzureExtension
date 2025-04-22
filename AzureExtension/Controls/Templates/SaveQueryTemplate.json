@@ -7,7 +7,7 @@
       "type": "TextBlock",
       "size": "Medium",
       "weight": "Bolder",
-      "text": "{{SaveSearchFormTitle}}",
+      "text": "{{SaveQueryFormTitle}}",
       "horizontalAlignment": "Center",
       "wrap": true,
       "style": "heading"
@@ -17,15 +17,15 @@
       "id": "Name",
       "label": "{{NameLabel}}",
       "errorMessage": "{{NameErrorMessage}}",
-      "value": "{{SavedSearchName}}"
+      "value": "{{SavedQueryName}}"
     },
     {
       "type": "Input.Text",
-      "id": "EnteredSearch",
-      "label": "{{EnteredSearchLabel}}",
+      "id": "EnteredQuery",
+      "label": "{{EnteredQueryLabel}}",
       "isRequired": true,
-      "errorMessage": "{{EnteredSearchErrorMessage}}",
-      "value": "{{SavedSearchString}}"
+      "errorMessage": "{{EnteredQueryErrorMessage}}",
+      "value": "{{SavedQueryString}}"
     },
     {
       "type": "ColumnSet",
@@ -51,9 +51,9 @@
   "actions": [
     {
       "type": "Action.Submit",
-      "title": "{{SaveSearchActionTitle}}",
+      "title": "{{SaveQueryActionTitle}}",
       "data": {
-        "id": "SaveSearchAction"
+        "id": "SaveQueryAction"
       }
     }
   ]

@@ -31,16 +31,16 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "{{SaveSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Query" : "Forms_Edit_Query") },
-        { "{{SavedSearchString}}", _savedQuery.Url },
-        { "{{SavedSearchName}}", _savedQuery.Name },
+        { "{{SaveQueryFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Query" : "Forms_Edit_Query") },
+        { "{{SavedQueryString}}", _savedQuery.Url },
+        { "{{SavedQueryName}}", _savedQuery.Name },
         { "{{IsTopLevel}}", IsTopLevelChecked },
-        { "{{EnteredSearchErrorMessage}}", _resources.GetResource("Forms_SaveQueryTemplateEnteredQueryError") },
-        { "{{EnteredSearchLabel}}", _resources.GetResource("Forms_SaveQueryTemplateEnteredQueryLabel") },
+        { "{{EnteredQueryErrorMessage}}", _resources.GetResource("Forms_SaveQueryTemplateEnteredQueryError") },
+        { "{{EnteredQueryLabel}}", _resources.GetResource("Forms_SaveQueryTemplateEnteredQueryLabel") },
         { "{{NameLabel}}", _resources.GetResource("Forms_SaveQueryTemplateNameLabel") },
         { "{{NameErrorMessage}}", _resources.GetResource("Forms_SaveQueryTemplateNameError") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveQueryTemplateIsTopLevelTitle") },
-        { "{{SaveSearchActionTitle}}", _resources.GetResource("Forms_SaveQueryTemplateSaveQueryActionTitle") },
+        { "{{SaveQueryActionTitle}}", _resources.GetResource("Forms_SaveQueryTemplateSaveQueryActionTitle") },
     };
 
     // for saving a new query
