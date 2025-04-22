@@ -34,12 +34,12 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
         { "{{SaveQueryFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Query" : "Forms_Edit_Query") },
         { "{{SavedQueryString}}", _savedQuery.Url },
         { "{{SavedQueryName}}", _savedQuery.Name },
-        { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{EnteredQueryErrorMessage}}", _resources.GetResource("Forms_SaveQueryTemplateEnteredQueryError") },
         { "{{EnteredQueryLabel}}", _resources.GetResource("Forms_SaveQueryTemplateEnteredQueryLabel") },
         { "{{NameLabel}}", _resources.GetResource("Forms_SaveQueryTemplateNameLabel") },
         { "{{NameErrorMessage}}", _resources.GetResource("Forms_SaveQueryTemplateNameError") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveQueryTemplateIsTopLevelTitle") },
+        { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SaveQueryActionTitle}}", _resources.GetResource("Forms_SaveQueryTemplateSaveQueryActionTitle") },
     };
 
@@ -97,7 +97,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             }
 
             LoadingStateChanged?.Invoke(this, false);
-            _queryRepository.AddSavedQueryAsync(query).Wait();
+            _queryRepository.UpdateQueryTopLevelStatus(query, query.IsTopLevel, _accountProvider.GetDefaultAccount());
             _savedQueriesMediator.AddQuery(query);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
             return query;
@@ -132,7 +132,8 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             name = queryInfo.Name;
         }
 
-        return new Query(queryInfo.AzureUri, name, queryInfo.Description, isTopLevel);
+        var uri = queryInfo.AzureUri;
+        return new Query(uri, name, queryInfo.Description, isTopLevel);
     }
 
     public async Task<bool> GetIsTopLevel()

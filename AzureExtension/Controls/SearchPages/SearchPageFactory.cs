@@ -25,16 +25,19 @@ public class SearchPageFactory : ISearchPageFactory
 
     private readonly AzureClientHelpers _azureClientHelpers;
 
-    private readonly IAzureSearchRepository _azureSearchRepository;
+    private readonly IQueryRepository _queryRepository;
 
-    public SearchPageFactory(IResources resources, IDataProvider dataProvider, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IAzureSearchRepository azureSearchRepository)
+    private readonly ISavedPullRequestSearchRepository _savedPullRequestSearchRepository;
+
+    public SearchPageFactory(IResources resources, IDataProvider dataProvider, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository, ISavedPullRequestSearchRepository savedPullRequestSearchRepository)
     {
         _resources = resources;
         _dataProvider = dataProvider;
         _mediator = mediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
-        _azureSearchRepository = azureSearchRepository;
+        _queryRepository = queryRepository;
+        _savedPullRequestSearchRepository = savedPullRequestSearchRepository;
     }
 
     public ListPage CreatePageForSearch(IAzureSearch search)
@@ -55,13 +58,15 @@ public class SearchPageFactory : ISearchPageFactory
     {
         if (search is IQuery)
         {
-            var saveQueryForm = new SaveQueryForm((IQuery)search, _resources, _mediator, _accountProvider, _azureClientHelpers, (IQueryRepository)_azureSearchRepository);
-            return new EditQueryPage(_resources, saveQueryForm, new StatusMessage(), "query edited successfully", "error in editing query");
+            var saveQueryForm = new SaveQueryForm((IQuery)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _queryRepository);
+            var statusMessage = new StatusMessage();
+            return new EditQueryPage(_resources, saveQueryForm, statusMessage, "query edited successfully", "error in editing query");
         }
         else if (search is IPullRequestSearch)
         {
-            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, (ISavedPullRequestSearchRepository)_azureSearchRepository);
-            return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, new StatusMessage(), "pull request search edited successfully", "error in editing pull request search");
+            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _savedPullRequestSearchRepository);
+            var statusMessage = new StatusMessage();
+            return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage, "pull request search edited successfully", "error in editing pull request search");
         }
         else
         {
@@ -95,5 +100,54 @@ public class SearchPageFactory : ISearchPageFactory
                 },
             },
         };
+    }
+
+    public CommandItem CreateCommandItemForSearch(IAzureSearch azureSearch)
+    {
+        return new CommandItem(CreatePageForSearch(azureSearch))
+        {
+            Title = azureSearch.Name,
+            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+            Subtitle = azureSearch.Url,
+            MoreCommands = new CommandContextItem[]
+            {
+                new(new LinkCommand(azureSearch.Url, _resources))
+                {
+                    Title = azureSearch.Name,
+                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                },
+                new(CreateEditPageForSearch(azureSearch))
+                {
+                    Title = _resources.GetResource("Pages_Edit"),
+                    Icon = new IconInfo("\uecc9"),
+                },
+                new(new RemoveAzureSearchCommand(azureSearch, _resources, _mediator, (IAzureSearchRepository)_savedPullRequestSearchRepository))
+                {
+                    Title = _resources.GetResource("Commands_Remove_Saved_Search"),
+                    Icon = new IconInfo("\uecc9"),
+                },
+            },
+        };
+    }
+
+    public async Task<List<IListItem>> CreateCommandsForTopLevelSearches()
+    {
+        var topLevelSearches = new List<IListItem>();
+        var topLevelQueries = await _queryRepository.GetTopLevelQueries();
+        var topLevelPullRequestSearches = await _savedPullRequestSearchRepository.GetTopLevelPullRequestSearches();
+
+        foreach (var query in topLevelQueries)
+        {
+            var commandItem = CreateItemForSearch(query, _queryRepository);
+            topLevelSearches.Add(commandItem);
+        }
+
+        foreach (var pullRequestSearch in topLevelPullRequestSearches)
+        {
+            var commandItem = CreateItemForSearch(pullRequestSearch, _savedPullRequestSearchRepository);
+            topLevelSearches.Add(commandItem);
+        }
+
+        return topLevelSearches;
     }
 }
