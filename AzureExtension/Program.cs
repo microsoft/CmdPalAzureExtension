@@ -170,7 +170,7 @@ public sealed class Program
         var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources.GetResource("Message_Query_Saved"), resources.GetResource("Message_Query_Saved_Error"), resources.GetResource("ListItems_AddQuery")), resources);
         var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedAzureSearchesMediator, persistentDataManager, searchPageFactory);
 
-        var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager);
+        var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedAzureSearchesMediator, persistentDataManager);
         var savePullRequestSearchPage = new SavePullRequestSearchPage(savePullRequestSearchForm, new StatusMessage());
         var addPullRequestSearchListItem = new AddPullRequestSearchListItem(savePullRequestSearchPage, resources);
         var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedAzureSearchesMediator, persistentDataManager, searchPageFactory);

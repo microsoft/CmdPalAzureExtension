@@ -70,16 +70,15 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     public override ICommandResult SubmitForm(string inputs, string data)
     {
         LoadingStateChanged?.Invoke(this, true);
-        Task.Run(() =>
+        Task.Run(async () =>
         {
-            var query = GetQuery(inputs);
-            ExtensionHost.LogMessage(new LogMessage() { Message = $"Query: {query}" });
+            await AddQuery(inputs);
         });
 
         return CommandResult.KeepOpen();
     }
 
-    public Query GetQuery(string payload)
+    public async Task AddQuery(string payload)
     {
         try
         {
@@ -93,14 +92,13 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             {
                 Log.Information($"Removing outdated search {_savedQuery.Name}, {_savedQuery.Url}");
 
-                _queryRepository.RemoveSavedQueryAsync(_savedQuery).Wait();
+                await _queryRepository.RemoveSavedQueryAsync(_savedQuery);
             }
 
             LoadingStateChanged?.Invoke(this, false);
             _queryRepository.UpdateQueryTopLevelStatus(query, query.IsTopLevel, _accountProvider.GetDefaultAccount());
             _savedQueriesMediator.AddQuery(query);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
-            return query;
         }
         catch (Exception ex)
         {
@@ -108,8 +106,6 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             _savedQueriesMediator.AddQuery(ex);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
         }
-
-        return new Query();
     }
 
     public Query CreateQueryFromJson(JsonNode? jsonNode)

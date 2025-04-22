@@ -4,7 +4,6 @@
 
 using System.Globalization;
 using System.Text.Json.Nodes;
-using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
@@ -18,8 +17,6 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 {
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _mediator;
-    private readonly IAccountProvider _accountProvider;
-    private readonly AzureClientHelpers _azureClientHelpers;
     private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
     private readonly IPullRequestSearch _savedPullRequestSearch;
 
@@ -50,23 +47,19 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequestSearch", TemplateSubstitutions);
 
     // for saving a new pull request search
-    public SavePullRequestSearchForm(IResources resources, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
+    public SavePullRequestSearchForm(IResources resources, SavedAzureSearchesMediator mediator, ISavedPullRequestSearchRepository pullRequestSearchRepository)
     {
         _resources = resources;
         _mediator = mediator;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
         _pullRequestSearchRepository = pullRequestSearchRepository;
         _savedPullRequestSearch = new PullRequestSearch();
     }
 
     // for editing an existing pull request search
-    public SavePullRequestSearchForm(IPullRequestSearch savedPullRequestSearch, IResources resources, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, ISavedPullRequestSearchRepository pullRequestSearchRepository)
+    public SavePullRequestSearchForm(IPullRequestSearch savedPullRequestSearch, IResources resources, SavedAzureSearchesMediator mediator, ISavedPullRequestSearchRepository pullRequestSearchRepository)
     {
         _resources = resources;
         _mediator = mediator;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
         _pullRequestSearchRepository = pullRequestSearchRepository;
         _savedPullRequestSearch = savedPullRequestSearch;
     }
@@ -74,16 +67,15 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     public override ICommandResult SubmitForm(string inputs, string data)
     {
         LoadingStateChanged?.Invoke(this, true);
-        Task.Run(() =>
+        Task.Run(async () =>
         {
-            var search = GetPullRequestSearch(inputs);
-            ExtensionHost.LogMessage(new LogMessage() { Message = $"PullRequestSearch: {search}" });
+            await AddPullRequestSearch(inputs);
         });
 
         return CommandResult.KeepOpen();
     }
 
-    private PullRequestSearch GetPullRequestSearch(string payload)
+    private async Task AddPullRequestSearch(string payload)
     {
         try
         {
@@ -97,14 +89,13 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             {
                 Log.Information($"Removing outdated search {_savedPullRequestSearch.Name}, {_savedPullRequestSearch.Url}");
 
-                _pullRequestSearchRepository.RemoveSavedPullRequestSearch(pullRequestSearch);
+                await _pullRequestSearchRepository.RemoveSavedPullRequestSearch(_savedPullRequestSearch);
             }
 
             LoadingStateChanged?.Invoke(this, false);
             _pullRequestSearchRepository.UpdatePullRequestSearchTopLevelStatus(pullRequestSearch, pullRequestSearch.IsTopLevel);
             _mediator.AddPullRequestSearch(pullRequestSearch);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
-            return pullRequestSearch;
         }
         catch (Exception ex)
         {
@@ -112,8 +103,6 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             _mediator.AddPullRequestSearch(ex);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
         }
-
-        return new PullRequestSearch();
     }
 
     public PullRequestSearch CreatePullRequestSearchFromJson(JsonNode? jsonNode)

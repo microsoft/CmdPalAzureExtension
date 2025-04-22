@@ -64,7 +64,7 @@ public class SearchPageFactory : ISearchPageFactory
         }
         else if (search is IPullRequestSearch)
         {
-            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _savedPullRequestSearchRepository);
+            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _savedPullRequestSearchRepository);
             var statusMessage = new StatusMessage();
             return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage, "pull request search edited successfully", "error in editing pull request search");
         }
@@ -83,49 +83,9 @@ public class SearchPageFactory : ISearchPageFactory
             Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(search.Url, _resources))
-                {
-                    Title = search.Name,
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-                },
-                new(CreateEditPageForSearch(search))
-                {
-                    Title = _resources.GetResource("Pages_Edit"),
-                    Icon = new IconInfo("\uecc9"),
-                },
-                new(new RemoveAzureSearchCommand(search, _resources, _mediator, azureSearchRepository))
-                {
-                    Title = _resources.GetResource("Commands_Remove_Saved_Search"),
-                    Icon = new IconInfo("\uecc9"),
-                },
-            },
-        };
-    }
-
-    public CommandItem CreateCommandItemForSearch(IAzureSearch azureSearch)
-    {
-        return new CommandItem(CreatePageForSearch(azureSearch))
-        {
-            Title = azureSearch.Name,
-            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-            Subtitle = azureSearch.Url,
-            MoreCommands = new CommandContextItem[]
-            {
-                new(new LinkCommand(azureSearch.Url, _resources))
-                {
-                    Title = azureSearch.Name,
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-                },
-                new(CreateEditPageForSearch(azureSearch))
-                {
-                    Title = _resources.GetResource("Pages_Edit"),
-                    Icon = new IconInfo("\uecc9"),
-                },
-                new(new RemoveAzureSearchCommand(azureSearch, _resources, _mediator, (IAzureSearchRepository)_savedPullRequestSearchRepository))
-                {
-                    Title = _resources.GetResource("Commands_Remove_Saved_Search"),
-                    Icon = new IconInfo("\uecc9"),
-                },
+                new(new LinkCommand(search.Url, _resources)),
+                new(CreateEditPageForSearch(search)),
+                new(new RemoveAzureSearchCommand(search, _resources, _mediator, azureSearchRepository)),
             },
         };
     }
