@@ -30,6 +30,7 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
     {
         var title = item.SystemTitle;
         var url = item.HtmlUrl;
+        var workItemType = item.WorkItemTypeName;
 
         return new ListItem(new LinkCommand(url, _resources))
         {
@@ -38,8 +39,8 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         };
     }
 
-    protected override Task<IEnumerable<IWorkItem>> LoadContentData()
+    protected async override Task<IEnumerable<IWorkItem>> LoadContentData()
     {
-        return _dataProvider.GetWorkItems(_query);
+        return await _dataProvider.GetWorkItems(_query);
     }
 }

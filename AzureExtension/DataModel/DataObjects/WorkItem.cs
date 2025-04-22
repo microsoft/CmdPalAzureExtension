@@ -55,6 +55,9 @@ public class WorkItem : IWorkItem
     [Write(false)]
     public WorkItemType? SystemWorkItemType => WorkItemType.Get(DataStore, SystemWorkItemTypeId);
 
+    [Write(false)]
+    public string WorkItemTypeName => SystemWorkItemType?.Name ?? string.Empty;
+
     public static readonly string IdentityRefFieldValueName = "Microsoft.VisualStudio.Services.WebApi.IdentityRef";
     public static readonly string SystemIdFieldName = "System.Id";
     public static readonly string WorkItemHtmlUrlFieldName = "DevHome.AzureExtension.WorkItemHtmlUrl";
