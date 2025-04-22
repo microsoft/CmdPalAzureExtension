@@ -165,9 +165,9 @@ public class PullRequestSearch
         return pullRequestsSet;
     }
 
-    public static PullRequestSearch GetOrCreate(DataStore dataStore, long repositoryId, long projectId, string developerId, PullRequestView view)
+    public static PullRequestSearch GetOrCreate(DataStore dataStore, long repositoryId, long projectId, string username, PullRequestView view)
     {
-        var newDeveloperPullRequests = Create(repositoryId, projectId, developerId, view);
+        var newDeveloperPullRequests = Create(repositoryId, projectId, username, view);
         return AddOrUpdate(dataStore, newDeveloperPullRequests);
     }
 

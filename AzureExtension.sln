@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Common.Dotnet.CsWinRT.props = Common.Dotnet.CsWinRT.props
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureExtension.Test", "AzureExtension.Test\AzureExtension.Test.csproj", "{6BA5755A-43C2-4F5B-BEC4-C33B758FAE69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -30,8 +32,19 @@ Global
 		{7B778B31-9A2B-459C-9278-DB0936757929}.Release|x64.ActiveCfg = Release|x64
 		{7B778B31-9A2B-459C-9278-DB0936757929}.Release|x64.Build.0 = Release|x64
 		{7B778B31-9A2B-459C-9278-DB0936757929}.Release|x64.Deploy.0 = Release|x64
+		{6BA5755A-43C2-4F5B-BEC4-C33B758FAE69}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{6BA5755A-43C2-4F5B-BEC4-C33B758FAE69}.Debug|ARM64.Build.0 = Debug|ARM64
+		{6BA5755A-43C2-4F5B-BEC4-C33B758FAE69}.Debug|x64.ActiveCfg = Debug|x64
+		{6BA5755A-43C2-4F5B-BEC4-C33B758FAE69}.Debug|x64.Build.0 = Debug|x64
+		{6BA5755A-43C2-4F5B-BEC4-C33B758FAE69}.Release|ARM64.ActiveCfg = Release|ARM64
+		{6BA5755A-43C2-4F5B-BEC4-C33B758FAE69}.Release|ARM64.Build.0 = Release|ARM64
+		{6BA5755A-43C2-4F5B-BEC4-C33B758FAE69}.Release|x64.ActiveCfg = Release|x64
+		{6BA5755A-43C2-4F5B-BEC4-C33B758FAE69}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FA945D61-456E-4BAA-9BD7-9DCE077B1FFA}
 	EndGlobalSection
 EndGlobal
