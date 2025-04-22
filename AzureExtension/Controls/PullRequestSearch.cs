@@ -18,18 +18,21 @@ public class PullRequestSearch : IPullRequestSearch
 
     public string PullRequestUrl { get; set; } = string.Empty;
 
+    public bool IsTopLevel { get; set; }
+
     public PullRequestSearch()
     {
         AzureUri = new AzureUri();
         Name = string.Empty;
     }
 
-    public PullRequestSearch(AzureUri azureUri, string title, string view)
+    public PullRequestSearch(AzureUri azureUri, string title, string view, bool isTopLevel)
     {
         AzureUri = azureUri;
         Name = title;
         View = view;
         PullRequestUrl = CreatePullRequestUrl(azureUri.OriginalString, view);
+        IsTopLevel = isTopLevel;
     }
 
     public string CreatePullRequestUrl(string url, string? view)
