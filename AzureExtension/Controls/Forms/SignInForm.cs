@@ -21,6 +21,7 @@ public partial class SignInForm : FormContent, IAzureForm
 
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly IResources _resources;
 
     private bool _isButtonEnabled = true;
 
@@ -29,12 +30,13 @@ public partial class SignInForm : FormContent, IAzureForm
 
     private Page? page;
 
-    public SignInForm(IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers)
+    public SignInForm(IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IResources resources)
     {
         _accountProvider = accountProvider;
         SignOutForm.SignOutAction += SignOutForm_SignOutAction;
         page = null;
         _azureClientHelpers = azureClientHelpers;
+        _resources = resources;
     }
 
     public void SetPage(Page page)
@@ -47,20 +49,6 @@ public partial class SignInForm : FormContent, IAzureForm
         _isButtonEnabled = !e.IsSignedIn;
     }
 
-    private void DeveloperIdProvider_OAuthRedirected(object? sender, Exception? e)
-    {
-        if (e is not null)
-        {
-            SetButtonEnabled(true);
-            LoadingStateChanged?.Invoke(this, false);
-            SignInAction?.Invoke(this, new SignInStatusChangedEventArgs(false, e));
-            FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, e));
-            return;
-        }
-
-        SetButtonEnabled(false);
-    }
-
     private void SetButtonEnabled(bool isEnabled)
     {
         _isButtonEnabled = isEnabled;
@@ -70,10 +58,10 @@ public partial class SignInForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "{{AuthTitle}}", "Sign into your ADO account" },
-        { "{{AuthButtonTitle}}", "Sign in" },
+        { "{{AuthTitle}}", _resources.GetResource("Forms_SignIn_TemplateAuthTitle") },
+        { "{{AuthButtonTitle}}", _resources.GetResource("Forms_SignIn_TemplateAuthButtonTitle") },
         { "{{AuthIcon}}", $"data:image/png;base64,{AzureIcon.GetBase64Icon("logo")}" },
-        { "{{AuthButtonTooltip}}", "tooltip" },
+        { "{{AuthButtonTooltip}}", _resources.GetResource("Forms_SignIn_TemplateAuthButtonTooltip") },
         { "{{ButtonIsEnabled}}", IsButtonEnabled },
     };
 

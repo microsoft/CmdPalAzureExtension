@@ -155,7 +155,7 @@ public sealed class Program
 
         var timeSpanHelper = new TimeSpanHelper(resources);
 
-        var signInForm = new SignInForm(accountProvider, azureClientHelpers);
+        var signInForm = new SignInForm(accountProvider, azureClientHelpers, resources);
         var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"));
         var signOutForm = new SignOutForm(accountProvider, resources);
         var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"));
