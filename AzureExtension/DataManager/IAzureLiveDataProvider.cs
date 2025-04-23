@@ -20,7 +20,7 @@ public interface IAzureLiveDataProvider
 
     Task<WorkItemQueryResult> GetWorkItemQueryResultByIdAsync(Uri connection, string projectId, Guid queryId, CancellationToken cancellationToken);
 
-    Task<List<WorkItem>> GetWorkItemsAsync(Uri connection, string projectId, List<int> workItemIds, WorkItemExpand links, WorkItemErrorPolicy omit, CancellationToken cancellationToken);
+    Task<List<WorkItem>> GetWorkItemsAsync(Uri connection, string projectId, List<int> workItemIds, WorkItemExpand expand, WorkItemErrorPolicy errorPolicy, CancellationToken cancellationToken);
 
     Task<WorkItemType> GetWorkItemTypeAsync(Uri connection, string projectId, string? fieldValue, CancellationToken cancellationToken);
 

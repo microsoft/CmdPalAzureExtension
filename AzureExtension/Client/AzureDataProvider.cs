@@ -76,11 +76,11 @@ public class AzureDataProvider : IAzureLiveDataProvider
         return await witClient.QueryByIdAsync(projectId, queryId, cancellationToken: cancellationToken);
     }
 
-    public async Task<List<WorkItem>> GetWorkItemsAsync(Uri connection, string projectId, List<int> workItemIds, WorkItemExpand links, WorkItemErrorPolicy omit, CancellationToken cancellationToken)
+    public async Task<List<WorkItem>> GetWorkItemsAsync(Uri connection, string projectId, List<int> workItemIds, WorkItemExpand expand, WorkItemErrorPolicy errorPolicy, CancellationToken cancellationToken)
     {
         var account = _accountProvider.GetDefaultAccount();
         using var witClient = _clientProvider.GetClient<WorkItemTrackingHttpClient>(connection, account);
-        return await witClient.GetWorkItemsAsync(projectId, workItemIds, null, null, WorkItemExpand.Links, WorkItemErrorPolicy.Omit, cancellationToken: cancellationToken);
+        return await witClient.GetWorkItemsAsync(projectId, workItemIds, null, null, expand, errorPolicy, cancellationToken: cancellationToken);
     }
 
     public async Task<WorkItemType> GetWorkItemTypeAsync(Uri connection, string projectId, string? fieldValue, CancellationToken cancellationToken)
