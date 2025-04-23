@@ -21,13 +21,15 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientProvider _azureClientProvider;
+    private readonly IAzureLiveDataProvider _liveDataProvider;
 
-    public AzureDataPullRequestSearchManager(DataStore dataStore, IAccountProvider accountProvider, AzureClientProvider clientProvider)
+    public AzureDataPullRequestSearchManager(DataStore dataStore, IAccountProvider accountProvider, IAzureLiveDataProvider liveDataProvider, AzureClientProvider clientProvider)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
         _log = Log.ForContext("SourceContext", nameof(AzureDataPullRequestSearchManager));
         _azureClientProvider = clientProvider;
+        _liveDataProvider = liveDataProvider;
     }
 
     private void ValidateDataStore()
@@ -79,12 +81,11 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
 
         if (project is null)
         {
-            using var projectClient = _azureClientProvider.GetClient<ProjectHttpClient>(azureUri.Connection, account);
-            var teamProject = await projectClient.GetProject(azureUri.Project);
+            var teamProject = await _liveDataProvider.GetTeamProject(azureUri.Connection, azureUri.Project);
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
 
-        var gitRepository = await gitClient.GetRepositoryAsync(project.InternalId, azureUri.Repository, cancellationToken: cancellationToken);
+        var gitRepository = await _liveDataProvider.GetRepositoryAsync(azureUri.Connection, project.InternalId, azureUri.Repository, cancellationToken);
 
         var searchCriteria = new GitPullRequestSearchCriteria
         {
@@ -108,7 +109,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         }
 
         // Get the pull requests with those criteria: (do we need internal id)
-        var pullRequests = await gitClient.GetPullRequestsAsync(project.InternalId, gitRepository.Id, searchCriteria, cancellationToken: cancellationToken);
+        var pullRequests = await _liveDataProvider.GetPullRequestsAsync(azureUri.Connection, project.InternalId, gitRepository.Id, searchCriteria, cancellationToken);
 
         // Get the PullRequest PolicyClient. This client provides the State and Reason fields for each pull request
         using var policyClient = _azureClientProvider.GetClient<PolicyHttpClient>(azureUri.Connection, account);
@@ -130,7 +131,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
 
             try
             {
-                var policyEvaluations = await policyClient.GetPolicyEvaluationsAsync(project.InternalId, artifactId, cancellationToken: cancellationToken);
+                var policyEvaluations = await _liveDataProvider.GetPolicyEvaluationsAsync(azureUri.Connection, project.InternalId, artifactId, cancellationToken);
                 GetPolicyStatus(policyEvaluations, out status, out statusReason);
             }
             catch (Exception ex)
@@ -140,7 +141,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
 
             if (pullRequest.LastMergeSourceCommit is not null)
             {
-                var commitRef = await gitClient.GetCommitAsync(pullRequest.LastMergeSourceCommit.CommitId, gitRepository.Id, cancellationToken: cancellationToken);
+                var commitRef = await _liveDataProvider.GetCommitAsync(azureUri.Connection, pullRequest.LastMergeSourceCommit.CommitId, gitRepository.Id, cancellationToken);
                 if (commitRef is not null)
                 {
                     pullRequest.LastMergeSourceCommit = commitRef;
