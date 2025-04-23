@@ -50,9 +50,6 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _mediator = mediator;
         DisplayName = "Azure Extension";
 
-        var path = ResourceLoader.GetDefaultResourceFilePath();
-        var resourceLoader = new ResourceLoader(path);
-
         _mediator.QuerySaved += OnSearchUpdated;
         _mediator.QueryRemoved += OnSearchUpdated;
         _mediator.PullRequestSearchSaved += OnSearchUpdated;
@@ -61,8 +58,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private void OnSearchUpdated(object? sender, object? args)
     {
-        if (args is Controls.Query || args is PersistentData.Query
-            || args is Controls.PullRequestSearch || args is PersistentData.PullRequestSearch)
+        if (args is IQuery || args is IPullRequestSearch)
         {
             RaiseItemsChanged();
         }
