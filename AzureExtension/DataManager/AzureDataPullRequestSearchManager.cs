@@ -16,6 +16,8 @@ namespace AzureExtension.DataManager;
 
 public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, IDataPullRequestSearchProvider
 {
+    private readonly TimeSpan _pullRequestSearchDeletionTime = TimeSpan.FromMinutes(2);
+
     private readonly ILogger _log;
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
@@ -69,8 +71,6 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
     public async Task UpdatePullRequestsAsync(IPullRequestSearch pullRequestSearch, CancellationToken cancellationToken)
     {
         var azureUri = new AzureUri(pullRequestSearch.Url);
-        var account = _accountProvider.GetDefaultAccount();
-        var connection = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
 
         var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
 
@@ -89,6 +89,9 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
             Status = PullRequestStatus.Active,
             IncludeLinks = true,
         };
+
+        var account = _accountProvider.GetDefaultAccount();
+        var connection = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
 
         switch (GetPullRequestView(pullRequestSearch.View))
         {
@@ -148,7 +151,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
             PullRequestSearchPullRequest.AddPullRequestToSearch(_dataStore, dsPullRequestSearch.Id, dsPullRequest.Id);
         }
 
-        PullRequestSearchPullRequest.DeleteBefore(_dataStore, dsPullRequestSearch, DateTime.UtcNow - TimeSpan.FromMinutes(2));
+        PullRequestSearchPullRequest.DeleteBefore(_dataStore, dsPullRequestSearch, DateTime.UtcNow - _pullRequestSearchDeletionTime);
     }
 
     // Helper methods

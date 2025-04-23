@@ -7,8 +7,6 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
-using Microsoft.TeamFoundation.Core.WebApi;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Serilog;
 using Query = AzureExtension.DataModel.Query;
 using TFModels = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
@@ -18,6 +16,8 @@ namespace AzureExtension.DataManager;
 
 public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
 {
+    private readonly TimeSpan _queryWorkItemDeletionTime = TimeSpan.FromMinutes(2);
+
     private readonly ILogger _log;
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
@@ -67,9 +67,6 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
         var stopwatch = System.Diagnostics.Stopwatch.StartNew(); // Start measuring time
 
         var azureUri = new AzureUri(query.Url);
-        var account = _accountProvider.GetDefaultAccount();
-
-        using var witClient = _azureClientProvider.GetClient<WorkItemTrackingHttpClient>(azureUri.Connection, account);
 
         // Good practice to only create data after we know the client is valid, but any exceptions
         // will roll back the transaction.
@@ -139,6 +136,7 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
             workItems = await _liveDataProvider.GetWorkItemsAsync(azureUri.Connection, project.InternalId, workItemIds, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit, cancellationToken);
         }
 
+        var account = _accountProvider.GetDefaultAccount();
         var workItemsList = new List<WorkItem>();
         var dsQuery = Query.GetOrCreate(_dataStore, azureUri.Query, project.Id, account.Username, query.Name);
         var connection = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
@@ -153,7 +151,7 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
             workItemsList.Add(cmdPalWorkItem);
         }
 
-        QueryWorkItem.DeleteBefore(_dataStore, dsQuery, DateTime.UtcNow - TimeSpan.FromMinutes(2));
+        QueryWorkItem.DeleteBefore(_dataStore, dsQuery, DateTime.UtcNow - _queryWorkItemDeletionTime);
 
         stopwatch.Stop(); // Stop measuring time
         _log.Information($"UpdateWorkItems took {stopwatch.ElapsedMilliseconds} ms to complete.");
