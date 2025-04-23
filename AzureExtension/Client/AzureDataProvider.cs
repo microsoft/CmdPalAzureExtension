@@ -33,6 +33,8 @@ public class AzureDataProvider : IAzureLiveDataProvider
     public async Task<List<PolicyEvaluationRecord>> GetPolicyEvaluationsAsync(Uri connection, string projectId, string artifactId, CancellationToken cancellationToken)
     {
         var account = _accountProvider.GetDefaultAccount();
+
+        // Get the PullRequest PolicyClient. This client provides the State and Reason fields for each pull request
         using var policyClient = _clientProvider.GetClient<PolicyHttpClient>(connection, account);
         return await policyClient.GetPolicyEvaluationsAsync(projectId, artifactId, cancellationToken: cancellationToken);
     }

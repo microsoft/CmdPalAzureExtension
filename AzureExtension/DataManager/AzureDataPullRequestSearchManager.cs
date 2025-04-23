@@ -7,7 +7,6 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
-using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Serilog;
@@ -73,8 +72,6 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         var account = _accountProvider.GetDefaultAccount();
         var connection = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
 
-        using var gitClient = _azureClientProvider.GetClient<GitHttpClient>(azureUri.Connection, account);
-
         var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
 
         var project = Project.Get(_dataStore, azureUri.Project, org.Id);
@@ -110,9 +107,6 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
 
         // Get the pull requests with those criteria: (do we need internal id)
         var pullRequests = await _liveDataProvider.GetPullRequestsAsync(azureUri.Connection, project.InternalId, gitRepository.Id, searchCriteria, cancellationToken);
-
-        // Get the PullRequest PolicyClient. This client provides the State and Reason fields for each pull request
-        using var policyClient = _azureClientProvider.GetClient<PolicyHttpClient>(azureUri.Connection, account);
 
         var repository = Repository.GetOrCreate(_dataStore, gitRepository, project.Id);
 

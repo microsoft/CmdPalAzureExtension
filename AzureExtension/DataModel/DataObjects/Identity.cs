@@ -193,10 +193,8 @@ public class Identity
     }
 
     // Creation from an Azure IdentityRef object.
-    public static Identity GetOrCreateIdentity(DataStore dataStore, IdentityRef? identityRef, VssConnection connection, string developerLoginId = "")
+    public static Identity GetOrCreateIdentity(DataStore dataStore, IdentityRef identityRef, VssConnection connection, string developerLoginId = "")
     {
-        ArgumentNullException.ThrowIfNull(identityRef);
-
         Identity? existing;
         if (identityRef.Id == null)
         {
