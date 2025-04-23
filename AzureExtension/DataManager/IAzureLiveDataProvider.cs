@@ -6,11 +6,14 @@ using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Microsoft.VisualStudio.Services.Profile;
 
 namespace AzureExtension.DataManager;
 
 public interface IAzureLiveDataProvider
 {
+    Task<Avatar> GetAvatarAsync(Uri connection, Guid identity);
+
     Task<TeamProject> GetTeamProject(Uri connection, string id);
 
     Task<GitRepository> GetRepositoryAsync(Uri connection, string projectId, string repositoryId, CancellationToken cancellationToken);

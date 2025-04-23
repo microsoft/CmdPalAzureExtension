@@ -145,7 +145,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
                 }
             }
 
-            var creator = Identity.GetOrCreateIdentity(_dataStore, pullRequest.CreatedBy, connection);
+            var creator = Identity.GetOrCreateIdentity(_dataStore, pullRequest.CreatedBy, azureUri.Connection, _liveDataProvider);
             var dsPullRequest = PullRequest.GetOrCreate(_dataStore, pullRequest, repository.Id, creator.Id, statusReason);
 
             PullRequestSearchPullRequest.AddPullRequestToSearch(_dataStore, dsPullRequestSearch.Id, dsPullRequest.Id);

@@ -146,7 +146,7 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
             var fieldValue = workItem.Fields["System.WorkItemType"].ToString();
 
             var workItemTypeInfo = await _liveDataProvider.GetWorkItemTypeAsync(azureUri.Connection, project.InternalId, fieldValue, cancellationToken);
-            var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, connection, project.Id, workItemTypeInfo);
+            var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, azureUri.Connection, _liveDataProvider, project.Id, workItemTypeInfo);
             QueryWorkItem.AddWorkItemToQuery(_dataStore, dsQuery.Id, cmdPalWorkItem.Id);
             workItemsList.Add(cmdPalWorkItem);
         }

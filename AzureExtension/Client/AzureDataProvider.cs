@@ -9,6 +9,8 @@ using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Microsoft.VisualStudio.Services.Profile;
+using Microsoft.VisualStudio.Services.Profile.Client;
 
 namespace AzureExtension.Client;
 
@@ -21,6 +23,13 @@ public class AzureDataProvider : IAzureLiveDataProvider
     {
         _clientProvider = azureClientProvider;
         _accountProvider = accountProvider;
+    }
+
+    public async Task<Avatar> GetAvatarAsync(Uri connection, Guid identity)
+    {
+        var account = _accountProvider.GetDefaultAccount();
+        using var client = _clientProvider.GetClient<ProfileHttpClient>(connection, account);
+        return await client.GetAvatarAsync(identity, AvatarSize.Small);
     }
 
     public async Task<GitCommit> GetCommitAsync(Uri connection, string commitId, Guid repositoryId, CancellationToken cancellationToken)

@@ -4,6 +4,7 @@
 
 using AzureExtension.Controls;
 using AzureExtension.Data;
+using AzureExtension.DataManager;
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
@@ -74,7 +75,13 @@ public class WorkItem : IWorkItem
         "System.WorkItemType",
     ];
 
-    private static WorkItem Create(DataStore dataStore, TFModels.WorkItem tfWorkItem, VssConnection connection, long projectId, TFModels.WorkItemType? tfWorkItemType = null)
+    private static WorkItem Create(
+        DataStore dataStore,
+        TFModels.WorkItem tfWorkItem,
+        Uri connection,
+        IAzureLiveDataProvider dataProvider,
+        long projectId,
+        TFModels.WorkItemType? tfWorkItemType = null)
     {
         var workItem = new WorkItem();
 
@@ -116,7 +123,7 @@ public class WorkItem : IWorkItem
             var fieldIdentityRef = tfWorkItem.Fields[field] as IdentityRef;
             if (fieldValue == IdentityRefFieldValueName && fieldIdentityRef != null)
             {
-                var identity = Identity.GetOrCreateIdentity(dataStore, fieldIdentityRef, connection);
+                var identity = Identity.GetOrCreateIdentity(dataStore, fieldIdentityRef, connection, dataProvider);
 
                 if (field == "System.CreatedBy")
                 {
@@ -199,11 +206,12 @@ public class WorkItem : IWorkItem
     public static WorkItem GetOrCreate(
         DataStore dataStore,
         TFModels.WorkItem tfWorkItem,
-        VssConnection connection,
+        Uri connection,
+        IAzureLiveDataProvider dataProvider,
         long projectId,
         TFModels.WorkItemType workItemType)
     {
-        var newWorkItem = Create(dataStore, tfWorkItem, connection, projectId, workItemType);
+        var newWorkItem = Create(dataStore, tfWorkItem, connection, dataProvider, projectId, workItemType);
         return AddOrUpdate(dataStore, newWorkItem);
     }
 
