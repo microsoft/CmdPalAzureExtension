@@ -901,4 +901,10 @@
   <data name="Forms_SignOut_PageTitle" xml:space="preserve">
     <value>Sign out</value>
   </data>
+  <data name="Forms_SignIn_PageTitle" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="Forms_SignIn_PageSubtitle" xml:space="preserve">
+    <value>Sign into your Azure Dev Ops account</value>
+  </data>
 </root>

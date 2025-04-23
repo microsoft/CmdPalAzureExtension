@@ -29,26 +29,31 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly IResources _resources;
 
-    private readonly AzureClientHelpers _azureClientHelpers;
-
     private readonly SavedPullRequestSearchesPage _savedPullRequestSearchesPage;
 
     private readonly ISearchPageFactory _searchPageFactory;
 
     private readonly SavedAzureSearchesMediator _mediator;
 
-    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedQueriesPage, IResources resources, AzureClientHelpers azureClientHelpers, SavedPullRequestSearchesPage savedPullRequestSearchesPage, ISearchPageFactory searchPageFactory, SavedAzureSearchesMediator mediator)
+    public AzureExtensionCommandProvider(
+        SignInPage signInPage,
+        SignOutPage signOutPage,
+        IAccountProvider accountProvider,
+        SavedQueriesPage savedQueriesPage,
+        IResources resources,
+        SavedPullRequestSearchesPage savedPullRequestSearchesPage,
+        ISearchPageFactory searchPageFactory,
+        SavedAzureSearchesMediator mediator)
     {
         _signInPage = signInPage;
         _signOutPage = signOutPage;
         _accountProvider = accountProvider;
         _savedQueriesPage = savedQueriesPage;
         _resources = resources;
-        _azureClientHelpers = azureClientHelpers;
         _savedPullRequestSearchesPage = savedPullRequestSearchesPage;
         _searchPageFactory = searchPageFactory;
         _mediator = mediator;
-        DisplayName = "Azure Extension";
+        DisplayName = "Azure Extension"; // Hardcoded because it's a product title
 
         _mediator.QuerySaved += OnSearchUpdated;
         _mediator.QueryRemoved += OnSearchUpdated;
@@ -73,8 +78,8 @@ public partial class AzureExtensionCommandProvider : CommandProvider
                 new CommandItem(_signInPage)
                 {
                     Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
-                    Title = "Sign in",
-                    Subtitle = "Sign into your Azure DevOps account",
+                    Title = _resources.GetResource("Forms_SignIn_PageTitle"),
+                    Subtitle = _resources.GetResource("Forms_SignIn_PageSubtitle"),
                 },
             };
         }
