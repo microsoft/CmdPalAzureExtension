@@ -3,17 +3,11 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Account;
-using AzureExtension.Client;
 using AzureExtension.Controls;
-using AzureExtension.Controls.ListItems;
 using AzureExtension.Controls.Pages;
-using AzureExtension.DataManager;
-using AzureExtension.DataManager.Cache;
 using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Microsoft.Windows.ApplicationModel.Resources;
 
 namespace AzureExtension;
 
