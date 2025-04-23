@@ -34,12 +34,12 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
         { "{{SaveSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Search" : "Forms_Edit_Search") },
         { "{{SavedSearchString}}", _savedQuery.Url },
         { "{{SavedSearchName}}", _savedQuery.Name },
-        { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{EnteredSearchErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchError") },
         { "{{EnteredSearchLabel}}", _resources.GetResource("Forms_SaveSearchTemplateEnteredSearchLabel") },
         { "{{NameLabel}}", _resources.GetResource("Forms_SaveSearchTemplateNameLabel") },
         { "{{NameErrorMessage}}", _resources.GetResource("Forms_SaveSearchTemplateNameError") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveSearchTemplateIsTopLevelTitle") },
+        { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SaveSearchActionTitle}}", _resources.GetResource("Forms_SaveSearchTemplateSaveSearchActionTitle") },
     };
 
@@ -70,16 +70,15 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     public override ICommandResult SubmitForm(string inputs, string data)
     {
         LoadingStateChanged?.Invoke(this, true);
-        Task.Run(() =>
+        Task.Run(async () =>
         {
-            var query = GetQuery(inputs);
-            ExtensionHost.LogMessage(new LogMessage() { Message = $"Query: {query}" });
+            await AddQuery(inputs);
         });
 
         return CommandResult.KeepOpen();
     }
 
-    public Query GetQuery(string payload)
+    public async Task AddQuery(string payload)
     {
         try
         {
@@ -93,14 +92,13 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             {
                 Log.Information($"Removing outdated search {_savedQuery.Name}, {_savedQuery.Url}");
 
-                _queryRepository.RemoveSavedQueryAsync(_savedQuery).Wait();
+                await _queryRepository.RemoveSavedQueryAsync(_savedQuery);
             }
 
             LoadingStateChanged?.Invoke(this, false);
-            _queryRepository.AddSavedQueryAsync(query).Wait();
+            _queryRepository.UpdateQueryTopLevelStatus(query, query.IsTopLevel, _accountProvider.GetDefaultAccount());
             _savedQueriesMediator.AddQuery(query);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
-            return query;
         }
         catch (Exception ex)
         {
@@ -108,8 +106,6 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             _savedQueriesMediator.AddQuery(ex);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
         }
-
-        return new Query();
     }
 
     public Query CreateQueryFromJson(JsonNode? jsonNode)
@@ -132,7 +128,8 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             name = queryInfo.Name;
         }
 
-        return new Query(queryInfo.AzureUri, name, queryInfo.Description, isTopLevel);
+        var uri = queryInfo.AzureUri;
+        return new Query(uri, name, queryInfo.Description, isTopLevel);
     }
 
     public async Task<bool> GetIsTopLevel()

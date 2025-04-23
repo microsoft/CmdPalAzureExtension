@@ -45,17 +45,24 @@
           "isRequired": true
         },
         {
-          "type": "Container",
-          "$when": "${message != null}",
-          "items": [
+          "type": "ColumnSet",
+          "columns": [
             {
-              "type": "TextBlock",
-              "text": "${message}",
-              "wrap": true,
-              "size": "Small"
+              "type": "Column",
+              "width": "auto",
+              "verticalContentAlignment": "Center",
+              "items": [
+                {
+                  "type": "Input.Toggle",
+                  "id": "IsTopLevel",
+                  "title": "{{IsTopLevelTitle}}",
+                  "valueOn": "true",
+                  "valueOff": "false",
+                  "value": "{{IsTopLevel}}"
+                }
+              ]
             }
-          ],
-          "style": "warning"
+          ]
         }
       ]
     }
