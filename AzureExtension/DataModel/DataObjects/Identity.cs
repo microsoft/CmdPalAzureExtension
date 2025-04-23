@@ -4,12 +4,12 @@
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AzureExtension.Client;
 using AzureExtension.Data;
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Microsoft.VisualStudio.Services.Profile;
-using Microsoft.VisualStudio.Services.Profile.Client;
 using Microsoft.VisualStudio.Services.WebApi;
 using Serilog;
 
@@ -65,12 +65,11 @@ public class Identity
 
     public override string ToString() => Name;
 
-    public static string GetAvatar(VssConnection connection, Guid identity)
+    public static string GetAvatar(Uri connection, IAzureLiveDataProvider dataProvider, Guid identity)
     {
         try
         {
-            using var client = connection.GetClient<ProfileHttpClient>();
-            var avatar = client.GetAvatarAsync(identity, AvatarSize.Small).Result;
+            var avatar = dataProvider.GetAvatarAsync(connection, identity).Result;
             _log.Debug($"Avatar found: {avatar.Value.Length} bytes.");
             return Convert.ToBase64String(avatar.Value);
         }
@@ -106,7 +105,7 @@ public class Identity
         }
     }
 
-    public static Identity CreateFromIdentityRef(IdentityRef identityRef, VssConnection connection)
+    public static Identity CreateFromIdentityRef(IdentityRef identityRef, Uri connection, IAzureLiveDataProvider dataProvider)
     {
         // It is possible the IdentityRef object content is null but contains
         // a display name like "Closed". This is what is given to work items
@@ -131,18 +130,18 @@ public class Identity
         {
             InternalId = identityRef.Id,
             Name = identityRef.DisplayName,
-            Avatar = GetAvatar(connection, new Guid(identityRef.Id)),
+            Avatar = GetAvatar(connection, dataProvider, new Guid(identityRef.Id)),
             TimeUpdated = DateTime.UtcNow.ToDataStoreInteger(),
         };
     }
 
-    private static Identity CreateFromIdentity(Microsoft.VisualStudio.Services.Identity.Identity identity, VssConnection connection)
+    private static Identity CreateFromIdentity(Microsoft.VisualStudio.Services.Identity.Identity identity, Uri connection, IAzureLiveDataProvider dataProvider)
     {
         return new Identity
         {
             InternalId = identity.Id.ToString(),
             Name = identity.DisplayName,
-            Avatar = GetAvatar(connection, identity.Id),
+            Avatar = GetAvatar(connection, dataProvider, identity.Id),
             TimeUpdated = DateTime.UtcNow.ToDataStoreInteger(),
         };
     }
@@ -193,10 +192,8 @@ public class Identity
     }
 
     // Creation from an Azure IdentityRef object.
-    public static Identity GetOrCreateIdentity(DataStore dataStore, IdentityRef? identityRef, VssConnection connection, string developerLoginId = "")
+    public static Identity GetOrCreateIdentity(DataStore dataStore, IdentityRef identityRef, Uri connection, IAzureLiveDataProvider dataProvider, string developerLoginId = "")
     {
-        ArgumentNullException.ThrowIfNull(identityRef);
-
         Identity? existing;
         if (identityRef.Id == null)
         {
@@ -215,7 +212,7 @@ public class Identity
         if (existing is null || (isDeveloper && !existing.IsLoggedInDeveloper) || ((DateTime.UtcNow - existing.UpdatedAt) > _updateThreshold)
             || (string.IsNullOrEmpty(existing.Avatar) && ((DateTime.UtcNow - existing.UpdatedAt) > _avatarRetryDelay)))
         {
-            var newIdentity = CreateFromIdentityRef(identityRef, connection);
+            var newIdentity = CreateFromIdentityRef(identityRef, connection, dataProvider);
             return AddOrUpdateIdentity(dataStore, newIdentity, developerLoginId);
         }
 
@@ -223,7 +220,7 @@ public class Identity
     }
 
     // Creation from an Azure Identity object.
-    public static Identity GetOrCreateIdentity(DataStore dataStore, Microsoft.VisualStudio.Services.Identity.Identity? identity, VssConnection connection, string developerLoginId = "")
+    public static Identity GetOrCreateIdentity(DataStore dataStore, Microsoft.VisualStudio.Services.Identity.Identity? identity, Uri connection, IAzureLiveDataProvider dataProvider, string developerLoginId = "")
     {
         ArgumentNullException.ThrowIfNull(identity);
 
@@ -238,7 +235,7 @@ public class Identity
         if (existing is null || (isDeveloper && !existing.IsLoggedInDeveloper) || ((DateTime.UtcNow - existing.UpdatedAt) > _updateThreshold)
             || (string.IsNullOrEmpty(existing.Avatar) && ((DateTime.UtcNow - existing.UpdatedAt) > _avatarRetryDelay)))
         {
-            var newIdentity = CreateFromIdentity(identity, connection);
+            var newIdentity = CreateFromIdentity(identity, connection, dataProvider);
             return AddOrUpdateIdentity(dataStore, newIdentity, developerLoginId);
         }
 
