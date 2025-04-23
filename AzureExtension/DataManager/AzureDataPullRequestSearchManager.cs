@@ -21,16 +21,20 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
     private readonly ILogger _log;
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
-    private readonly AzureClientProvider _azureClientProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
+    private readonly IAuthorizedEntityIdProvider _authorizedEntityIdProvider;
 
-    public AzureDataPullRequestSearchManager(DataStore dataStore, IAccountProvider accountProvider, IAzureLiveDataProvider liveDataProvider, AzureClientProvider clientProvider)
+    public AzureDataPullRequestSearchManager(
+        DataStore dataStore,
+        IAccountProvider accountProvider,
+        IAzureLiveDataProvider liveDataProvider,
+        IAuthorizedEntityIdProvider authorizedEntityIdProvider)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
         _log = Log.ForContext("SourceContext", nameof(AzureDataPullRequestSearchManager));
-        _azureClientProvider = clientProvider;
         _liveDataProvider = liveDataProvider;
+        _authorizedEntityIdProvider = authorizedEntityIdProvider;
     }
 
     private void ValidateDataStore()
@@ -91,17 +95,17 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         };
 
         var account = _accountProvider.GetDefaultAccount();
-        var connection = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
+        var authorizedEntityId = _authorizedEntityIdProvider.GetAuthorizedEntityId(azureUri.Connection, account);
 
         switch (GetPullRequestView(pullRequestSearch.View))
         {
             case PullRequestView.Unknown:
                 throw new ArgumentException("PullRequestView is unknown");
             case PullRequestView.Mine:
-                searchCriteria.CreatorId = connection.AuthorizedIdentity.Id;
+                searchCriteria.CreatorId = authorizedEntityId;
                 break;
             case PullRequestView.Assigned:
-                searchCriteria.ReviewerId = connection.AuthorizedIdentity.Id;
+                searchCriteria.ReviewerId = authorizedEntityId;
                 break;
             case PullRequestView.All:
                 /* Nothing different for this */

@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Account;
-using AzureExtension.DataManager;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
@@ -14,12 +13,12 @@ using Microsoft.VisualStudio.Services.Profile.Client;
 
 namespace AzureExtension.Client;
 
-public class AzureDataProvider : IAzureLiveDataProvider
+public class AzureLiveDataProvider : IAzureLiveDataProvider
 {
     private readonly AzureClientProvider _clientProvider;
     private readonly IAccountProvider _accountProvider;
 
-    public AzureDataProvider(AzureClientProvider azureClientProvider, IAccountProvider accountProvider)
+    public AzureLiveDataProvider(AzureClientProvider azureClientProvider, IAccountProvider accountProvider)
     {
         _clientProvider = azureClientProvider;
         _accountProvider = accountProvider;

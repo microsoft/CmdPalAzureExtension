@@ -8,7 +8,7 @@ using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Profile;
 
-namespace AzureExtension.DataManager;
+namespace AzureExtension.Client;
 
 public interface IAzureLiveDataProvider
 {

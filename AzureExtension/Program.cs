@@ -133,9 +133,9 @@ public sealed class Program
         using var cacheDataStore = new DataStore("DataStore", combinedCachePath, cacheDataStoreSchema);
         cacheDataStore.Create();
 
-        var azureLiveDataProvider = new AzureDataProvider(azureClientProvider, accountProvider);
+        var azureLiveDataProvider = new AzureLiveDataProvider(azureClientProvider, accountProvider);
 
-        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
+        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider);
         var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
 
         var azureDataManager = new AzureDataManager(cacheDataStore, queryManager, pullRequestSearchManager);

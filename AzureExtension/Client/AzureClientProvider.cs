@@ -10,7 +10,7 @@ using Serilog;
 
 namespace AzureExtension.Client;
 
-public class AzureClientProvider
+public class AzureClientProvider : IAuthorizedEntityIdProvider
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", nameof(AzureClientProvider)));
 
@@ -179,5 +179,11 @@ public class AzureClientProvider
         }
 
         return new ConnectionResult(ResultType.Failure, ErrorType.FailedGettingClient, false);
+    }
+
+    public Guid GetAuthorizedEntityId(Uri connection, IAccount account)
+    {
+        var vssConnection = GetVssConnection(connection, account);
+        return vssConnection.AuthorizedIdentity.Id;
     }
 }

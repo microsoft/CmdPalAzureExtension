@@ -22,14 +22,12 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
-    private readonly AzureClientProvider _azureClientProvider;
 
-    public AzureDataQueryManager(DataStore dataStore, IAccountProvider accountProvider, IAzureLiveDataProvider liveDataProvider, AzureClientProvider azureClientProvider)
+    public AzureDataQueryManager(DataStore dataStore, IAccountProvider accountProvider, IAzureLiveDataProvider liveDataProvider)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
         _log = Serilog.Log.ForContext("SourceContext", nameof(AzureDataQueryManager));
-        _azureClientProvider = azureClientProvider;
         _liveDataProvider = liveDataProvider;
     }
 
@@ -139,7 +137,6 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
         var account = _accountProvider.GetDefaultAccount();
         var workItemsList = new List<WorkItem>();
         var dsQuery = Query.GetOrCreate(_dataStore, azureUri.Query, project.Id, account.Username, query.Name);
-        var connection = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
 
         foreach (var workItem in workItems)
         {
