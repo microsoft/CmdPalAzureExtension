@@ -706,15 +706,15 @@
     <value>Sign in to Azure Dev Ops</value>
     <comment>Shown in form's sign in button tooltip</comment>
   </data>
-  <data name="Forms_SignOut_Button_Title" xml:space="preserve">
+  <data name="Forms_SignOut_TemplateAuthButtonTitle" xml:space="preserve">
     <value>Sign out</value>
     <comment>Title for sign out button title, shown in sign out form</comment>
   </data>
-  <data name="Forms_SignOut_Title" xml:space="preserve">
+  <data name="Forms_SignOut_TemplateAuthTitle" xml:space="preserve">
     <value>Are you sure you want to sign out?</value>
     <comment>Title for sign out form page</comment>
   </data>
-  <data name="Forms_SignOut_Tooltip" xml:space="preserve">
+  <data name="Forms_SignOut_TemplateAuthButtonTooltip" xml:space="preserve">
     <value>Sign out from Azure extension</value>
     <comment>Tooltip for sign out button on sign out form</comment>
   </data>
@@ -897,5 +897,8 @@
   </data>
   <data name="Forms_SignIn_TemplateAuthButtonTooltip" xml:space="preserve">
     <value>Sign into your Azure Dev Ops account</value>
+  </data>
+  <data name="Forms_SignOut_PageTitle" xml:space="preserve">
+    <value>Sign out</value>
   </data>
 </root>

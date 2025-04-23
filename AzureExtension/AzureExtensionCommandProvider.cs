@@ -96,7 +96,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
                 new(_signOutPage)
                 {
                     Title = _resources.GetResource("ExtensionTitle"),
-                    Subtitle = _resources.GetResource("Forms_Sign_Out_Button_Title"),
+                    Subtitle = _resources.GetResource("Forms_SignOut_PageTitle"),
                     Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
                 },
             };
