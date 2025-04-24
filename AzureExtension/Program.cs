@@ -156,10 +156,11 @@ public sealed class Program
         var resources = new Resources(resourceLoader);
 
         var timeSpanHelper = new TimeSpanHelper(resources);
+        var authenticationMediator = new AuthenticationMediator();
 
-        var signInForm = new SignInForm(accountProvider, azureClientHelpers);
+        var signInForm = new SignInForm(accountProvider, azureClientHelpers, authenticationMediator);
         var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"));
-        var signOutForm = new SignOutForm(accountProvider, resources);
+        var signOutForm = new SignOutForm(accountProvider, resources, authenticationMediator);
         var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"));
 
         var savedAzureSearchesMediator = new SavedAzureSearchesMediator();
@@ -177,7 +178,7 @@ public sealed class Program
         var addPullRequestSearchListItem = new AddPullRequestSearchListItem(savePullRequestSearchPage, resources);
         var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedAzureSearchesMediator, persistentDataManager, searchPageFactory);
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, azureClientHelpers, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator);
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 

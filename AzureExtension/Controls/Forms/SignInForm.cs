@@ -13,14 +13,13 @@ namespace AzureExtension.Controls.Forms;
 
 public partial class SignInForm : FormContent, IAzureForm
 {
-    public static event EventHandler<SignInStatusChangedEventArgs>? SignInAction;
-
     public event EventHandler<bool>? LoadingStateChanged;
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly AuthenticationMediator _authenticationMediator;
 
     private bool _isButtonEnabled = true;
 
@@ -29,10 +28,11 @@ public partial class SignInForm : FormContent, IAzureForm
 
     private Page? page;
 
-    public SignInForm(IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers)
+    public SignInForm(IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, AuthenticationMediator authenticationMediator)
     {
         _accountProvider = accountProvider;
-        SignOutForm.SignOutAction += SignOutForm_SignOutAction;
+        _authenticationMediator = authenticationMediator;
+        _authenticationMediator.SignOutAction += SignOutForm_SignOutAction;
         page = null;
         _azureClientHelpers = azureClientHelpers;
     }
@@ -45,20 +45,6 @@ public partial class SignInForm : FormContent, IAzureForm
     private void SignOutForm_SignOutAction(object? sender, SignInStatusChangedEventArgs e)
     {
         _isButtonEnabled = !e.IsSignedIn;
-    }
-
-    private void DeveloperIdProvider_OAuthRedirected(object? sender, Exception? e)
-    {
-        if (e is not null)
-        {
-            SetButtonEnabled(true);
-            LoadingStateChanged?.Invoke(this, false);
-            SignInAction?.Invoke(this, new SignInStatusChangedEventArgs(false, e));
-            FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, e));
-            return;
-        }
-
-        SetButtonEnabled(false);
     }
 
     private void SetButtonEnabled(bool isEnabled)
@@ -88,14 +74,14 @@ public partial class SignInForm : FormContent, IAzureForm
             {
                 var signInSucceeded = await HandleSignIn();
                 LoadingStateChanged?.Invoke(this, false);
-                SignInAction?.Invoke(this, new SignInStatusChangedEventArgs(signInSucceeded, null));
+                _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(signInSucceeded, null));
                 FormSubmitted?.Invoke(this, new FormSubmitEventArgs(signInSucceeded, null));
             }
             catch (Exception ex)
             {
                 LoadingStateChanged?.Invoke(this, false);
                 SetButtonEnabled(true);
-                SignInAction?.Invoke(this, new SignInStatusChangedEventArgs(false, ex));
+                _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(false, ex));
                 FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
             }
         });

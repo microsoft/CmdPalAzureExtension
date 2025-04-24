@@ -3,17 +3,11 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Account;
-using AzureExtension.Client;
 using AzureExtension.Controls;
-using AzureExtension.Controls.ListItems;
 using AzureExtension.Controls.Pages;
-using AzureExtension.DataManager;
-using AzureExtension.DataManager.Cache;
 using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Microsoft.Windows.ApplicationModel.Resources;
 
 namespace AzureExtension;
 
@@ -29,31 +23,38 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly IResources _resources;
 
-    private readonly AzureClientHelpers _azureClientHelpers;
-
     private readonly SavedPullRequestSearchesPage _savedPullRequestSearchesPage;
 
     private readonly ISearchPageFactory _searchPageFactory;
 
-    private readonly SavedAzureSearchesMediator _mediator;
+    private readonly SavedAzureSearchesMediator _savedSearchesMediator;
 
-    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedQueriesPage, IResources resources, AzureClientHelpers azureClientHelpers, SavedPullRequestSearchesPage savedPullRequestSearchesPage, ISearchPageFactory searchPageFactory, SavedAzureSearchesMediator mediator)
+    private readonly AuthenticationMediator _authenticationMediator;
+
+    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedQueriesPage, IResources resources, SavedPullRequestSearchesPage savedPullRequestSearchesPage, ISearchPageFactory searchPageFactory, SavedAzureSearchesMediator mediator, AuthenticationMediator authenticationMediator)
     {
         _signInPage = signInPage;
         _signOutPage = signOutPage;
         _accountProvider = accountProvider;
         _savedQueriesPage = savedQueriesPage;
         _resources = resources;
-        _azureClientHelpers = azureClientHelpers;
         _savedPullRequestSearchesPage = savedPullRequestSearchesPage;
         _searchPageFactory = searchPageFactory;
-        _mediator = mediator;
+        _savedSearchesMediator = mediator;
+        _authenticationMediator = authenticationMediator;
         DisplayName = "Azure Extension";
 
-        _mediator.QuerySaved += OnSearchUpdated;
-        _mediator.QueryRemoved += OnSearchUpdated;
-        _mediator.PullRequestSearchSaved += OnSearchUpdated;
-        _mediator.PullRequestSearchRemoved += OnSearchUpdated;
+        _savedSearchesMediator.QuerySaved += OnSearchUpdated;
+        _savedSearchesMediator.QueryRemoved += OnSearchUpdated;
+        _savedSearchesMediator.PullRequestSearchSaved += OnSearchUpdated;
+        _savedSearchesMediator.PullRequestSearchRemoved += OnSearchUpdated;
+        _authenticationMediator.SignInAction += OnSignInStatusChanged;
+        _authenticationMediator.SignOutAction += OnSignInStatusChanged;
+    }
+
+    private void OnSignInStatusChanged(object? sender, SignInStatusChangedEventArgs e)
+    {
+        RaiseItemsChanged();
     }
 
     private void OnSearchUpdated(object? sender, object? args)
