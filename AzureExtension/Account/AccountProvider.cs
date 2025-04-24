@@ -41,7 +41,8 @@ public class AccountProvider : IAccountProvider
 
     private PublicClientApplicationBuilder InitializePublicClientApplicationBuilder()
     {
-        var windowHandle = Windows.Win32.PInvoke.FindWindow(null, "Microsoft Teams");
+        // var windowHandle = Windows.Win32.PInvoke.FindWindow(null, "Microsoft Teams");
+        var windowHandle = Windows.Win32.PInvoke.GetForegroundWindow();
 
         var builder = PublicClientApplicationBuilder.Create(_microsoftEntraIdSettings.ClientId)
            .WithAuthority(string.Format(CultureInfo.InvariantCulture, _microsoftEntraIdSettings.Authority, _microsoftEntraIdSettings.TenantId))
