@@ -140,7 +140,7 @@ public class WorkItem : IWorkItem
             if (field == WorkItemTypeFieldName && tfWorkItemType != null)
             {
                 // Need a separate query to create WorkItemType object.
-                var workItemType = WorkItemType.CreateFromTeamWorkItemType(tfWorkItemType, projectId);
+                var workItemType = WorkItemType.GetOrCreateByTeamWorkItemType(dataStore, tfWorkItemType, projectId);
 
                 workItem.SystemWorkItemTypeId = workItemType.Id;
                 continue;
