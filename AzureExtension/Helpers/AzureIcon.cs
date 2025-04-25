@@ -30,6 +30,7 @@ public static class AzureIcon
                 { "StatusYellow", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "StatusYellow.png") },
                 { "StatusPurple", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "StatusPurple.png") },
                 { "StatusOrange", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "StatusOrange.png") },
+                { "Query", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Query.svg") },
             };
     }
 

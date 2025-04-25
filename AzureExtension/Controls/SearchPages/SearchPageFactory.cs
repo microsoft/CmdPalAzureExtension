@@ -80,7 +80,6 @@ public class SearchPageFactory : ISearchPageFactory
         {
             Title = search.Name,
             Subtitle = search.Url,
-            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
             MoreCommands = new CommandContextItem[]
             {
                 new(new LinkCommand(search.Url, _resources)),

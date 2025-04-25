@@ -22,7 +22,7 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         _query = query;
         _resources = resources;
         _dataProvider = dataProvider;
-        Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
+        Icon = new IconInfo(AzureIcon.IconDictionary["Query"]);
         Name = query.Name;
     }
 
