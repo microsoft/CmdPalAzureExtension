@@ -30,12 +30,11 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
     {
         var title = item.SystemTitle;
         var url = item.HtmlUrl;
-        var workItemType = item.WorkItemTypeName;
 
         return new ListItem(new LinkCommand(url, _resources))
         {
             Title = title,
-            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+            Icon = new IconInfo(AzureIcon.IconDictionary[item.WorkItemTypeName]),
         };
     }
 

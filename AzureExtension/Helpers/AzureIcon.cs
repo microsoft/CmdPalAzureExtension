@@ -16,9 +16,20 @@ public static class AzureIcon
                 { "pr", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "pulls.png") },
                 { "release", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "releases.png") },
                 { "logo", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "AzureExtensionDark.png") },
-                { "Issues", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "issues.png") },
-                { "PullRequests", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "pulls.png") },
-                { "IssuesAndPullRequests", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "gh_logo.jpg") },
+                { "Bug", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Bug.png") },
+                { "Feature", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Feature.png") },
+                { "Issue", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Issue.png") },
+                { "Impediment", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Impediment.png") },
+                { "PullRequest", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "PullRequest.png") },
+                { "Task", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Task.png") },
+                { "Deliverable", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Deliverable.svg") },
+                { "StatusGreen", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "StatusGreen.png") },
+                { "StatusBlue", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "StatusBlue.png") },
+                { "StatusGray", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "StatusGray.png") },
+                { "StatusRed", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "StatusRed.png") },
+                { "StatusYellow", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "StatusYellow.png") },
+                { "StatusPurple", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "StatusPurple.png") },
+                { "StatusOrange", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "StatusOrange.png") },
             };
     }
 
@@ -35,7 +46,7 @@ public static class AzureIcon
         return string.Empty;
     }
 
-    private static string GetIconForType(string? workItemType)
+    public static string GetIconForType(string? workItemType)
     {
         return workItemType switch
         {
@@ -45,6 +56,7 @@ public static class AzureIcon
             "Impediment" => IconLoader.GetIconAsBase64("Impediment.png"),
             "Pull Request" => IconLoader.GetIconAsBase64("PullRequest.png"),
             "Task" => IconLoader.GetIconAsBase64("Task.png"),
+            "Deliverable" => IconLoader.GetIconAsBase64("Deliverable.svg"),
             _ => IconLoader.GetIconAsBase64("ADO.png"),
         };
     }
