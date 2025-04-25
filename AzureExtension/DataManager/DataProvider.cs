@@ -23,7 +23,13 @@ public class DataProvider : IDataProvider
 
     public static readonly int PullRequestResultLimit = 25;
 
-    public event CacheManagerUpdateEventHandler? OnUpdate;
+    private CacheManagerUpdateEventHandler? _onUpdate;
+
+    public event CacheManagerUpdateEventHandler? OnUpdate
+    {
+        add => _onUpdate = value;
+        remove => _onUpdate -= value;
+    }
 
     public DataProvider(ICacheManager cacheManager, IDataQueryProvider queryProvider, IDataPullRequestSearchProvider pullRequestSearchProvider)
     {
@@ -37,7 +43,7 @@ public class DataProvider : IDataProvider
 
     public void OnCacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
     {
-        OnUpdate?.Invoke(source, e);
+        _onUpdate?.Invoke(source, e);
     }
 
     public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
