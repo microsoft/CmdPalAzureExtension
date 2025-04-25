@@ -43,7 +43,6 @@ public class IconLoader
             { "StatusOrange", (@"Assets\StatusOrange.png", @"Assets\StatusOrange.png") },
             { "StatusRed", (@"Assets\StatusRed.png", @"Assets\StatusRed.png") },
             { "Task", (@"Assets\Task.png", @"Assets\Task.png") },
-            { "TaskGroup", (@"Assets\TaskGroup.png", @"Assets\TaskGroup.png") },
             { "TestCase", (@"Assets\TestCase.png", @"Assets\TestCase.png") },
             { "TestPlan", (@"Assets\TestPlan.png", @"Assets\TestPlan.png") },
             { "TestSuite", (@"Assets\TestSuite.png", @"Assets\TestSuite.png") },
