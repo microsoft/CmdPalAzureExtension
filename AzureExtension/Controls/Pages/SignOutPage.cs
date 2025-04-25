@@ -19,7 +19,7 @@ public sealed partial class SignOutPage : ContentPage
     public SignOutPage(SignOutForm signOutForm, StatusMessage statusMessage, string successMessage, string errorMessage)
     {
         Title = "Sign out";
-        Icon = AzureIcon.IconDictionary["logo"];
+        Icon = IconLoader.GetIcon("Logo");
         _signOutForm = signOutForm;
         _statusMessage = statusMessage;
         _successMessage = successMessage;

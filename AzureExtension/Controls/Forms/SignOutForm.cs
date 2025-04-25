@@ -30,7 +30,7 @@ public sealed partial class SignOutForm : FormContent, IAzureForm
     {
         { "{{AuthTitle}}", _resources.GetResource("Forms_Sign_Out_Title") },
         { "{{AuthButtonTitle}}", _resources.GetResource("Forms_Sign_Out_Button_Title") },
-        { "{{AuthIcon}}", $"data:image/png;base64,{AzureIcon.GetBase64Icon("logo")}" },
+        { "{{AuthIcon}}", $"data:image/png;base64,{IconLoader.GetIconAsBase64("Logo")}" },
         { "{{AuthButtonTooltip}}", _resources.GetResource("Forms_Sign_Out_Tooltip") },
         { "{{ButtonIsEnabled}}", "true" },
     };

@@ -58,7 +58,7 @@ public partial class SignInForm : FormContent, IAzureForm
     {
         { "{{AuthTitle}}", "Sign into your ADO account" },
         { "{{AuthButtonTitle}}", "Sign in" },
-        { "{{AuthIcon}}", $"data:image/png;base64,{AzureIcon.GetBase64Icon("logo")}" },
+        { "{{AuthIcon}}", $"data:image/png;base64,{IconLoader.GetIconAsBase64("Logo")}" },
         { "{{AuthButtonTooltip}}", "tooltip" },
         { "{{ButtonIsEnabled}}", IsButtonEnabled },
     };
