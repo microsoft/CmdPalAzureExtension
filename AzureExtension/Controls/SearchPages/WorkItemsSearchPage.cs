@@ -22,7 +22,7 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         _query = query;
         _resources = resources;
         _dataProvider = dataProvider;
-        Icon = new IconInfo(AzureIcon.IconDictionary["Query"]);
+        Icon = AzureIcon.IconDictionary["Query"];
         Name = query.Name;
     }
 
@@ -34,7 +34,7 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         return new ListItem(new LinkCommand(url, _resources))
         {
             Title = title,
-            Icon = new IconInfo(AzureIcon.IconDictionary[item.WorkItemTypeName]),
+            Icon = AzureIcon.GetIconForType(item.WorkItemTypeName),
         };
     }
 

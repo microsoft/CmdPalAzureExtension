@@ -73,7 +73,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             {
                 new CommandItem(_signInPage)
                 {
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                    Icon = AzureIcon.IconDictionary["logo"],
                     Title = "Sign in",
                     Subtitle = "Sign into your Azure DevOps account",
                 },
@@ -98,7 +98,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
                 {
                     Title = _resources.GetResource("ExtensionTitle"),
                     Subtitle = _resources.GetResource("Forms_Sign_Out_Button_Title"),
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                    Icon = AzureIcon.IconDictionary["logo"],
                 },
             };
 

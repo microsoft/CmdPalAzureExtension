@@ -21,7 +21,7 @@ public abstract partial class SearchPage<T> : ListPage
     public SearchPage(IAzureSearch search, IDataProvider dataProvider)
     {
         CurrentSearch = search;
-        Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
+        Icon = AzureIcon.IconDictionary["logo"];
         Name = search.Name;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         DataProvider = dataProvider;
@@ -61,7 +61,7 @@ public abstract partial class SearchPage<T> : ListPage
                     new ListItem(new NoOpCommand())
                     {
                         Title = "No items found",
-                        Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                        Icon = AzureIcon.IconDictionary["logo"],
                     },
                 };
             }
