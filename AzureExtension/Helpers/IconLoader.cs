@@ -52,6 +52,13 @@ public class IconLoader
         _iconDictionary = _filePathDictionary.ToDictionary(
             kvp => kvp.Key,
             kvp => IconHelpers.FromRelativePaths(kvp.Value.LightModePath, kvp.Value.DarkModePath));
+
+        // Add icon glyphs
+        _iconDictionary.Add("Edit", new IconInfo("\uE70F"));
+        _iconDictionary.Add("Remove", new IconInfo("\uECC9"));
+        _iconDictionary.Add("Add", new IconInfo("\uECC8"));
+        _iconDictionary.Add("Search", new IconInfo("\uE721"));
+        _iconDictionary.Add("OpenLink", new IconInfo("\uE8A7"));
     }
 
     public static IconInfo GetIcon(string key)

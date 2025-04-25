@@ -14,6 +14,6 @@ public partial class AddPullRequestSearchListItem : ListItem
     : base(page)
     {
         Title = resources.GetResource("ListItems_AddSearch");
-        Icon = new IconInfo("\uecc8");
+        Icon = IconLoader.GetIcon("Add");
     }
 }
