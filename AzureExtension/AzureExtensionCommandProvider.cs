@@ -92,7 +92,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
                 new ListItem(_savedPullRequestSearchesPage)
                 {
                     Title = "Saved Azure Dev Ops Pull Request Searches",
-                    Icon = IconLoader.GetIcon("Search"),
+                    Icon = IconLoader.GetIcon("PullRequest"),
                 },
                 new(_signOutPage)
                 {
