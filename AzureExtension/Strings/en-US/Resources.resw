@@ -671,7 +671,7 @@
     <comment>Shown if the user submits the form without entering a query</comment>
   </data>
   <data name="Forms_SaveSearchTemplateEnteredSearchLabel" xml:space="preserve">
-    <value>Query URL (not the Copy Query URL, the one at the top of the browser)</value>
+    <value>Query URL</value>
     <comment>Shown as the label for the input text box for the Azure query</comment>
   </data>
   <data name="Forms_SaveSearchTemplateIsTopLevelTitle" xml:space="preserve">
