@@ -86,12 +86,12 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             {
                 new(_savedQueriesPage)
                 {
-                    Title = _resources.GetResource("Pages_Saved_Searches"),
+                    Title = "Saved Azure Dev Ops Queries",
                     Icon = IconLoader.GetIcon("Search"),
                 },
                 new ListItem(_savedPullRequestSearchesPage)
                 {
-                    Title = "Save Pull Request Search",
+                    Title = "Saved Azure Dev Ops Pull Request Searches",
                     Icon = IconLoader.GetIcon("Search"),
                 },
                 new(_signOutPage)

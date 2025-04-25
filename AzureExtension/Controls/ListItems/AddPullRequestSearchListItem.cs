@@ -13,7 +13,7 @@ public partial class AddPullRequestSearchListItem : ListItem
     public AddPullRequestSearchListItem(SavePullRequestSearchPage page, IResources resources)
     : base(page)
     {
-        Title = resources.GetResource("ListItems_AddSearch");
+        Title = "Add a pull request search";
         Icon = IconLoader.GetIcon("Add");
     }
 }
