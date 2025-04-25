@@ -73,7 +73,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             {
                 new CommandItem(_signInPage)
                 {
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                    Icon = IconLoader.GetIcon("Logo"),
                     Title = "Sign in",
                     Subtitle = "Sign into your Azure DevOps account",
                 },
@@ -86,19 +86,19 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             {
                 new(_savedQueriesPage)
                 {
-                    Title = _resources.GetResource("Pages_Saved_Searches"),
-                    Icon = new IconInfo("\ue721"),
+                    Title = "Saved Azure Dev Ops Queries",
+                    Icon = IconLoader.GetIcon("Search"),
                 },
                 new ListItem(_savedPullRequestSearchesPage)
                 {
-                    Title = "Save Pull Request Search",
-                    Icon = new IconInfo("\ue721"),
+                    Title = "Saved Azure Dev Ops Pull Request Searches",
+                    Icon = IconLoader.GetIcon("PullRequest"),
                 },
                 new(_signOutPage)
                 {
                     Title = _resources.GetResource("ExtensionTitle"),
                     Subtitle = _resources.GetResource("Forms_Sign_Out_Button_Title"),
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                    Icon = IconLoader.GetIcon("Logo"),
                 },
             };
 

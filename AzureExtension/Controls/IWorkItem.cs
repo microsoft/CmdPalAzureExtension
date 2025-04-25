@@ -11,4 +11,6 @@ public interface IWorkItem
     long Id { get; }
 
     string HtmlUrl { get; }
+
+    string WorkItemTypeName { get; }
 }

@@ -22,7 +22,7 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         _query = query;
         _resources = resources;
         _dataProvider = dataProvider;
-        Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
+        Icon = IconLoader.GetIcon("Query");
         Name = query.Name;
     }
 
@@ -34,12 +34,12 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         return new ListItem(new LinkCommand(url, _resources))
         {
             Title = title,
-            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+            Icon = IconLoader.GetIcon(item.WorkItemTypeName),
         };
     }
 
-    protected override Task<IEnumerable<IWorkItem>> LoadContentData()
+    protected async override Task<IEnumerable<IWorkItem>> LoadContentData()
     {
-        return _dataProvider.GetWorkItems(_query);
+        return await _dataProvider.GetWorkItems(_query);
     }
 }

@@ -18,12 +18,12 @@ public class SavePullRequestSearchPage : ContentPage
     public SavePullRequestSearchPage(SavePullRequestSearchForm savePullRequestSearchForm, StatusMessage statusMessage)
     {
         Title = "Save Pull Request";
-        Icon = new IconInfo("\uecc8");
+        Icon = IconLoader.GetIcon("Add");
         _savePullRequestSearchForm = savePullRequestSearchForm;
         _statusMessage = statusMessage;
 
         // Wire up events using the helper
-        FormEventHelper.WireFormEvents(_savePullRequestSearchForm, this, _statusMessage, "success!", "failure");
+        FormEventHelper.WireFormEvents(_savePullRequestSearchForm, this, _statusMessage, "Pull request search saved!", "Pull request search failed: ");
 
         // Hide status message initially
         ExtensionHost.HideStatus(_statusMessage);

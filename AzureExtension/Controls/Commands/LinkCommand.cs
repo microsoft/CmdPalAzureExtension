@@ -15,7 +15,7 @@ internal sealed partial class LinkCommand : InvokableCommand
     internal LinkCommand(string url, IResources resources)
     {
         Name = resources.GetResource("Commands_Open_Link");
-        Icon = new IconInfo("\uE8A7");
+        Icon = IconLoader.GetIcon("OpenLink");
         _url = url;
     }
 

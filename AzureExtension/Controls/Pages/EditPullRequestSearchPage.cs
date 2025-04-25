@@ -34,7 +34,7 @@ internal sealed partial class EditPullRequestSearchPage : ContentPage
         // Set page properties
         Title = _resources.GetResource("Pages_Edit");
         Name = _resources.GetResource("Pages_Edit"); // Title is for the Page, Name is for the Command
-        Icon = new IconInfo("\uE70F");
+        Icon = IconLoader.GetIcon("Edit");
     }
 
     public override IContent[] GetContent()
