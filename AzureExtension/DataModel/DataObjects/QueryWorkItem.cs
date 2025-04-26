@@ -6,8 +6,6 @@ using AzureExtension.Data;
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using Serilog;
-using SQLitePCL;
 
 namespace AzureExtension.DataModel;
 
@@ -26,8 +24,6 @@ public class QueryWorkItem
     [Write(false)]
     [Computed]
     public DateTime UpdatedAt => TimeUpdated.ToDateTime();
-
-    private static readonly ILogger _log = Serilog.Log.ForContext("SourceContext", nameof(QueryWorkItem));
 
     private static QueryWorkItem GetByQueryIdAndWorkItemId(DataStore dataStore, long queryId, long workItemId)
     {
@@ -76,6 +72,5 @@ public class QueryWorkItem
         command.Parameters.AddWithValue("$QueryId", query.Id);
         command.Parameters.AddWithValue("$Time", date.ToDataStoreInteger());
         var rowsDeleted = command.ExecuteNonQuery();
-        _log.Information($"Deleted {rowsDeleted} QueryWorkItem records for query {query.Id} before {date}");
     }
 }
