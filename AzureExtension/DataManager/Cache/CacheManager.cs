@@ -93,12 +93,12 @@ public sealed class CacheManager : IDisposable, ICacheManager
         }
     }
 
-    private async Task SemaphoreWrapper(Task stateTask)
+    private async Task SemaphoreWrapper(Func<Task> stateProcedure)
     {
         await _stateSemaphore.WaitAsync();
         try
         {
-            await stateTask;
+            await stateProcedure();
         }
         finally
         {
@@ -110,12 +110,12 @@ public sealed class CacheManager : IDisposable, ICacheManager
     // an instant update of its data.
     public async Task Refresh(DataUpdateParameters parameters)
     {
-        await SemaphoreWrapper(State.Refresh(parameters));
+        await SemaphoreWrapper(async () => await State.Refresh(parameters));
     }
 
     public async Task PeriodicUpdate()
     {
-        await SemaphoreWrapper(State.PeriodicUpdate());
+        await SemaphoreWrapper(async () => await State.PeriodicUpdate());
     }
 
     public Task Update(DataUpdateParameters parameters)
@@ -147,10 +147,14 @@ public sealed class CacheManager : IDisposable, ICacheManager
         }
     }
 
-    private void HandleDataManagerUpdate(object? source, DataManagerUpdateEventArgs e)
+    private async void HandleDataManagerUpdate(object? source, DataManagerUpdateEventArgs e)
     {
         _logger.Information($"DataManager update: {e.Kind}, {e.Parameters.UpdateType}");
-        State.HandleDataManagerUpdate(source, e);
+        await SemaphoreWrapper(() =>
+        {
+            State.HandleDataManagerUpdate(source, e);
+            return Task.CompletedTask;
+        });
 
         switch (e.Kind)
         {
