@@ -95,7 +95,7 @@ public class WorkItemType
         {
             Name = workItemType.Name ?? string.Empty,
             Description = workItemType.Description ?? string.Empty,
-            Icon = workItemType.Icon.Url.ToString() ?? string.Empty,
+            Icon = workItemType.Icon?.Url.ToString() ?? string.Empty,
             Color = workItemType.Color ?? string.Empty,
             ProjectId = projectId,
             TimeUpdated = DateTime.UtcNow.ToDataStoreInteger(),

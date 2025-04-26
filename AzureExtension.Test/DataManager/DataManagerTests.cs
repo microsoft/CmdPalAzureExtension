@@ -4,10 +4,17 @@
 
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataManager;
 using AzureExtension.DataModel;
+using Microsoft.Identity.Client;
+using Microsoft.TeamFoundation.Core.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Microsoft.VisualStudio.Services.Profile;
 using Moq;
+using Query = AzureExtension.DataModel.Query;
+using TFModels = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 namespace AzureExtension.Test.DataManager;
 
@@ -58,6 +65,85 @@ public class DataManagerTests
         var prsearchManager = new AzureDataPullRequestSearchManager(dataStore, stubAccountProvider, stubLiveDataProvider, stubAuthProvider);
         var azureDataManager = new AzureDataManager(dataStore, queryManager, prsearchManager);
         Assert.IsNotNull(azureDataManager);
+        CleanUpDataStore(dataStore);
+    }
+
+    [TestMethod]
+    public async Task TestDataQueryManagerUpdateFlow()
+    {
+        var dataStore = GetTestDataStore();
+        var mockAccountProvider = new Mock<IAccountProvider>();
+        var mockLiveDataProvider = new Mock<IAzureLiveDataProvider>();
+        var queryManager = new AzureDataQueryManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object);
+
+        var stubAccount = new Mock<IAccount>();
+        stubAccount.SetupGet(a => a.Username).Returns("TestUsername");
+
+        mockAccountProvider.Setup(a => a.GetDefaultAccount()).Returns(stubAccount.Object);
+
+        mockLiveDataProvider.Setup(p => p.GetTeamProject(It.IsAny<Uri>(), It.IsAny<string>()))
+            .ReturnsAsync(new TeamProject
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test Project",
+                Url = "https://dev.azure.com/Org/Project",
+            });
+
+        mockLiveDataProvider.Setup(p => p.GetWorkItemQueryResultByIdAsync(It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new WorkItemQueryResult
+            {
+                QueryType = QueryType.Flat,
+                WorkItems =
+                [
+                    new WorkItemReference
+                    {
+                        Id = 1,
+                        Url = "https://dev.azure.com/Org/Project/_apis/wit/workitems/1",
+                    },
+                ],
+            });
+
+        mockLiveDataProvider.Setup(p => p.GetWorkItemsAsync(It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<List<int>>(), It.IsAny<WorkItemExpand>(), It.IsAny<WorkItemErrorPolicy>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+            [
+                new TFModels.WorkItem
+                {
+                    Id = 1,
+                    Fields =
+                    {
+                        ["System.Title"] = "Test Work Item",
+                        ["System.State"] = "New",
+                        ["System.WorkItemType"] = "Task",
+                    },
+                },
+            ]);
+
+        mockLiveDataProvider.Setup(p => p.GetWorkItemTypeAsync(It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new TFModels.WorkItemType
+            {
+                Name = "Task",
+                Url = "https://dev.azure.com/Org/Project/_apis/wit/workitemtypes/Task",
+            });
+
+        mockLiveDataProvider.Setup(p => p.GetAvatarAsync(It.IsAny<Uri>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new Avatar
+            {
+                Value = Array.Empty<byte>(),
+            });
+
+        var testQuery = new Mock<IQuery>();
+        testQuery.SetupGet(q => q.Url).Returns("https://dev.azure.com/organization/project/_queries/query/12345678-1234-1234-1234-1234567890ab");
+        testQuery.SetupGet(q => q.Name).Returns("Test Query");
+
+        await queryManager.UpdateQueryAsync(testQuery.Object, CancellationToken.None);
+
+        var dsQuery = Query.Get(dataStore, 1);
+
+        Assert.IsNotNull(dsQuery);
+        Assert.AreEqual("Test Query", dsQuery.Name);
+        Assert.AreEqual("TestUsername", dsQuery.Username);
+        Assert.AreEqual("Test Project", dsQuery.Project.Name);
+
         CleanUpDataStore(dataStore);
     }
 }
