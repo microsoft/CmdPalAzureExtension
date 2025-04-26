@@ -48,6 +48,8 @@ public class DataProvider : IDataProvider
 
     public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
     {
+        _cacheManager.CancelUpdateInProgress();
+
         var parameters = new DataUpdateParameters
         {
             UpdateType = DataUpdateType.Query,
@@ -66,6 +68,8 @@ public class DataProvider : IDataProvider
 
     public async Task<IEnumerable<IPullRequest>> GetPullRequests(IPullRequestSearch pullRequestSearch)
     {
+        _cacheManager.CancelUpdateInProgress();
+
         var parameters = new DataUpdateParameters
         {
             UpdateType = DataUpdateType.PullRequests,
