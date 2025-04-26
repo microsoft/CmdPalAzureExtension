@@ -18,7 +18,7 @@ public class IconLoader
     {
         _filePathDictionary = new Dictionary<string, (string LightModePath, string DarkModePath)>
         {
-            { "Logo", (@"Assets\AzureLogo_Light.png", @"Assets\AzureExtensionDark.png") },
+            { "Logo", (@"Assets\AzureIcon.png", @"Assets\AzureIcon.png") },
             { "Bug", (@"Assets\Bug.png", @"Assets\Bug.png") },
             { "ChangeRequest", (@"Assets\ChangeRequest.png", @"Assets\ChangeRequest.png") },
             { "Deliverable", (@"Assets\Deliverable.svg", @"Assets\Deliverable.svg") },
@@ -71,10 +71,11 @@ public class IconLoader
         return _iconDictionary["Logo"];
     }
 
-    public static string GetIconAsBase64(string key, string mode = "dark")
+    // This is for icons in adaptive cards
+    public static string GetIconAsBase64(string key)
     {
         var log = Log.ForContext("SourceContext", nameof(IconLoader));
-        log.Debug($"Asking for icon: {key} in {mode} mode");
+        log.Debug($"Asking for icon: {key}");
 
         if (!_filePathDictionary.TryGetValue(key, out var paths))
         {
@@ -92,7 +93,15 @@ public class IconLoader
             log.Debug($"The icon {key} was converted and stored for both light and dark modes.");
         }
 
-        return Application.Current.RequestedTheme == ApplicationTheme.Light ? base64Values.LightModeBase64 : base64Values.DarkModeBase64;
+        // We don't have access to CmdPal's theme information directly.
+        // This is a temporary solution.
+        // As of now, we don't have any icons in adaptive cards that need theme adaptations.
+        if (string.Equals(paths.LightModePath, paths.DarkModePath, StringComparison.OrdinalIgnoreCase))
+        {
+            return base64Values.LightModeBase64;
+        }
+
+        return base64Values.DarkModeBase64;
     }
 
     private static string ConvertIconToDataString(string filePath)
