@@ -46,6 +46,8 @@ public class PullRequestSearchPullRequest
 
         if (existingPullRequestSearchPullRequest != null)
         {
+            existingPullRequestSearchPullRequest.TimeUpdated = DateTime.UtcNow.ToDataStoreInteger();
+            dataStore.Connection.Update(existingPullRequestSearchPullRequest);
             return existingPullRequestSearchPullRequest;
         }
 
