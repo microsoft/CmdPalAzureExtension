@@ -93,14 +93,12 @@ public sealed class CacheManager : IDisposable, ICacheManager
         }
     }
 
-    // This method is called by the pages to request
-    // an instant update of its data.
-    public async Task Refresh(DataUpdateParameters parameters)
+    private async Task SemaphoreWrapper(Task stateTask)
     {
         await _stateSemaphore.WaitAsync();
         try
         {
-            await State.Refresh(parameters);
+            await stateTask;
         }
         finally
         {
@@ -108,17 +106,16 @@ public sealed class CacheManager : IDisposable, ICacheManager
         }
     }
 
+    // This method is called by the pages to request
+    // an instant update of its data.
+    public async Task Refresh(DataUpdateParameters parameters)
+    {
+        await SemaphoreWrapper(State.Refresh(parameters));
+    }
+
     public async Task PeriodicUpdate()
     {
-        await _stateSemaphore.WaitAsync();
-        try
-        {
-            await State.PeriodicUpdate();
-        }
-        finally
-        {
-            _stateSemaphore.Release();
-        }
+        await SemaphoreWrapper(State.PeriodicUpdate());
     }
 
     public Task Update(DataUpdateParameters parameters)
