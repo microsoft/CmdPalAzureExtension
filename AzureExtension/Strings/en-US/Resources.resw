@@ -262,10 +262,6 @@
     <value>Widget title</value>
     <comment>Shown in Widget, placeholder for widget title</comment>
   </data>
-  <data name="Widget_Template.QueryURLLabel" xml:space="preserve">
-    <value>Query URL:</value>
-    <comment>Shown in Widget</comment>
-  </data>
   <data name="Widget_Template.RepositoryURLLabel" xml:space="preserve">
     <value>Repository URL:</value>
     <comment>Shown in Pull Request Widget</comment>
@@ -281,10 +277,6 @@
   <data name="Widget_Template_Button.RemoveTile" xml:space="preserve">
     <value>Remove tile</value>
     <comment>Shown in Widget, configuration of Tiles</comment>
-  </data>
-  <data name="Widget_Template_ErrorMessage.QueryURL" xml:space="preserve">
-    <value>Provide the query's URL</value>
-    <comment>Shown in Widget, when widget doesn't provide query URL</comment>
   </data>
   <data name="Widget_Template_ErrorMessage.RepositoryURL" xml:space="preserve">
     <value>Provide the repository's URL</value>
@@ -679,7 +671,7 @@
     <comment>Shown if the user submits the form without entering a query</comment>
   </data>
   <data name="Forms_SaveSearchTemplateEnteredSearchLabel" xml:space="preserve">
-    <value>Query string or URL:</value>
+    <value>Query URL</value>
     <comment>Shown as the label for the input text box for the Azure query</comment>
   </data>
   <data name="Forms_SaveSearchTemplateIsTopLevelTitle" xml:space="preserve">
