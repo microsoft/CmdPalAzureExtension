@@ -87,6 +87,8 @@ public abstract partial class SearchPage<T> : ListPage
     {
         DataProvider.OnUpdate += CacheManagerUpdateHandler;
 
+        Logger.Information($"Getting data for query \"{CurrentSearch.Name}\"");
+
         var items = await LoadContentData();
 
         Logger.Information($"Found {items.Count()} items matching search query \"{CurrentSearch.Name}\"");

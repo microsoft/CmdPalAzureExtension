@@ -13,11 +13,8 @@ public class IdleState : CacheManagerState
 
     public async override Task Refresh(DataUpdateParameters dataUpdateParameters)
     {
-        lock (CacheManager.GetStateLock())
-        {
-            CacheManager.State = CacheManager.RefreshingState;
-            CacheManager.CurrentUpdateParameters = dataUpdateParameters;
-        }
+        CacheManager.State = CacheManager.RefreshingState;
+        CacheManager.CurrentUpdateParameters = dataUpdateParameters;
 
         Logger.Information($"Starting refresh for : {dataUpdateParameters}");
         await CacheManager.Update(dataUpdateParameters);
@@ -32,10 +29,7 @@ public class IdleState : CacheManagerState
             return;
         }
 
-        lock (CacheManager.GetStateLock())
-        {
-            CacheManager.State = CacheManager.PeriodicUpdatingState;
-        }
+        CacheManager.State = CacheManager.PeriodicUpdatingState;
 
         var parameters = new DataUpdateParameters
         {

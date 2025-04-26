@@ -14,16 +14,11 @@ public sealed class CacheManager : IDisposable, ICacheManager
 
     // Lock to be used everytime we want to check or update the state of
     // the CacheManager.
-    private static readonly object _stateLock = new();
+    private readonly SemaphoreSlim _stateSemaphore = new(1, 1);
 
     private readonly ILogger _logger;
 
     public CacheManagerState State { get; set; }
-
-    public object GetStateLock()
-    {
-        return _stateLock;
-    }
 
     public CacheManagerState IdleState { get; private set; }
 
@@ -82,13 +77,10 @@ public sealed class CacheManager : IDisposable, ICacheManager
 
     public void CancelUpdateInProgress()
     {
-        lock (_stateLock)
+        if (!_cancelSource.IsCancellationRequested)
         {
-            if (!_cancelSource.IsCancellationRequested)
-            {
-                _logger.Information("Cancelling update.");
-                _cancelSource.Cancel();
-            }
+            _logger.Information("Cancelling update.");
+            _cancelSource.Cancel();
         }
     }
 
@@ -105,33 +97,48 @@ public sealed class CacheManager : IDisposable, ICacheManager
     // an instant update of its data.
     public async Task Refresh(DataUpdateParameters parameters)
     {
-        await State.Refresh(parameters);
+        await _stateSemaphore.WaitAsync();
+        try
+        {
+            await State.Refresh(parameters);
+        }
+        finally
+        {
+            _stateSemaphore.Release();
+        }
     }
 
     public async Task PeriodicUpdate()
     {
-        await State.PeriodicUpdate();
+        await _stateSemaphore.WaitAsync();
+        try
+        {
+            await State.PeriodicUpdate();
+        }
+        finally
+        {
+            _stateSemaphore.Release();
+        }
     }
 
-    public async Task Update(DataUpdateParameters parameters)
+    public Task Update(DataUpdateParameters parameters)
     {
         _logger.Information($"Starting update of type {parameters.UpdateType}.");
 
-        lock (_stateLock)
-        {
-            _cancelSource = new CancellationTokenSource();
-            parameters.CancellationToken = _cancelSource.Token;
-        }
+        _cancelSource = new CancellationTokenSource();
+        parameters.CancellationToken = _cancelSource.Token;
 
         switch (parameters.UpdateType)
         {
             case DataUpdateType.PullRequests:
             case DataUpdateType.Query:
-                await _dataUpdateService.UpdateData(parameters);
+                _ = _dataUpdateService.UpdateData(parameters);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(parameters), parameters, null);
         }
+
+        return Task.CompletedTask;
     }
 
     public void SendUpdateEvent(object? source, CacheManagerUpdateKind kind, Exception? ex = null)
