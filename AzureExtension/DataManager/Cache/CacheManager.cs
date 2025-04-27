@@ -129,6 +129,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
         {
             case DataUpdateType.PullRequests:
             case DataUpdateType.Query:
+            case DataUpdateType.All:
                 _ = _dataUpdateService.UpdateData(parameters);
                 break;
             default:
@@ -203,6 +204,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
                     _dataUpdateService.OnUpdate -= HandleDataManagerUpdate;
                     DataUpdater.Dispose();
                     _cancelSource.Dispose();
+                    _stateSemaphore.Dispose();
                 }
                 catch (Exception e)
                 {
