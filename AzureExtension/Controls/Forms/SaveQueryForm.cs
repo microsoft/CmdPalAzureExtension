@@ -16,12 +16,12 @@ namespace AzureExtension.Controls.Forms;
 
 public sealed partial class SaveQueryForm : FormContent, IAzureForm
 {
-    private readonly IQuery _savedQuery;
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _savedQueriesMediator;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
     private readonly IQueryRepository _queryRepository;
+    private IQuery _savedQuery;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
@@ -97,6 +97,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
             LoadingStateChanged?.Invoke(this, false);
             _queryRepository.UpdateQueryTopLevelStatus(query, query.IsTopLevel, _accountProvider.GetDefaultAccount());
+            _savedQuery = query;
             _savedQueriesMediator.AddQuery(query);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         }

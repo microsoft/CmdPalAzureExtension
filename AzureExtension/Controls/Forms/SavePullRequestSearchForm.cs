@@ -18,7 +18,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _mediator;
     private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
-    private readonly IPullRequestSearch _savedPullRequestSearch;
+    private IPullRequestSearch _savedPullRequestSearch;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
@@ -85,6 +85,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
             LoadingStateChanged?.Invoke(this, false);
             _pullRequestSearchRepository.UpdatePullRequestSearchTopLevelStatus(pullRequestSearch, pullRequestSearch.IsTopLevel);
+            _savedPullRequestSearch = pullRequestSearch;
             _mediator.AddPullRequestSearch(pullRequestSearch);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         }
