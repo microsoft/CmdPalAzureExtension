@@ -15,19 +15,15 @@ public class PendingRefreshState : CacheManagerState
     {
         await Task.Run(() =>
         {
-            lock (CacheManager.GetStateLock())
+            var currentParameters = CacheManager.CurrentUpdateParameters;
+            if (dataUpdateParameters.UpdateType == currentParameters?.UpdateType
+                && dataUpdateParameters.UpdateObject == currentParameters?.UpdateObject)
             {
-                var currentParameters = CacheManager.CurrentUpdateParameters;
-                if (dataUpdateParameters.UpdateType == currentParameters?.UpdateType
-                    && dataUpdateParameters.UpdateObject == currentParameters?.UpdateObject)
-                {
-                    Logger.Information("Search is the same as the pending parameters. Ignoring.");
-                    return;
-                }
-
-                CacheManager.CurrentUpdateParameters = dataUpdateParameters;
+                Logger.Information("Search is the same as the pending parameters. Ignoring.");
+                return;
             }
 
+            CacheManager.CurrentUpdateParameters = dataUpdateParameters;
             CacheManager.CancelUpdateInProgress();
         });
     }
@@ -38,22 +34,15 @@ public class PendingRefreshState : CacheManagerState
         {
             case DataManagerUpdateKind.Cancel:
                 Logger.Information($"Received data manager cancellation. Refreshing for {CacheManager.CurrentUpdateParameters}");
-                lock (CacheManager.GetStateLock())
-                {
-                    CacheManager.State = CacheManager.RefreshingState;
-                }
+                CacheManager.State = CacheManager.RefreshingState;
 
                 await CacheManager.Update(CacheManager.CurrentUpdateParameters!);
                 break;
             default:
                 Logger.Information($"Received data manager update event {e.Kind}. Changing to Idle state.");
 
-                lock (CacheManager.GetStateLock())
-                {
-                    CacheManager.State = CacheManager.IdleState;
-                    CacheManager.CurrentUpdateParameters = null;
-                }
-
+                CacheManager.State = CacheManager.IdleState;
+                CacheManager.CurrentUpdateParameters = null;
                 break;
         }
     }

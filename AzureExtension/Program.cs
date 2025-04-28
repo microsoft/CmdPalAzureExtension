@@ -35,7 +35,7 @@ public sealed class Program
     public static async Task Main([System.Runtime.InteropServices.WindowsRuntime.ReadOnlyArray] string[] args)
     {
         // Setup Logging
-        Environment.SetEnvironmentVariable("DEVHOME_LOGS_ROOT", ApplicationData.Current.TemporaryFolder.Path);
+        Environment.SetEnvironmentVariable("CMDPAL_LOGS_ROOT", ApplicationData.Current.TemporaryFolder.Path);
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
             .Build();
