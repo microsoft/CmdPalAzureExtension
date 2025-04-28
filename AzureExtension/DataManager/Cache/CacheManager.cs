@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Serilog;
+using System.Runtime.CompilerServices;
 
 namespace AzureExtension.DataManager.Cache;
 
@@ -93,6 +94,14 @@ public sealed class CacheManager : IDisposable, ICacheManager
         }
     }
 
+    private static void TryRelease(SemaphoreSlim semaphore)
+    {
+        if (semaphore.CurrentCount == 0)
+        {
+            semaphore.Release();
+        }
+    }
+
     private async Task SemaphoreWrapper(Func<Task> stateProcedure)
     {
         await _stateSemaphore.WaitAsync();
@@ -102,7 +111,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
         }
         finally
         {
-            _stateSemaphore.Release();
+            TryRelease(_stateSemaphore);
         }
     }
 
@@ -118,25 +127,26 @@ public sealed class CacheManager : IDisposable, ICacheManager
         await SemaphoreWrapper(async () => await State.PeriodicUpdate());
     }
 
-    public Task Update(DataUpdateParameters parameters)
+    public async Task Update(DataUpdateParameters parameters)
     {
         _logger.Information($"Starting update of type {parameters.UpdateType}.");
 
         _cancelSource = new CancellationTokenSource();
         parameters.CancellationToken = _cancelSource.Token;
 
+        // It is safe to release here. No more state changes.
+        TryRelease(_stateSemaphore);
+
         switch (parameters.UpdateType)
         {
             case DataUpdateType.PullRequests:
             case DataUpdateType.Query:
             case DataUpdateType.All:
-                _ = _dataUpdateService.UpdateData(parameters);
+                await _dataUpdateService.UpdateData(parameters);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(parameters), parameters, null);
         }
-
-        return Task.CompletedTask;
     }
 
     public void SendUpdateEvent(object? source, CacheManagerUpdateKind kind, Exception? ex = null)
