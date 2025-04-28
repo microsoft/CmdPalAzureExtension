@@ -10,4 +10,6 @@ namespace AzureExtension.PersistentData;
 public interface IAzureValidator
 {
     InfoResult GetQueryInfo(string queryUrl, IAccount account);
+
+    InfoResult GetRepositoryInfo(string repositoryUrl, IAccount account);
 }
