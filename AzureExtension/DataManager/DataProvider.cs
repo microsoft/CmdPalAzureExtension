@@ -46,6 +46,35 @@ public class DataProvider : IDataProvider
         _onUpdate?.Invoke(source, e);
     }
 
+    private async Task WaitForCacheUpdateAsync(DataUpdateParameters parameters)
+    {
+        var tcs = new TaskCompletionSource();
+
+        CacheManagerUpdateEventHandler handler = null!;
+        handler = (sender, args) =>
+        {
+            _cacheManager.OnUpdate -= handler;
+            tcs.TrySetResult();
+        };
+
+        _cacheManager.OnUpdate += handler;
+        _ = _cacheManager.RequestRefresh(parameters);
+
+        await tcs.Task;
+    }
+
+    private async Task WaitForLoadingDataIfNull(object? dataStoreObject, DataUpdateParameters parameters)
+    {
+        if (dataStoreObject == null)
+        {
+            await WaitForCacheUpdateAsync(parameters);
+        }
+        else
+        {
+            _ = _cacheManager.RequestRefresh(parameters);
+        }
+    }
+
     public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
     {
         var parameters = new DataUpdateParameters
@@ -55,11 +84,7 @@ public class DataProvider : IDataProvider
         };
 
         var dsQuery = _queryProvider.GetQuery(query);
-        var refreshTask = _cacheManager.RequestRefresh(parameters);
-        if (dsQuery == null)
-        {
-            await refreshTask;
-        }
+        await WaitForLoadingDataIfNull(dsQuery, parameters);
 
         return _queryProvider.GetWorkItems(query);
     }
@@ -73,11 +98,7 @@ public class DataProvider : IDataProvider
         };
 
         var dsPullRequestSearch = _pullRequestSearchProvider.GetPullRequestSearch(pullRequestSearch);
-        var refreshTask = _cacheManager.RequestRefresh(parameters);
-        if (dsPullRequestSearch == null)
-        {
-            await refreshTask;
-        }
+        await WaitForLoadingDataIfNull(dsPullRequestSearch, parameters);
 
         return _pullRequestSearchProvider.GetPullRequests(pullRequestSearch);
     }

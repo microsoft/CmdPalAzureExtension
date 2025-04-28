@@ -93,14 +93,6 @@ public sealed class CacheManager : IDisposable, ICacheManager
         }
     }
 
-    private static void TryRelease(SemaphoreSlim semaphore)
-    {
-        if (semaphore.CurrentCount == 0)
-        {
-            semaphore.Release();
-        }
-    }
-
     private async Task SemaphoreWrapper(Func<Task> stateProcedure)
     {
         await _stateSemaphore.WaitAsync();
@@ -110,7 +102,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
         }
         finally
         {
-            TryRelease(_stateSemaphore);
+            _stateSemaphore.Release();
         }
     }
 
@@ -126,26 +118,25 @@ public sealed class CacheManager : IDisposable, ICacheManager
         await SemaphoreWrapper(async () => await State.PeriodicUpdate());
     }
 
-    public async Task Update(DataUpdateParameters parameters)
+    public Task Update(DataUpdateParameters parameters)
     {
         _logger.Information($"Starting update of type {parameters.UpdateType}.");
 
         _cancelSource = new CancellationTokenSource();
         parameters.CancellationToken = _cancelSource.Token;
 
-        // It is safe to release here. No more state changes.
-        TryRelease(_stateSemaphore);
-
         switch (parameters.UpdateType)
         {
             case DataUpdateType.PullRequests:
             case DataUpdateType.Query:
             case DataUpdateType.All:
-                await _dataUpdateService.UpdateData(parameters);
+                _ = _dataUpdateService.UpdateData(parameters);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(parameters), parameters, null);
         }
+
+        return Task.CompletedTask;
     }
 
     public void SendUpdateEvent(object? source, CacheManagerUpdateKind kind, Exception? ex = null)
