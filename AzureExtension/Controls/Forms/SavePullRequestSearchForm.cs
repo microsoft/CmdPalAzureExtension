@@ -99,16 +99,17 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     public PullRequestSearch CreatePullRequestSearchFromJson(JsonNode? jsonNode)
     {
         var searchUrl = jsonNode?["url"]?.ToString() ?? string.Empty;
+        var searchUri = new AzureUri(searchUrl);
         var name = jsonNode?["title"]?.ToString() ?? string.Empty;
         var view = jsonNode?["view"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
         if (string.IsNullOrEmpty(name))
         {
-            name = string.Empty;
+            name = $"{searchUri.Repository} - {view}";
         }
 
-        return new PullRequestSearch(new AzureUri(searchUrl), name, view, isTopLevel);
+        return new PullRequestSearch(searchUri, name, view, isTopLevel);
     }
 
     public async Task<bool> GetIsTopLevel()
