@@ -70,7 +70,7 @@ public class DataProviderTests
     }
 
     [TestMethod]
-    public async Task DataProviderPullRequestssFromFreshPullRequestSearch()
+    public async Task DataProviderPullRequestsFromFreshPullRequestSearch()
     {
         var mockCacheManager = new Mock<ICacheManager>();
         var stubQueryProvider = new Mock<IDataQueryProvider>();
@@ -90,7 +90,7 @@ public class DataProviderTests
     }
 
     [TestMethod]
-    public async Task DataProviderPullRequestssFromCachedPullRequestSearch()
+    public async Task DataProviderPullRequestsFromCachedPullRequestSearch()
     {
         var mockCacheManager = new Mock<ICacheManager>();
         var stubQueryProvider = new Mock<IDataQueryProvider>();
