@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Controls;
+using Microsoft.Identity.Client;
 
 namespace AzureExtension.PersistentData;
 
@@ -20,5 +21,5 @@ public interface ISavedPullRequestSearchRepository : IAzureSearchRepository
 
     Task<bool> IsTopLevel(IPullRequestSearch pullRequestSearch);
 
-    void UpdatePullRequestSearchTopLevelStatus(IPullRequestSearch pullRequestSearch, bool isTopLevel);
+    void UpdatePullRequestSearchTopLevelStatus(IPullRequestSearch pullRequestSearch, bool isTopLevel, IAccount account);
 }

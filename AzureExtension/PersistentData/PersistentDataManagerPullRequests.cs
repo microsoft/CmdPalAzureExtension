@@ -2,7 +2,9 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Client;
 using AzureExtension.Controls;
+using Microsoft.Identity.Client;
 
 namespace AzureExtension.PersistentData;
 
@@ -80,9 +82,16 @@ public partial class PersistentDataManager : ISavedPullRequestSearchRepository
         return Task.CompletedTask;
     }
 
-    public void UpdatePullRequestSearchTopLevelStatus(IPullRequestSearch pullRequestSearch, bool isTopLevel)
+    public bool ValidatePullRequestSearch(IPullRequestSearch pullRequestSearch, IAccount account)
+    {
+        var repositoryInfo = _azureValidator.GetRepositoryInfo(pullRequestSearch.Url, account);
+        return repositoryInfo.Result == ResultType.Success;
+    }
+
+    public void UpdatePullRequestSearchTopLevelStatus(IPullRequestSearch pullRequestSearch, bool isTopLevel, IAccount account)
     {
         ValidateDataStore();
+        ValidatePullRequestSearch(pullRequestSearch, account);
         PullRequestSearch.AddOrUpdate(_dataStore, pullRequestSearch.Url, pullRequestSearch.Name, pullRequestSearch.View, isTopLevel);
     }
 }

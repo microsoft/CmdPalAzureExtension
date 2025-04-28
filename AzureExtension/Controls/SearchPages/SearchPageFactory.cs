@@ -64,7 +64,7 @@ public class SearchPageFactory : ISearchPageFactory
         }
         else if (search is IPullRequestSearch)
         {
-            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _savedPullRequestSearchRepository);
+            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _savedPullRequestSearchRepository);
             var statusMessage = new StatusMessage();
             return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage, "Pull request search edited successfully", "error in editing pull request search");
         }
