@@ -35,6 +35,7 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         {
             Title = title,
             Icon = IconLoader.GetIcon(item.WorkItemTypeName),
+            Tags = new[] { new Tag(item.SystemState) },
         };
     }
 

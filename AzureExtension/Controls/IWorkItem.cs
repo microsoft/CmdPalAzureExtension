@@ -13,4 +13,6 @@ public interface IWorkItem
     string HtmlUrl { get; }
 
     string WorkItemTypeName { get; }
+
+    string SystemState { get; }
 }
