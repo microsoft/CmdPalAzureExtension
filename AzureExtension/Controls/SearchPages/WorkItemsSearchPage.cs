@@ -25,6 +25,7 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         _dataProvider = dataProvider;
         Icon = IconLoader.GetIcon("Query");
         Name = query.Name;
+        ShowDetails = true;
     }
 
     protected override ListItem GetListItem(IWorkItem item)
@@ -37,6 +38,11 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
             Title = title,
             Icon = IconLoader.GetIcon(item.WorkItemTypeName),
             Tags = new[] { GetStatusTag(item) },
+
+            Details = new Details()
+            {
+                Body = item.SystemTitle,
+            },
         };
     }
 
