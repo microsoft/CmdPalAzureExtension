@@ -41,7 +41,9 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
 
             Details = new Details()
             {
-                Body = item.SystemTitle,
+                HeroImage = new IconInfo(item.SystemCreatedBy?.Avatar),
+                Title = item.SystemTitle,
+                Body = GetMarkdownText(item),
             },
         };
     }
@@ -71,5 +73,22 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
             Text = item.SystemState,
             Icon = IconLoader.GetIcon(color),
         };
+    }
+
+    private string GetMarkdownText(IWorkItem item)
+    {
+        return $@"
+System work item type: {item.WorkItemTypeName}
+
+Internal id: {item.Id}
+
+State: {item.SystemState}
+
+Reason: {item.SystemReason}
+
+Assigned to: {item.SystemAssignedTo?.Name ?? "Unassigned"}
+
+Changed date: {item.SystemChangedDate}
+        ";
     }
 }
