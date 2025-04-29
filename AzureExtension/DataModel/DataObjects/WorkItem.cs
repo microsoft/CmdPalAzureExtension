@@ -136,6 +136,10 @@ public class WorkItem : IWorkItem
                 {
                     workItem.SystemCreatedById = identity.Id;
                 }
+                else if (field == "System.AssignedTo")
+                {
+                    workItem.SystemAssignedToId = identity.Id;
+                }
 
                 continue;
             }
