@@ -17,12 +17,15 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
 
     private readonly IDataProvider _dataProvider;
 
-    public WorkItemsSearchPage(IQuery query, IResources resources, IDataProvider dataProvider)
+    private readonly TimeSpanHelper _timeSpanHelper;
+
+    public WorkItemsSearchPage(IQuery query, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
         : base(query, dataProvider)
     {
         _query = query;
         _resources = resources;
         _dataProvider = dataProvider;
+        _timeSpanHelper = timeSpanHelper;
         Icon = IconLoader.GetIcon("Query");
         Name = query.Name;
         ShowDetails = true;
@@ -44,6 +47,19 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
                 HeroImage = new IconInfo(item.SystemCreatedBy?.Avatar),
                 Title = item.SystemTitle,
                 Body = GetMarkdownText(item),
+                Metadata = new[]
+                {
+                    new DetailsElement()
+                    {
+                        Data = new DetailsTags()
+                        {
+                            Tags = new[]
+                            {
+                                GetStatusTag(item),
+                            },
+                        },
+                    },
+                },
             },
         };
     }
@@ -77,18 +93,13 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
 
     private string GetMarkdownText(IWorkItem item)
     {
+        var name = item.SystemAssignedTo?.Name;
         return $@"
-System work item type: {item.WorkItemTypeName}
-
-Internal id: {item.Id}
-
-State: {item.SystemState}
-
 Reason: {item.SystemReason}
 
 Assigned to: {item.SystemAssignedTo?.Name ?? "Unassigned"}
 
-Changed date: {item.SystemChangedDate}
+Changed date: {_timeSpanHelper.TimeSpanToDisplayString(new TimeSpan(item.SystemCreatedDate))}
         ";
     }
 }
