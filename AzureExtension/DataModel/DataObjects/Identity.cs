@@ -105,7 +105,7 @@ public class Identity
         }
     }
 
-    public static Identity CreateFromIdentityRef(IdentityRef identityRef, Uri connection, IAzureLiveDataProvider dataProvider)
+    public static Identity CreateFromIdentityRef(IdentityRef identityRef, Uri connection, IAzureLiveDataProvider dataProvider, bool loadAvatar)
     {
         // It is possible the IdentityRef object content is null but contains
         // a display name like "Closed". This is what is given to work items
@@ -130,18 +130,18 @@ public class Identity
         {
             InternalId = identityRef.Id,
             Name = identityRef.DisplayName,
-            Avatar = GetAvatar(connection, dataProvider, new Guid(identityRef.Id)),
+            Avatar = loadAvatar ? GetAvatar(connection, dataProvider, new Guid(identityRef.Id)) : string.Empty,
             TimeUpdated = DateTime.UtcNow.ToDataStoreInteger(),
         };
     }
 
-    private static Identity CreateFromIdentity(Microsoft.VisualStudio.Services.Identity.Identity identity, Uri connection, IAzureLiveDataProvider dataProvider)
+    private static Identity CreateFromIdentity(Microsoft.VisualStudio.Services.Identity.Identity identity, Uri connection, IAzureLiveDataProvider dataProvider, bool loadAvatar)
     {
         return new Identity
         {
             InternalId = identity.Id.ToString(),
             Name = identity.DisplayName,
-            Avatar = GetAvatar(connection, dataProvider, identity.Id),
+            Avatar = loadAvatar ? GetAvatar(connection, dataProvider, identity.Id) : string.Empty,
             TimeUpdated = DateTime.UtcNow.ToDataStoreInteger(),
         };
     }
@@ -192,7 +192,13 @@ public class Identity
     }
 
     // Creation from an Azure IdentityRef object.
-    public static Identity GetOrCreateIdentity(DataStore dataStore, IdentityRef identityRef, Uri connection, IAzureLiveDataProvider dataProvider, string developerLoginId = "")
+    public static Identity GetOrCreateIdentity(
+        DataStore dataStore,
+        IdentityRef identityRef,
+        Uri connection,
+        IAzureLiveDataProvider dataProvider,
+        bool loadAvatar = false,
+        string developerLoginId = "")
     {
         Identity? existing;
         if (identityRef.Id == null)
@@ -210,9 +216,9 @@ public class Identity
         // but not every time.
         var isDeveloper = !string.IsNullOrEmpty(developerLoginId);
         if (existing is null || (isDeveloper && !existing.IsLoggedInDeveloper) || ((DateTime.UtcNow - existing.UpdatedAt) > _updateThreshold)
-            || (string.IsNullOrEmpty(existing.Avatar) && ((DateTime.UtcNow - existing.UpdatedAt) > _avatarRetryDelay)))
+            || (loadAvatar && string.IsNullOrEmpty(existing.Avatar) && ((DateTime.UtcNow - existing.UpdatedAt) > _avatarRetryDelay)))
         {
-            var newIdentity = CreateFromIdentityRef(identityRef, connection, dataProvider);
+            var newIdentity = CreateFromIdentityRef(identityRef, connection, dataProvider, loadAvatar);
             return AddOrUpdateIdentity(dataStore, newIdentity, developerLoginId);
         }
 
@@ -220,7 +226,13 @@ public class Identity
     }
 
     // Creation from an Azure Identity object.
-    public static Identity GetOrCreateIdentity(DataStore dataStore, Microsoft.VisualStudio.Services.Identity.Identity? identity, Uri connection, IAzureLiveDataProvider dataProvider, string developerLoginId = "")
+    public static Identity GetOrCreateIdentity(
+        DataStore dataStore,
+        Microsoft.VisualStudio.Services.Identity.Identity? identity,
+        Uri connection,
+        IAzureLiveDataProvider dataProvider,
+        bool loadAvatar = false,
+        string developerLoginId = "")
     {
         ArgumentNullException.ThrowIfNull(identity);
 
@@ -233,9 +245,9 @@ public class Identity
         // but not every time.
         var isDeveloper = !string.IsNullOrEmpty(developerLoginId);
         if (existing is null || (isDeveloper && !existing.IsLoggedInDeveloper) || ((DateTime.UtcNow - existing.UpdatedAt) > _updateThreshold)
-            || (string.IsNullOrEmpty(existing.Avatar) && ((DateTime.UtcNow - existing.UpdatedAt) > _avatarRetryDelay)))
+            || (loadAvatar && string.IsNullOrEmpty(existing.Avatar) && ((DateTime.UtcNow - existing.UpdatedAt) > _avatarRetryDelay)))
         {
-            var newIdentity = CreateFromIdentity(identity, connection, dataProvider);
+            var newIdentity = CreateFromIdentity(identity, connection, dataProvider, loadAvatar);
             return AddOrUpdateIdentity(dataStore, newIdentity, developerLoginId);
         }
 
