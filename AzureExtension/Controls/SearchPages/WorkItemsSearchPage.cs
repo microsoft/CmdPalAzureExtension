@@ -4,11 +4,12 @@
 
 using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
+using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
+public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
 {
     private readonly IQuery _query;
 
@@ -35,12 +36,34 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         {
             Title = title,
             Icon = IconLoader.GetIcon(item.WorkItemTypeName),
-            Tags = new[] { new Tag(item.SystemState) },
+            Tags = new[] { GetStatusTag(item) },
         };
     }
 
     protected async override Task<IEnumerable<IWorkItem>> LoadContentData()
     {
         return await _dataProvider.GetWorkItems(_query);
+    }
+
+    protected ITag GetStatusTag(IWorkItem item)
+    {
+        var color = item.SystemState switch
+        {
+            "Active" => "StatusRed",
+            "Committed" => "StatusBlue",
+            "Started" => "StatusBlue",
+            "Completed" => "StatusGreen",
+            "Closed" => "StatusGreen",
+            "Resolved" => "StatusBlue",
+            "Proposed" => "StatusGray",
+            "Cut" => "StatusGray",
+            _ => "StatusGray",
+        };
+
+        return new Tag()
+        {
+            Text = item.SystemState,
+            Icon = IconLoader.GetIcon(color),
+        };
     }
 }
