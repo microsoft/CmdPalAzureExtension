@@ -9,6 +9,7 @@ using AzureExtension.Data;
 using AzureExtension.DataModel;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
+using Microsoft.VisualStudio.Services.WebApi;
 using Serilog;
 using PullRequestSearch = AzureExtension.DataModel.PullRequestSearch;
 
@@ -22,19 +23,19 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
-    private readonly IAuthorizedEntityIdProvider _authorizedEntityIdProvider;
+    private readonly IConnectionProvider _connectionProvider;
 
     public AzureDataPullRequestSearchManager(
         DataStore dataStore,
         IAccountProvider accountProvider,
         IAzureLiveDataProvider liveDataProvider,
-        IAuthorizedEntityIdProvider authorizedEntityIdProvider)
+        IConnectionProvider connectionProvider)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
         _log = Log.ForContext("SourceContext", nameof(AzureDataPullRequestSearchManager));
         _liveDataProvider = liveDataProvider;
-        _authorizedEntityIdProvider = authorizedEntityIdProvider;
+        _connectionProvider = connectionProvider;
     }
 
     private void ValidateDataStore()
@@ -79,14 +80,16 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
 
         var project = Project.Get(_dataStore, azureUri.Project, org.Id);
+        var account = _accountProvider.GetDefaultAccount();
+        using var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
 
         if (project is null)
         {
-            var teamProject = await _liveDataProvider.GetTeamProject(azureUri.Connection, azureUri.Project);
+            var teamProject = await _liveDataProvider.GetTeamProject(vssConnection, azureUri.Project);
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
 
-        var gitRepository = await _liveDataProvider.GetRepositoryAsync(azureUri.Connection, project.InternalId, azureUri.Repository, cancellationToken);
+        var gitRepository = await _liveDataProvider.GetRepositoryAsync(vssConnection, project.InternalId, azureUri.Repository, cancellationToken);
 
         var searchCriteria = new GitPullRequestSearchCriteria
         {
@@ -94,8 +97,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
             IncludeLinks = true,
         };
 
-        var account = _accountProvider.GetDefaultAccount();
-        var authorizedEntityId = _authorizedEntityIdProvider.GetAuthorizedEntityId(azureUri.Connection, account);
+        var authorizedEntityId = vssConnection.AuthorizedIdentity.Id;
 
         switch (GetPullRequestView(pullRequestSearch.View))
         {
@@ -113,49 +115,102 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         }
 
         // Get the pull requests with those criteria: (do we need internal id)
-        var pullRequests = await _liveDataProvider.GetPullRequestsAsync(azureUri.Connection, project.InternalId, gitRepository.Id, searchCriteria, cancellationToken);
+        var pullRequests = await _liveDataProvider.GetPullRequestsAsync(vssConnection, project.InternalId, gitRepository.Id, searchCriteria, cancellationToken);
 
         var repository = Repository.GetOrCreate(_dataStore, gitRepository, project.Id);
 
         var dsPullRequestSearch = PullRequestSearch.GetOrCreate(_dataStore, repository.Id, project.Id, account.Username, GetPullRequestView(pullRequestSearch.View));
 
+        _log.Information("Starting pull request downloading.");
+
+        using var dbSemaphore = new SemaphoreSlim(1, 1);
+
+        var tasks = new List<Task<PullRequest>>();
         foreach (var pullRequest in pullRequests)
         {
-            var status = PolicyStatus.Unknown;
-            var statusReason = string.Empty;
-
-            // ArtifactId is null in the pull request object and it is not the correct object. The ArtifactId for the
-            // Policy Evaluations API is this:
-            //     vstfs:///CodeReview/CodeReviewId/{projectId}/{pullRequestId}
-            // Documentation: https://learn.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.policy.webapi.policyevaluationrecord.artifactid
-            var artifactId = $"vstfs:///CodeReview/CodeReviewId/{project.InternalId}/{pullRequest.PullRequestId}";
-
-            try
+            var prTask = Task<PullRequest>.Run(async () =>
             {
-                var policyEvaluations = await _liveDataProvider.GetPolicyEvaluationsAsync(azureUri.Connection, project.InternalId, artifactId, cancellationToken);
-                GetPolicyStatus(policyEvaluations, out status, out statusReason);
-            }
-            catch (Exception ex)
-            {
-                _log.Error(ex, $"Failed getting policy evaluations for pull request: {pullRequest.PullRequestId} {pullRequest.Url}");
-            }
+                var status = PolicyStatus.Unknown;
+                var statusReason = string.Empty;
 
-            if (pullRequest.LastMergeSourceCommit is not null)
-            {
-                var commitRef = await _liveDataProvider.GetCommitAsync(azureUri.Connection, pullRequest.LastMergeSourceCommit.CommitId, gitRepository.Id, cancellationToken);
-                if (commitRef is not null)
+                // ArtifactId is null in the pull request object and it is not the correct object. The ArtifactId for the
+                // Policy Evaluations API is this:
+                //     vstfs:///CodeReview/CodeReviewId/{projectId}/{pullRequestId}
+                // Documentation: https://learn.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.policy.webapi.policyevaluationrecord.artifactid
+                var artifactId = $"vstfs:///CodeReview/CodeReviewId/{project.InternalId}/{pullRequest.PullRequestId}";
+
+                _log.Information($"Starting download for {pullRequest.Title}");
+
+                var policyEvaliationsTask = _liveDataProvider.GetPolicyEvaluationsAsync(vssConnection, project.InternalId, artifactId, cancellationToken);
+                Task<GitCommit>? commitTask = null;
+                if (pullRequest.LastMergeSourceCommit is not null)
                 {
-                    pullRequest.LastMergeSourceCommit = commitRef;
+                    commitTask = _liveDataProvider.GetCommitAsync(vssConnection, pullRequest.LastMergeSourceCommit.CommitId, gitRepository.Id, cancellationToken);
                 }
-            }
 
-            var creator = Identity.GetOrCreateIdentity(_dataStore, pullRequest.CreatedBy, azureUri.Connection, _liveDataProvider);
-            var dsPullRequest = PullRequest.GetOrCreate(_dataStore, pullRequest, repository.Id, creator.Id, statusReason);
+                _log.Information($"Started tasks for {pullRequest.Title}");
 
-            PullRequestSearchPullRequest.AddPullRequestToSearch(_dataStore, dsPullRequestSearch.Id, dsPullRequest.Id);
+                try
+                {
+                    _log.Information($"Waiting for policy evaluations for {pullRequest.Title}");
+                    var policyEvaluations = await policyEvaliationsTask;
+                    GetPolicyStatus(policyEvaluations, out status, out statusReason);
+                }
+                catch (Exception ex)
+                {
+                    _log.Error(ex, $"Failed getting policy evaluations for pull request: {pullRequest.PullRequestId} {pullRequest.Url}");
+                }
+
+                _log.Information($"Finished getting policy evaluations for {pullRequest.Title}");
+
+                if (pullRequest.LastMergeSourceCommit is not null)
+                {
+                    _log.Information($"Waiting for commit for {pullRequest.Title} with commitId {pullRequest.LastMergeSourceCommit.CommitId}");
+                    var commitRef = await commitTask!;
+                    if (commitRef is not null)
+                    {
+                        pullRequest.LastMergeSourceCommit = commitRef;
+                    }
+                }
+
+                _log.Information($"Finished download for {pullRequest.Title}");
+
+                await dbSemaphore.WaitAsync(cancellationToken);
+                try
+                {
+                    var creator = Identity.GetOrCreateIdentity(_dataStore, pullRequest.CreatedBy, vssConnection, _liveDataProvider);
+                    var dsPullRequest = PullRequest.GetOrCreate(_dataStore, pullRequest, repository.Id, creator.Id, statusReason);
+                    _log.Information($"Finishing inserting {pullRequest.Title}");
+                    return dsPullRequest;
+                }
+                finally
+                {
+                    dbSemaphore.Release();
+                }
+            });
+
+            tasks.Add(prTask);
         }
 
-        PullRequestSearchPullRequest.DeleteBefore(_dataStore, dsPullRequestSearch, DateTime.UtcNow - _pullRequestSearchDeletionTime);
+        _log.Information($"Waiting for {tasks.Count} pull requests to finish downloading.");
+
+        foreach (var task in tasks)
+        {
+            var dsPullRequest = await task;
+            _log.Information($"Finished downloading pull request {dsPullRequest.Title} with id {dsPullRequest.Id}");
+            await dbSemaphore.WaitAsync(cancellationToken);
+            try
+            {
+                PullRequestSearchPullRequest.AddPullRequestToSearch(_dataStore, dsPullRequestSearch.Id, dsPullRequest.Id);
+                PullRequestSearchPullRequest.DeleteBefore(_dataStore, dsPullRequestSearch, DateTime.UtcNow - _pullRequestSearchDeletionTime);
+            }
+            finally
+            {
+                dbSemaphore.Release();
+            }
+        }
+
+        _log.Information("Finished pull request downloading.");
     }
 
     // Helper methods

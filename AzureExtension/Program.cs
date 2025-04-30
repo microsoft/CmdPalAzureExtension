@@ -118,7 +118,7 @@ public sealed class Program
 
         var authenticationSettings = new AuthenticationSettings();
         authenticationSettings.InitializeSettings();
-        var accountProvider = new AccountProvider(authenticationSettings);
+        using var accountProvider = new AccountProvider(authenticationSettings);
 
         // In the case that this is the first launch we will try to automatically connect the default Windows account
         await accountProvider.EnableSSOForAzureExtensionAsync();
@@ -133,9 +133,9 @@ public sealed class Program
         using var cacheDataStore = new DataStore("DataStore", combinedCachePath, cacheDataStoreSchema);
         cacheDataStore.Create();
 
-        var azureLiveDataProvider = new AzureLiveDataProvider(azureClientProvider, accountProvider);
+        var azureLiveDataProvider = new AzureLiveDataProvider();
 
-        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider);
+        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
         var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
 
         var azureDataManager = new AzureDataManager(cacheDataStore, queryManager, pullRequestSearchManager);

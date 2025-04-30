@@ -22,13 +22,15 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
+    private readonly IConnectionProvider _connectionProvider;
 
-    public AzureDataQueryManager(DataStore dataStore, IAccountProvider accountProvider, IAzureLiveDataProvider liveDataProvider)
+    public AzureDataQueryManager(DataStore dataStore, IAccountProvider accountProvider, IAzureLiveDataProvider liveDataProvider, IConnectionProvider connectionProvider)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
         _log = Serilog.Log.ForContext("SourceContext", nameof(AzureDataQueryManager));
         _liveDataProvider = liveDataProvider;
+        _connectionProvider = connectionProvider;
     }
 
     private void ValidateDataStore()
@@ -66,6 +68,10 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
 
         var azureUri = new AzureUri(query.Url);
 
+        var account = _accountProvider.GetDefaultAccount();
+
+        using var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
+
         // Good practice to only create data after we know the client is valid, but any exceptions
         // will roll back the transaction.
         var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
@@ -73,13 +79,13 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
         var project = Project.Get(_dataStore, azureUri.Project, org.Id);
         if (project is null)
         {
-            var teamProject = await _liveDataProvider.GetTeamProject(azureUri.Connection, azureUri.Project);
+            var teamProject = await _liveDataProvider.GetTeamProject(vssConnection, azureUri.Project);
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
 
         var queryId = new Guid(azureUri.Query);
 
-        var queryResult = await _liveDataProvider.GetWorkItemQueryResultByIdAsync(azureUri.Connection, project.InternalId, queryId, cancellationToken);
+        var queryResult = await _liveDataProvider.GetWorkItemQueryResultByIdAsync(vssConnection, project.InternalId, queryId, cancellationToken);
 
         var workItemIds = new List<int>();
 
@@ -131,10 +137,9 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
         var workItems = new List<TFModels.WorkItem>();
         if (workItemIds.Count > 0)
         {
-            workItems = await _liveDataProvider.GetWorkItemsAsync(azureUri.Connection, project.InternalId, workItemIds, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit, cancellationToken);
+            workItems = await _liveDataProvider.GetWorkItemsAsync(vssConnection, project.InternalId, workItemIds, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit, cancellationToken);
         }
 
-        var account = _accountProvider.GetDefaultAccount();
         var workItemsList = new List<WorkItem>();
         var dsQuery = Query.GetOrCreate(_dataStore, azureUri.Query, project.Id, account.Username, query.Name);
 
@@ -142,8 +147,8 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
         {
             var fieldValue = workItem.Fields["System.WorkItemType"].ToString();
 
-            var workItemTypeInfo = await _liveDataProvider.GetWorkItemTypeAsync(azureUri.Connection, project.InternalId, fieldValue, cancellationToken);
-            var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, azureUri.Connection, _liveDataProvider, project.Id, workItemTypeInfo);
+            var workItemTypeInfo = await _liveDataProvider.GetWorkItemTypeAsync(vssConnection, project.InternalId, fieldValue, cancellationToken);
+            var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, vssConnection, _liveDataProvider, project.Id, workItemTypeInfo);
             QueryWorkItem.AddWorkItemToQuery(_dataStore, dsQuery.Id, cmdPalWorkItem.Id);
             workItemsList.Add(cmdPalWorkItem);
         }

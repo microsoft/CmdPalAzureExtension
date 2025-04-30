@@ -64,7 +64,7 @@ public class DataManagerTests
         var dataStore = GetTestDataStore();
         var stubAccountProvider = new Mock<IAccountProvider>().Object;
         var stubLiveDataProvider = new Mock<IAzureLiveDataProvider>().Object;
-        var stubAuthProvider = new Mock<IAuthorizedEntityIdProvider>().Object;
+        var stubAuthProvider = new Mock<IConnectionProvider>().Object;
         var queryManager = new AzureDataQueryManager(dataStore, stubAccountProvider, stubLiveDataProvider);
         var prsearchManager = new AzureDataPullRequestSearchManager(dataStore, stubAccountProvider, stubLiveDataProvider, stubAuthProvider);
         var azureDataManager = new AzureDataManager(dataStore, queryManager, prsearchManager);
@@ -158,7 +158,7 @@ public class DataManagerTests
         var dataStore = GetTestDataStore();
         var mockAccountProvider = new Mock<IAccountProvider>();
         var mockLiveDataProvider = new Mock<IAzureLiveDataProvider>();
-        var mockAuthProvider = new Mock<IAuthorizedEntityIdProvider>();
+        var mockAuthProvider = new Mock<IConnectionProvider>();
         var pullRequestSearchManager = new AzureDataPullRequestSearchManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object, mockAuthProvider.Object);
 
         var stubAccount = new Mock<IAccount>();

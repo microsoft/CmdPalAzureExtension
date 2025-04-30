@@ -7,26 +7,27 @@ using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Profile;
+using Microsoft.VisualStudio.Services.WebApi;
 
 namespace AzureExtension.Client;
 
 public interface IAzureLiveDataProvider
 {
-    Task<Avatar> GetAvatarAsync(Uri connection, Guid identity);
+    Task<Avatar> GetAvatarAsync(IVssConnection connection, Guid identity);
 
-    Task<TeamProject> GetTeamProject(Uri connection, string id);
+    Task<TeamProject> GetTeamProject(IVssConnection connection, string id);
 
-    Task<GitRepository> GetRepositoryAsync(Uri connection, string projectId, string repositoryId, CancellationToken cancellationToken);
+    Task<GitRepository> GetRepositoryAsync(IVssConnection connection, string projectId, string repositoryId, CancellationToken cancellationToken);
 
-    Task<WorkItemQueryResult> GetWorkItemQueryResultByIdAsync(Uri connection, string projectId, Guid queryId, CancellationToken cancellationToken);
+    Task<WorkItemQueryResult> GetWorkItemQueryResultByIdAsync(IVssConnection connection, string projectId, Guid queryId, CancellationToken cancellationToken);
 
-    Task<List<WorkItem>> GetWorkItemsAsync(Uri connection, string projectId, List<int> workItemIds, WorkItemExpand expand, WorkItemErrorPolicy errorPolicy, CancellationToken cancellationToken);
+    Task<List<WorkItem>> GetWorkItemsAsync(IVssConnection connection, string projectId, List<int> workItemIds, WorkItemExpand expand, WorkItemErrorPolicy errorPolicy, CancellationToken cancellationToken);
 
-    Task<WorkItemType> GetWorkItemTypeAsync(Uri connection, string projectId, string? fieldValue, CancellationToken cancellationToken);
+    Task<WorkItemType> GetWorkItemTypeAsync(IVssConnection connection, string projectId, string? fieldValue, CancellationToken cancellationToken);
 
-    Task<List<GitPullRequest>> GetPullRequestsAsync(Uri connection, string projectId, Guid repositoryId, GitPullRequestSearchCriteria searchCriteria, CancellationToken cancellationToken);
+    Task<List<GitPullRequest>> GetPullRequestsAsync(IVssConnection connection, string projectId, Guid repositoryId, GitPullRequestSearchCriteria searchCriteria, CancellationToken cancellationToken);
 
-    Task<List<PolicyEvaluationRecord>> GetPolicyEvaluationsAsync(Uri connection, string projectId, string artifactId, CancellationToken cancellationToken);
+    Task<List<PolicyEvaluationRecord>> GetPolicyEvaluationsAsync(IVssConnection connection, string projectId, string artifactId, CancellationToken cancellationToken);
 
-    Task<GitCommit> GetCommitAsync(Uri connection, string commitId, Guid repositoryId, CancellationToken cancellationToken);
+    Task<GitCommit> GetCommitAsync(IVssConnection connection, string commitId, Guid repositoryId, CancellationToken cancellationToken);
 }

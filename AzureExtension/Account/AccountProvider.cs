@@ -13,7 +13,7 @@ using Serilog;
 
 namespace AzureExtension.Account;
 
-public class AccountProvider : IAccountProvider
+public class AccountProvider : IAccountProvider, IDisposable
 {
     private readonly AuthenticationSettings _microsoftEntraIdSettings;
 
@@ -112,6 +112,30 @@ public class AccountProvider : IAccountProvider
         return accounts.FirstOrDefault()!;
     }
 
+    private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
+    private IAccount? account;
+
+    public async Task<IAccount> GetDefaultAccountAsync()
+    {
+        await _lock.WaitAsync();
+        if (account != null)
+        {
+            _log.Information("Tem account, returning");
+            _lock.Release();
+            return account;
+        }
+
+        _log.Information("Não tem account. Vamos buscar no PCA.");
+
+        var accounts = await _publicClientApplication!.GetAccountsAsync();
+        account = accounts.FirstOrDefault()!;
+        _lock.Release();
+
+        _log.Information($"Account atualizado");
+
+        return account;
+    }
+
     public async Task<IEnumerable<IAccount>> GetLoggedInAccounts()
     {
         return await _publicClientApplication!.GetAccountsAsync();
@@ -197,6 +221,12 @@ public class AccountProvider : IAccountProvider
         return new VssAadCredential(new VssAadToken("Bearer", authResult.AccessToken));
     }
 
+    public async Task<VssCredentials> GetCredentialsAsync(IAccount account)
+    {
+        var authResult = await ObtainTokenForLoggedInDeveloperAccount(account.Username);
+        return new VssAadCredential(new VssAadToken("Bearer", authResult.AccessToken));
+    }
+
     public async Task<AuthenticationResult> ObtainTokenForLoggedInDeveloperAccount(string loginId)
     {
         _log.Debug($"ObtainTokenForLoggedInDeveloperAccount");
@@ -253,5 +283,23 @@ public class AccountProvider : IAccountProvider
     public bool IsSignedIn()
     {
         return GetLoggedInAccounts().Result.Any();
+    }
+
+    // Disposing area
+    private bool _disposed;
+
+    private void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            _lock.Dispose();
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

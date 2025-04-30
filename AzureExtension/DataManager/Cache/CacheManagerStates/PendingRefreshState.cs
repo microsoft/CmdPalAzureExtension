@@ -33,7 +33,7 @@ public class PendingRefreshState : CacheManagerState
         switch (e.Kind)
         {
             case DataManagerUpdateKind.Cancel:
-                Logger.Information($"Received data manager cancellation. Refreshing for {CacheManager.CurrentUpdateParameters}");
+                Logger.Information($"Received data manager cancellation. Refreshing for {CacheManager.CurrentUpdateParameters!.UpdateType}");
                 CacheManager.State = CacheManager.RefreshingState;
 
                 await CacheManager.Update(CacheManager.CurrentUpdateParameters!);

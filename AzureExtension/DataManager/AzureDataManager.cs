@@ -111,6 +111,7 @@ public class AzureDataManager : IDataUpdateService
 
         tx.Commit();
         _log.Information($"Update complete: {parameters}");
+        OnUpdate?.Invoke(this, new DataManagerUpdateEventArgs(DataManagerUpdateKind.Success, parameters));
     }
 
     public async Task UpdateData(DataUpdateParameters parameters)
@@ -125,8 +126,6 @@ public class AzureDataManager : IDataUpdateService
         };
 
         await PerformUpdateAsync(parameters, operation);
-
-        OnUpdate?.Invoke(this, new DataManagerUpdateEventArgs(DataManagerUpdateKind.Success, parameters));
     }
 
     public bool IsNewOrStaleData(DataUpdateParameters parameters, TimeSpan refreshCooldown)

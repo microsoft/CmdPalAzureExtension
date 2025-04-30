@@ -17,7 +17,11 @@ public interface IAccountProvider
 
     VssCredentials GetCredentials(IAccount account);
 
+    Task<VssCredentials> GetCredentialsAsync(IAccount account);
+
     IAccount GetDefaultAccount();
+
+    Task<IAccount> GetDefaultAccountAsync();
 
     bool IsSignedIn();
 }
