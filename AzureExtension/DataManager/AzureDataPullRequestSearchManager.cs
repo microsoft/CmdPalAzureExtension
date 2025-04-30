@@ -148,7 +148,9 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
 
                 try
                 {
-                    var policyEvaluations = await policyEvaliationsTask;
+                    var policyEvaluations = await Task.WhenAny(policyEvaliationsTask, Task.Delay(TimeSpan.FromSeconds(5))) == policyEvaliationsTask
+                                           ? await policyEvaliationsTask
+                                           : throw new TimeoutException("Fetching policy evaluations timed out.");
                     GetPolicyStatus(policyEvaluations, out status, out statusReason);
                 }
                 catch (Exception ex)
