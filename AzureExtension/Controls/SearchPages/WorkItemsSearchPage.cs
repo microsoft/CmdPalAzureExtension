@@ -44,7 +44,6 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
 
             Details = new Details()
             {
-                HeroImage = new IconInfo(item.SystemCreatedBy?.Avatar),
                 Title = item.SystemTitle,
                 Body = GetMarkdownText(item),
                 Metadata = new[]
@@ -93,7 +92,6 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
 
     private string GetMarkdownText(IWorkItem item)
     {
-        var name = item.SystemAssignedTo?.Name;
         return $@"
 Reason: {item.SystemReason}
 

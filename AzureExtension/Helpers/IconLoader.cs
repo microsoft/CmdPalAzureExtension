@@ -110,4 +110,16 @@ public class IconLoader
         var imageData = Convert.ToBase64String(File.ReadAllBytes(fullPath));
         return imageData;
     }
+
+    public static IconInfo FromBase64(string base64String)
+    {
+        byte[] bytes = Convert.FromBase64String(base64String);
+
+        using (var memoryStream = new MemoryStream(bytes))
+        {
+            var randomAccessStream = memoryStream.AsRandomAccessStream();
+
+            return IconInfo.FromStream(randomAccessStream);
+        }
+    }
 }
