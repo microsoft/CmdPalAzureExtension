@@ -44,7 +44,7 @@ public class SearchPageFactory : ISearchPageFactory
     {
         if (search is IQuery)
         {
-            return new WorkItemsSearchPage((IQuery)search, _resources, _dataProvider);
+            return new WorkItemsSearchPage((IQuery)search, _resources, _dataProvider, new TimeSpanHelper(_resources));
         }
         else if (search is IPullRequestSearch)
         {

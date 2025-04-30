@@ -126,7 +126,7 @@ public class WorkItem : IWorkItem
             var fieldIdentityRef = tfWorkItem.Fields[field] as IdentityRef;
             if (fieldValue == IdentityRefFieldValueName && fieldIdentityRef != null)
             {
-                var identity = Identity.GetOrCreateIdentity(dataStore, fieldIdentityRef, connection, dataProvider);
+                var identity = Identity.GetOrCreateIdentity(dataStore, fieldIdentityRef, connection, dataProvider, true);
 
                 if (field == "System.CreatedBy")
                 {
@@ -135,6 +135,10 @@ public class WorkItem : IWorkItem
                 else if (field == "System.ChangedBy")
                 {
                     workItem.SystemCreatedById = identity.Id;
+                }
+                else if (field == "System.AssignedTo")
+                {
+                    workItem.SystemAssignedToId = identity.Id;
                 }
 
                 continue;
