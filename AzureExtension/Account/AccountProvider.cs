@@ -112,28 +112,10 @@ public class AccountProvider : IAccountProvider, IDisposable
         return accounts.FirstOrDefault()!;
     }
 
-    private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
-    private IAccount? account;
-
     public async Task<IAccount> GetDefaultAccountAsync()
     {
-        await _lock.WaitAsync();
-        if (account != null)
-        {
-            _log.Information("Tem account, returning");
-            _lock.Release();
-            return account;
-        }
-
-        _log.Information("Não tem account. Vamos buscar no PCA.");
-
         var accounts = await _publicClientApplication!.GetAccountsAsync();
-        account = accounts.FirstOrDefault()!;
-        _lock.Release();
-
-        _log.Information($"Account atualizado");
-
-        return account;
+        return accounts.FirstOrDefault()!;
     }
 
     public async Task<IEnumerable<IAccount>> GetLoggedInAccounts()
@@ -292,7 +274,6 @@ public class AccountProvider : IAccountProvider, IDisposable
     {
         if (!_disposed)
         {
-            _lock.Dispose();
             _disposed = true;
         }
     }

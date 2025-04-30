@@ -139,8 +139,6 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
                 // Documentation: https://learn.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.policy.webapi.policyevaluationrecord.artifactid
                 var artifactId = $"vstfs:///CodeReview/CodeReviewId/{project.InternalId}/{pullRequest.PullRequestId}";
 
-                _log.Information($"Starting download for {pullRequest.Title}");
-
                 var policyEvaliationsTask = _liveDataProvider.GetPolicyEvaluationsAsync(vssConnection, project.InternalId, artifactId, cancellationToken);
                 Task<GitCommit>? commitTask = null;
                 if (pullRequest.LastMergeSourceCommit is not null)
@@ -148,11 +146,8 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
                     commitTask = _liveDataProvider.GetCommitAsync(vssConnection, pullRequest.LastMergeSourceCommit.CommitId, gitRepository.Id, cancellationToken);
                 }
 
-                _log.Information($"Started tasks for {pullRequest.Title}");
-
                 try
                 {
-                    _log.Information($"Waiting for policy evaluations for {pullRequest.Title}");
                     var policyEvaluations = await policyEvaliationsTask;
                     GetPolicyStatus(policyEvaluations, out status, out statusReason);
                 }
@@ -161,11 +156,8 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
                     _log.Error(ex, $"Failed getting policy evaluations for pull request: {pullRequest.PullRequestId} {pullRequest.Url}");
                 }
 
-                _log.Information($"Finished getting policy evaluations for {pullRequest.Title}");
-
                 if (pullRequest.LastMergeSourceCommit is not null)
                 {
-                    _log.Information($"Waiting for commit for {pullRequest.Title} with commitId {pullRequest.LastMergeSourceCommit.CommitId}");
                     var commitRef = await commitTask!;
                     if (commitRef is not null)
                     {
@@ -173,14 +165,11 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
                     }
                 }
 
-                _log.Information($"Finished download for {pullRequest.Title}");
-
                 await dbSemaphore.WaitAsync(cancellationToken);
                 try
                 {
                     var creator = Identity.GetOrCreateIdentity(_dataStore, pullRequest.CreatedBy, vssConnection, _liveDataProvider);
                     var dsPullRequest = PullRequest.GetOrCreate(_dataStore, pullRequest, repository.Id, creator.Id, statusReason);
-                    _log.Information($"Finishing inserting {pullRequest.Title}");
                     return dsPullRequest;
                 }
                 finally
@@ -197,7 +186,6 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         foreach (var task in tasks)
         {
             var dsPullRequest = await task;
-            _log.Information($"Finished downloading pull request {dsPullRequest.Title} with id {dsPullRequest.Id}");
             await dbSemaphore.WaitAsync(cancellationToken);
             try
             {
