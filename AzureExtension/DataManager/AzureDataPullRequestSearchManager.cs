@@ -139,7 +139,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
                 // Documentation: https://learn.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.policy.webapi.policyevaluationrecord.artifactid
                 var artifactId = $"vstfs:///CodeReview/CodeReviewId/{project.InternalId}/{pullRequest.PullRequestId}";
 
-                var policyEvaliationsTask = _liveDataProvider.GetPolicyEvaluationsAsync(vssConnection, project.InternalId, artifactId, cancellationToken);
+                var policyEvaluationsTask = _liveDataProvider.GetPolicyEvaluationsAsync(vssConnection, project.InternalId, artifactId, cancellationToken);
                 Task<GitCommit>? commitTask = null;
                 if (pullRequest.LastMergeSourceCommit is not null)
                 {
@@ -148,8 +148,8 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
 
                 try
                 {
-                    var policyEvaluations = await Task.WhenAny(policyEvaliationsTask, Task.Delay(TimeSpan.FromSeconds(5))) == policyEvaliationsTask
-                                           ? await policyEvaliationsTask
+                    var policyEvaluations = await Task.WhenAny(policyEvaluationsTask, Task.Delay(TimeSpan.FromSeconds(5))) == policyEvaluationsTask
+                                           ? await policyEvaluationsTask
                                            : throw new TimeoutException("Fetching policy evaluations timed out.");
                     GetPolicyStatus(policyEvaluations, out status, out statusReason);
                 }
