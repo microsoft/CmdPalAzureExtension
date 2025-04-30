@@ -13,7 +13,7 @@ using Serilog;
 
 namespace AzureExtension.Account;
 
-public class AccountProvider : IAccountProvider, IDisposable
+public class AccountProvider : IAccountProvider
 {
     private readonly AuthenticationSettings _microsoftEntraIdSettings;
 
@@ -265,22 +265,5 @@ public class AccountProvider : IAccountProvider, IDisposable
     public bool IsSignedIn()
     {
         return GetLoggedInAccounts().Result.Any();
-    }
-
-    // Disposing area
-    private bool _disposed;
-
-    private void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            _disposed = true;
-        }
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 }
