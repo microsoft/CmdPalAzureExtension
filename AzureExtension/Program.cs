@@ -118,7 +118,7 @@ public sealed class Program
 
         var authenticationSettings = new AuthenticationSettings();
         authenticationSettings.InitializeSettings();
-        using var accountProvider = new AccountProvider(authenticationSettings);
+        var accountProvider = new AccountProvider(authenticationSettings);
 
         // In the case that this is the first launch we will try to automatically connect the default Windows account
         await accountProvider.EnableSSOForAzureExtensionAsync();
