@@ -34,7 +34,8 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
         return new ListItem(new LinkCommand(url, _resources))
         {
             Title = title,
-            Icon = IconLoader.GetIcon("PullRequest"),
+            Icon = IconLoader.GetIconForPullRequestStatus(item.PolicyStatus),
+            Subtitle = $"status: {item.Status}, policy status: {item.PolicyStatus}",
         };
     }
 

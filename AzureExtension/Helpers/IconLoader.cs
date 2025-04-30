@@ -2,8 +2,8 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.DataModel;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Microsoft.UI.Xaml;
 using Serilog;
 
 namespace AzureExtension.Helpers;
@@ -109,5 +109,24 @@ public class IconLoader
         var fullPath = Path.Combine(AppContext.BaseDirectory, filePath);
         var imageData = Convert.ToBase64String(File.ReadAllBytes(fullPath));
         return imageData;
+    }
+
+    public static IconInfo GetIconForPullRequestStatus(string? prStatus)
+    {
+        prStatus ??= string.Empty;
+        if (Enum.TryParse<PolicyStatus>(prStatus, false, out var policyStatus))
+        {
+            return policyStatus switch
+            {
+                PolicyStatus.Approved => GetIcon("PullRequestApproved"),
+                PolicyStatus.Running => GetIcon("PullRequestWaiting"),
+                PolicyStatus.Queued => GetIcon("PullRequestWaiting"),
+                PolicyStatus.Rejected => GetIcon("PullRequestRejected"),
+                PolicyStatus.Broken => GetIcon("PullRequestRejected"),
+                _ => GetIcon("PullRequestReviewNotStarted"),
+            };
+        }
+
+        return new IconInfo(string.Empty);
     }
 }
