@@ -60,7 +60,7 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
                     new DetailsElement()
                     {
                         Key = "Last changed:",
-                        Data = new DetailsLink() { Text = $"{new TimeSpan(item.SystemChangedDate)}" },
+                        Data = new DetailsLink() { Text = $"{_timeSpanHelper.TimeSpanToDisplayString(TimeSpan.FromTicks(item.SystemChangedDate))}" },
                     },
                     new DetailsElement()
                     {
