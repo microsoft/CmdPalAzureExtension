@@ -18,15 +18,15 @@ public interface IWorkItem
 
     string SystemState { get; }
 
-    public string SystemReason { get; }
+    string SystemReason { get; }
 
-    public long SystemCreatedDate { get; }
+    long SystemCreatedDate { get; }
 
-    public long SystemChangedDate { get; }
+    long SystemChangedDate { get; }
 
-    public Identity? SystemAssignedTo { get; }
+    Identity? SystemAssignedTo { get; }
 
-    public Identity? SystemCreatedBy { get; }
+    Identity? SystemCreatedBy { get; }
 
-    public Identity? SystemChangedBy { get; }
+    Identity? SystemChangedBy { get; }
 }
