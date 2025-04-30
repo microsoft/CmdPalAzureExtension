@@ -128,7 +128,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         var tasks = new List<Task<PullRequest>>();
         foreach (var pullRequest in pullRequests)
         {
-            var prTask = Task<PullRequest>.Run(async () =>
+            var prTask = Task.Run(async () =>
             {
                 var status = PolicyStatus.Unknown;
                 var statusReason = string.Empty;
