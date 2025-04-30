@@ -45,9 +45,23 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
             Details = new Details()
             {
                 Title = item.SystemTitle,
-                Body = GetMarkdownText(item),
                 Metadata = new[]
                 {
+                    new DetailsElement()
+                    {
+                        Key = "Reason:",
+                        Data = new DetailsLink() { Text = $"{item.SystemReason}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Assigned to:",
+                        Data = new DetailsLink() { Text = $"{item.SystemAssignedTo?.Name ?? "Unassigned"}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Last changed:",
+                        Data = new DetailsLink() { Text = $"{new TimeSpan(item.SystemChangedDate)}" },
+                    },
                     new DetailsElement()
                     {
                         Data = new DetailsTags()
@@ -88,16 +102,5 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
             Text = item.SystemState,
             Icon = IconLoader.GetIcon(color),
         };
-    }
-
-    private string GetMarkdownText(IWorkItem item)
-    {
-        return $@"
-Reason: {item.SystemReason}
-
-Assigned to: {item.SystemAssignedTo?.Name ?? "Unassigned"}
-
-Changed date: {_timeSpanHelper.TimeSpanToDisplayString(new TimeSpan(item.SystemCreatedDate))}
-        ";
     }
 }
