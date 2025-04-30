@@ -64,8 +64,9 @@ public class DataManagerTests
         var dataStore = GetTestDataStore();
         var stubAccountProvider = new Mock<IAccountProvider>().Object;
         var stubLiveDataProvider = new Mock<IAzureLiveDataProvider>().Object;
-        var stubAuthProvider = new Mock<IAuthorizedEntityIdProvider>().Object;
-        var queryManager = new AzureDataQueryManager(dataStore, stubAccountProvider, stubLiveDataProvider);
+        var stubAuthProvider = new Mock<IConnectionProvider>().Object;
+        var stubConnectionProvider = new Mock<IConnectionProvider>().Object;
+        var queryManager = new AzureDataQueryManager(dataStore, stubAccountProvider, stubLiveDataProvider, stubConnectionProvider);
         var prsearchManager = new AzureDataPullRequestSearchManager(dataStore, stubAccountProvider, stubLiveDataProvider, stubAuthProvider);
         var azureDataManager = new AzureDataManager(dataStore, queryManager, prsearchManager);
         Assert.IsNotNull(azureDataManager);
@@ -78,14 +79,27 @@ public class DataManagerTests
         var dataStore = GetTestDataStore();
         var mockAccountProvider = new Mock<IAccountProvider>();
         var mockLiveDataProvider = new Mock<IAzureLiveDataProvider>();
-        var queryManager = new AzureDataQueryManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object);
+        var mockConnectionProvider = new Mock<IConnectionProvider>();
+        var queryManager = new AzureDataQueryManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object, mockConnectionProvider.Object);
+
+        var mockVssConnection = new Mock<IVssConnection>();
+        var stubIdentity = new Microsoft.VisualStudio.Services.Identity.Identity()
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        mockVssConnection.Setup(c => c.AuthorizedIdentity).Returns(stubIdentity);
+
+        mockConnectionProvider
+            .Setup(c => c.GetVssConnectionAsync(It.IsAny<Uri>(), It.IsAny<IAccount>()))
+            .ReturnsAsync(mockVssConnection.Object);
 
         var stubAccount = new Mock<IAccount>();
         stubAccount.SetupGet(a => a.Username).Returns("TestUsername");
 
         mockAccountProvider.Setup(a => a.GetDefaultAccount()).Returns(stubAccount.Object);
 
-        mockLiveDataProvider.Setup(p => p.GetTeamProject(It.IsAny<Uri>(), It.IsAny<string>()))
+        mockLiveDataProvider.Setup(p => p.GetTeamProject(It.IsAny<IVssConnection>(), It.IsAny<string>()))
             .ReturnsAsync(new TeamProject
             {
                 Id = Guid.NewGuid(),
@@ -93,7 +107,7 @@ public class DataManagerTests
                 Url = "https://dev.azure.com/Org/Project",
             });
 
-        mockLiveDataProvider.Setup(p => p.GetWorkItemQueryResultByIdAsync(It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+        mockLiveDataProvider.Setup(p => p.GetWorkItemQueryResultByIdAsync(It.IsAny<IVssConnection>(), It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new WorkItemQueryResult
             {
                 QueryType = QueryType.Flat,
@@ -107,7 +121,7 @@ public class DataManagerTests
                 ],
             });
 
-        mockLiveDataProvider.Setup(p => p.GetWorkItemsAsync(It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<List<int>>(), It.IsAny<WorkItemExpand>(), It.IsAny<WorkItemErrorPolicy>(), It.IsAny<CancellationToken>()))
+        mockLiveDataProvider.Setup(p => p.GetWorkItemsAsync(It.IsAny<IVssConnection>(), It.IsAny<string>(), It.IsAny<List<int>>(), It.IsAny<WorkItemExpand>(), It.IsAny<WorkItemErrorPolicy>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(
             [
                 new TFModels.WorkItem
@@ -122,14 +136,14 @@ public class DataManagerTests
                 },
             ]);
 
-        mockLiveDataProvider.Setup(p => p.GetWorkItemTypeAsync(It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        mockLiveDataProvider.Setup(p => p.GetWorkItemTypeAsync(It.IsAny<IVssConnection>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TFModels.WorkItemType
             {
                 Name = "Task",
                 Url = "https://dev.azure.com/Org/Project/_apis/wit/workitemtypes/Task",
             });
 
-        mockLiveDataProvider.Setup(p => p.GetAvatarAsync(It.IsAny<Uri>(), It.IsAny<Guid>()))
+        mockLiveDataProvider.Setup(p => p.GetAvatarAsync(It.IsAny<IVssConnection>(), It.IsAny<Guid>()))
             .ReturnsAsync(new Avatar
             {
                 Value = Array.Empty<byte>(),
@@ -158,18 +172,27 @@ public class DataManagerTests
         var dataStore = GetTestDataStore();
         var mockAccountProvider = new Mock<IAccountProvider>();
         var mockLiveDataProvider = new Mock<IAzureLiveDataProvider>();
-        var mockAuthProvider = new Mock<IAuthorizedEntityIdProvider>();
-        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object, mockAuthProvider.Object);
+        var mockConnectionProvider = new Mock<IConnectionProvider>();
+        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object, mockConnectionProvider.Object);
+
+        var mockVssConnection = new Mock<IVssConnection>();
+        var stubIdentity = new Microsoft.VisualStudio.Services.Identity.Identity()
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        mockVssConnection.Setup(c => c.AuthorizedIdentity).Returns(stubIdentity);
+
+        mockConnectionProvider
+            .Setup(c => c.GetVssConnectionAsync(It.IsAny<Uri>(), It.IsAny<IAccount>()))
+            .ReturnsAsync(mockVssConnection.Object);
 
         var stubAccount = new Mock<IAccount>();
         stubAccount.SetupGet(a => a.Username).Returns("TestUsername");
 
         mockAccountProvider.Setup(a => a.GetDefaultAccount()).Returns(stubAccount.Object);
 
-        mockAuthProvider.Setup(a => a.GetAuthorizedEntityId(It.IsAny<Uri>(), It.IsAny<IAccount>()))
-            .Returns(Guid.NewGuid());
-
-        mockLiveDataProvider.Setup(p => p.GetTeamProject(It.IsAny<Uri>(), It.IsAny<string>()))
+        mockLiveDataProvider.Setup(p => p.GetTeamProject(It.IsAny<IVssConnection>(), It.IsAny<string>()))
             .ReturnsAsync(new TeamProject
             {
                 Id = Guid.NewGuid(),
@@ -177,7 +200,7 @@ public class DataManagerTests
                 Url = "https://dev.azure.com/Org/Project",
             });
 
-        mockLiveDataProvider.Setup(p => p.GetRepositoryAsync(It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        mockLiveDataProvider.Setup(p => p.GetRepositoryAsync(It.IsAny<IVssConnection>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new GitRepository
             {
                 Id = Guid.NewGuid(),
@@ -189,7 +212,7 @@ public class DataManagerTests
                 },
             });
 
-        mockLiveDataProvider.Setup(p => p.GetPullRequestsAsync(It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<GitPullRequestSearchCriteria>(), It.IsAny<CancellationToken>()))
+        mockLiveDataProvider.Setup(p => p.GetPullRequestsAsync(It.IsAny<IVssConnection>(), It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<GitPullRequestSearchCriteria>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(
             [
                 new GitPullRequest

@@ -65,7 +65,7 @@ public class Identity
 
     public override string ToString() => Name;
 
-    public static string GetAvatar(Uri connection, IAzureLiveDataProvider dataProvider, Guid identity)
+    public static string GetAvatar(IVssConnection connection, IAzureLiveDataProvider dataProvider, Guid identity)
     {
         try
         {
@@ -105,7 +105,7 @@ public class Identity
         }
     }
 
-    public static Identity CreateFromIdentityRef(IdentityRef identityRef, Uri connection, IAzureLiveDataProvider dataProvider, bool loadAvatar)
+    public static Identity CreateFromIdentityRef(IdentityRef identityRef, IVssConnection connection, IAzureLiveDataProvider dataProvider, bool loadAvatar)
     {
         // It is possible the IdentityRef object content is null but contains
         // a display name like "Closed". This is what is given to work items
@@ -135,7 +135,7 @@ public class Identity
         };
     }
 
-    private static Identity CreateFromIdentity(Microsoft.VisualStudio.Services.Identity.Identity identity, Uri connection, IAzureLiveDataProvider dataProvider, bool loadAvatar)
+    private static Identity CreateFromIdentity(Microsoft.VisualStudio.Services.Identity.Identity identity, IVssConnection connection, IAzureLiveDataProvider dataProvider, bool loadAvatar)
     {
         return new Identity
         {
@@ -195,7 +195,7 @@ public class Identity
     public static Identity GetOrCreateIdentity(
         DataStore dataStore,
         IdentityRef identityRef,
-        Uri connection,
+        IVssConnection connection,
         IAzureLiveDataProvider dataProvider,
         bool loadAvatar = false,
         string developerLoginId = "")
@@ -229,7 +229,7 @@ public class Identity
     public static Identity GetOrCreateIdentity(
         DataStore dataStore,
         Microsoft.VisualStudio.Services.Identity.Identity? identity,
-        Uri connection,
+        IVssConnection connection,
         IAzureLiveDataProvider dataProvider,
         bool loadAvatar = false,
         string developerLoginId = "")

@@ -10,7 +10,7 @@ using Serilog;
 
 namespace AzureExtension.Client;
 
-public class AzureClientProvider : IAuthorizedEntityIdProvider
+public class AzureClientProvider : IConnectionProvider
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", nameof(AzureClientProvider)));
 
@@ -34,6 +34,19 @@ public class AzureClientProvider : IAuthorizedEntityIdProvider
 
         var credentials = _accountProvider.GetCredentials(account);
 
+        return new VssConnection(azureUri.Connection, credentials);
+    }
+
+    private async Task<VssConnection> CreateVssConnectionAsync(Uri uri, IAccount account)
+    {
+        var azureUri = new AzureUri(uri);
+        if (!azureUri.IsValid)
+        {
+            _log.Information($"Cannot Create Connection: invalid uri argument value i.e. {uri}");
+            throw new ArgumentException(uri.ToString());
+        }
+
+        var credentials = await _accountProvider.GetCredentialsAsync(account);
         return new VssConnection(azureUri.Connection, credentials);
     }
 
@@ -112,9 +125,14 @@ public class AzureClientProvider : IAuthorizedEntityIdProvider
     /// <exception cref="ArgumentException">If the azure uri is not valid.</exception>
     /// <exception cref="ArgumentNullException">If developerId is null.</exception>
     /// <exception cref="AzureClientException">If a connection can't be made.</exception>
-    public VssConnection GetVssConnection(Uri uri, IAccount account)
+    public IVssConnection GetVssConnection(Uri uri, IAccount account)
     {
         return CreateVssConnection(uri, account);
+    }
+
+    public async Task<IVssConnection> GetVssConnectionAsync(Uri uri, IAccount account)
+    {
+        return await CreateVssConnectionAsync(uri, account);
     }
 
     public ConnectionResult GetVssConnectionResult(Uri uri, IAccount account)

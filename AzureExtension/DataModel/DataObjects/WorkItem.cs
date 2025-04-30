@@ -81,7 +81,7 @@ public class WorkItem : IWorkItem
     private static WorkItem Create(
         DataStore dataStore,
         TFModels.WorkItem tfWorkItem,
-        Uri connection,
+        IVssConnection connection,
         IAzureLiveDataProvider dataProvider,
         long projectId,
         TFModels.WorkItemType? tfWorkItemType = null)
@@ -209,7 +209,7 @@ public class WorkItem : IWorkItem
     public static WorkItem GetOrCreate(
         DataStore dataStore,
         TFModels.WorkItem tfWorkItem,
-        Uri connection,
+        IVssConnection connection,
         IAzureLiveDataProvider dataProvider,
         long projectId,
         TFModels.WorkItemType workItemType)

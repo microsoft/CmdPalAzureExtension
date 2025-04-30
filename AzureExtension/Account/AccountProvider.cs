@@ -112,6 +112,12 @@ public class AccountProvider : IAccountProvider
         return accounts.FirstOrDefault()!;
     }
 
+    public async Task<IAccount> GetDefaultAccountAsync()
+    {
+        var accounts = await _publicClientApplication!.GetAccountsAsync();
+        return accounts.FirstOrDefault()!;
+    }
+
     public async Task<IEnumerable<IAccount>> GetLoggedInAccounts()
     {
         return await _publicClientApplication!.GetAccountsAsync();
@@ -194,6 +200,12 @@ public class AccountProvider : IAccountProvider
     public VssCredentials GetCredentials(IAccount account)
     {
         var authResult = ObtainTokenForLoggedInDeveloperAccount(account.Username).Result;
+        return new VssAadCredential(new VssAadToken("Bearer", authResult.AccessToken));
+    }
+
+    public async Task<VssCredentials> GetCredentialsAsync(IAccount account)
+    {
+        var authResult = await ObtainTokenForLoggedInDeveloperAccount(account.Username);
         return new VssAadCredential(new VssAadToken("Bearer", authResult.AccessToken));
     }
 
