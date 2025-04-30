@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -60,7 +61,7 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
                     new DetailsElement()
                     {
                         Key = "Last changed:",
-                        Data = new DetailsLink() { Text = $"{_timeSpanHelper.TimeSpanToDisplayString(TimeSpan.FromTicks(item.SystemChangedDate))}" },
+                        Data = new DetailsLink() { Text = $"{new DateTime(item.SystemChangedDate)}" },
                     },
                     new DetailsElement()
                     {
