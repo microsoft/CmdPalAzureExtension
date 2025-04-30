@@ -61,7 +61,12 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
                     new DetailsElement()
                     {
                         Key = "Last changed:",
-                        Data = new DetailsLink() { Text = $"{new DateTime(item.SystemChangedDate)}" },
+                        Data = new DetailsLink() { Text = $"{_timeSpanHelper.DateTimeOffsetToDisplayString(new DateTime(item.SystemChangedDate), null)}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Created:",
+                        Data = new DetailsLink() { Text = $"{new DateTime(item.SystemCreatedDate)}" },
                     },
                     new DetailsElement()
                     {
