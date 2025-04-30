@@ -41,7 +41,7 @@ public sealed class TimeSpanHelper
         return MessageFormatter.Format(_resources.GetResource("Widget_Template_DaysAgo", log), new { days = timeSpan.Days });
     }
 
-    internal string DateTimeOffsetToDisplayString(DateTimeOffset? dateTime, ILogger log)
+    internal string DateTimeOffsetToDisplayString(DateTimeOffset? dateTime, ILogger? log)
     {
         if (dateTime == null)
         {
