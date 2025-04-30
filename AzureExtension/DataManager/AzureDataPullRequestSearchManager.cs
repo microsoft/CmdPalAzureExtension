@@ -192,7 +192,6 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
             try
             {
                 PullRequestSearchPullRequest.AddPullRequestToSearch(_dataStore, dsPullRequestSearch.Id, dsPullRequest.Id);
-                PullRequestSearchPullRequest.DeleteBefore(_dataStore, dsPullRequestSearch, DateTime.UtcNow - _pullRequestSearchDeletionTime);
             }
             finally
             {
@@ -200,6 +199,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
             }
         }
 
+        PullRequestSearchPullRequest.DeleteBefore(_dataStore, dsPullRequestSearch, DateTime.UtcNow - _pullRequestSearchDeletionTime);
         _log.Information("Finished pull request downloading.");
     }
 

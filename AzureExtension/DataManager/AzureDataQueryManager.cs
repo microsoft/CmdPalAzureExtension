@@ -64,8 +64,6 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
 
     public async Task UpdateQueryAsync(IQuery query, CancellationToken cancellationToken)
     {
-        var stopwatch = System.Diagnostics.Stopwatch.StartNew(); // Start measuring time
-
         var azureUri = new AzureUri(query.Url);
 
         var account = _accountProvider.GetDefaultAccount();
@@ -140,7 +138,6 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
             workItems = await _liveDataProvider.GetWorkItemsAsync(vssConnection, project.InternalId, workItemIds, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit, cancellationToken);
         }
 
-        var workItemsList = new List<WorkItem>();
         var dsQuery = Query.GetOrCreate(_dataStore, azureUri.Query, project.Id, account.Username, query.Name);
 
         foreach (var workItem in workItems)
@@ -150,12 +147,8 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
             var workItemTypeInfo = await _liveDataProvider.GetWorkItemTypeAsync(vssConnection, project.InternalId, fieldValue, cancellationToken);
             var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, vssConnection, _liveDataProvider, project.Id, workItemTypeInfo);
             QueryWorkItem.AddWorkItemToQuery(_dataStore, dsQuery.Id, cmdPalWorkItem.Id);
-            workItemsList.Add(cmdPalWorkItem);
         }
 
         QueryWorkItem.DeleteBefore(_dataStore, dsQuery, DateTime.UtcNow - _queryWorkItemDeletionTime);
-
-        stopwatch.Stop(); // Stop measuring time
-        _log.Information($"UpdateWorkItems took {stopwatch.ElapsedMilliseconds} ms to complete.");
     }
 }
