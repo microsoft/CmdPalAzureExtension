@@ -121,8 +121,6 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
 
         var dsPullRequestSearch = PullRequestSearch.GetOrCreate(_dataStore, repository.Id, project.Id, account.Username, GetPullRequestView(pullRequestSearch.View));
 
-        _log.Information("Starting pull request downloading.");
-
         using var dbSemaphore = new SemaphoreSlim(1, 1);
 
         var tasks = new List<Task<PullRequest>>();
@@ -183,8 +181,6 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
             tasks.Add(prTask);
         }
 
-        _log.Information($"Waiting for {tasks.Count} pull requests to finish downloading.");
-
         foreach (var task in tasks)
         {
             var dsPullRequest = await task;
@@ -200,7 +196,6 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         }
 
         PullRequestSearchPullRequest.DeleteBefore(_dataStore, dsPullRequestSearch, DateTime.UtcNow - _pullRequestSearchDeletionTime);
-        _log.Information("Finished pull request downloading.");
     }
 
     // Helper methods
@@ -212,7 +207,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         }
         catch (Exception)
         {
-            Log.Error($"Unknown Pull Request view for string: {viewStr}");
+            _log.Error($"Unknown Pull Request view for string: {viewStr}");
             return PullRequestView.Unknown;
         }
     }
