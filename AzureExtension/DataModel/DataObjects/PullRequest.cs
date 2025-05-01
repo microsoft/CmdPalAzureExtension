@@ -62,8 +62,8 @@ public class PullRequest : IPullRequest
             CreatorId = creatorId,
             Title = gitPullRequest.Title,
             Url = gitPullRequest.Url,
-            Status = status.ToString(),
-            PolicyStatus = statusReason,
+            PolicyStatus = status.ToString(),
+            PolicyStatusReason = statusReason,
             TargetBranch = gitPullRequest.TargetRefName,
             CreationDate = gitPullRequest.CreationDate.Ticks,
         };
