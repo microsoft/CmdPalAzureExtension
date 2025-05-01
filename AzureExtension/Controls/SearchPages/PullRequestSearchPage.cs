@@ -32,9 +32,8 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
     {
         var title = item.Title;
         var url = item.HtmlUrl;
+        var policyStatus = item.PolicyStatus;
         var avatar = item.Creator?.Avatar ?? string.Empty;
-        var avatarIconString = ConvertBase64ToStreamReference(avatar);
-        var iconData = new IconData(avatarIconString);
 
         return new ListItem(new LinkCommand(url, _resources))
         {
@@ -45,7 +44,6 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
             Details = new Details()
             {
                 Title = item.Title,
-                HeroImage = new IconInfo(iconData, iconData),
                 Metadata = new[]
                 {
                     new DetailsElement()
