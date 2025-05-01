@@ -52,7 +52,7 @@ public class PullRequest : IPullRequest
         GitPullRequest gitPullRequest,
         long repositoryId,
         long creatorId,
-        string status,
+        PolicyStatus status,
         string statusReason)
     {
         var pullRequest = new PullRequest
@@ -62,7 +62,7 @@ public class PullRequest : IPullRequest
             CreatorId = creatorId,
             Title = gitPullRequest.Title,
             Url = gitPullRequest.Url,
-            Status = status,
+            Status = status.ToString(),
             PolicyStatus = statusReason,
             TargetBranch = gitPullRequest.TargetRefName,
             CreationDate = gitPullRequest.CreationDate.Ticks,
@@ -116,7 +116,7 @@ public class PullRequest : IPullRequest
         GitPullRequest gitPullRequest,
         long repositoryId,
         long creatorId,
-        string status,
+        PolicyStatus status,
         string statusReason)
     {
         var pullRequest = Create(dataStore, gitPullRequest, repositoryId, creatorId, status, statusReason);
