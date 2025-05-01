@@ -97,7 +97,7 @@ public class DataManagerTests
         var stubAccount = new Mock<IAccount>();
         stubAccount.SetupGet(a => a.Username).Returns("TestUsername");
 
-        mockAccountProvider.Setup(a => a.GetDefaultAccount()).Returns(stubAccount.Object);
+        mockAccountProvider.Setup(a => a.GetDefaultAccountAsync()).ReturnsAsync(stubAccount.Object);
 
         mockLiveDataProvider.Setup(p => p.GetTeamProject(It.IsAny<IVssConnection>(), It.IsAny<string>()))
             .ReturnsAsync(new TeamProject
@@ -190,7 +190,7 @@ public class DataManagerTests
         var stubAccount = new Mock<IAccount>();
         stubAccount.SetupGet(a => a.Username).Returns("TestUsername");
 
-        mockAccountProvider.Setup(a => a.GetDefaultAccount()).Returns(stubAccount.Object);
+        mockAccountProvider.Setup(a => a.GetDefaultAccountAsync()).ReturnsAsync(stubAccount.Object);
 
         mockLiveDataProvider.Setup(p => p.GetTeamProject(It.IsAny<IVssConnection>(), It.IsAny<string>()))
             .ReturnsAsync(new TeamProject
