@@ -68,7 +68,7 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
 
         var account = await _accountProvider.GetDefaultAccountAsync();
 
-        using var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
+        var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
 
         // Good practice to only create data after we know the client is valid, but any exceptions
         // will roll back the transaction.
