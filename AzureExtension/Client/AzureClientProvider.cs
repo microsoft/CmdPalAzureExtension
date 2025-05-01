@@ -17,13 +17,15 @@ public class AzureClientProvider : IConnectionProvider, IDisposable
     private static readonly ILogger _log = _logger.Value;
 
     private readonly IAccountProvider _accountProvider;
+    private readonly IVssConnectionFactory _factory;
 
-    public AzureClientProvider(IAccountProvider accountProvider)
+    public AzureClientProvider(IAccountProvider accountProvider, IVssConnectionFactory factory)
     {
         _accountProvider = accountProvider;
+        _factory = factory;
     }
 
-    private VssConnection CreateVssConnection(Uri uri, IAccount account)
+    private IVssConnection CreateVssConnection(Uri uri, IAccount account)
     {
         var azureUri = new AzureUri(uri);
         if (!azureUri.IsValid)
@@ -34,10 +36,10 @@ public class AzureClientProvider : IConnectionProvider, IDisposable
 
         var credentials = _accountProvider.GetCredentials(account);
 
-        return new VssConnection(azureUri.Connection, credentials);
+        return _factory.CreateVssConnection(azureUri.Connection, credentials);
     }
 
-    private async Task<VssConnection> CreateVssConnectionAsync(Uri uri, IAccount account)
+    private async Task<IVssConnection> CreateVssConnectionAsync(Uri uri, IAccount account)
     {
         var azureUri = new AzureUri(uri);
         if (!azureUri.IsValid)
@@ -47,7 +49,7 @@ public class AzureClientProvider : IConnectionProvider, IDisposable
         }
 
         var credentials = await _accountProvider.GetCredentialsAsync(account);
-        return new VssConnection(azureUri.Connection, credentials);
+        return _factory.CreateVssConnection(azureUri.Connection, credentials);
     }
 
     public ConnectionResult CreateVssConnectionResult(Uri uri, IAccount account)
@@ -92,10 +94,10 @@ public class AzureClientProvider : IConnectionProvider, IDisposable
 
         try
         {
-            VssConnection? connection = null;
+            IVssConnection? connection = null;
             if (credentials != null)
             {
-                connection = new VssConnection(azureUri.Connection, credentials);
+                connection = _factory.CreateVssConnection(azureUri.Connection, credentials);
             }
 
             if (connection != null)
@@ -125,17 +127,17 @@ public class AzureClientProvider : IConnectionProvider, IDisposable
     /// <exception cref="ArgumentException">If the azure uri is not valid.</exception>
     /// <exception cref="ArgumentNullException">If developerId is null.</exception>
     /// <exception cref="AzureClientException">If a connection can't be made.</exception>
-    private VssConnection GetVssConnection(Uri uri, IAccount account)
+    private IVssConnection GetVssConnection(Uri uri, IAccount account)
     {
         return CreateVssConnection(uri, account);
     }
 
-    private bool IsConnectionExpired(VssConnection connection)
+    private bool IsConnectionExpired(IVssConnection connection)
     {
         try
         {
             var identity = connection.AuthorizedIdentity;
-            return identity == null || identity.Id == Guid.Empty;
+            return identity == null || identity.Id == Guid.Empty || !connection.HasAuthenticated;
         }
         catch (VssUnauthorizedException)
         {
@@ -148,7 +150,7 @@ public class AzureClientProvider : IConnectionProvider, IDisposable
         }
     }
 
-    private readonly Dictionary<Tuple<Uri, IAccount>, VssConnection> _connections = new();
+    private readonly Dictionary<Tuple<Uri, IAccount>, IVssConnection> _connections = new();
 
     /// <summary>
     /// Gets the VssConnection. Not thread safe. Caches VssConnection for the same uri and account.
