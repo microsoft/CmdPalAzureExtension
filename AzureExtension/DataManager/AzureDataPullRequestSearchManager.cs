@@ -80,7 +80,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
 
         var project = Project.Get(_dataStore, azureUri.Project, org.Id);
-        var account = _accountProvider.GetDefaultAccount();
+        var account = await _accountProvider.GetDefaultAccountAsync();
         using var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
 
         if (project is null)
