@@ -17,12 +17,15 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
 
     private readonly IDataProvider _dataProvider;
 
-    public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider)
+    private readonly TimeSpanHelper _timeSpanHelper;
+
+    public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
         : base(search, dataProvider)
     {
         _search = search;
         _resources = resources;
         _dataProvider = dataProvider;
+        _timeSpanHelper = timeSpanHelper;
         Icon = IconLoader.GetIcon("PullRequest");
         Name = search.Name;
         ShowDetails = true;
@@ -50,7 +53,7 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
                     new DetailsElement()
                     {
                         Key = "Last updated:",
-                        Data = new DetailsLink() { Text = $"{item.Creator?.UpdatedAt}" },
+                        Data = new DetailsLink() { Text = $"{_timeSpanHelper.DateTimeOffsetToDisplayString(item.Creator?.UpdatedAt, null)}" },
                     },
                     new DetailsElement()
                     {

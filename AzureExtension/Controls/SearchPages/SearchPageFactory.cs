@@ -48,7 +48,7 @@ public class SearchPageFactory : ISearchPageFactory
         }
         else if (search is IPullRequestSearch)
         {
-            return new PullRequestSearchPage((IPullRequestSearch)search, _resources, _dataProvider);
+            return new PullRequestSearchPage((IPullRequestSearch)search, _resources, _dataProvider, new TimeSpanHelper(_resources));
         }
 
         throw new NotImplementedException($"No page for search type {search.GetType()}");
