@@ -265,8 +265,8 @@ public class DataManagerTests
 
         var dsPullRequest = PullRequest.GetForPullRequestSearch(dataStore, dsPullRequestSearch).First();
         Assert.AreEqual("Test Pull Request", dsPullRequest.Title);
-        Assert.AreEqual("Approved", dsPullRequest.Status);
-        Assert.AreEqual("Approved in test", dsPullRequest.PolicyStatus);
+        Assert.AreEqual("Approved", dsPullRequest.PolicyStatus);
+        Assert.AreEqual("Approved in test", dsPullRequest.PolicyStatusReason);
         CleanUpDataStore(dataStore);
     }
 }
