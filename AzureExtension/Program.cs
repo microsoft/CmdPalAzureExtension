@@ -123,7 +123,8 @@ public sealed class Program
         // In the case that this is the first launch we will try to automatically connect the default Windows account
         await accountProvider.EnableSSOForAzureExtensionAsync();
 
-        var azureClientProvider = new AzureClientProvider(accountProvider);
+        var vssConnectionFactory = new VssConnectionFactory();
+        using var azureClientProvider = new AzureClientProvider(accountProvider, vssConnectionFactory);
         var azureClientHelpers = new AzureClientHelpers(azureClientProvider);
 
         var dataStoreFolderPath = ApplicationData.Current.LocalFolder.Path;
