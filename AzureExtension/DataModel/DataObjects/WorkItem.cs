@@ -126,7 +126,7 @@ public class WorkItem : IWorkItem
             var fieldIdentityRef = tfWorkItem.Fields[field] as IdentityRef;
             if (fieldValue == IdentityRefFieldValueName && fieldIdentityRef != null)
             {
-                var identity = Identity.GetOrCreateIdentity(dataStore, fieldIdentityRef, connection, dataProvider, true);
+                var identity = Identity.GetOrCreateIdentity(dataStore, fieldIdentityRef, connection, dataProvider);
 
                 if (field == "System.CreatedBy")
                 {

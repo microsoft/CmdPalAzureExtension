@@ -129,4 +129,14 @@ public class IconLoader
 
         return new IconInfo(string.Empty);
     }
+
+    public static string ConvertBase64ToDataUri(string base64String, string mimeType = "image/png")
+    {
+        if (string.IsNullOrEmpty(base64String))
+        {
+            throw new ArgumentException("Base64 string cannot be null or empty.", nameof(base64String));
+        }
+
+        return $"data:{mimeType};base64,{base64String}";
+    }
 }

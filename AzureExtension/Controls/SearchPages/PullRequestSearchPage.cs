@@ -32,8 +32,6 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
     {
         var title = item.Title;
         var url = item.HtmlUrl;
-        var policyStatus = item.PolicyStatus;
-        var avatar = item.Creator?.Avatar ?? string.Empty;
 
         return new ListItem(new LinkCommand(url, _resources))
         {
@@ -50,11 +48,6 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
                     {
                         Key = "Author:",
                         Data = new DetailsLink() { Text = $"{item.Creator?.Name}" },
-                    },
-                    new DetailsElement()
-                    {
-                        Key = "Avatar:",
-                        Data = new DetailsLink() { Text = $"{item.Creator?.Avatar ?? "no string here"}" },
                     },
                     new DetailsElement()
                     {
@@ -139,21 +132,5 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
     protected override Task<IEnumerable<IPullRequest>> LoadContentData()
     {
         return _dataProvider.GetPullRequests(_search);
-    }
-
-    public static IRandomAccessStreamReference ConvertBase64ToStreamReference(string base64String)
-    {
-        // Step 1: Decode the base64 string into a byte array
-        byte[] bytes = Convert.FromBase64String(base64String);
-
-        // Step 2: Create a MemoryStream from the byte array
-        using (var memoryStream = new MemoryStream(bytes))
-        {
-            // Step 3: Convert MemoryStream to IRandomAccessStream
-            IRandomAccessStream randomAccessStream = memoryStream.AsRandomAccessStream();
-
-            // Step 4: Wrap the IRandomAccessStream into an IRandomAccessStreamReference
-            return RandomAccessStreamReference.CreateFromStream(randomAccessStream);
-        }
     }
 }
