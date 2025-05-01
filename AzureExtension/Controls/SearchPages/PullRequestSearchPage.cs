@@ -24,6 +24,7 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
         _dataProvider = dataProvider;
         Icon = IconLoader.GetIcon("PullRequest");
         Name = search.Name;
+        ShowDetails = true;
     }
 
     protected override ListItem GetListItem(IPullRequest item)
@@ -36,6 +37,99 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
             Title = title,
             Icon = IconLoader.GetIconForPullRequestStatus(item.PolicyStatus),
             Subtitle = $"status: {item.Status}, policy status: {item.PolicyStatus}",
+
+            Details = new Details()
+            {
+                Title = item.Title,
+                Metadata = new[]
+                {
+                    new DetailsElement()
+                    {
+                        Key = "Author:",
+                        Data = new DetailsLink() { Text = $"{item.Creator?.Name}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Avatar:",
+                        Data = new DetailsLink() { Text = $"{item.Creator?.Avatar ?? "no string here"}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Creator?.UpdatedAt",
+                        Data = new DetailsLink() { Text = $"{item.Creator?.UpdatedAt}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Creator?.DeveloperLoginId:",
+                        Data = new DetailsLink() { Text = $"{item.Creator?.DeveloperLoginId}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Creator?.TimeUpdated: ",
+                        Data = new DetailsLink() { Text = $"{item.Creator?.TimeUpdated}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Creator?.InternalId: ",
+                        Data = new DetailsLink() { Text = $"{item.Creator?.InternalId}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "RepositoryId:",
+                        Data = new DetailsLink() { Text = $"{item.RepositoryId}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Pull request InternalId:",
+                        Data = new DetailsLink() { Text = $"{item.InternalId}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Url:",
+                        Data = new DetailsLink() { Link = new Uri(item.Url) },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "HtmlUrl:",
+                        Data = new DetailsLink() { Link = new Uri(item.HtmlUrl) },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "RepositoryGuid:",
+                        Data = new DetailsLink() { Text = $"{item.RepositoryGuid}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Status: ",
+                        Data = new DetailsLink() { Text = $"{item.Status}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Target branch:",
+                        Data = new DetailsLink() { Text = $"{item.TargetBranch}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Policy status: ",
+                        Data = new DetailsLink() { Text = $"{item.PolicyStatus}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Reason:",
+                        Data = new DetailsLink() { Text = $"{item.PolicyStatusReason}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Author:",
+                        Data = new DetailsLink() { Text = $"{item.Creator}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Created:",
+                        Data = new DetailsLink() { Text = $"{new DateTime(item.CreationDate)}" },
+                    },
+                },
+            },
         };
     }
 
