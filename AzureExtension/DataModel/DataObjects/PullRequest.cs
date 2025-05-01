@@ -52,6 +52,7 @@ public class PullRequest : IPullRequest
         GitPullRequest gitPullRequest,
         long repositoryId,
         long creatorId,
+        string status,
         string statusReason)
     {
         var pullRequest = new PullRequest
@@ -61,7 +62,7 @@ public class PullRequest : IPullRequest
             CreatorId = creatorId,
             Title = gitPullRequest.Title,
             Url = gitPullRequest.Url,
-            Status = gitPullRequest.Status.ToString(),
+            Status = status,
             PolicyStatus = statusReason,
             TargetBranch = gitPullRequest.TargetRefName,
             CreationDate = gitPullRequest.CreationDate.Ticks,
@@ -110,9 +111,15 @@ public class PullRequest : IPullRequest
         return pullRequest;
     }
 
-    public static PullRequest GetOrCreate(DataStore dataStore, GitPullRequest gitPullRequest, long repositoryId, long creatorId, string statusReason)
+    public static PullRequest GetOrCreate(
+        DataStore dataStore,
+        GitPullRequest gitPullRequest,
+        long repositoryId,
+        long creatorId,
+        string status,
+        string statusReason)
     {
-        var pullRequest = Create(dataStore, gitPullRequest, repositoryId, creatorId, statusReason);
+        var pullRequest = Create(dataStore, gitPullRequest, repositoryId, creatorId, status, statusReason);
         return AddOrUpdate(dataStore, pullRequest);
     }
 

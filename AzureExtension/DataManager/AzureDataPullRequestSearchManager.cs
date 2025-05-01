@@ -168,8 +168,9 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
                 await dbSemaphore.WaitAsync(cancellationToken);
                 try
                 {
+                    var statusString = status.ToString();
                     var creator = Identity.GetOrCreateIdentity(_dataStore, pullRequest.CreatedBy, vssConnection, _liveDataProvider);
-                    var dsPullRequest = PullRequest.GetOrCreate(_dataStore, pullRequest, repository.Id, creator.Id, statusReason);
+                    var dsPullRequest = PullRequest.GetOrCreate(_dataStore, pullRequest, repository.Id, creator.Id, statusString, statusReason);
                     return dsPullRequest;
                 }
                 finally
