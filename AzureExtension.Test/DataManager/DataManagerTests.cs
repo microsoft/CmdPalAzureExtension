@@ -262,9 +262,11 @@ public class DataManagerTests
         Assert.AreEqual("TestUsername", dsPullRequestSearch.Username);
         Assert.AreEqual("Test Project", dsPullRequestSearch.Project.Name);
         Assert.AreEqual("Test Repository", dsPullRequestSearch.Repository.Name);
-        Assert.AreEqual("Test Pull Request", PullRequest.GetForPullRequestSearch(dataStore, dsPullRequestSearch).First().Title);
-        Assert.AreEqual("Approved", PullRequest.GetForPullRequestSearch(dataStore, dsPullRequestSearch).First().Status);
-        Assert.AreEqual("Approved in test", PullRequest.GetForPullRequestSearch(dataStore, dsPullRequestSearch).First().PolicyStatus);
+
+        var dsPullRequest = PullRequest.GetForPullRequestSearch(dataStore, dsPullRequestSearch).First();
+        Assert.AreEqual("Test Pull Request", dsPullRequest.Title);
+        Assert.AreEqual("Approved", dsPullRequest.Status);
+        Assert.AreEqual("Approved in test", dsPullRequest.PolicyStatus);
         CleanUpDataStore(dataStore);
     }
 }
