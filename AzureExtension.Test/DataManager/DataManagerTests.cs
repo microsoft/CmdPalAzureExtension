@@ -10,6 +10,7 @@ using AzureExtension.DataManager;
 using AzureExtension.DataModel;
 using Microsoft.Identity.Client;
 using Microsoft.TeamFoundation.Core.WebApi;
+using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Profile;
@@ -231,6 +232,24 @@ public class DataManagerTests
                 },
             ]);
 
+        mockLiveDataProvider.Setup(p => p.GetPolicyEvaluationsAsync(It.IsAny<IVssConnection>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+            [
+                new PolicyEvaluationRecord()
+                {
+                    Status = PolicyEvaluationStatus.Approved,
+                    Configuration = new PolicyConfiguration()
+                    {
+                        IsEnabled = true,
+                        IsBlocking = true,
+                        Type = new PolicyType()
+                        {
+                            DisplayName = "Approved in test",
+                        },
+                    },
+                }
+            ]);
+
         var testPullRequestSearch = new Mock<IPullRequestSearch>();
         testPullRequestSearch.SetupGet(q => q.Url).Returns("https://dev.azure.com/organization/project/_pullRequests/12345678-1234-1234-1234-1234567890ab");
         testPullRequestSearch.SetupGet(q => q.Name).Returns("Test Pull Request Search");
@@ -243,7 +262,11 @@ public class DataManagerTests
         Assert.AreEqual("TestUsername", dsPullRequestSearch.Username);
         Assert.AreEqual("Test Project", dsPullRequestSearch.Project.Name);
         Assert.AreEqual("Test Repository", dsPullRequestSearch.Repository.Name);
-        Assert.AreEqual("Test Pull Request", PullRequest.GetForPullRequestSearch(dataStore, dsPullRequestSearch).First().Title);
+
+        var dsPullRequest = PullRequest.GetForPullRequestSearch(dataStore, dsPullRequestSearch).First();
+        Assert.AreEqual("Test Pull Request", dsPullRequest.Title);
+        Assert.AreEqual("Approved", dsPullRequest.PolicyStatus);
+        Assert.AreEqual("Approved in test", dsPullRequest.PolicyStatusReason);
         CleanUpDataStore(dataStore);
     }
 }
