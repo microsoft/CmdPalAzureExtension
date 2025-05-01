@@ -140,11 +140,24 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
 
         var dsQuery = Query.GetOrCreate(_dataStore, azureUri.Query, project.Id, account.Username, query.Name);
 
+        var workItemTasks = new List<Task<TFModels.WorkItemType>>();
         foreach (var workItem in workItems)
         {
-            var fieldValue = workItem.Fields["System.WorkItemType"].ToString();
+            var wiTask = Task.Run(async () =>
+            {
+                var fieldValue = workItem.Fields["System.WorkItemType"].ToString();
+                var workItemTypeInfo = await _liveDataProvider.GetWorkItemTypeAsync(vssConnection, project.InternalId, workItem.Fields["System.WorkItemType"].ToString(), cancellationToken);
+                return workItemTypeInfo;
+            });
+            workItemTasks.Add(wiTask);
+        }
 
-            var workItemTypeInfo = await _liveDataProvider.GetWorkItemTypeAsync(vssConnection, project.InternalId, fieldValue, cancellationToken);
+        for (var i = 0; i < workItemTasks.Count; i++)
+        {
+            var task = workItemTasks[i];
+            var workItem = workItems[i];
+
+            var workItemTypeInfo = await task;
             var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, vssConnection, _liveDataProvider, project.Id, workItemTypeInfo);
             QueryWorkItem.AddWorkItemToQuery(_dataStore, dsQuery.Id, cmdPalWorkItem.Id);
         }
