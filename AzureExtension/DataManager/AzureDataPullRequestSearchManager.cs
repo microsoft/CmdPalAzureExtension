@@ -9,7 +9,6 @@ using AzureExtension.Data;
 using AzureExtension.DataModel;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
-using Microsoft.VisualStudio.Services.WebApi;
 using Serilog;
 using PullRequestSearch = AzureExtension.DataModel.PullRequestSearch;
 
@@ -80,7 +79,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
         var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
 
         var project = Project.Get(_dataStore, azureUri.Project, org.Id);
-        var account = _accountProvider.GetDefaultAccount();
+        var account = await _accountProvider.GetDefaultAccountAsync();
         using var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
 
         if (project is null)
@@ -168,8 +167,8 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
                 await dbSemaphore.WaitAsync(cancellationToken);
                 try
                 {
-                    var creator = Identity.GetOrCreateIdentity(_dataStore, pullRequest.CreatedBy, vssConnection, _liveDataProvider, true);
-                    var dsPullRequest = PullRequest.GetOrCreate(_dataStore, pullRequest, repository.Id, creator.Id, statusReason);
+                    var creator = Identity.GetOrCreateIdentity(_dataStore, pullRequest.CreatedBy, vssConnection, _liveDataProvider);
+                    var dsPullRequest = PullRequest.GetOrCreate(_dataStore, pullRequest, repository.Id, creator.Id, status, statusReason);
                     return dsPullRequest;
                 }
                 finally

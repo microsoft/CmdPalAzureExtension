@@ -66,7 +66,7 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
     {
         var azureUri = new AzureUri(query.Url);
 
-        var account = _accountProvider.GetDefaultAccount();
+        var account = await _accountProvider.GetDefaultAccountAsync();
 
         using var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
 
