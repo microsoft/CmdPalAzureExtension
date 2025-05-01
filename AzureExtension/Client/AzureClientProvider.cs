@@ -10,7 +10,7 @@ using Serilog;
 
 namespace AzureExtension.Client;
 
-public class AzureClientProvider : IConnectionProvider
+public class AzureClientProvider : IConnectionProvider, IDisposable
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", nameof(AzureClientProvider)));
 
@@ -125,14 +125,55 @@ public class AzureClientProvider : IConnectionProvider
     /// <exception cref="ArgumentException">If the azure uri is not valid.</exception>
     /// <exception cref="ArgumentNullException">If developerId is null.</exception>
     /// <exception cref="AzureClientException">If a connection can't be made.</exception>
-    public IVssConnection GetVssConnection(Uri uri, IAccount account)
+    private VssConnection GetVssConnection(Uri uri, IAccount account)
     {
         return CreateVssConnection(uri, account);
     }
 
+    private bool IsConnectionExpired(VssConnection connection)
+    {
+        try
+        {
+            var identity = connection.AuthorizedIdentity;
+            return identity == null || identity.Id == Guid.Empty;
+        }
+        catch (VssUnauthorizedException)
+        {
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _log.Error($"Error checking if connection is expired: {ex}");
+            return true;
+        }
+    }
+
+    private readonly Dictionary<Tuple<Uri, IAccount>, VssConnection> _connections = new();
+
+    /// <summary>
+    /// Gets the VssConnection. Not thread safe. Caches VssConnection for the same uri and account.
+    /// </summary>
+    /// <param name="uri">The uri to an Azure DevOps resource.</param>
+    /// <param name="account">The developer to authenticate with.</param>
+    /// <returns>An authorized connection to the resource.</returns>
     public async Task<IVssConnection> GetVssConnectionAsync(Uri uri, IAccount account)
     {
-        return await CreateVssConnectionAsync(uri, account);
+        var conectionKey = Tuple.Create(uri, account);
+
+        if (_connections.TryGetValue(conectionKey, out var connection))
+        {
+            if (!IsConnectionExpired(connection))
+            {
+                return connection;
+            }
+
+            connection.Dispose();
+            _connections.Remove(conectionKey);
+        }
+
+        var newConnection = await CreateVssConnectionAsync(uri, account);
+        _connections.TryAdd(conectionKey, newConnection);
+        return newConnection;
     }
 
     public ConnectionResult GetVssConnectionResult(Uri uri, IAccount account)
@@ -203,5 +244,30 @@ public class AzureClientProvider : IConnectionProvider
     {
         var vssConnection = GetVssConnection(connection, account);
         return vssConnection.AuthorizedIdentity.Id;
+    }
+
+    // Disposing area
+    private bool _disposed;
+
+    private void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                foreach (var connection in _connections.Values)
+                {
+                    connection.Dispose();
+                }
+            }
+
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }
