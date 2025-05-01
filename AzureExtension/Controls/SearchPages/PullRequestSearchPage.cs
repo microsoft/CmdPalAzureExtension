@@ -5,6 +5,7 @@
 using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Windows.Storage.Streams;
 
 namespace AzureExtension.Controls.Pages;
 
@@ -31,6 +32,9 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
     {
         var title = item.Title;
         var url = item.HtmlUrl;
+        var avatar = item.Creator?.Avatar ?? string.Empty;
+        var avatarIconString = ConvertBase64ToStreamReference(avatar);
+        var iconData = new IconData(avatarIconString);
 
         return new ListItem(new LinkCommand(url, _resources))
         {
@@ -41,6 +45,7 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
             Details = new Details()
             {
                 Title = item.Title,
+                HeroImage = new IconInfo(iconData, iconData),
                 Metadata = new[]
                 {
                     new DetailsElement()
@@ -136,5 +141,21 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
     protected override Task<IEnumerable<IPullRequest>> LoadContentData()
     {
         return _dataProvider.GetPullRequests(_search);
+    }
+
+    public static IRandomAccessStreamReference ConvertBase64ToStreamReference(string base64String)
+    {
+        // Step 1: Decode the base64 string into a byte array
+        byte[] bytes = Convert.FromBase64String(base64String);
+
+        // Step 2: Create a MemoryStream from the byte array
+        using (var memoryStream = new MemoryStream(bytes))
+        {
+            // Step 3: Convert MemoryStream to IRandomAccessStream
+            IRandomAccessStream randomAccessStream = memoryStream.AsRandomAccessStream();
+
+            // Step 4: Wrap the IRandomAccessStream into an IRandomAccessStreamReference
+            return RandomAccessStreamReference.CreateFromStream(randomAccessStream);
+        }
     }
 }
