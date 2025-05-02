@@ -43,6 +43,8 @@ public class QueryWorkItem
 
         if (existingQueryWorkItem != null)
         {
+            existingQueryWorkItem.TimeUpdated = DateTime.UtcNow.ToDataStoreInteger();
+            dataStore.Connection.Update(existingQueryWorkItem);
             return existingQueryWorkItem;
         }
 

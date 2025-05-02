@@ -13,25 +13,19 @@ public class RefreshingState : CacheManagerState
 
     public override Task Refresh(DataUpdateParameters dataUpdateParameters)
     {
-        lock (CacheManager.GetStateLock())
+        var currentParameters = CacheManager.CurrentUpdateParameters;
+        if (dataUpdateParameters.UpdateType == currentParameters?.UpdateType
+            && dataUpdateParameters.UpdateObject == currentParameters?.UpdateObject)
         {
-            var currentParameters = CacheManager.CurrentUpdateParameters;
-            if (dataUpdateParameters.UpdateType == currentParameters?.UpdateType
-                && dataUpdateParameters.UpdateObject == currentParameters?.UpdateObject)
-            {
-                Logger.Information("Search is the same as the pending search. Ignoring.");
-                return Task.CompletedTask;
-            }
-
-            CacheManager.CurrentUpdateParameters = dataUpdateParameters;
+            Logger.Information("Search is the same as the pending search. Ignoring.");
+            return Task.CompletedTask;
         }
+
+        CacheManager.CurrentUpdateParameters = dataUpdateParameters;
 
         CacheManager.CancelUpdateInProgress();
 
-        lock (CacheManager.GetStateLock())
-        {
-            CacheManager.State = CacheManager.PendingRefreshState;
-        }
+        CacheManager.State = CacheManager.PendingRefreshState;
 
         return Task.CompletedTask;
     }
@@ -39,10 +33,7 @@ public class RefreshingState : CacheManagerState
     public override void HandleDataManagerUpdate(object? source, DataManagerUpdateEventArgs e)
     {
         Logger.Information("Received data manager update event. Changing to Idle state.");
-        lock (CacheManager.GetStateLock())
-        {
-            CacheManager.State = CacheManager.IdleState;
-            CacheManager.CurrentUpdateParameters = null;
-        }
+        CacheManager.State = CacheManager.IdleState;
+        CacheManager.CurrentUpdateParameters = null;
     }
 }

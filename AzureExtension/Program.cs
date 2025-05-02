@@ -35,7 +35,7 @@ public sealed class Program
     public static async Task Main([System.Runtime.InteropServices.WindowsRuntime.ReadOnlyArray] string[] args)
     {
         // Setup Logging
-        Environment.SetEnvironmentVariable("DEVHOME_LOGS_ROOT", ApplicationData.Current.TemporaryFolder.Path);
+        Environment.SetEnvironmentVariable("CMDPAL_LOGS_ROOT", ApplicationData.Current.TemporaryFolder.Path);
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
             .Build();
@@ -123,7 +123,8 @@ public sealed class Program
         // In the case that this is the first launch we will try to automatically connect the default Windows account
         await accountProvider.EnableSSOForAzureExtensionAsync();
 
-        var azureClientProvider = new AzureClientProvider(accountProvider);
+        var vssConnectionFactory = new VssConnectionFactory();
+        using var azureClientProvider = new AzureClientProvider(accountProvider, vssConnectionFactory);
         var azureClientHelpers = new AzureClientHelpers(azureClientProvider);
 
         var dataStoreFolderPath = ApplicationData.Current.LocalFolder.Path;
@@ -133,8 +134,10 @@ public sealed class Program
         using var cacheDataStore = new DataStore("DataStore", combinedCachePath, cacheDataStoreSchema);
         cacheDataStore.Create();
 
-        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureClientProvider);
-        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureClientProvider);
+        var azureLiveDataProvider = new AzureLiveDataProvider();
+
+        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
+        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
 
         var azureDataManager = new AzureDataManager(cacheDataStore, queryManager, pullRequestSearchManager);
         var cacheManager = new CacheManager(azureDataManager);
@@ -154,10 +157,11 @@ public sealed class Program
         var resources = new Resources(resourceLoader);
 
         var timeSpanHelper = new TimeSpanHelper(resources);
+        var authenticationMediator = new AuthenticationMediator();
 
-        var signInForm = new SignInForm(accountProvider, azureClientHelpers, resources);
+        var signInForm = new SignInForm(accountProvider, azureClientHelpers, authenticationMediator, resources);
         var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"));
-        var signOutForm = new SignOutForm(accountProvider, resources);
+        var signOutForm = new SignOutForm(accountProvider, resources, authenticationMediator);
         var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"));
 
         var savedAzureSearchesMediator = new SavedAzureSearchesMediator();
@@ -170,12 +174,12 @@ public sealed class Program
         var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources.GetResource("Message_Query_Saved"), resources.GetResource("Message_Query_Saved_Error"), resources.GetResource("ListItems_AddQuery")), resources);
         var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedAzureSearchesMediator, persistentDataManager, searchPageFactory);
 
-        var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedAzureSearchesMediator, persistentDataManager);
+        var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedAzureSearchesMediator, accountProvider, persistentDataManager);
         var savePullRequestSearchPage = new SavePullRequestSearchPage(savePullRequestSearchForm, new StatusMessage());
         var addPullRequestSearchListItem = new AddPullRequestSearchListItem(savePullRequestSearchPage, resources);
         var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedAzureSearchesMediator, persistentDataManager, searchPageFactory);
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, azureClientHelpers, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator);
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 

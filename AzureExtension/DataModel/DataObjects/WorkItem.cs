@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.Helpers;
@@ -55,6 +56,9 @@ public class WorkItem : IWorkItem
     [Write(false)]
     public WorkItemType? SystemWorkItemType => WorkItemType.Get(DataStore, SystemWorkItemTypeId);
 
+    [Write(false)]
+    public string WorkItemTypeName => SystemWorkItemType?.Name ?? string.Empty;
+
     public static readonly string IdentityRefFieldValueName = "Microsoft.VisualStudio.Services.WebApi.IdentityRef";
     public static readonly string SystemIdFieldName = "System.Id";
     public static readonly string WorkItemHtmlUrlFieldName = "DevHome.AzureExtension.WorkItemHtmlUrl";
@@ -74,7 +78,13 @@ public class WorkItem : IWorkItem
         "System.WorkItemType",
     ];
 
-    private static WorkItem Create(DataStore dataStore, TFModels.WorkItem tfWorkItem, VssConnection connection, long projectId, TFModels.WorkItemType? tfWorkItemType = null)
+    private static WorkItem Create(
+        DataStore dataStore,
+        TFModels.WorkItem tfWorkItem,
+        IVssConnection connection,
+        IAzureLiveDataProvider dataProvider,
+        long projectId,
+        TFModels.WorkItemType? tfWorkItemType = null)
     {
         var workItem = new WorkItem();
 
@@ -116,7 +126,7 @@ public class WorkItem : IWorkItem
             var fieldIdentityRef = tfWorkItem.Fields[field] as IdentityRef;
             if (fieldValue == IdentityRefFieldValueName && fieldIdentityRef != null)
             {
-                var identity = Identity.GetOrCreateIdentity(dataStore, fieldIdentityRef, connection);
+                var identity = Identity.GetOrCreateIdentity(dataStore, fieldIdentityRef, connection, dataProvider, true);
 
                 if (field == "System.CreatedBy")
                 {
@@ -126,6 +136,10 @@ public class WorkItem : IWorkItem
                 {
                     workItem.SystemCreatedById = identity.Id;
                 }
+                else if (field == "System.AssignedTo")
+                {
+                    workItem.SystemAssignedToId = identity.Id;
+                }
 
                 continue;
             }
@@ -133,7 +147,7 @@ public class WorkItem : IWorkItem
             if (field == WorkItemTypeFieldName && tfWorkItemType != null)
             {
                 // Need a separate query to create WorkItemType object.
-                var workItemType = WorkItemType.CreateFromTeamWorkItemType(tfWorkItemType, projectId);
+                var workItemType = WorkItemType.GetOrCreateByTeamWorkItemType(dataStore, tfWorkItemType, projectId);
 
                 workItem.SystemWorkItemTypeId = workItemType.Id;
                 continue;
@@ -199,11 +213,12 @@ public class WorkItem : IWorkItem
     public static WorkItem GetOrCreate(
         DataStore dataStore,
         TFModels.WorkItem tfWorkItem,
-        VssConnection connection,
+        IVssConnection connection,
+        IAzureLiveDataProvider dataProvider,
         long projectId,
         TFModels.WorkItemType workItemType)
     {
-        var newWorkItem = Create(dataStore, tfWorkItem, connection, projectId, workItemType);
+        var newWorkItem = Create(dataStore, tfWorkItem, connection, dataProvider, projectId, workItemType);
         return AddOrUpdate(dataStore, newWorkItem);
     }
 

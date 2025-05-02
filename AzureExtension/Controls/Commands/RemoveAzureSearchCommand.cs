@@ -21,7 +21,7 @@ public partial class RemoveAzureSearchCommand : InvokableCommand
         _azureSearchRepository = azureSearchRepository;
         _savedAzureSearch = azureSearch;
         Name = _resources.GetResource("Commands_Remove_Saved_Search");
-        Icon = new IconInfo("\uecc9");
+        Icon = IconLoader.GetIcon("Remove");
     }
 
     public override CommandResult Invoke()

@@ -41,7 +41,8 @@ public class AccountProvider : IAccountProvider
 
     private PublicClientApplicationBuilder InitializePublicClientApplicationBuilder()
     {
-        var windowHandle = Windows.Win32.PInvoke.FindWindow(null, "Microsoft Teams");
+        // var windowHandle = Windows.Win32.PInvoke.FindWindow(null, "Microsoft Teams");
+        var windowHandle = Windows.Win32.PInvoke.GetForegroundWindow();
 
         var builder = PublicClientApplicationBuilder.Create(_microsoftEntraIdSettings.ClientId)
            .WithAuthority(string.Format(CultureInfo.InvariantCulture, _microsoftEntraIdSettings.Authority, _microsoftEntraIdSettings.TenantId))
@@ -108,6 +109,12 @@ public class AccountProvider : IAccountProvider
     public IAccount GetDefaultAccount()
     {
         var accounts = _publicClientApplication!.GetAccountsAsync().Result;
+        return accounts.FirstOrDefault()!;
+    }
+
+    public async Task<IAccount> GetDefaultAccountAsync()
+    {
+        var accounts = await _publicClientApplication!.GetAccountsAsync();
         return accounts.FirstOrDefault()!;
     }
 
@@ -193,6 +200,12 @@ public class AccountProvider : IAccountProvider
     public VssCredentials GetCredentials(IAccount account)
     {
         var authResult = ObtainTokenForLoggedInDeveloperAccount(account.Username).Result;
+        return new VssAadCredential(new VssAadToken("Bearer", authResult.AccessToken));
+    }
+
+    public async Task<VssCredentials> GetCredentialsAsync(IAccount account)
+    {
+        var authResult = await ObtainTokenForLoggedInDeveloperAccount(account.Username);
         return new VssAadCredential(new VssAadToken("Bearer", authResult.AccessToken));
     }
 

@@ -22,7 +22,7 @@ public sealed partial class SaveQueryPage : ContentPage
         _statusMessage = statusMessage;
         _successMessage = successMessage;
         _errorMessage = errorMessage;
-        Icon = new IconInfo("\uecc8");
+        Icon = IconLoader.GetIcon("Add");
         Title = saveQueryPageTitle;
 
         // Wire up events using the helper

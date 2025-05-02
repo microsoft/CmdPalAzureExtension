@@ -31,9 +31,9 @@ public class WorkItem
 
     public WorkItemType SystemWorkItemType { get; set; }
 
-    public IconInfo Icon { get; set; }
+    public IconInfo Icon { get; set; } = new IconInfo(string.Empty);
 
-    public IconInfo StatusIcon { get; set; }
+    public IconInfo StatusIcon { get; set; } = new IconInfo(string.Empty);
 
     public WorkItem()
     {
@@ -41,8 +41,6 @@ public class WorkItem
         SystemCreatedBy = new Identity();
         SystemChangedBy = new Identity();
         SystemWorkItemType = new WorkItemType();
-        Icon = new IconInfo(string.Empty);
-        StatusIcon = new IconInfo(string.Empty);
     }
 
     public void AddSystemId(int? id)

@@ -22,7 +22,7 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
         _search = search;
         _resources = resources;
         _dataProvider = dataProvider;
-        Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
+        Icon = IconLoader.GetIcon("PullRequest");
         Name = search.Name;
     }
 
@@ -34,7 +34,7 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
         return new ListItem(new LinkCommand(url, _resources))
         {
             Title = title,
-            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+            Icon = IconLoader.GetIcon("PullRequest"),
         };
     }
 

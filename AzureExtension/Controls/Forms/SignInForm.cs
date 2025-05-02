@@ -13,8 +13,6 @@ namespace AzureExtension.Controls.Forms;
 
 public partial class SignInForm : FormContent, IAzureForm
 {
-    public static event EventHandler<SignInStatusChangedEventArgs>? SignInAction;
-
     public event EventHandler<bool>? LoadingStateChanged;
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
@@ -22,6 +20,7 @@ public partial class SignInForm : FormContent, IAzureForm
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
     private readonly IResources _resources;
+    private readonly AuthenticationMediator _authenticationMediator;
 
     private bool _isButtonEnabled = true;
 
@@ -30,10 +29,11 @@ public partial class SignInForm : FormContent, IAzureForm
 
     private Page? page;
 
-    public SignInForm(IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IResources resources)
+    public SignInForm(IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, AuthenticationMediator authenticationMediator, IResources resources)
     {
         _accountProvider = accountProvider;
-        SignOutForm.SignOutAction += SignOutForm_SignOutAction;
+        _authenticationMediator = authenticationMediator;
+        _authenticationMediator.SignOutAction += SignOutForm_SignOutAction;
         page = null;
         _azureClientHelpers = azureClientHelpers;
         _resources = resources;
@@ -60,7 +60,7 @@ public partial class SignInForm : FormContent, IAzureForm
     {
         { "{{AuthTitle}}", _resources.GetResource("Forms_SignIn_TemplateAuthTitle") },
         { "{{AuthButtonTitle}}", _resources.GetResource("Forms_SignIn_TemplateAuthButtonTitle") },
-        { "{{AuthIcon}}", $"data:image/png;base64,{AzureIcon.GetBase64Icon("logo")}" },
+        { "{{AuthIcon}}", $"data:image/png;base64,{IconLoader.GetIconAsBase64("Logo")}" },
         { "{{AuthButtonTooltip}}", _resources.GetResource("Forms_SignIn_TemplateAuthButtonTooltip") },
         { "{{ButtonIsEnabled}}", IsButtonEnabled },
     };
@@ -76,14 +76,14 @@ public partial class SignInForm : FormContent, IAzureForm
             {
                 var signInSucceeded = await HandleSignIn();
                 LoadingStateChanged?.Invoke(this, false);
-                SignInAction?.Invoke(this, new SignInStatusChangedEventArgs(signInSucceeded, null));
+                _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(signInSucceeded, null));
                 FormSubmitted?.Invoke(this, new FormSubmitEventArgs(signInSucceeded, null));
             }
             catch (Exception ex)
             {
                 LoadingStateChanged?.Invoke(this, false);
                 SetButtonEnabled(true);
-                SignInAction?.Invoke(this, new SignInStatusChangedEventArgs(false, ex));
+                _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(false, ex));
                 FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
             }
         });

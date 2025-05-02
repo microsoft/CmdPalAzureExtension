@@ -9,6 +9,4 @@ public interface ICacheManager
     event CacheManagerUpdateEventHandler? OnUpdate;
 
     Task RequestRefresh(DataUpdateParameters parameters);
-
-    void CancelUpdateInProgress();
 }

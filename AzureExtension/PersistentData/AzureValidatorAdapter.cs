@@ -33,4 +33,22 @@ public class AzureValidatorAdapter : IAzureValidator
             return queryInfo;
         }
     }
+
+    public InfoResult GetRepositoryInfo(string repositoryUrl, IAccount account)
+    {
+        if (string.IsNullOrEmpty(repositoryUrl))
+        {
+            throw new InvalidOperationException("Repository URL cannot be null or empty.");
+        }
+
+        var repositoryInfo = _azureClientHelpers.GetRepositoryInfo(repositoryUrl, account);
+        if (repositoryInfo.Result != ResultType.Success)
+        {
+            throw new InvalidOperationException(repositoryInfo.ErrorMessage);
+        }
+        else
+        {
+            return repositoryInfo;
+        }
+    }
 }

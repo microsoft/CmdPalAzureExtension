@@ -14,6 +14,6 @@ public partial class AddQueryListItem : ListItem
     : base(page)
     {
         Title = resources.GetResource("ListItems_AddQuery");
-        Icon = new IconInfo("\uecc8");
+        Icon = IconLoader.GetIcon("Add");
     }
 }

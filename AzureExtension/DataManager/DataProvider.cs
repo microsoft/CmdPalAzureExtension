@@ -23,7 +23,13 @@ public class DataProvider : IDataProvider
 
     public static readonly int PullRequestResultLimit = 25;
 
-    public event CacheManagerUpdateEventHandler? OnUpdate;
+    private CacheManagerUpdateEventHandler? _onUpdate;
+
+    public event CacheManagerUpdateEventHandler? OnUpdate
+    {
+        add => _onUpdate = value;
+        remove => _onUpdate -= value;
+    }
 
     public DataProvider(ICacheManager cacheManager, IDataQueryProvider queryProvider, IDataPullRequestSearchProvider pullRequestSearchProvider)
     {
@@ -37,7 +43,36 @@ public class DataProvider : IDataProvider
 
     public void OnCacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
     {
-        OnUpdate?.Invoke(source, e);
+        _onUpdate?.Invoke(source, e);
+    }
+
+    private async Task WaitForCacheUpdateAsync(DataUpdateParameters parameters)
+    {
+        var tcs = new TaskCompletionSource();
+
+        CacheManagerUpdateEventHandler handler = null!;
+        handler = (sender, args) =>
+        {
+            _cacheManager.OnUpdate -= handler;
+            tcs.TrySetResult();
+        };
+
+        _cacheManager.OnUpdate += handler;
+        _ = _cacheManager.RequestRefresh(parameters);
+
+        await tcs.Task;
+    }
+
+    private async Task WaitForLoadingDataIfNull(object? dataStoreObject, DataUpdateParameters parameters)
+    {
+        if (dataStoreObject == null)
+        {
+            await WaitForCacheUpdateAsync(parameters);
+        }
+        else
+        {
+            _ = _cacheManager.RequestRefresh(parameters);
+        }
     }
 
     public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
@@ -49,11 +84,7 @@ public class DataProvider : IDataProvider
         };
 
         var dsQuery = _queryProvider.GetQuery(query);
-        var refreshTask = _cacheManager.RequestRefresh(parameters);
-        if (dsQuery == null)
-        {
-            await refreshTask;
-        }
+        await WaitForLoadingDataIfNull(dsQuery, parameters);
 
         return _queryProvider.GetWorkItems(query);
     }
@@ -67,11 +98,7 @@ public class DataProvider : IDataProvider
         };
 
         var dsPullRequestSearch = _pullRequestSearchProvider.GetPullRequestSearch(pullRequestSearch);
-        var refreshTask = _cacheManager.RequestRefresh(parameters);
-        if (dsPullRequestSearch == null)
-        {
-            await refreshTask;
-        }
+        await WaitForLoadingDataIfNull(dsPullRequestSearch, parameters);
 
         return _pullRequestSearchProvider.GetPullRequests(pullRequestSearch);
     }

@@ -4,11 +4,12 @@
 
 using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
+using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
+public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
 {
     private readonly IQuery _query;
 
@@ -16,14 +17,18 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
 
     private readonly IDataProvider _dataProvider;
 
-    public WorkItemsSearchPage(IQuery query, IResources resources, IDataProvider dataProvider)
+    private readonly TimeSpanHelper _timeSpanHelper;
+
+    public WorkItemsSearchPage(IQuery query, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
         : base(query, dataProvider)
     {
         _query = query;
         _resources = resources;
         _dataProvider = dataProvider;
-        Icon = new IconInfo(AzureIcon.IconDictionary["logo"]);
+        _timeSpanHelper = timeSpanHelper;
+        Icon = IconLoader.GetIcon("Query");
         Name = query.Name;
+        ShowDetails = true;
     }
 
     protected override ListItem GetListItem(IWorkItem item)
@@ -34,12 +39,73 @@ public sealed partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         return new ListItem(new LinkCommand(url, _resources))
         {
             Title = title,
-            Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+            Icon = IconLoader.GetIcon(item.WorkItemTypeName),
+            Tags = new[] { GetStatusTag(item) },
+
+            Details = new Details()
+            {
+                Title = item.SystemTitle,
+                Metadata = new[]
+                {
+                    new DetailsElement()
+                    {
+                        Key = "Reason:",
+                        Data = new DetailsLink() { Text = $"{item.SystemReason}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Assigned to:",
+                        Data = new DetailsLink() { Text = $"{item.SystemAssignedTo?.Name ?? "Unassigned"}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Last changed:",
+                        Data = new DetailsLink() { Text = $"{_timeSpanHelper.DateTimeOffsetToDisplayString(new DateTime(item.SystemChangedDate), null)}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Created:",
+                        Data = new DetailsLink() { Text = $"{new DateTime(item.SystemCreatedDate)}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Data = new DetailsTags()
+                        {
+                            Tags = new[]
+                            {
+                                GetStatusTag(item),
+                            },
+                        },
+                    },
+                },
+            },
         };
     }
 
-    protected override Task<IEnumerable<IWorkItem>> LoadContentData()
+    protected async override Task<IEnumerable<IWorkItem>> LoadContentData()
     {
-        return _dataProvider.GetWorkItems(_query);
+        return await _dataProvider.GetWorkItems(_query);
+    }
+
+    protected ITag GetStatusTag(IWorkItem item)
+    {
+        var color = item.SystemState switch
+        {
+            "Active" => "StatusRed",
+            "Committed" => "StatusBlue",
+            "Started" => "StatusBlue",
+            "Completed" => "StatusGreen",
+            "Closed" => "StatusGreen",
+            "Resolved" => "StatusBlue",
+            "Proposed" => "StatusGray",
+            "Cut" => "StatusGray",
+            _ => "StatusGray",
+        };
+
+        return new Tag()
+        {
+            Text = item.SystemState,
+            Icon = IconLoader.GetIcon(color),
+        };
     }
 }

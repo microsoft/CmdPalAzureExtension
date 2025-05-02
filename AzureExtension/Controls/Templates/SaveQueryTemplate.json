@@ -25,7 +25,8 @@
       "label": "{{EnteredQueryLabel}}",
       "isRequired": true,
       "errorMessage": "{{EnteredQueryErrorMessage}}",
-      "value": "{{SavedQueryString}}"
+      "value": "{{SavedQueryString}}",
+      "placeholder": "https://microsoft.visualstudio.com/project/_queries/query/queryId"
     },
     {
       "type": "ColumnSet",

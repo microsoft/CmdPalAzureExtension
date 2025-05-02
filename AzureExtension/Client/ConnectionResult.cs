@@ -27,7 +27,7 @@ public class ConnectionResult
         get; private set;
     }
 
-    public VssConnection? Connection
+    public IVssConnection? Connection
     {
         get; private set;
     }
@@ -38,7 +38,7 @@ public class ConnectionResult
         set;
     }
 
-    public ConnectionResult(Uri? uri, VssHttpClientBase? type, VssConnection? connection)
+    public ConnectionResult(Uri? uri, VssHttpClientBase? type, IVssConnection? connection)
     {
         Result = ResultType.Success;
         Error = ErrorType.None;

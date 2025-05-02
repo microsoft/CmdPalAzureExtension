@@ -27,17 +27,11 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly ISearchPageFactory _searchPageFactory;
 
-    private readonly SavedAzureSearchesMediator _mediator;
+    private readonly SavedAzureSearchesMediator _savedSearchesMediator;
 
-    public AzureExtensionCommandProvider(
-        SignInPage signInPage,
-        SignOutPage signOutPage,
-        IAccountProvider accountProvider,
-        SavedQueriesPage savedQueriesPage,
-        IResources resources,
-        SavedPullRequestSearchesPage savedPullRequestSearchesPage,
-        ISearchPageFactory searchPageFactory,
-        SavedAzureSearchesMediator mediator)
+    private readonly AuthenticationMediator _authenticationMediator;
+
+    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedQueriesPage, IResources resources, SavedPullRequestSearchesPage savedPullRequestSearchesPage, ISearchPageFactory searchPageFactory, SavedAzureSearchesMediator mediator, AuthenticationMediator authenticationMediator)
     {
         _signInPage = signInPage;
         _signOutPage = signOutPage;
@@ -46,13 +40,21 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _resources = resources;
         _savedPullRequestSearchesPage = savedPullRequestSearchesPage;
         _searchPageFactory = searchPageFactory;
-        _mediator = mediator;
-        DisplayName = "Azure Extension"; // Hardcoded because it's a product title
+        _savedSearchesMediator = mediator;
+        _authenticationMediator = authenticationMediator;
+        DisplayName = "Azure Extension";
 
-        _mediator.QuerySaved += OnSearchUpdated;
-        _mediator.QueryRemoved += OnSearchUpdated;
-        _mediator.PullRequestSearchSaved += OnSearchUpdated;
-        _mediator.PullRequestSearchRemoved += OnSearchUpdated;
+        _savedSearchesMediator.QuerySaved += OnSearchUpdated;
+        _savedSearchesMediator.QueryRemoved += OnSearchUpdated;
+        _savedSearchesMediator.PullRequestSearchSaved += OnSearchUpdated;
+        _savedSearchesMediator.PullRequestSearchRemoved += OnSearchUpdated;
+        _authenticationMediator.SignInAction += OnSignInStatusChanged;
+        _authenticationMediator.SignOutAction += OnSignInStatusChanged;
+    }
+
+    private void OnSignInStatusChanged(object? sender, SignInStatusChangedEventArgs e)
+    {
+        RaiseItemsChanged();
     }
 
     private void OnSearchUpdated(object? sender, object? args)
@@ -71,7 +73,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             {
                 new CommandItem(_signInPage)
                 {
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                    Icon = IconLoader.GetIcon("Logo"),
                     Title = _resources.GetResource("Forms_SignIn_PageTitle"),
                     Subtitle = _resources.GetResource("Forms_SignIn_PageSubtitle"),
                 },
@@ -85,18 +87,18 @@ public partial class AzureExtensionCommandProvider : CommandProvider
                 new(_savedQueriesPage)
                 {
                     Title = _resources.GetResource("Pages_Saved_Queries"),
-                    Icon = new IconInfo("\ue721"),
+                    Icon = IconLoader.GetIcon("Search"),
                 },
                 new ListItem(_savedPullRequestSearchesPage)
                 {
-                    Title = "Save Pull Request Search",
-                    Icon = new IconInfo("\ue721"),
+                    Title = "Saved Azure Dev Ops Pull Request Searches",
+                    Icon = IconLoader.GetIcon("PullRequest"),
                 },
                 new(_signOutPage)
                 {
                     Title = _resources.GetResource("ExtensionTitle"),
                     Subtitle = _resources.GetResource("Forms_SignOut_PageTitle"),
-                    Icon = new IconInfo(AzureIcon.IconDictionary["logo"]),
+                    Icon = IconLoader.GetIcon("Logo"),
                 },
             };
 

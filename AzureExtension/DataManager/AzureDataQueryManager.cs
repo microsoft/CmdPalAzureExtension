@@ -7,8 +7,6 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
-using Microsoft.TeamFoundation.Core.WebApi;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Serilog;
 using Query = AzureExtension.DataModel.Query;
 using TFModels = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
@@ -18,17 +16,21 @@ namespace AzureExtension.DataManager;
 
 public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
 {
+    private readonly TimeSpan _queryWorkItemDeletionTime = TimeSpan.FromMinutes(2);
+
     private readonly ILogger _log;
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
-    private readonly AzureClientProvider _azureClientProvider;
+    private readonly IAzureLiveDataProvider _liveDataProvider;
+    private readonly IConnectionProvider _connectionProvider;
 
-    public AzureDataQueryManager(DataStore dataStore, IAccountProvider accountProvider, AzureClientProvider azureClientProvider)
+    public AzureDataQueryManager(DataStore dataStore, IAccountProvider accountProvider, IAzureLiveDataProvider liveDataProvider, IConnectionProvider connectionProvider)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
         _log = Serilog.Log.ForContext("SourceContext", nameof(AzureDataQueryManager));
-        _azureClientProvider = azureClientProvider;
+        _liveDataProvider = liveDataProvider;
+        _connectionProvider = connectionProvider;
     }
 
     private void ValidateDataStore()
@@ -62,13 +64,11 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
 
     public async Task UpdateQueryAsync(IQuery query, CancellationToken cancellationToken)
     {
-        var stopwatch = System.Diagnostics.Stopwatch.StartNew(); // Start measuring time
-
         var azureUri = new AzureUri(query.Url);
-        var account = _accountProvider.GetDefaultAccount();
-        var connection = _azureClientProvider.GetVssConnection(azureUri.Connection, account);
 
-        using var witClient = _azureClientProvider.GetClient<WorkItemTrackingHttpClient>(azureUri.Connection, account);
+        var account = await _accountProvider.GetDefaultAccountAsync();
+
+        var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
 
         // Good practice to only create data after we know the client is valid, but any exceptions
         // will roll back the transaction.
@@ -77,13 +77,13 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
         var project = Project.Get(_dataStore, azureUri.Project, org.Id);
         if (project is null)
         {
-            using var projectClient = _azureClientProvider.GetClient<ProjectHttpClient>(azureUri.Connection, account);
-            var teamProject = await projectClient.GetProject(azureUri.Project);
+            var teamProject = await _liveDataProvider.GetTeamProject(vssConnection, azureUri.Project);
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
 
         var queryId = new Guid(azureUri.Query);
-        var queryResult = await witClient.QueryByIdAsync(project.InternalId, queryId, cancellationToken: cancellationToken);
+
+        var queryResult = await _liveDataProvider.GetWorkItemQueryResultByIdAsync(vssConnection, project.InternalId, queryId, cancellationToken);
 
         var workItemIds = new List<int>();
 
@@ -135,24 +135,29 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
         var workItems = new List<TFModels.WorkItem>();
         if (workItemIds.Count > 0)
         {
-            workItems = await witClient.GetWorkItemsAsync(project.InternalId, workItemIds, null, null, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit, cancellationToken: cancellationToken);
+            workItems = await _liveDataProvider.GetWorkItemsAsync(vssConnection, project.InternalId, workItemIds, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit, cancellationToken);
         }
 
-        var workItemsList = new List<WorkItem>();
         var dsQuery = Query.GetOrCreate(_dataStore, azureUri.Query, project.Id, account.Username, query.Name);
 
+        var workItemTasks = new List<Task<TFModels.WorkItemType>>();
         foreach (var workItem in workItems)
         {
             var fieldValue = workItem.Fields["System.WorkItemType"].ToString();
-            var workItemTypeInfo = await witClient.GetWorkItemTypeAsync(project.InternalId, fieldValue, cancellationToken: cancellationToken);
-            var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, connection, project.Id, workItemTypeInfo);
-            QueryWorkItem.AddWorkItemToQuery(_dataStore, dsQuery.Id, cmdPalWorkItem.Id);
-            workItemsList.Add(cmdPalWorkItem);
+            var wiTask = _liveDataProvider.GetWorkItemTypeAsync(vssConnection, project.InternalId, fieldValue, cancellationToken);
+            workItemTasks.Add(wiTask);
         }
 
-        QueryWorkItem.DeleteBefore(_dataStore, dsQuery, DateTime.UtcNow - TimeSpan.FromMinutes(2));
+        for (var i = 0; i < workItemTasks.Count; i++)
+        {
+            var task = workItemTasks[i];
+            var workItem = workItems[i];
 
-        stopwatch.Stop(); // Stop measuring time
-        _log.Information($"UpdateWorkItems took {stopwatch.ElapsedMilliseconds} ms to complete.");
+            var workItemTypeInfo = await task;
+            var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, vssConnection, _liveDataProvider, project.Id, workItemTypeInfo);
+            QueryWorkItem.AddWorkItemToQuery(_dataStore, dsQuery.Id, cmdPalWorkItem.Id);
+        }
+
+        QueryWorkItem.DeleteBefore(_dataStore, dsQuery, DateTime.UtcNow - _queryWorkItemDeletionTime);
     }
 }

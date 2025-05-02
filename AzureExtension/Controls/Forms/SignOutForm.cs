@@ -11,26 +11,26 @@ namespace AzureExtension.Controls.Forms;
 
 public sealed partial class SignOutForm : FormContent, IAzureForm
 {
-    public static event EventHandler<SignInStatusChangedEventArgs>? SignOutAction;
-
     public event EventHandler<bool>? LoadingStateChanged;
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
     private readonly IAccountProvider _accountProvider;
     private readonly IResources _resources;
+    private readonly AuthenticationMediator _authenticationMediator;
 
-    public SignOutForm(IAccountProvider accountProvider, IResources resources)
+    public SignOutForm(IAccountProvider accountProvider, IResources resources, AuthenticationMediator authenticationMediator)
     {
         _accountProvider = accountProvider;
         _resources = resources;
+        _authenticationMediator = authenticationMediator;
     }
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{AuthTitle}}", _resources.GetResource("Forms_SignOut_TemplateAuthTitle") },
         { "{{AuthButtonTitle}}", _resources.GetResource("Forms_SignOut_TemplateAuthButtonTitle") },
-        { "{{AuthIcon}}", $"data:image/png;base64,{AzureIcon.GetBase64Icon("logo")}" },
+        { "{{AuthIcon}}", $"data:image/png;base64,{IconLoader.GetIconAsBase64("Logo")}" },
         { "{{AuthButtonTooltip}}", _resources.GetResource("Forms_SignOut_TemplateAuthButtonTooltip") },
         { "{{ButtonIsEnabled}}", "true" },
     };
@@ -54,7 +54,7 @@ public sealed partial class SignOutForm : FormContent, IAzureForm
                 var signOutSucceeded = !_accountProvider.IsSignedIn();
 
                 LoadingStateChanged?.Invoke(this, false);
-                SignOutAction?.Invoke(this, new SignInStatusChangedEventArgs(!signOutSucceeded, null));
+                _authenticationMediator.SignOut(new SignInStatusChangedEventArgs(!signOutSucceeded, null));
                 FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
             }
             catch (Exception ex)
@@ -62,7 +62,7 @@ public sealed partial class SignOutForm : FormContent, IAzureForm
                 LoadingStateChanged?.Invoke(this, false);
 
                 // if sign out fails, the user is still signed in (true)
-                SignOutAction?.Invoke(this, new SignInStatusChangedEventArgs(true, ex));
+                _authenticationMediator.SignOut(new SignInStatusChangedEventArgs(true, ex));
                 FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
             }
         });

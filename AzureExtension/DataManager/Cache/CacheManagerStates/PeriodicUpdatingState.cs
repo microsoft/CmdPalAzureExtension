@@ -17,21 +17,15 @@ public class PeriodicUpdatingState : CacheManagerState
         {
             CacheManager.CancelUpdateInProgress();
 
-            lock (CacheManager.GetStateLock())
-            {
-                CacheManager.CurrentUpdateParameters = dataUpdateParameters;
-                CacheManager.State = CacheManager.PendingRefreshState;
-            }
+            CacheManager.CurrentUpdateParameters = dataUpdateParameters;
+            CacheManager.State = CacheManager.PendingRefreshState;
         });
     }
 
     public override void HandleDataManagerUpdate(object? source, DataManagerUpdateEventArgs e)
     {
         Logger.Information("Received data manager update event. Changing to Idle state.");
-        lock (CacheManager.GetStateLock())
-        {
-            CacheManager.State = CacheManager.IdleState;
-            CacheManager.CurrentUpdateParameters = null;
-        }
+        CacheManager.State = CacheManager.IdleState;
+        CacheManager.CurrentUpdateParameters = null;
     }
 }
