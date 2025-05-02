@@ -28,9 +28,9 @@ public partial class SavedQueriesPage : ListPage
        ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
-
-        Icon = new IconInfo("\ue721");
-        Name = _resources.GetResource("Pages_Saved_Queries");
+        Title = _resources.GetResource("Pages_Saved_Queries");
+        Name = _resources.GetResource("Pages_Saved_Queries"); // Title is for the Page, Name is for the command
+        Icon = IconLoader.GetIcon("Search");
         _savedQueriesMediator = savedQueriesMediator;
         _savedQueriesMediator.QueryRemoved += OnQueryRemoved;
         _savedQueriesMediator.QueryRemoving += OnQueryRemoving;

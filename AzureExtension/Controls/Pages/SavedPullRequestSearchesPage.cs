@@ -26,6 +26,9 @@ public class SavedPullRequestSearchesPage : ListPage
         ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
+        Title = "Saved Azure Dev Ops Pull Request Searches";
+        Name = "Saved Azure Dev Ops Pull Request Searches"; // Title is for the Page, Name is for the command
+        Icon = IconLoader.GetIcon("PullRequest");
         _pullRequestSearchRepository = pullRequestSearchRepository;
         _addPullRequestSearchListItem = addPullRequestSearchListItem;
         _mediator = mediator;

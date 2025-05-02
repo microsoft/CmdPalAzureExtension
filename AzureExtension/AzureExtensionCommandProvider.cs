@@ -84,21 +84,11 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             var topLevelCommands = GetTopLevelSearches().GetAwaiter().GetResult();
             var defaultCommands = new List<ListItem>
             {
-                new(_savedQueriesPage)
-                {
-                    Title = _resources.GetResource("Pages_Saved_Queries"),
-                    Icon = IconLoader.GetIcon("Search"),
-                },
-                new ListItem(_savedPullRequestSearchesPage)
-                {
-                    Title = "Saved Azure Dev Ops Pull Request Searches",
-                    Icon = IconLoader.GetIcon("PullRequest"),
-                },
+                new(_savedQueriesPage),
+                new(_savedPullRequestSearchesPage),
                 new(_signOutPage)
                 {
-                    Title = _resources.GetResource("ExtensionTitle"),
-                    Subtitle = _resources.GetResource("Forms_SignOut_PageTitle"),
-                    Icon = IconLoader.GetIcon("Logo"),
+                   Subtitle = _resources.GetResource("Forms_SignOut_PageTitle"),
                 },
             };
 
