@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
@@ -78,5 +79,12 @@ public class AzureLiveDataProvider : IAzureLiveDataProvider
     {
         var witClient = connection.GetClient<WorkItemTrackingHttpClient>();
         return await witClient.GetWorkItemTypeAsync(projectId, fieldValue, cancellationToken: cancellationToken);
+    }
+
+    public async Task<List<Build>> GetBuildsAsync(IVssConnection connection, string projectId, long definitionId, CancellationToken cancellationToken)
+    {
+        var buildClient = connection.GetClient<BuildHttpClient>();
+        var queryOrder = BuildQueryOrder.QueueTimeDescending;
+        return await buildClient.GetBuildsAsync(projectId, [(int)definitionId], queryOrder: queryOrder, cancellationToken: cancellationToken);
     }
 }

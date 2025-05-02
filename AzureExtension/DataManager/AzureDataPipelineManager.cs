@@ -68,7 +68,7 @@ public class AzureDataPipelineManager : IPipelineProvider, IPipelineUpdater
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
 
-        var builds = await client.GetBuildsAsync(project.InternalId, definitions: [(int)definitionSearch.InternalId], queryOrder: BuildQueryOrder.QueueTimeDescending, cancellationToken: cancellationToken);
+        var builds = await _liveDataProvider.GetBuildsAsync(vssConnection, project.InternalId, definitionSearch.InternalId, cancellationToken);
 
         foreach (var build in builds)
         {
