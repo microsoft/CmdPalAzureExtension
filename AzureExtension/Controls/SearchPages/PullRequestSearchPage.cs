@@ -39,6 +39,11 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
         {
             Title = title,
             Icon = IconLoader.GetIconForPullRequestStatus(item.PolicyStatus),
+            MoreCommands = new CommandContextItem[]
+            {
+                new(new CopyCommand(item.HtmlUrl, "Copy pull request URL")),
+                new(new CopyCommand(item.InternalId.ToStringInvariant(), "Copy pull request number")),
+            },
             Details = new Details()
             {
                 Title = item.Title,
