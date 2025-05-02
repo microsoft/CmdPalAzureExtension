@@ -83,7 +83,7 @@ public class SearchPageFactory : ISearchPageFactory
             Icon = search is IQuery ? IconLoader.GetIcon("Query") : IconLoader.GetIcon("PullRequest"),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(search.Url, _resources)),
+                new(new LinkCommand(search is IQuery ? search.Url : $"{search.Url}/pullrequests", _resources)),
                 new(CreateEditPageForSearch(search)),
                 new(new RemoveAzureSearchCommand(search, _resources, _mediator, azureSearchRepository)),
             },
