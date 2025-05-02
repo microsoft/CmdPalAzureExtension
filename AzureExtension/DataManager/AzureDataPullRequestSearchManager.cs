@@ -9,7 +9,6 @@ using AzureExtension.Data;
 using AzureExtension.DataModel;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
-using Microsoft.VisualStudio.Services.WebApi;
 using Serilog;
 using PullRequestSearch = AzureExtension.DataModel.PullRequestSearch;
 
