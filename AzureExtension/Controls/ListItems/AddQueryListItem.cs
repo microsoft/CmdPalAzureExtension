@@ -13,7 +13,7 @@ public partial class AddQueryListItem : ListItem
     public AddQueryListItem(SaveQueryPage page, IResources resources)
     : base(page)
     {
-        Title = resources.GetResource("ListItems_AddSearch");
+        Title = resources.GetResource("ListItems_AddQuery");
         Icon = IconLoader.GetIcon("Add");
     }
 }

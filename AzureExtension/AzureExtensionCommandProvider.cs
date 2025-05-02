@@ -42,7 +42,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _searchPageFactory = searchPageFactory;
         _savedSearchesMediator = mediator;
         _authenticationMediator = authenticationMediator;
-        DisplayName = "Azure Extension";
+        DisplayName = "Azure Extension"; // hard-coded because it's a product title
 
         _savedSearchesMediator.QuerySaved += OnSearchUpdated;
         _savedSearchesMediator.QueryRemoved += OnSearchUpdated;
@@ -73,9 +73,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             {
                 new CommandItem(_signInPage)
                 {
-                    Icon = IconLoader.GetIcon("Logo"),
-                    Title = "Sign in",
-                    Subtitle = "Sign into your Azure DevOps account",
+                    Subtitle = _resources.GetResource("Forms_SignIn_PageSubtitle"),
                 },
             };
         }
@@ -84,21 +82,11 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             var topLevelCommands = GetTopLevelSearches().GetAwaiter().GetResult();
             var defaultCommands = new List<ListItem>
             {
-                new(_savedQueriesPage)
-                {
-                    Title = "Saved Azure Dev Ops Queries",
-                    Icon = IconLoader.GetIcon("Search"),
-                },
-                new ListItem(_savedPullRequestSearchesPage)
-                {
-                    Title = "Saved Azure Dev Ops Pull Request Searches",
-                    Icon = IconLoader.GetIcon("PullRequest"),
-                },
+                new(_savedQueriesPage),
+                new(_savedPullRequestSearchesPage),
                 new(_signOutPage)
                 {
-                    Title = _resources.GetResource("ExtensionTitle"),
-                    Subtitle = _resources.GetResource("Forms_Sign_Out_Button_Title"),
-                    Icon = IconLoader.GetIcon("Logo"),
+                   Subtitle = _resources.GetResource("Forms_SignOut_PageTitle"),
                 },
             };
 

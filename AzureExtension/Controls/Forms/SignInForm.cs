@@ -19,6 +19,7 @@ public partial class SignInForm : FormContent, IAzureForm
 
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly IResources _resources;
     private readonly AuthenticationMediator _authenticationMediator;
 
     private bool _isButtonEnabled = true;
@@ -28,13 +29,14 @@ public partial class SignInForm : FormContent, IAzureForm
 
     private Page? page;
 
-    public SignInForm(IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, AuthenticationMediator authenticationMediator)
+    public SignInForm(IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, AuthenticationMediator authenticationMediator, IResources resources)
     {
         _accountProvider = accountProvider;
         _authenticationMediator = authenticationMediator;
         _authenticationMediator.SignOutAction += SignOutForm_SignOutAction;
         page = null;
         _azureClientHelpers = azureClientHelpers;
+        _resources = resources;
     }
 
     public void SetPage(Page page)
@@ -56,10 +58,10 @@ public partial class SignInForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "{{AuthTitle}}", "Sign into your ADO account" },
-        { "{{AuthButtonTitle}}", "Sign in" },
+        { "{{AuthTitle}}", _resources.GetResource("Forms_SignIn_TemplateAuthTitle") },
+        { "{{AuthButtonTitle}}", _resources.GetResource("Forms_SignIn_TemplateAuthButtonTitle") },
         { "{{AuthIcon}}", $"data:image/png;base64,{IconLoader.GetIconAsBase64("Logo")}" },
-        { "{{AuthButtonTooltip}}", "tooltip" },
+        { "{{AuthButtonTooltip}}", _resources.GetResource("Forms_SignIn_TemplateAuthButtonTooltip") },
         { "{{ButtonIsEnabled}}", IsButtonEnabled },
     };
 

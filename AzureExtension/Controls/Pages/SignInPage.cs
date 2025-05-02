@@ -15,11 +15,14 @@ public partial class SignInPage : ContentPage
     private readonly StatusMessage _statusMessage;
     private readonly string _successMessage;
     private readonly string _errorMessage;
+    private readonly IResources _resources;
 
-    public SignInPage(SignInForm signInForm, StatusMessage statusMessage, string successMessage, string errorMessage)
+    public SignInPage(SignInForm signInForm, StatusMessage statusMessage, string successMessage, string errorMessage, IResources resources)
     {
-        Title = "Sign in";
+        _resources = resources;
         Icon = IconLoader.GetIcon("Logo");
+        Title = _resources.GetResource("Forms_SignIn_PageTitle");
+        Name = _resources.GetResource("Forms_SignIn_PageTitle"); // Title is for the Page, Name is for the command
         _signInForm = signInForm;
         _statusMessage = statusMessage;
         _successMessage = successMessage;

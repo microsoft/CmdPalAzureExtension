@@ -15,15 +15,20 @@ public sealed partial class SignOutPage : ContentPage
     private readonly StatusMessage _statusMessage;
     private readonly string _successMessage;
     private readonly string _errorMessage;
+    private readonly IResources _resources;
 
-    public SignOutPage(SignOutForm signOutForm, StatusMessage statusMessage, string successMessage, string errorMessage)
+    public SignOutPage(SignOutForm signOutForm, StatusMessage statusMessage, string successMessage, string errorMessage, IResources resources)
     {
-        Title = "Sign out";
-        Icon = IconLoader.GetIcon("Logo");
+        _resources = resources;
         _signOutForm = signOutForm;
         _statusMessage = statusMessage;
         _successMessage = successMessage;
         _errorMessage = errorMessage;
+        Icon = IconLoader.GetIcon("Logo");
+        Title = _resources.GetResource("ExtensionTitle");
+
+        // Subtitle in CommandProvider = _resources.GetResource("ExtensionSubtitle"); - subtitle is not part of the page interface
+        Name = _resources.GetResource("ExtensionTitle"); // Title is for the Page, Name is for the command
 
         // Wire up events using the helper
         FormEventHelper.WireFormEvents(_signOutForm, this, _statusMessage, _successMessage, _errorMessage);

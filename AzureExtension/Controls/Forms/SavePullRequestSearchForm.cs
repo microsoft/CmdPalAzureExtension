@@ -30,11 +30,20 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "{{url}}", _savedPullRequestSearch.Url },
-        { "{{enteredTitle}}", _savedPullRequestSearch.Name },
-        { "{{selectedView}}", string.IsNullOrEmpty(_savedPullRequestSearch.View) ? "Mine" : _savedPullRequestSearch.View },
-        { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveSearchTemplateIsTopLevelTitle") },
+        { "{{RepositoryUrlPlaceholder}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateRepositoryUrlPlaceholder") },
+        { "{{RepositoryUrlLabel}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateRepositoryUrlLabel") },
+        { "{{PullRequestSearchRepositoryUrl}}", _savedPullRequestSearch.Url },
+        { "{{RepositoryUrlError}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateRepositoryUrlError") },
+        { "{{PullRequestSearchTitlePlaceholder}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplatePullRequestSearchTitlePlaceholder") },
+        { "{{PullRequestSearchTitleLabel}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplatePullRequestSearchTitleLabel") },
+        { "{{EnteredPullRequestSearchTitle}}", _savedPullRequestSearch.Name },
+        { "{{PullRequestSearchViewMineTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewMineTitle") },
+        { "{{PullRequestSearchViewAssignedToMeTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAssignedToMeTitle") },
+        { "{{PullRequestSearchViewAllTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAllTitle") },
+        { "{{PullRequestSearchSelectedView}}", string.IsNullOrEmpty(_savedPullRequestSearch.View) ? _resources.GetResource("Forms_SavePullRequestSearch_TemplateDefaultView") : _savedPullRequestSearch.View },
+        { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateIsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
+        { "{{SavePullRequestSearchActionTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateSavePullRequestSearchActionTitle") },
     };
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequestSearch", TemplateSubstitutions);
@@ -88,7 +97,9 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             }
 
             LoadingStateChanged?.Invoke(this, false);
+
             _pullRequestSearchRepository.UpdatePullRequestSearchTopLevelStatus(pullRequestSearch, pullRequestSearch.IsTopLevel, _accountProvider.GetDefaultAccount());
+
             _mediator.AddPullRequestSearch(pullRequestSearch);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         }
