@@ -59,6 +59,7 @@ public class IconLoader
         _iconDictionary.Add("Add", new IconInfo("\uECC8"));
         _iconDictionary.Add("Search", new IconInfo("\uE721"));
         _iconDictionary.Add("OpenLink", new IconInfo("\uE8A7"));
+        _iconDictionary.Add("Copy", new IconInfo("\uE8C8"));
     }
 
     public static IconInfo GetIcon(string key)
