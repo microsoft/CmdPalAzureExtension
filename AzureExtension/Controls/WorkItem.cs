@@ -11,6 +11,8 @@ public class WorkItem
 {
     public int Id { get; set; }
 
+    public long InternalId { get; set; }
+
     public string SystemTitle { get; set; } = string.Empty;
 
     public string HtmlUrl { get; set; } = string.Empty;

@@ -41,7 +41,11 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
             Title = title,
             Icon = IconLoader.GetIcon(item.WorkItemTypeName),
             Tags = new[] { GetStatusTag(item) },
-
+            MoreCommands = new CommandContextItem[]
+            {
+                new(new CopyCommand(item.InternalId.ToStringInvariant(), "Copy work item ID")),
+                new(new CopyCommand(item.HtmlUrl, "Copy work item URL")),
+            },
             Details = new Details()
             {
                 Title = item.SystemTitle,
