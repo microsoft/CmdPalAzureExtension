@@ -27,28 +27,14 @@ public class AzureDataPipelineManager
         _connectionProvider = connectionProvider;
     }
 
-    public IEnumerable<IDefinition> GetDefinitions(IPipelineSearch pipelineSearch)
+    public Definition? GetDefinition(IDefinitionSearch definitionSearch)
     {
-        var azureUri = new AzureUri(pipelineSearch.RepositoryUrl);
-
-        var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
-        if (org is null)
-        {
-            return Enumerable.Empty<Definition>();
-        }
-
-        var project = Project.Get(_dataStore, azureUri.Project, org.Id);
-        if (project is null)
-        {
-            return Enumerable.Empty<Definition>();
-        }
-
-        return Definition.GetAll(_dataStore, project.Id);
+         return Definition.GetByInternalId(_dataStore, definitionSearch.InternalId);
     }
 
-    public IEnumerable<IBuild> GetBuild(IDefinition definition)
+    public IEnumerable<IBuild> GetBuilds(IDefinitionSearch definitionSearch)
     {
-        var dsDefinition = Definition.GetByInternalId(_dataStore, definition.InternalId);
+        var dsDefinition = GetDefinition(definitionSearch);
         if (dsDefinition is null)
         {
             return Enumerable.Empty<IBuild>();
@@ -57,9 +43,9 @@ public class AzureDataPipelineManager
         return Build.GetForDefinition(_dataStore, dsDefinition.Id);
     }
 
-    public async Task UpdatePipelineAsync(IPipelineSearch pipelineSearch, CancellationToken cancellationToken)
+    public async Task UpdatePipelineAsync(IDefinitionSearch definitionSearch, CancellationToken cancellationToken)
     {
-        var azureUri = new AzureUri(pipelineSearch.RepositoryUrl);
+        var azureUri = new AzureUri(definitionSearch.ProjectUrl);
         var account = await _accountProvider.GetDefaultAccountAsync();
         var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Uri, account);
 
@@ -76,8 +62,7 @@ public class AzureDataPipelineManager
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
 
-        // Gets the last maximum of 1000 builds
-        var builds = await client.GetBuildsAsync(project.InternalId, queryOrder: BuildQueryOrder.QueueTimeDescending, cancellationToken: cancellationToken);
+        var builds = await client.GetBuildsAsync(project.InternalId, definitions: [definitionSearch.InternalId], queryOrder: BuildQueryOrder.QueueTimeDescending, cancellationToken: cancellationToken);
 
         foreach (var build in builds)
         {
