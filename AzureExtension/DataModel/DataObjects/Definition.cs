@@ -38,6 +38,10 @@ public class Definition : IDefinition
     [Computed]
     public Project Project => Project.Get(DataStore, ProjectId);
 
+    [Write(false)]
+    [Computed]
+    public DateTime UpdatedAt => TimeUpdated.ToDateTime();
+
     private static Definition Create(
         DataStore dataStore,
         DefinitionReference definitionReference,

@@ -12,7 +12,7 @@ using Build = AzureExtension.DataModel.Build;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataPipelineManager
+public class AzureDataPipelineManager : IPipelineProvider, IPipelineUpdater
 {
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
@@ -41,6 +41,12 @@ public class AzureDataPipelineManager
         }
 
         return Build.GetForDefinition(_dataStore, dsDefinition.Id);
+    }
+
+    public bool IsNewOrStale(IDefinitionSearch definitionSearch, TimeSpan refreshCooldown)
+    {
+        var dsDefinition = GetDefinition(definitionSearch);
+        return dsDefinition == null || DateTime.UtcNow - dsDefinition.UpdatedAt > refreshCooldown;
     }
 
     public async Task UpdatePipelineAsync(IDefinitionSearch definitionSearch, CancellationToken cancellationToken)

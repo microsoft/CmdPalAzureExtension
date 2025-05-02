@@ -122,6 +122,7 @@ public class AzureDataManager : IDataUpdateService
         {
             DataUpdateType.Query => async () => await _queryUpdater.UpdateQueryAsync((parameters.UpdateObject as IQuery)!, parameters.CancellationToken.GetValueOrDefault()),
             DataUpdateType.PullRequests => async () => await _pullRequestSearchUpdater.UpdatePullRequestsAsync((parameters.UpdateObject as IPullRequestSearch)!, parameters.CancellationToken.GetValueOrDefault()),
+            DataUpdateType
             _ => throw new NotImplementedException($"Update type {type} not implemented."),
         };
 

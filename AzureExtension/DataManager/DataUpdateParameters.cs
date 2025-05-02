@@ -9,6 +9,7 @@ public enum DataUpdateType
     All,
     Query,
     PullRequests,
+    Pipeline,
     Repository,
 }
 
