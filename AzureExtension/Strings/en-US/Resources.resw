@@ -899,4 +899,7 @@
   <data name="Forms_SignIn_PageSubtitle" xml:space="preserve">
     <value>Sign into your Azure Dev Ops account</value>
   </data>
+  <data name="ListItems_AddPullRequestSearch" xml:space="preserve">
+    <value>Add a pull request search</value>
+  </data>
 </root>
