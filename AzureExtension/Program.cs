@@ -206,7 +206,7 @@ public sealed class Program
     {
         public required string ProjectUrl { get; set; }
 
-        public int InternalId { get; set; }
+        public long InternalId { get; set; }
     }
 
     private static void LogPackageInformation()

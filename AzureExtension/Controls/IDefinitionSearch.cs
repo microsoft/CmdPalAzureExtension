@@ -6,7 +6,7 @@ namespace AzureExtension.Controls;
 
 public interface IDefinitionSearch
 {
-    int InternalId { get; set; } // This is the ID of the definition in Azure DevOps
+    long InternalId { get; set; } // This is the ID of the definition in Azure DevOps
 
     string ProjectUrl { get; set; } // This is the URL of the project in Azure DevOps
 }

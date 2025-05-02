@@ -25,4 +25,5 @@ public enum ErrorType
     InitializeVssConnectionFailure,
     NullConnection,
     VssResourceNotFound,
+    DefinitionNotFound,
 }

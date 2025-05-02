@@ -62,7 +62,7 @@ public class AzureDataPipelineManager
             project = Project.GetOrCreateByTeamProject(_dataStore, teamProject, org.Id);
         }
 
-        var builds = await client.GetBuildsAsync(project.InternalId, definitions: [definitionSearch.InternalId], queryOrder: BuildQueryOrder.QueueTimeDescending, cancellationToken: cancellationToken);
+        var builds = await client.GetBuildsAsync(project.InternalId, definitions: [(int)definitionSearch.InternalId], queryOrder: BuildQueryOrder.QueueTimeDescending, cancellationToken: cancellationToken);
 
         foreach (var build in builds)
         {
