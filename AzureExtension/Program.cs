@@ -139,6 +139,10 @@ public sealed class Program
         var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
         var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
 
+        var pipelineManager = new AzureDataPipelineManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
+
+        await pipelineManager.UpdatePipelineAsync("https://dev.azure.com/microsoft/dart", CancellationToken.None);
+
         var azureDataManager = new AzureDataManager(cacheDataStore, queryManager, pullRequestSearchManager);
         var cacheManager = new CacheManager(azureDataManager);
         var dataProvider = new DataProvider(cacheManager, queryManager, pullRequestSearchManager);
