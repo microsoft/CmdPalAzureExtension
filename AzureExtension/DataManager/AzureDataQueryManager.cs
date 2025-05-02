@@ -68,7 +68,7 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
 
         var account = await _accountProvider.GetDefaultAccountAsync();
 
-        using var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
+        var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
 
         // Good practice to only create data after we know the client is valid, but any exceptions
         // will roll back the transaction.
@@ -140,11 +140,20 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
 
         var dsQuery = Query.GetOrCreate(_dataStore, azureUri.Query, project.Id, account.Username, query.Name);
 
+        var workItemTasks = new List<Task<TFModels.WorkItemType>>();
         foreach (var workItem in workItems)
         {
             var fieldValue = workItem.Fields["System.WorkItemType"].ToString();
+            var wiTask = _liveDataProvider.GetWorkItemTypeAsync(vssConnection, project.InternalId, fieldValue, cancellationToken);
+            workItemTasks.Add(wiTask);
+        }
 
-            var workItemTypeInfo = await _liveDataProvider.GetWorkItemTypeAsync(vssConnection, project.InternalId, fieldValue, cancellationToken);
+        for (var i = 0; i < workItemTasks.Count; i++)
+        {
+            var task = workItemTasks[i];
+            var workItem = workItems[i];
+
+            var workItemTypeInfo = await task;
             var cmdPalWorkItem = WorkItem.GetOrCreate(_dataStore, workItem, vssConnection, _liveDataProvider, project.Id, workItemTypeInfo);
             QueryWorkItem.AddWorkItemToQuery(_dataStore, dsQuery.Id, cmdPalWorkItem.Id);
         }
