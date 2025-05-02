@@ -842,4 +842,52 @@
     <value>updated</value>
     <comment>Indicates when something was updated</comment>
   </data>
+  <data name="Pages_WorkItemsSearchPage_Reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_AssignedTo" xml:space="preserve">
+    <value>Assigned To</value>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_LastChanged" xml:space="preserve">
+    <value>Last Changed</value>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_CreatedDate" xml:space="preserve">
+    <value>Date Created</value>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_Unassigned" xml:space="preserve">
+    <value>Unassigned</value>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_CopyURLCommand" xml:space="preserve">
+    <value>Copy URL</value>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_CopyWorkItemId" xml:space="preserve">
+    <value>Copy Work Item ID</value>
+  </data>
+  <data name="Pages_PullRequestSearchPage_Author" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="Pages_PullRequestSearchPage_UpdatedAt" xml:space="preserve">
+    <value>Last Updated</value>
+  </data>
+  <data name="Pages_PullRequestSearchPage_TargetBranch" xml:space="preserve">
+    <value>Target Branch</value>
+  </data>
+  <data name="Pages_PullRequestSearchPage_PolicyStatus" xml:space="preserve">
+    <value>Policy Status</value>
+  </data>
+  <data name="Pages_PullRequestSearchPage_PolicyStatusReason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="Pages_PullRequestSearchPage_InternalId" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Pages_PullRequestSearchPage_CreationDate" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="Pages_PullRequestSearchPage_CopyURLCommand" xml:space="preserve">
+    <value>Copy Pull Request URL</value>
+  </data>
+  <data name="Pages_PullRequestSearchPage_CopyIdCommand" xml:space="preserve">
+    <value>Copy Pull Request ID</value>
+  </data>
 </root>

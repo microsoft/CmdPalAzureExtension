@@ -21,7 +21,6 @@ public abstract partial class SearchPage<T> : ListPage
     public SearchPage(IAzureSearch search, IDataProvider dataProvider)
     {
         CurrentSearch = search;
-        Icon = IconLoader.GetIcon("Logo");
         Name = search.Name;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         DataProvider = dataProvider;

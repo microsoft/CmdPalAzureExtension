@@ -48,7 +48,7 @@ public class SearchPageFactory : ISearchPageFactory
         }
         else if (search is IPullRequestSearch)
         {
-            return new PullRequestSearchPage((IPullRequestSearch)search, _resources, _dataProvider);
+            return new PullRequestSearchPage((IPullRequestSearch)search, _resources, _dataProvider, new TimeSpanHelper(_resources));
         }
 
         throw new NotImplementedException($"No page for search type {search.GetType()}");
@@ -80,9 +80,10 @@ public class SearchPageFactory : ISearchPageFactory
         {
             Title = search.Name,
             Subtitle = search.Url,
+            Icon = search is IQuery ? IconLoader.GetIcon("Query") : IconLoader.GetIcon("PullRequest"),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(search.Url, _resources)),
+                new(new LinkCommand(search is IQuery ? search.Url : $"{search.Url}/pullrequests", _resources)),
                 new(CreateEditPageForSearch(search)),
                 new(new RemoveAzureSearchCommand(search, _resources, _mediator, azureSearchRepository)),
             },

@@ -16,14 +16,18 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
 
     private readonly IDataProvider _dataProvider;
 
-    public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider)
+    private readonly TimeSpanHelper _timeSpanHelper;
+
+    public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
         : base(search, dataProvider)
     {
         _search = search;
         _resources = resources;
         _dataProvider = dataProvider;
+        _timeSpanHelper = timeSpanHelper;
         Icon = IconLoader.GetIcon("PullRequest");
         Name = search.Name;
+        ShowDetails = true;
     }
 
     protected override ListItem GetListItem(IPullRequest item)
@@ -34,7 +38,54 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
         return new ListItem(new LinkCommand(url, _resources))
         {
             Title = title,
-            Icon = IconLoader.GetIcon("PullRequest"),
+            Icon = IconLoader.GetIconForPullRequestStatus(item.PolicyStatus),
+            MoreCommands = new CommandContextItem[]
+            {
+                new(new CopyCommand(item.HtmlUrl, _resources.GetResource("Pages_PullRequestSearchPage_CopyURLCommand"))),
+                new(new CopyCommand(item.InternalId.ToStringInvariant(), _resources.GetResource("Pages_PullRequestSearchPage_CopyIdCommand"))),
+            },
+            Details = new Details()
+            {
+                Title = item.Title,
+                Metadata = new[]
+                {
+                    new DetailsElement()
+                    {
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_Author"),
+                        Data = new DetailsLink() { Text = $"{item.Creator?.Name}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_UpdatedAt"),
+                        Data = new DetailsLink() { Text = $"{_timeSpanHelper.DateTimeOffsetToDisplayString(item.Creator?.UpdatedAt, null)}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_TargetBranch"),
+                        Data = new DetailsLink() { Text = $"{item.TargetBranch}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_PolicyStatus"),
+                        Data = new DetailsLink() { Text = $"{item.PolicyStatus}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_PolicyStatusReason"),
+                        Data = new DetailsLink() { Text = $"{item.PolicyStatusReason}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_InternalId"),
+                        Data = new DetailsLink() { Text = $"{item.InternalId}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_CreationDate"),
+                        Data = new DetailsLink() { Text = $"{new DateTime(item.CreationDate)}" },
+                    },
+                },
+            },
         };
     }
 

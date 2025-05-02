@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.DataModel;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Serilog;
 
@@ -58,6 +59,7 @@ public class IconLoader
         _iconDictionary.Add("Add", new IconInfo("\uECC8"));
         _iconDictionary.Add("Search", new IconInfo("\uE721"));
         _iconDictionary.Add("OpenLink", new IconInfo("\uE8A7"));
+        _iconDictionary.Add("Copy", new IconInfo("\uE8C8"));
     }
 
     public static IconInfo GetIcon(string key)
@@ -108,5 +110,34 @@ public class IconLoader
         var fullPath = Path.Combine(AppContext.BaseDirectory, filePath);
         var imageData = Convert.ToBase64String(File.ReadAllBytes(fullPath));
         return imageData;
+    }
+
+    public static IconInfo GetIconForPullRequestStatus(string? prStatus)
+    {
+        prStatus ??= string.Empty;
+        if (Enum.TryParse<PolicyStatus>(prStatus, false, out var policyStatus))
+        {
+            return policyStatus switch
+            {
+                PolicyStatus.Approved => GetIcon("PullRequestApproved"),
+                PolicyStatus.Running => GetIcon("PullRequestWaiting"),
+                PolicyStatus.Queued => GetIcon("PullRequestWaiting"),
+                PolicyStatus.Rejected => GetIcon("PullRequestRejected"),
+                PolicyStatus.Broken => GetIcon("PullRequestRejected"),
+                _ => GetIcon("PullRequestReviewNotStarted"),
+            };
+        }
+
+        return new IconInfo(string.Empty);
+    }
+
+    public static string ConvertBase64ToDataUri(string base64String, string mimeType = "image/png")
+    {
+        if (string.IsNullOrEmpty(base64String))
+        {
+            throw new ArgumentException("Base64 string cannot be null or empty.", nameof(base64String));
+        }
+
+        return $"data:{mimeType};base64,{base64String}";
     }
 }
