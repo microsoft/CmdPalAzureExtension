@@ -141,8 +141,7 @@ public sealed class Program
 
         var pipelineManager = new AzureDataPipelineManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
 
-        await pipelineManager.UpdatePipelineAsync("https://dev.azure.com/microsoft/dart", CancellationToken.None);
-
+        // await pipelineManager.UpdatePipelineAsync("https://dev.azure.com/microsoft/dart", CancellationToken.None);
         var azureDataManager = new AzureDataManager(cacheDataStore, queryManager, pullRequestSearchManager);
         var cacheManager = new CacheManager(azureDataManager);
         var dataProvider = new DataProvider(cacheManager, queryManager, pullRequestSearchManager);

@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.Helpers;
 using Dapper;
@@ -11,7 +12,7 @@ using TFModels = Microsoft.TeamFoundation.Build.WebApi;
 namespace AzureExtension.DataModel;
 
 [Table("Build")]
-public class Build
+public class Build : IBuild
 {
     [Key]
     public long Id { get; set; } = DataStore.NoForeignKey;

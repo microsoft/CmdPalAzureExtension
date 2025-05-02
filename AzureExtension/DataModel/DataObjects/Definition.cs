@@ -8,12 +8,11 @@ using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Microsoft.TeamFoundation.Build.WebApi;
-using Microsoft.TeamFoundation.SourceControl.WebApi;
 
 namespace AzureExtension.DataModel;
 
 [Table("Definition")]
-public class Definition
+public class Definition : IDefinition
 {
     private static readonly long _updateThreshold = TimeSpan.FromHours(4).Ticks;
 
@@ -57,7 +56,7 @@ public class Definition
         return definition;
     }
 
-    private static Definition? GetByInternalId(DataStore dataStore, long internalId)
+    public static Definition? GetByInternalId(DataStore dataStore, long internalId)
     {
         var sql = "SELECT * FROM Definition WHERE InternalId = @InternalId";
         var definition = dataStore.Connection.QuerySingleOrDefault<Definition>(sql, new { InternalId = internalId });
@@ -97,6 +96,23 @@ public class Definition
     {
         var definition = Create(dataStore, definitionReference, projectId);
         return AddOrUpdate(dataStore, definition);
+    }
+
+    public static IEnumerable<Definition> GetAll(DataStore dataStore, long projectId)
+    {
+        var sql = "SELECT * FROM Definition WHERE ProjectId = @ProjectId";
+        var param = new
+        {
+            ProjectId = projectId,
+        };
+
+        var definitions = dataStore.Connection.Query<Definition>(sql, param);
+        foreach (var definition in definitions)
+        {
+            definition.DataStore = dataStore;
+        }
+
+        return definitions;
     }
 
     public static void DeleteUnreferenced(DataStore dataStore)

@@ -4,6 +4,7 @@
 
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
 using Microsoft.TeamFoundation.Build.WebApi;
@@ -26,18 +27,39 @@ public class AzureDataPipelineManager
         _connectionProvider = connectionProvider;
     }
 
-    public class Pipeline
+    public IEnumerable<IDefinition> GetDefinitions(IPipelineSearch pipelineSearch)
     {
-        public string Name { get; set; } = string.Empty;
+        var azureUri = new AzureUri(pipelineSearch.RepositoryUrl);
 
-        public string Url { get; set; } = string.Empty;
+        var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
+        if (org is null)
+        {
+            return Enumerable.Empty<Definition>();
+        }
 
-        public string Status { get; set; } = string.Empty;
+        var project = Project.Get(_dataStore, azureUri.Project, org.Id);
+        if (project is null)
+        {
+            return Enumerable.Empty<Definition>();
+        }
+
+        return Definition.GetAll(_dataStore, project.Id);
     }
 
-    public async Task UpdatePipelineAsync(string url, CancellationToken cancellationToken)
+    public IEnumerable<IBuild> GetBuild(IDefinition definition)
     {
-        var azureUri = new AzureUri(url);
+        var dsDefinition = Definition.GetByInternalId(_dataStore, definition.InternalId);
+        if (dsDefinition is null)
+        {
+            return Enumerable.Empty<IBuild>();
+        }
+
+        return Build.GetForDefinition(_dataStore, dsDefinition.Id);
+    }
+
+    public async Task UpdatePipelineAsync(IPipelineSearch pipelineSearch, CancellationToken cancellationToken)
+    {
+        var azureUri = new AzureUri(pipelineSearch.RepositoryUrl);
         var account = await _accountProvider.GetDefaultAccountAsync();
         var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Uri, account);
 
@@ -63,7 +85,5 @@ public class AzureDataPipelineManager
             var creator = Identity.GetOrCreateIdentity(_dataStore, build.RequestedBy, vssConnection, _liveDataProvider);
             var dsBuild = Build.GetOrCreate(_dataStore, build, dsDefinition.Id, creator.Id);
         }
-
-        // Get the pipelines
     }
 }
