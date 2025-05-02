@@ -41,8 +41,8 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
             Icon = IconLoader.GetIconForPullRequestStatus(item.PolicyStatus),
             MoreCommands = new CommandContextItem[]
             {
-                new(new CopyCommand(item.HtmlUrl, "Copy pull request URL")),
-                new(new CopyCommand(item.InternalId.ToStringInvariant(), "Copy pull request number")),
+                new(new CopyCommand(item.HtmlUrl, _resources.GetResource("Pages_PullRequestSearchPage_CopyURLCommand"))),
+                new(new CopyCommand(item.InternalId.ToStringInvariant(), _resources.GetResource("Pages_PullRequestSearchPage_CopyIdCommand"))),
             },
             Details = new Details()
             {
@@ -51,37 +51,37 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
                 {
                     new DetailsElement()
                     {
-                        Key = "Author:",
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_Author"),
                         Data = new DetailsLink() { Text = $"{item.Creator?.Name}" },
                     },
                     new DetailsElement()
                     {
-                        Key = "Last updated:",
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_UpdatedAt"),
                         Data = new DetailsLink() { Text = $"{_timeSpanHelper.DateTimeOffsetToDisplayString(item.Creator?.UpdatedAt, null)}" },
                     },
                     new DetailsElement()
                     {
-                        Key = "Target branch:",
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_TargetBranch"),
                         Data = new DetailsLink() { Text = $"{item.TargetBranch}" },
                     },
                     new DetailsElement()
                     {
-                        Key = "Policy status:",
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_PolicyStatus"),
                         Data = new DetailsLink() { Text = $"{item.PolicyStatus}" },
                     },
                     new DetailsElement()
                     {
-                        Key = "Reason:",
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_PolicyStatusReason"),
                         Data = new DetailsLink() { Text = $"{item.PolicyStatusReason}" },
                     },
                     new DetailsElement()
                     {
-                        Key = "Id:",
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_InternalId"),
                         Data = new DetailsLink() { Text = $"{item.InternalId}" },
                     },
                     new DetailsElement()
                     {
-                        Key = "Created:",
+                        Key = _resources.GetResource("Pages_PullRequestSearchPage_CreationDate"),
                         Data = new DetailsLink() { Text = $"{new DateTime(item.CreationDate)}" },
                     },
                 },

@@ -43,8 +43,8 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
             Tags = new[] { GetStatusTag(item) },
             MoreCommands = new CommandContextItem[]
             {
-                new(new CopyCommand(item.InternalId.ToStringInvariant(), "Copy work item ID")),
-                new(new CopyCommand(item.HtmlUrl, "Copy work item URL")),
+                new(new CopyCommand(item.InternalId.ToStringInvariant(), _resources.GetResource("Pages_WorkItemsSearchPage_CopyWorkItemId"))),
+                new(new CopyCommand(item.HtmlUrl, _resources.GetResource("Pages_WorkItemsSearchPage_CopyURLCommand"))),
             },
             Details = new Details()
             {
@@ -53,22 +53,22 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
                 {
                     new DetailsElement()
                     {
-                        Key = "Reason:",
+                        Key = _resources.GetResource("Pages_WorkItemsSearchPage_Reason"),
                         Data = new DetailsLink() { Text = $"{item.SystemReason}" },
                     },
                     new DetailsElement()
                     {
-                        Key = "Assigned to:",
-                        Data = new DetailsLink() { Text = $"{item.SystemAssignedTo?.Name ?? "Unassigned"}" },
+                        Key = _resources.GetResource("Pages_WorkItemsSearchPage_AssignedTo"),
+                        Data = new DetailsLink() { Text = $"{item.SystemAssignedTo?.Name ?? _resources.GetResource("Pages_WorkItemsSearchPage_Unassigned")}" },
                     },
                     new DetailsElement()
                     {
-                        Key = "Last changed:",
+                        Key = _resources.GetResource("Pages_WorkItemsSearchPage_LastChanged"),
                         Data = new DetailsLink() { Text = $"{_timeSpanHelper.DateTimeOffsetToDisplayString(new DateTime(item.SystemChangedDate), null)}" },
                     },
                     new DetailsElement()
                     {
-                        Key = "Created:",
+                        Key = _resources.GetResource("Pages_WorkItemsSearchPage_CreatedDate"),
                         Data = new DetailsLink() { Text = $"{new DateTime(item.SystemCreatedDate)}" },
                     },
                     new DetailsElement()
