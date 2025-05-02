@@ -28,6 +28,8 @@ public class Definition
 
     public long CreationDate { get; set; } = DataStore.NoForeignKey;
 
+    public string HtmlUrl { get; set; } = string.Empty;
+
     public long TimeUpdated { get; set; } = DataStore.NoForeignKey;
 
     [Write(false)]
@@ -48,6 +50,7 @@ public class Definition
             Name = definitionReference.Name,
             ProjectId = projectId,
             CreationDate = definitionReference.CreatedDate.ToDataStoreInteger(),
+            HtmlUrl = definitionReference.Url,
             TimeUpdated = DateTime.UtcNow.ToDataStoreInteger(),
         };
         definition.DataStore = dataStore;
