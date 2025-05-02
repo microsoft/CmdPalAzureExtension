@@ -18,7 +18,8 @@ public class DataProviderTests
         var dataProvider = new DataProvider(
             new Mock<ICacheManager>().Object,
             new Mock<IDataQueryProvider>().Object,
-            new Mock<IDataPullRequestSearchProvider>().Object);
+            new Mock<IDataPullRequestSearchProvider>().Object,
+            new Mock<IPipelineProvider>().Object);
 
         Assert.IsNotNull(dataProvider);
     }
@@ -29,7 +30,12 @@ public class DataProviderTests
         var mockCacheManager = new Mock<ICacheManager>();
         var mockQueryProvider = new Mock<IDataQueryProvider>();
         var stubPullRequestSearchProvider = new Mock<IDataPullRequestSearchProvider>();
-        var dataProvider = new DataProvider(mockCacheManager.Object, mockQueryProvider.Object, stubPullRequestSearchProvider.Object);
+        var stubPipelineProvider = new Mock<IPipelineProvider>();
+        var dataProvider = new DataProvider(
+            mockCacheManager.Object,
+            mockQueryProvider.Object,
+            stubPullRequestSearchProvider.Object,
+            stubPipelineProvider.Object);
 
         var stubQuery = new Mock<IQuery>();
 
@@ -49,7 +55,12 @@ public class DataProviderTests
         var mockCacheManager = new Mock<ICacheManager>();
         var mockQueryProvider = new Mock<IDataQueryProvider>();
         var stubPullRequestSearchProvider = new Mock<IDataPullRequestSearchProvider>();
-        var dataProvider = new DataProvider(mockCacheManager.Object, mockQueryProvider.Object, stubPullRequestSearchProvider.Object);
+        var stubPipelineProvider = new Mock<IPipelineProvider>();
+        var dataProvider = new DataProvider(
+            mockCacheManager.Object,
+            mockQueryProvider.Object,
+            stubPullRequestSearchProvider.Object,
+            stubPipelineProvider.Object);
 
         var stubQuery = new Mock<IQuery>();
 
@@ -75,7 +86,12 @@ public class DataProviderTests
         var mockCacheManager = new Mock<ICacheManager>();
         var stubQueryProvider = new Mock<IDataQueryProvider>();
         var mockPullRequestSearchProvider = new Mock<IDataPullRequestSearchProvider>();
-        var dataProvider = new DataProvider(mockCacheManager.Object, stubQueryProvider.Object, mockPullRequestSearchProvider.Object);
+        var stubPipelineProvider = new Mock<IPipelineProvider>();
+        var dataProvider = new DataProvider(
+            mockCacheManager.Object,
+            stubQueryProvider.Object,
+            mockPullRequestSearchProvider.Object,
+            stubPipelineProvider.Object);
 
         var stubPullRequestSearch = new Mock<IPullRequestSearch>();
 
@@ -95,7 +111,12 @@ public class DataProviderTests
         var mockCacheManager = new Mock<ICacheManager>();
         var stubQueryProvider = new Mock<IDataQueryProvider>();
         var mockPullRequestSearchProvider = new Mock<IDataPullRequestSearchProvider>();
-        var dataProvider = new DataProvider(mockCacheManager.Object, stubQueryProvider.Object, mockPullRequestSearchProvider.Object);
+        var stubPipelineProvider = new Mock<IPipelineProvider>();
+        var dataProvider = new DataProvider(
+            mockCacheManager.Object,
+            stubQueryProvider.Object,
+            mockPullRequestSearchProvider.Object,
+            stubPipelineProvider.Object);
 
         var stubPullRequestSearch = new Mock<IPullRequestSearch>();
 
