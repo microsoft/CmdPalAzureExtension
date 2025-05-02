@@ -121,7 +121,7 @@ public class Definition : IDefinition
 
     public static void DeleteUnreferenced(DataStore dataStore)
     {
-        var sql = "DELETE FROM Definition WHERE ProjectId NOT IN (SELECT Id FROM Project)";
+        var sql = "DELETE FROM Definition WHERE (Id NOT IN (SELECT DISTINCT DefinitionId FROM Build))";
         var command = dataStore.Connection!.CreateCommand();
         command.CommandText = sql;
         command.ExecuteNonQuery();

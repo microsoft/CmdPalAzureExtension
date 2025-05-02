@@ -75,6 +75,7 @@ public class AzureDataManager : IDataUpdateService
 
     private readonly TimeSpan _queryRetentionTime = TimeSpan.FromDays(7);
     private readonly TimeSpan _pullRequestSearchRetentionTime = TimeSpan.FromDays(7);
+    private readonly TimeSpan _pipelineRetentionTime = TimeSpan.FromDays(7);
 
     // Removes unused data from the datastore.
     private void PruneObsoleteData()
@@ -85,6 +86,8 @@ public class AzureDataManager : IDataUpdateService
         PullRequestSearchPullRequest.DeleteUnreferenced(_dataStore);
         WorkItem.DeleteNotReferencedByQuery(_dataStore);
         PullRequest.DeleteNotReferencedBySearch(_dataStore);
+        Build.DeleteBefore(_dataStore, DateTime.UtcNow - _pipelineRetentionTime);
+        Definition.DeleteUnreferenced(_dataStore);
     }
 
     private async Task PerformUpdateAsync(DataUpdateParameters parameters, Func<Task> asyncOperation)
