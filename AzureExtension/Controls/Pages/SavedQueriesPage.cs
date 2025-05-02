@@ -28,8 +28,8 @@ public partial class SavedQueriesPage : ListPage
        ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
-        Title = _resources.GetResource("Pages_Saved_Queries");
-        Name = _resources.GetResource("Pages_Saved_Queries"); // Title is for the Page, Name is for the command
+        Title = _resources.GetResource("Pages_SavedQueries");
+        Name = _resources.GetResource("Pages_SavedQueries"); // Title is for the Page, Name is for the command
         Icon = IconLoader.GetIcon("Search");
         _savedQueriesMediator = savedQueriesMediator;
         _savedQueriesMediator.QueryRemoved += OnQueryRemoved;
@@ -48,7 +48,7 @@ public partial class SavedQueriesPage : ListPage
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = $"{_resources.GetResource("Pages_Saved_Queries_Error")} {e.Message}",
+                Message = $"{_resources.GetResource("Pages_SavedQueries_Error")} {e.Message}",
                 State = MessageState.Error,
             });
 
@@ -64,7 +64,7 @@ public partial class SavedQueriesPage : ListPage
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = _resources.GetResource("Pages_Saved_Queries_Failure"),
+                Message = _resources.GetResource("Pages_SavedQueries_Failure"),
                 State = MessageState.Error,
             });
 

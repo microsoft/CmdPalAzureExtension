@@ -42,7 +42,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _searchPageFactory = searchPageFactory;
         _savedSearchesMediator = mediator;
         _authenticationMediator = authenticationMediator;
-        DisplayName = "Azure Extension"; // hardcoded because it's a product title
+        DisplayName = "Azure Extension"; // hard-coded because it's a product title
 
         _savedSearchesMediator.QuerySaved += OnSearchUpdated;
         _savedSearchesMediator.QueryRemoved += OnSearchUpdated;

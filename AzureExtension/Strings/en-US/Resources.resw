@@ -794,15 +794,15 @@
     <value>pull request title</value>
     <comment>Shown in command to copy title of pull request on a page</comment>
   </data>
-  <data name="Pages_Saved_Queries" xml:space="preserve">
-    <value>Saved ADO Queries</value>
+  <data name="Pages_SavedQueries" xml:space="preserve">
+    <value>Saved Azure DevOps Queries</value>
     <comment>Name of page that shows list of saved github queries</comment>
   </data>
-  <data name="Pages_Saved_Queries_Error" xml:space="preserve">
+  <data name="Pages_SavedQueries_Error" xml:space="preserve">
     <value>Error in removing query: </value>
     <comment>Shown in a toast when error happens when saving a query</comment>
   </data>
-  <data name="Pages_Saved_Queries_Failure" xml:space="preserve">
+  <data name="Pages_SavedQueries_Failure" xml:space="preserve">
     <value>Failed to remove query.</value>
     <comment>Shown when failed to remove a search from saved queries page</comment>
   </data>
@@ -897,9 +897,12 @@
     <value>Sign in</value>
   </data>
   <data name="Forms_SignIn_PageSubtitle" xml:space="preserve">
-    <value>Sign into your Azure Dev Ops account</value>
+    <value>Sign into your Azure DevOps account</value>
   </data>
   <data name="ListItems_AddPullRequestSearch" xml:space="preserve">
     <value>Add a pull request search</value>
+  </data>
+  <data name="Pages_SavedPullRequestSearches_Title" xml:space="preserve">
+    <value>Saved Azure DevOps Pull Request Searches</value>
   </data>
 </root>
