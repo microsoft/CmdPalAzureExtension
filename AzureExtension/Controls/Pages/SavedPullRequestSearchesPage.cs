@@ -46,7 +46,7 @@ public class SavedPullRequestSearchesPage : ListPage
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = $"{_resources.GetResource("Pages_Saved_Searches_Error")} {e.Message}",
+                Message = $"{_resources.GetResource("Pages_SavedPullRequestSearches_Error")} {e.Message}",
                 State = MessageState.Error,
             });
 
@@ -62,7 +62,7 @@ public class SavedPullRequestSearchesPage : ListPage
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = _resources.GetResource("Pages_Saved_Searches_Failure"),
+                Message = _resources.GetResource("Pages_SavedPullRequestSearches_Failure"),
                 State = MessageState.Error,
             });
 

@@ -73,8 +73,6 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             {
                 new CommandItem(_signInPage)
                 {
-                    Icon = IconLoader.GetIcon("Logo"),
-                    Title = _resources.GetResource("Forms_SignIn_PageTitle"),
                     Subtitle = _resources.GetResource("Forms_SignIn_PageSubtitle"),
                 },
             };

@@ -26,6 +26,7 @@ public sealed partial class SignOutForm : FormContent, IAzureForm
         _authenticationMediator = authenticationMediator;
     }
 
+    // ButtonIsEnabled is set to true by default. Nothing currently changes this value
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{AuthTitle}}", _resources.GetResource("Forms_SignOut_TemplateAuthTitle") },

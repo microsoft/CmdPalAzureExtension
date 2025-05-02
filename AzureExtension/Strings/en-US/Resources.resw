@@ -905,4 +905,24 @@
   <data name="Pages_SavedPullRequestSearches_Title" xml:space="preserve">
     <value>Saved Azure DevOps Pull Request Searches</value>
   </data>
+  <data name="Pages_SignIn_Title" xml:space="preserve">
+    <value>Sign In</value>
+  </data>
+  <data name="Pages_SavedPullRequestSearches_Error" xml:space="preserve">
+    <value>Error in removing pull request search:</value>
+    <comment>Shown in a toast when error happens when saving a query</comment>
+  </data>
+  <data name="Pages_SavedPullRequestSearches_Failure" xml:space="preserve">
+    <value>Failed to remove pull request search:</value>
+    <comment>Shown when failed to remove a search from saved queries page</comment>
+  </data>
+  <data name="Pages_SavePullRequestSearch_Title" xml:space="preserve">
+    <value>Save Pull Request Search</value>
+  </data>
+  <data name="Pages_SavePullRequestSearch_SuccessMessage" xml:space="preserve">
+    <value>Pull request search saved successfully!</value>
+  </data>
+  <data name="Pages_SavePullRequestSearch_FailureMessage" xml:space="preserve">
+    <value>Saving pull request search failed: </value>
+  </data>
 </root>
