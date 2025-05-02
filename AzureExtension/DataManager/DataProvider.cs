@@ -15,6 +15,7 @@ public class DataProvider : IDataProvider
     private readonly ICacheManager _cacheManager;
     private readonly IDataQueryProvider _queryProvider;
     private readonly IDataPullRequestSearchProvider _pullRequestSearchProvider;
+    private readonly IPipelineProvider _pipelineProvider;
 
     public static readonly string IdentityRefFieldValueName = "Microsoft.VisualStudio.Services.WebApi.IdentityRef";
     public static readonly string SystemIdFieldName = "System.Id";
@@ -31,12 +32,17 @@ public class DataProvider : IDataProvider
         remove => _onUpdate -= value;
     }
 
-    public DataProvider(ICacheManager cacheManager, IDataQueryProvider queryProvider, IDataPullRequestSearchProvider pullRequestSearchProvider)
+    public DataProvider(
+        ICacheManager cacheManager,
+        IDataQueryProvider queryProvider,
+        IDataPullRequestSearchProvider pullRequestSearchProvider,
+        IPipelineProvider pipelineProvider)
     {
         _log = Log.ForContext("SourceContext", nameof(IDataProvider));
         _cacheManager = cacheManager;
         _queryProvider = queryProvider;
         _pullRequestSearchProvider = pullRequestSearchProvider;
+        _pipelineProvider = pipelineProvider;
 
         _cacheManager.OnUpdate += OnCacheManagerUpdate;
     }
@@ -101,5 +107,31 @@ public class DataProvider : IDataProvider
         await WaitForLoadingDataIfNull(dsPullRequestSearch, parameters);
 
         return _pullRequestSearchProvider.GetPullRequests(pullRequestSearch);
+    }
+
+    public async Task<IEnumerable<IBuild>> GetBuilds(IDefinitionSearch definitionSearch)
+    {
+        var parameters = new DataUpdateParameters
+        {
+            UpdateType = DataUpdateType.Pipeline,
+            UpdateObject = definitionSearch,
+        };
+
+        var dsDefinition = _pipelineProvider.GetDefinition(definitionSearch);
+        await WaitForLoadingDataIfNull(dsDefinition, parameters);
+        return _pipelineProvider.GetBuilds(definitionSearch);
+    }
+
+    public async Task<IDefinition> GetDefinition(IDefinitionSearch definitionSearch)
+    {
+        var parameters = new DataUpdateParameters
+        {
+            UpdateType = DataUpdateType.Pipeline,
+            UpdateObject = definitionSearch,
+        };
+
+        var dsDefinition = _pipelineProvider.GetDefinition(definitionSearch);
+        await WaitForLoadingDataIfNull(dsDefinition, parameters);
+        return dsDefinition!;
     }
 }

@@ -141,17 +141,9 @@ public sealed class Program
 
         var pipelineManager = new AzureDataPipelineManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
 
-        var definitionSearch = new DefinitionSearch
-        {
-            ProjectUrl = "https://dev.azure.com/microsoft/dart",
-            InternalId = 158060,
-        };
-
-        await pipelineManager.UpdatePipelineAsync(definitionSearch, CancellationToken.None);
-
-        var azureDataManager = new AzureDataManager(cacheDataStore, queryManager, pullRequestSearchManager);
+        var azureDataManager = new AzureDataManager(cacheDataStore, queryManager, pullRequestSearchManager, pipelineManager);
         var cacheManager = new CacheManager(azureDataManager);
-        var dataProvider = new DataProvider(cacheManager, queryManager, pullRequestSearchManager);
+        var dataProvider = new DataProvider(cacheManager, queryManager, pullRequestSearchManager, pipelineManager);
 
         var azureValidator = new AzureValidatorAdapter(azureClientHelpers);
 
@@ -200,13 +192,6 @@ public sealed class Program
         // Since we have single instance of the extension object, we exit as soon as it is disposed.
         extensionDisposedEvent.WaitOne();
         Log.Information($"Extension is disposed.");
-    }
-
-    private sealed class DefinitionSearch : IDefinitionSearch
-    {
-        public required string ProjectUrl { get; set; }
-
-        public long InternalId { get; set; }
     }
 
     private static void LogPackageInformation()

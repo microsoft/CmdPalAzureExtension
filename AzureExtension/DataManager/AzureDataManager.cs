@@ -20,16 +20,19 @@ public class AzureDataManager : IDataUpdateService
     private readonly DataStore _dataStore;
     private readonly IDataPullRequestSearchUpdater _pullRequestSearchUpdater;
     private readonly IDataQueryUpdater _queryUpdater;
+    private readonly IPipelineUpdater _pipelineUpdater;
 
     public AzureDataManager(
         DataStore dataStore,
         IDataQueryUpdater queryUpdater,
-        IDataPullRequestSearchUpdater pullRequestSearchUpdater)
+        IDataPullRequestSearchUpdater pullRequestSearchUpdater,
+        IPipelineUpdater pipelineUpdater)
     {
         _log = Log.ForContext("SourceContext", nameof(AzureDataManager));
         _dataStore = dataStore;
         _queryUpdater = queryUpdater;
         _pullRequestSearchUpdater = pullRequestSearchUpdater;
+        _pipelineUpdater = pipelineUpdater;
     }
 
     private void ValidateDataStore()
@@ -122,7 +125,7 @@ public class AzureDataManager : IDataUpdateService
         {
             DataUpdateType.Query => async () => await _queryUpdater.UpdateQueryAsync((parameters.UpdateObject as IQuery)!, parameters.CancellationToken.GetValueOrDefault()),
             DataUpdateType.PullRequests => async () => await _pullRequestSearchUpdater.UpdatePullRequestsAsync((parameters.UpdateObject as IPullRequestSearch)!, parameters.CancellationToken.GetValueOrDefault()),
-            DataUpdateType
+            DataUpdateType.Pipeline => async () => await _pipelineUpdater.UpdatePipelineAsync((parameters.UpdateObject as IDefinitionSearch)!, parameters.CancellationToken.GetValueOrDefault()),
             _ => throw new NotImplementedException($"Update type {type} not implemented."),
         };
 
@@ -135,6 +138,7 @@ public class AzureDataManager : IDataUpdateService
         {
             IQuery query => _queryUpdater.IsNewOrStale(query, refreshCooldown),
             IPullRequestSearch pullRequestSearch => _pullRequestSearchUpdater.IsNewOrStale(pullRequestSearch, refreshCooldown),
+            IDefinitionSearch pipeline => _pipelineUpdater.IsNewOrStale(pipeline, refreshCooldown),
             _ => throw new NotImplementedException($"Update type {parameters.UpdateType} not implemented."),
         };
     }
