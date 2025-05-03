@@ -78,7 +78,7 @@ public class Definition : IDefinition
         var existingDefinition = GetByInternalId(dataStore, definition.InternalId);
         if (existingDefinition != null)
         {
-            if (definition.CreationDate - existingDefinition.CreationDate < _updateThreshold)
+            if (definition.TimeUpdated - existingDefinition.TimeUpdated < _updateThreshold)
             {
                 return existingDefinition;
             }
