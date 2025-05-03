@@ -201,12 +201,12 @@ public class AzureClientHelpers
             if (ex.InnerException is VssResourceNotFoundException)
             {
                 log.Error(ex, $"Vss Resource Not Found for {azureUri}");
-                return new InfoResult(azureUri, InfoType.Repository, ResultType.Failure, ErrorType.VssResourceNotFound, ex);
+                return new InfoResult(azureUri, InfoType.Project, ResultType.Failure, ErrorType.VssResourceNotFound, ex);
             }
             else
             {
                 log.Error(ex, $"Failed getting repository info for: {azureUri}");
-                return new InfoResult(azureUri, InfoType.Repository, ResultType.Failure, ErrorType.Unknown, ex);
+                return new InfoResult(azureUri, InfoType.Project, ResultType.Failure, ErrorType.Unknown, ex);
             }
         }
     }
