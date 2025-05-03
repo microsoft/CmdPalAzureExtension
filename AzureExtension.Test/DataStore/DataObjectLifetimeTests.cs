@@ -79,4 +79,64 @@ public partial class DataStoreTests
         Assert.AreEqual(2, dataStoreDefinitions[0].Id);
         Assert.AreEqual("TestDefinition2", dataStoreDefinitions[0].Name);
     }
+
+    [TestMethod]
+    public void UpdatingFreshDefinition()
+    {
+        using var dataStore = new DataStore("TestStore", TestHelpers.GetDataStoreFilePath(TestOptions), TestOptions.DataStoreOptions.DataStoreSchema!);
+        dataStore.Create();
+
+        using var tx = dataStore.Connection!.BeginTransaction();
+
+        var now = DateTime.UtcNow;
+        dataStore.Connection.Insert(new Project { Id = 1, Name = "TestProject" });
+
+        var definition = new Definition { InternalId = 1, Name = "TestDefinition1", ProjectId = 1, TimeUpdated = now.ToDataStoreInteger() };
+        dataStore.Connection.Insert(definition);
+
+        var secondDefinition = new Definition
+        {
+            InternalId = 1,
+            Name = "TestDefinition2",
+            ProjectId = 1,
+            TimeUpdated = now.ToDataStoreInteger() + 100,
+        };
+
+        Definition.AddOrUpdate(dataStore, secondDefinition);
+
+        tx.Commit();
+
+        var dsDefinition = dataStore.Connection.Get<Definition>(1);
+        Assert.AreEqual("TestDefinition1", dsDefinition.Name);
+    }
+
+    [TestMethod]
+    public void UpdatingOldDefinition()
+    {
+        using var dataStore = new DataStore("TestStore", TestHelpers.GetDataStoreFilePath(TestOptions), TestOptions.DataStoreOptions.DataStoreSchema!);
+        dataStore.Create();
+
+        using var tx = dataStore.Connection!.BeginTransaction();
+
+        var now = DateTime.UtcNow;
+        dataStore.Connection.Insert(new Project { Id = 1, Name = "TestProject" });
+
+        var definition = new Definition { InternalId = 1, Name = "TestDefinition1", ProjectId = 1, TimeUpdated = now.ToDataStoreInteger() };
+        dataStore.Connection.Insert(definition);
+
+        var secondDefinition = new Definition
+        {
+            InternalId = 1,
+            Name = "TestDefinition2",
+            ProjectId = 1,
+            TimeUpdated = now.ToDataStoreInteger() + TimeSpan.FromHours(5).ToDataStoreInteger(), // Update threshold is 4 hours
+        };
+
+        Definition.AddOrUpdate(dataStore, secondDefinition);
+
+        tx.Commit();
+
+        var dsDefinition = dataStore.Connection.Get<Definition>(1);
+        Assert.AreEqual("TestDefinition2", dsDefinition.Name);
+    }
 }
