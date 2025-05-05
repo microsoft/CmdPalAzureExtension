@@ -433,4 +433,76 @@
     <value>All</value>
     <comment>The option to select all active pull requests in a repository</comment>
   </data>
+  <data name="Commands_Remove_Search" xml:space="preserve">
+    <value>Remove</value>
+    <comment>Title for command to remove a query or pull request search</comment>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_CopyWorkItemId" xml:space="preserve">
+    <value>Copy Work Item ID</value>
+    <comment>The label for the command to copy the work item ID</comment>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_CopyURLCommand" xml:space="preserve">
+    <value>Copy Work Item URL</value>
+    <comment>The label for the command to copy a work item URL</comment>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_Reason" xml:space="preserve">
+    <value>Reason</value>
+    <comment>The label for the work item's "Reason" detail</comment>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_AssignedTo" xml:space="preserve">
+    <value>Assigned To</value>
+    <comment>The label for the work item's "Assigned To" detail</comment>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_Unassigned" xml:space="preserve">
+    <value>Unassigned</value>
+    <comment>The label for the work item's "Unassigned" detail</comment>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_LastChanged" xml:space="preserve">
+    <value>Last Changed</value>
+    <comment>The label for the work item's "Last Changed" detail</comment>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_CreatedDate" xml:space="preserve">
+    <value>Created</value>
+    <comment>The label for the work item's "Created Date" detail</comment>
+  </data>
+  <data name="Pages_PullRequestSearchPage_CopyIdCommand" xml:space="preserve">
+    <value>Copy Pull Request ID</value>
+    <comment>The label for the command to copy a pull request's ID</comment>
+  </data>
+  <data name="Pages_PullRequestSearchPage_CopyURLCommand" xml:space="preserve">
+    <value>Copy Pull Request URL</value>
+    <comment>The label for the command to copy the pull request URL</comment>
+  </data>
+  <data name="Pages_PullRequestSearchPage_Author" xml:space="preserve">
+    <value>Author</value>
+    <comment>Label for the pull request's "Author" detail</comment>
+  </data>
+  <data name="Pages_PullRequestSearchPage_UpdatedAt" xml:space="preserve">
+    <value>Last updated</value>
+    <comment>Label for the pull request's "Updated At" detail</comment>
+  </data>
+  <data name="Pages_PullRequestSearchPage_TargetBranch" xml:space="preserve">
+    <value>Target Branch</value>
+    <comment>Label for the pull request's "Target Branch" detail</comment>
+  </data>
+  <data name="Pages_PullRequestSearchPage_PolicyStatus" xml:space="preserve">
+    <value>Policy Status</value>
+    <comment>Label for the pull request's "Policy Status" detail</comment>
+  </data>
+  <data name="Pages_PullRequestSearchPage_PolicyStatusReason" xml:space="preserve">
+    <value>Policy Status Reason</value>
+    <comment>Label for the pull request's "Policy Status Reason" detail</comment>
+  </data>
+  <data name="Pages_PullRequestSearchPage_InternalId" xml:space="preserve">
+    <value>ID</value>
+    <comment>Label for the pull request's internal/ADO Id detail</comment>
+  </data>
+  <data name="Pages_PullRequestSearchPage_CreationDate" xml:space="preserve">
+    <value>Created</value>
+    <comment>Label for the pull request's "Creation Date" detail</comment>
+  </data>
+  <data name="Pages_PullRequestSearchPage_PolicyStatusReasonNone" xml:space="preserve">
+    <value>None provided</value>
+    <comment>This replaces the pull request's "Policy Status Reason" detail value when none was provided from ADO</comment>
+  </data>
 </root>
