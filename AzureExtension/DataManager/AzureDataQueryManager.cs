@@ -7,6 +7,7 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Serilog;
 using Query = AzureExtension.DataModel.Query;
 using TFModels = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
@@ -84,6 +85,10 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
         var queryId = new Guid(azureUri.Query);
 
         var queryResult = await _liveDataProvider.GetWorkItemQueryResultByIdAsync(vssConnection, project.InternalId, queryId, cancellationToken);
+
+        var client = vssConnection.GetClient<WorkItemTrackingHttpClient>();
+
+        var res = await client.GetQueriesAsync(project.InternalId, cancellationToken: cancellationToken);
 
         var workItemIds = new List<int>();
 

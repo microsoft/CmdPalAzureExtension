@@ -62,6 +62,19 @@ public class AzureLiveDataProvider : IAzureLiveDataProvider
         return await projectClient.GetProject(id);
     }
 
+    public async Task<IEnumerable<TeamProject>> GetTeamProjects(IVssConnection connection, CancellationToken cancellationToken)
+    {
+        var projectClient = connection.GetClient<ProjectHttpClient>();
+        var projectReferences = await projectClient.GetProjects();
+        var projects = new List<TeamProject>();
+        foreach (var project in projectReferences)
+        {
+            projects.Add(await GetTeamProject(connection, project.Id.ToString()));
+        }
+
+        return projects;
+    }
+
     public async Task<WorkItemQueryResult> GetWorkItemQueryResultByIdAsync(IVssConnection connection, string projectId, Guid queryId, CancellationToken cancellationToken)
     {
         var witClient = connection.GetClient<WorkItemTrackingHttpClient>();
