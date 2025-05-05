@@ -30,7 +30,7 @@ public partial class SavedQueriesPage : ListPage
         _resources = resources;
         Title = _resources.GetResource("Pages_SavedQueries");
         Name = _resources.GetResource("Pages_SavedQueries"); // Title is for the Page, Name is for the command
-        Icon = IconLoader.GetIcon("Search");
+        Icon = IconLoader.GetIcon("QueryList");
         _savedQueriesMediator = savedQueriesMediator;
         _savedQueriesMediator.QueryRemoved += OnQueryRemoved;
         _savedQueriesMediator.QueryRemoving += OnQueryRemoving;

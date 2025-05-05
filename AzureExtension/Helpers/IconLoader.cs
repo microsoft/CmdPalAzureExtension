@@ -33,6 +33,7 @@ public class IconLoader
             { "PullRequestReviewNotStarted", (@"Assets\PullRequestReviewNotStarted.png", @"Assets\PullRequestReviewNotStarted.png") },
             { "PullRequestWaiting", (@"Assets\PullRequestWaiting.png", @"Assets\PullRequestWaiting.png") },
             { "Query", (@"Assets\QueryLight.svg", @"Assets\QueryDark.svg") },
+            { "QueryList", (@"Assets\QueryListLight.svg", @"Assets\QueryListDark.svg") },
             { "Requirement", (@"Assets\Requirement.png", @"Assets\Requirement.png") },
             { "Review", (@"Assets\Review.png", @"Assets\Review.png") },
             { "Risk", (@"Assets\Risk.png", @"Assets\Risk.png") },
