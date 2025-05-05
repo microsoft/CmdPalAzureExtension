@@ -20,7 +20,7 @@ public partial class RemoveAzureSearchCommand : InvokableCommand
         _savedAzureSearchesMediator = savedAzureSearchesMediator;
         _azureSearchRepository = azureSearchRepository;
         _savedAzureSearch = azureSearch;
-        Name = _resources.GetResource("Commands_Remove_Saved_Search");
+        Name = _resources.GetResource("Commands_Remove_Search");
         Icon = IconLoader.GetIcon("Remove");
     }
 

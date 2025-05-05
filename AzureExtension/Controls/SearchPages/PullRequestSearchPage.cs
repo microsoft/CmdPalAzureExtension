@@ -72,7 +72,7 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
                     new DetailsElement()
                     {
                         Key = _resources.GetResource("Pages_PullRequestSearchPage_PolicyStatusReason"),
-                        Data = new DetailsLink() { Text = $"{item.PolicyStatusReason}" },
+                        Data = new DetailsLink() { Text = !string.IsNullOrEmpty(item.PolicyStatusReason) ? $"{item.PolicyStatusReason}" : _resources.GetResource("Pages_PullRequestSearchPage_PolicyStatusReasonNone") },
                     },
                     new DetailsElement()
                     {
