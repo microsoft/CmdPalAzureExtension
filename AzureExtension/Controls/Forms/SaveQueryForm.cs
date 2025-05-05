@@ -110,7 +110,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
     public Query CreateQueryFromJson(JsonNode? jsonNode)
     {
-        var queryUrl = jsonNode?["EnteredSearch"]?.ToString() ?? string.Empty;
+        var queryUrl = jsonNode?["EnteredQuery"]?.ToString() ?? string.Empty;
         var name = jsonNode?["Name"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
