@@ -534,7 +534,7 @@
     <comment>The error message if a pipeline search doesn't have a URL</comment>
   </data>
   <data name="Forms_SavePipelineSearch_URLPlaceholderSuffix" xml:space="preserve">
-    <value>project</value>
+    <value>project/_build?definitionId=######</value>
     <comment>The suffix for the pipeline search URL placeholder</comment>
   </data>
 </root>

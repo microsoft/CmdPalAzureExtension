@@ -171,7 +171,7 @@ public sealed class Program
 
         // The searchPageFactory requires an instance of IQueryRepository and ISavedPullRequestSearchRepository.
         // Currently, the PersistentDataManager implements both interfaces, so it is passed in twice.
-        var searchPageFactory = new SearchPageFactory(resources, dataProvider, savedAzureSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager, persistentDataManager);
+        var searchPageFactory = new SearchPageFactory(resources, dataProvider, savedAzureSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager, persistentDataManager, pipelinePersistentDataManager);
 
         var addQueryForm = new SaveQueryForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager);
         var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources.GetResource("Message_Query_Saved"), resources.GetResource("Message_Query_Saved_Error"), resources.GetResource("ListItems_AddQuery")), resources);
@@ -184,8 +184,8 @@ public sealed class Program
 
         var savePipelineSearchForm = new SavePipelineSearchForm(resources, pipelinePersistentDataManager, savedAzureSearchesMediator, accountProvider, azureClientHelpers);
         var savePipelineSearchPage = new SavePipelineSearchPage(resources, savePipelineSearchForm);
-        var addPipelineSearchListItem = new AddPipelineListItem(savePipelineSearchPage);
-        var savedPipelineSearchesPage = new SavedPipelineSearchesPage(resources, addPipelineSearchListItem);
+        var addPipelineSearchListItem = new AddPipelineSearchListItem(savePipelineSearchPage);
+        var savedPipelineSearchesPage = new SavedPipelineSearchesPage(resources, addPipelineSearchListItem, savedAzureSearchesMediator, pipelinePersistentDataManager, accountProvider, searchPageFactory);
 
         var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator, savedPipelineSearchesPage);
 

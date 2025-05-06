@@ -30,7 +30,7 @@ public class SavedPipelinesPage : ListPage
         {
             new ListItem(new PipelineDefinitionPage()),
             new ListItem(new BuildPage()),
-            new AddPipelineListItem(new SavePipelinePage(_resources)),
+            new AddPipelineSearchListItem(new SavePipelinePage(_resources)),
         };
     }
 }

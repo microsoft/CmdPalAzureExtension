@@ -29,7 +29,17 @@ public class SearchPageFactory : ISearchPageFactory
 
     private readonly ISavedPullRequestSearchRepository _savedPullRequestSearchRepository;
 
-    public SearchPageFactory(IResources resources, IDataProvider dataProvider, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository, ISavedPullRequestSearchRepository savedPullRequestSearchRepository)
+    private readonly IDefinitionRepository _definitionRepository;
+
+    public SearchPageFactory(
+        IResources resources,
+        IDataProvider dataProvider,
+        SavedAzureSearchesMediator mediator,
+        IAccountProvider accountProvider,
+        AzureClientHelpers azureClientHelpers,
+        IQueryRepository queryRepository,
+        ISavedPullRequestSearchRepository savedPullRequestSearchRepository,
+        IDefinitionRepository definitionRepository)
     {
         _resources = resources;
         _dataProvider = dataProvider;
@@ -38,6 +48,7 @@ public class SearchPageFactory : ISearchPageFactory
         _azureClientHelpers = azureClientHelpers;
         _queryRepository = queryRepository;
         _savedPullRequestSearchRepository = savedPullRequestSearchRepository;
+        _definitionRepository = definitionRepository;
     }
 
     public ListPage CreatePageForSearch(IAzureSearch search)
@@ -67,6 +78,12 @@ public class SearchPageFactory : ISearchPageFactory
             var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _savedPullRequestSearchRepository);
             var statusMessage = new StatusMessage();
             return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage, "Pull request search edited successfully", "error in editing pull request search");
+        }
+        else if (search is IDefinitionSearch)
+        {
+            var savePipelineSearchForm = new SavePipelineSearchForm(_resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
+            var statusMessage = new StatusMessage();
+            return new EditPipelineSearchPage(_resources, savePipelineSearchForm, statusMessage, "Pipeline search edited successfully", "error in editing pipeline search");
         }
         else
         {

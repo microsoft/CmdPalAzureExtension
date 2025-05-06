@@ -8,16 +8,16 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.ListItems
 {
-    public partial class AddPipelineListItem : ListItem
+    public partial class AddPipelineSearchListItem : ListItem
     {
-        public AddPipelineListItem(SavePipelinePage page)
+        public AddPipelineSearchListItem(SavePipelinePage page)
         : base(page)
         {
             Title = "Add Pipeline";
             Icon = IconLoader.GetIcon("Add");
         }
 
-        public AddPipelineListItem(SavePipelineSearchPage page)
+        public AddPipelineSearchListItem(SavePipelineSearchPage page)
         : base(page)
         {
             Title = "Add Pipelines by Project";
