@@ -15,6 +15,7 @@ public static class TemplateHelper
             "AuthTemplate" => "Controls\\Templates\\AuthTemplate.json",
             "SavePullRequestSearch" => "Controls\\Templates\\SavePullRequestSearchTemplate.json",
             "SaveQuery" => "Controls\\Templates\\SaveQueryTemplate.json",
+            "SavePipelineSearch" => "Controls\\Templates\\SavePipelineSearchTemplate.json",
             _ => throw new NotImplementedException($"Template for page '{page}' is not implemented."),
         };
     }

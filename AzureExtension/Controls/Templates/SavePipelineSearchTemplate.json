@@ -7,26 +7,19 @@
       "type": "TextBlock",
       "size": "Medium",
       "weight": "Bolder",
-      "text": "{{SaveQueryFormTitle}}",
+      "text": "{{SavePipelineSearchFormTitle}}",
       "horizontalAlignment": "Center",
       "wrap": true,
       "style": "heading"
     },
     {
       "type": "Input.Text",
-      "id": "Name",
-      "label": "{{NameLabel}}",
-      "errorMessage": "{{NameErrorMessage}}",
-      "value": "{{SavedQueryName}}"
-    },
-    {
-      "type": "Input.Text",
-      "id": "EnteredQuery",
-      "label": "{{EnteredQueryLabel}}",
+      "id": "EnteredPipelineSearch",
+      "label": "{{EnteredPipelineSearchLabel}}",
       "isRequired": true,
-      "errorMessage": "{{EnteredQueryErrorMessage}}",
-      "value": "{{SavedQueryString}}",
-      "placeholder": "https://microsoft.visualstudio.com/project/_queries/query/queryId"
+      "errorMessage": "{{EnteredPipelineSearchErrorMessage}}",
+      "value": "{{SavedPipelineSearchString}}",
+      "placeholder": "https://microsoft.visualstudio.com/{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}"
     },
     {
       "type": "ColumnSet",
@@ -52,9 +45,9 @@
   "actions": [
     {
       "type": "Action.Submit",
-      "title": "{{SaveQueryActionTitle}}",
+      "title": "{{SavePipelineSearchActionTitle}}",
       "data": {
-        "id": "SaveQueryAction"
+        "id": "SavePipelineSearchAction"
       }
     }
   ]

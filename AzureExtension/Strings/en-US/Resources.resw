@@ -157,8 +157,16 @@
     <value>Query is required</value>
     <comment>Shown if the user submits the form without entering a query</comment>
   </data>
+  <data name="Forms_SavePullRequestSearch_TemplateEnteredQueryError" xml:space="preserve">
+    <value>Query is required</value>
+    <comment>Shown if the user submits the form without entering a query</comment>
+  </data>
   <data name="Forms_SaveQuery_TemplateEnteredQueryLabel" xml:space="preserve">
     <value>Query string or URL:</value>
+    <comment>Shown as the label for the input text box for the Azure query</comment>
+  </data>
+  <data name="Forms_SavePipelineSearch_TemplateEnteredPipelineSearchLabel" xml:space="preserve">
+    <value>Project URL</value>
     <comment>Shown as the label for the input text box for the Azure query</comment>
   </data>
   <data name="Forms_SaveQuery_TemplateIsTopLevelTitle" xml:space="preserve">
@@ -174,6 +182,10 @@
     <comment>Shown as the name for the saved query</comment>
   </data>
   <data name="Forms_SaveQuery_TemplateSaveQueryActionTitle" xml:space="preserve">
+    <value>Save</value>
+    <comment>The title for the button that submits the form and saves the query</comment>
+  </data>
+  <data name="Forms_SavePipelineSearch_TemplateSavePipelineSearchActionTitle" xml:space="preserve">
     <value>Save</value>
     <comment>The title for the button that submits the form and saves the query</comment>
   </data>
@@ -365,6 +377,10 @@
     <value>Add query to the top level</value>
     <comment>The label for the checkbox that adds a query to the top-level commands</comment>
   </data>
+  <data name="Forms_SavePipelineSearch_TemplateIsTopLevelTitle" xml:space="preserve">
+    <value>Add pipeline search to the top level</value>
+    <comment>The label for the checkbox that adds a query to the top-level commands</comment>
+  </data>
   <data name="Forms_SignIn_TemplateAuthTitle" xml:space="preserve">
     <value>Sign into your Azure Dev Ops account</value>
     <comment>The title for the form displayed in the SignInPage</comment>
@@ -504,5 +520,21 @@
   <data name="Pages_PullRequestSearchPage_PolicyStatusReasonNone" xml:space="preserve">
     <value>None provided</value>
     <comment>This replaces the pull request's "Policy Status Reason" detail value when none was provided from ADO</comment>
+  </data>
+  <data name="Forms_Save_PipelineSearch" xml:space="preserve">
+    <value>Save Pipeline Search</value>
+    <comment>The title for the form to save a pipeline search</comment>
+  </data>
+  <data name="Forms_Edit_PipelineSearch" xml:space="preserve">
+    <value>Edit Pipeline Search</value>
+    <comment>The title for the form to edit a pipeline search</comment>
+  </data>
+  <data name="Forms_SavePipelineSearch_TemplateEnteredPipelineSearchError" xml:space="preserve">
+    <value>Project URL is required</value>
+    <comment>The error message if a pipeline search doesn't have a URL</comment>
+  </data>
+  <data name="Forms_SavePipelineSearch_URLPlaceholderSuffix" xml:space="preserve">
+    <value>project</value>
+    <comment>The suffix for the pipeline search URL placeholder</comment>
   </data>
 </root>
