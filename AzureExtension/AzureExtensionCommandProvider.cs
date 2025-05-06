@@ -84,6 +84,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             {
                 new(_savedQueriesPage),
                 new(_savedPullRequestSearchesPage),
+                new(new SavedPipelinesPage()),
                 new(_signOutPage)
                 {
                    Subtitle = _resources.GetResource("Forms_SignOut_PageTitle"),
