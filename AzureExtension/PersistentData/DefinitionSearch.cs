@@ -5,6 +5,7 @@
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
+using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
 
@@ -31,6 +32,10 @@ public class DefinitionSearch : IDefinitionSearch
             return new AzureUri(ProjectUrl);
         }
     }
+
+    public string Name => InternalId.ToStringInvariant();
+
+    public string Url => ProjectUrl;
 
     public static DefinitionSearch? Get(DataStore dataStore, long internalId, string projectUrl)
     {
