@@ -33,4 +33,6 @@ public interface IAzureLiveDataProvider
     Task<GitCommit> GetCommitAsync(IVssConnection connection, string commitId, Guid repositoryId, CancellationToken cancellationToken);
 
     Task<List<Build>> GetBuildsAsync(IVssConnection connection, string projectId, long definitionId, CancellationToken cancellationToken);
+
+    Task<BuildDefinition> GetDefinitionAsync(IVssConnection connection, string projectId, long definitionId, CancellationToken cancellationToken);
 }
