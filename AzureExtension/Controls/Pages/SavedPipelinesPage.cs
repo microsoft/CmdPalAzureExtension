@@ -4,7 +4,6 @@
 
 using AzureExtension.Controls.ListItems;
 using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
@@ -18,8 +17,11 @@ public class SavedPipelinesPage : ListPage
 
     public override IconInfo Icon => IconLoader.GetIcon("Logo");
 
-    public SavedPipelinesPage()
+    private readonly IResources _resources;
+
+    public SavedPipelinesPage(IResources resources)
     {
+        _resources = resources;
     }
 
     public override IListItem[] GetItems()
@@ -28,7 +30,7 @@ public class SavedPipelinesPage : ListPage
         {
             new ListItem(new PipelineDefinitionPage()),
             new ListItem(new BuildPage()),
-            new AddPipelineListItem(new SavePipelinePage()),
+            new AddPipelineListItem(new SavePipelinePage(_resources)),
         };
     }
 }
