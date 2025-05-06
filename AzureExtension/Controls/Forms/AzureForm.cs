@@ -23,7 +23,6 @@ public abstract class AzureForm : FormContent
 
     public override ICommandResult SubmitForm(string inputs, string data)
     {
-        LoadingStateChanged?.Invoke(this, true);
         Task.Run(async () =>
         {
             await HandleInputs(inputs);

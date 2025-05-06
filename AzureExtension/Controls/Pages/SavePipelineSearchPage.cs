@@ -13,14 +13,17 @@ public class SavePipelineSearchPage : ContentPage
 {
     private readonly IResources _resources;
 
-    public SavePipelineSearchPage(IResources resources)
+    private readonly SavePipelineSearchForm _savePipelineSearchForm;
+
+    public SavePipelineSearchPage(IResources resources, SavePipelineSearchForm savePipelineSearchForm)
     {
+        Title = "Save Pipeline Search";
         _resources = resources;
+        _savePipelineSearchForm = savePipelineSearchForm;
     }
 
     public override IContent[] GetContent()
     {
-        var content = new SavePipelineSearchForm(_resources);
-        return new[] { content };
+        return new[] { _savePipelineSearchForm };
     }
 }

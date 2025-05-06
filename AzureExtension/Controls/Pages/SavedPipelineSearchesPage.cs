@@ -20,9 +20,12 @@ public class SavedPipelineSearchesPage : ListPage
 
     private readonly IResources _resources;
 
-    public SavedPipelineSearchesPage(IResources resources)
+    private readonly AddPipelineListItem _addPipelineListItem;
+
+    public SavedPipelineSearchesPage(IResources resources, AddPipelineListItem addPipelineListItem)
     {
         _resources = resources;
+        _addPipelineListItem = addPipelineListItem;
     }
 
     public override IListItem[] GetItems()
@@ -31,7 +34,7 @@ public class SavedPipelineSearchesPage : ListPage
         {
             new ListItem(new PipelineDefinitionPage()),
             new ListItem(new BuildPage()),
-            new AddPipelineListItem(new SavePipelineSearchPage(_resources)),
+            _addPipelineListItem,
         };
     }
 }

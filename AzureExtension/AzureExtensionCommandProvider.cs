@@ -31,7 +31,19 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly AuthenticationMediator _authenticationMediator;
 
-    public AzureExtensionCommandProvider(SignInPage signInPage, SignOutPage signOutPage, IAccountProvider accountProvider, SavedQueriesPage savedQueriesPage, IResources resources, SavedPullRequestSearchesPage savedPullRequestSearchesPage, ISearchPageFactory searchPageFactory, SavedAzureSearchesMediator mediator, AuthenticationMediator authenticationMediator)
+    private readonly SavedPipelineSearchesPage _savedPipelineSearchesPage;
+
+    public AzureExtensionCommandProvider(
+        SignInPage signInPage,
+        SignOutPage signOutPage,
+        IAccountProvider accountProvider,
+        SavedQueriesPage savedQueriesPage,
+        IResources resources,
+        SavedPullRequestSearchesPage savedPullRequestSearchesPage,
+        ISearchPageFactory searchPageFactory,
+        SavedAzureSearchesMediator mediator,
+        AuthenticationMediator authenticationMediator,
+        SavedPipelineSearchesPage savedPipelineSearchesPage)
     {
         _signInPage = signInPage;
         _signOutPage = signOutPage;
@@ -42,6 +54,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _searchPageFactory = searchPageFactory;
         _savedSearchesMediator = mediator;
         _authenticationMediator = authenticationMediator;
+        _savedPipelineSearchesPage = savedPipelineSearchesPage;
         DisplayName = "Azure Extension"; // hard-coded because it's a product title
 
         _savedSearchesMediator.QuerySaved += OnSearchUpdated;
@@ -50,6 +63,8 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _savedSearchesMediator.PullRequestSearchRemoved += OnSearchUpdated;
         _authenticationMediator.SignInAction += OnSignInStatusChanged;
         _authenticationMediator.SignOutAction += OnSignInStatusChanged;
+        _savedSearchesMediator.PipelineSearchSaved += OnSearchUpdated;
+        _savedSearchesMediator.PipelineSearchRemoved += OnSearchUpdated;
     }
 
     private void OnSignInStatusChanged(object? sender, SignInStatusChangedEventArgs e)
@@ -84,7 +99,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             {
                 new(_savedQueriesPage),
                 new(_savedPullRequestSearchesPage),
-                new(new SavedPipelineSearchesPage(_resources)),
+                new(_savedPipelineSearchesPage),
                 new(new SavedPipelinesPage(_resources)),
                 new(_signOutPage)
                 {

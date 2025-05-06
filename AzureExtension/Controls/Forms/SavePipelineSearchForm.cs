@@ -88,6 +88,8 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
     public override Task HandleInputs(string inputs)
     {
+        LoadingStateChanged?.Invoke(this, true);
+
         try
         {
             var payloadJson = JsonNode.Parse(inputs) ?? throw new InvalidOperationException("No search found");
