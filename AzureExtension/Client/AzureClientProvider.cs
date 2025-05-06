@@ -52,7 +52,7 @@ public class AzureClientProvider : IConnectionProvider, IDisposable
         return _factory.CreateVssConnection(azureUri.Connection, credentials);
     }
 
-    public ConnectionResult CreateVssConnectionResult(Uri uri, IAccount account)
+    public async Task<ConnectionResult> CreateVssConnectionResult(Uri uri, IAccount account)
     {
         var azureUri = new AzureUri(uri);
         if (!azureUri.IsValid)
@@ -64,7 +64,7 @@ public class AzureClientProvider : IConnectionProvider, IDisposable
         VssCredentials? credentials;
         try
         {
-            credentials = _accountProvider.GetCredentials(account);
+            credentials = await _accountProvider.GetCredentialsAsync(account);
             if (credentials == null)
             {
                 _log.Error($"Unable to get credentials for developerId");
@@ -178,7 +178,7 @@ public class AzureClientProvider : IConnectionProvider, IDisposable
         return newConnection;
     }
 
-    public ConnectionResult GetVssConnectionResult(Uri uri, IAccount account)
+    public Task<ConnectionResult> GetVssConnectionResult(Uri uri, IAccount account)
     {
         return CreateVssConnectionResult(uri, account);
     }
@@ -210,36 +210,6 @@ public class AzureClientProvider : IConnectionProvider, IDisposable
         }
 
         return connection.GetClient<T>();
-    }
-
-    public ConnectionResult GetAzureDevOpsClient<T>(string uri, IAccount account)
-        where T : VssHttpClientBase
-    {
-        var azureUri = new AzureUri(uri);
-        if (!azureUri.IsValid)
-        {
-            _log.Information($"Cannot GetClient as uri validation failed: value of uri {uri}");
-            return new ConnectionResult(ResultType.Failure, ErrorType.InvalidArgument, false);
-        }
-
-        return GetAzureDevOpsClient<T>(azureUri.Uri, account);
-    }
-
-    public ConnectionResult GetAzureDevOpsClient<T>(Uri uri, IAccount account)
-       where T : VssHttpClientBase
-    {
-        var connectionResult = GetVssConnectionResult(uri, account);
-        if (connectionResult.Result == ResultType.Failure)
-        {
-            return connectionResult;
-        }
-
-        if (connectionResult.Connection != null)
-        {
-            return new ConnectionResult(uri, connectionResult.Connection.GetClient<T>(), connectionResult.Connection);
-        }
-
-        return new ConnectionResult(ResultType.Failure, ErrorType.FailedGettingClient, false);
     }
 
     public Guid GetAuthorizedEntityId(Uri connection, IAccount account)

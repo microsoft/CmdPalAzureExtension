@@ -82,16 +82,15 @@ public partial class PersistentDataManager : ISavedPullRequestSearchRepository
         return Task.CompletedTask;
     }
 
-    public bool ValidatePullRequestSearch(IPullRequestSearch pullRequestSearch, IAccount account)
+    public Task ValidatePullRequestSearch(IPullRequestSearch pullRequestSearch, IAccount account)
     {
-        var repositoryInfo = _azureValidator.GetRepositoryInfo(pullRequestSearch.Url, account);
-        return repositoryInfo.Result == ResultType.Success;
+        return _azureValidator.GetRepositoryInfo(pullRequestSearch.Url, account);
     }
 
     public void UpdatePullRequestSearchTopLevelStatus(IPullRequestSearch pullRequestSearch, bool isTopLevel, IAccount account)
     {
         ValidateDataStore();
-        ValidatePullRequestSearch(pullRequestSearch, account);
+        ValidatePullRequestSearch(pullRequestSearch, account).Wait();
         PullRequestSearch.AddOrUpdate(_dataStore, pullRequestSearch.Url, pullRequestSearch.Name, pullRequestSearch.View, isTopLevel);
     }
 }
