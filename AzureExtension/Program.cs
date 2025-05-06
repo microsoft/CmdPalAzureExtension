@@ -153,6 +153,7 @@ public sealed class Program
         persistentDataStore.Create();
 
         var persistentDataManager = new PersistentDataManager(persistentDataStore, azureValidator);
+        var pipelinePersistentDataManager = new PersistentDataManagerDefinitionSearch(persistentDataStore, azureValidator, azureLiveDataProvider, azureClientProvider);
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);

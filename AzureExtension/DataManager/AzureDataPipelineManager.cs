@@ -55,8 +55,6 @@ public class AzureDataPipelineManager : IPipelineProvider, IPipelineUpdater
         var account = await _accountProvider.GetDefaultAccountAsync();
         var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Uri, account);
 
-        var client = vssConnection.GetClient<BuildHttpClient>();
-
         // Good practice to only create data after we know the client is valid, but any exceptions
         // will roll back the transaction.
         var org = Organization.GetOrCreate(_dataStore, azureUri.Connection);
