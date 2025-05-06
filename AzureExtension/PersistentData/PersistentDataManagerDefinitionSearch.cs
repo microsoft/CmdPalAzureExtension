@@ -68,8 +68,7 @@ public class PersistentDataManagerDefinitionSearch : IDefinitionRepository
     {
         var azureUri = new AzureUri(definitionSearch.ProjectUrl);
         var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
-        var client = vssConnection.GetClient<BuildHttpClient>();
-        var definitionBuild = await client.GetDefinitionAsync(azureUri.Project, (int)definitionSearch.InternalId);
+        var definitionBuild = await _liveDataProvider.GetDefinitionAsync(vssConnection, azureUri.Project, definitionSearch.InternalId, CancellationToken.None);
         return new Definition { InternalId = definitionBuild.Id, Name = definitionBuild.Name };
     }
 

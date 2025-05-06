@@ -14,7 +14,7 @@ using WorkItem = AzureExtension.DataModel.WorkItem;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
+public class AzureDataQueryManager : IDataQueryProvider, IDataUpdater
 {
     private readonly TimeSpan _queryWorkItemDeletionTime = TimeSpan.FromMinutes(2);
 
@@ -53,6 +53,11 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
     {
         var dsQuery = GetQuery(query);
         return dsQuery == null || DateTime.UtcNow - dsQuery.UpdatedAt > refreshCooldown;
+    }
+
+    public bool IsNewOrStale(DataUpdateParameters parameters, TimeSpan refreshCooldown)
+    {
+        return IsNewOrStale((parameters.UpdateObject as IQuery)!, refreshCooldown);
     }
 
     public IEnumerable<IWorkItem> GetWorkItems(IQuery query)
@@ -159,5 +164,10 @@ public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider
         }
 
         QueryWorkItem.DeleteBefore(_dataStore, dsQuery, DateTime.UtcNow - _queryWorkItemDeletionTime);
+    }
+
+    public Task UpdateData(DataUpdateParameters parameters)
+    {
+        return UpdateQueryAsync((parameters.UpdateObject as IQuery)!, parameters.CancellationToken.GetValueOrDefault());
     }
 }

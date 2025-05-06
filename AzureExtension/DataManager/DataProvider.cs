@@ -17,13 +17,6 @@ public class DataProvider : IDataProvider
     private readonly IDataPullRequestSearchProvider _pullRequestSearchProvider;
     private readonly IPipelineProvider _pipelineProvider;
 
-    public static readonly string IdentityRefFieldValueName = "Microsoft.VisualStudio.Services.WebApi.IdentityRef";
-    public static readonly string SystemIdFieldName = "System.Id";
-    public static readonly string WorkItemHtmlUrlFieldName = "DevHome.AzureExtension.WorkItemHtmlUrl";
-    public static readonly string WorkItemTypeFieldName = "System.WorkItemType";
-
-    public static readonly int PullRequestResultLimit = 25;
-
     private CacheManagerUpdateEventHandler? _onUpdate;
 
     public event CacheManagerUpdateEventHandler? OnUpdate
