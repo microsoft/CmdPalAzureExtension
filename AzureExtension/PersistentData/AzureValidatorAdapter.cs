@@ -51,4 +51,22 @@ public class AzureValidatorAdapter : IAzureValidator
             return repositoryInfo;
         }
     }
+
+    public InfoResult GetDefinitionInfo(string searchUrl, long definitionId, IAccount account)
+    {
+        if (string.IsNullOrEmpty(searchUrl))
+        {
+            throw new InvalidOperationException("Search URL cannot be null or empty.");
+        }
+
+        var searchInfo = _azureClientHelpers.GetDefinitionInfo(searchUrl, definitionId, account);
+        if (searchInfo.Result != ResultType.Success)
+        {
+            throw new InvalidOperationException(searchInfo.ErrorMessage);
+        }
+        else
+        {
+            return searchInfo;
+        }
+    }
 }

@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
@@ -30,4 +31,6 @@ public interface IAzureLiveDataProvider
     Task<List<PolicyEvaluationRecord>> GetPolicyEvaluationsAsync(IVssConnection connection, string projectId, string artifactId, CancellationToken cancellationToken);
 
     Task<GitCommit> GetCommitAsync(IVssConnection connection, string commitId, Guid repositoryId, CancellationToken cancellationToken);
+
+    Task<List<Build>> GetBuildsAsync(IVssConnection connection, string projectId, long definitionId, CancellationToken cancellationToken);
 }

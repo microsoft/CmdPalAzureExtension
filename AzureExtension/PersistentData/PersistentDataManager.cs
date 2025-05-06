@@ -12,7 +12,7 @@ namespace AzureExtension.PersistentData;
 
 public partial class PersistentDataManager : IQueryRepository
 {
-    private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", nameof(PersistentDataManager)));
+    private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", nameof(PersistentDataManager)));
 
     private static readonly ILogger _log = _logger.Value;
 

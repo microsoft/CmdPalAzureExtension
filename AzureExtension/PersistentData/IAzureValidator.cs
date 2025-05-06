@@ -12,4 +12,6 @@ public interface IAzureValidator
     InfoResult GetQueryInfo(string queryUrl, IAccount account);
 
     InfoResult GetRepositoryInfo(string repositoryUrl, IAccount account);
+
+    InfoResult GetDefinitionInfo(string searchUrl, long definitionId, IAccount account);
 }

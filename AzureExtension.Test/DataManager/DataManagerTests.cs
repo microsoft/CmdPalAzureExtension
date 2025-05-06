@@ -69,7 +69,8 @@ public class DataManagerTests
         var stubConnectionProvider = new Mock<IConnectionProvider>().Object;
         var queryManager = new AzureDataQueryManager(dataStore, stubAccountProvider, stubLiveDataProvider, stubConnectionProvider);
         var prsearchManager = new AzureDataPullRequestSearchManager(dataStore, stubAccountProvider, stubLiveDataProvider, stubAuthProvider);
-        var azureDataManager = new AzureDataManager(dataStore, queryManager, prsearchManager);
+        var pipelineManager = new AzureDataPipelineManager(dataStore, stubAccountProvider, stubLiveDataProvider, stubConnectionProvider);
+        var azureDataManager = new AzureDataManager(dataStore, queryManager, prsearchManager, pipelineManager);
         Assert.IsNotNull(azureDataManager);
         CleanUpDataStore(dataStore);
     }

@@ -17,7 +17,7 @@ public class AzureDataStoreSchema : IDataStoreSchema
     }
 
     // Update this anytime incompatible changes happen with a released version.
-    private const long SchemaVersionValue = 0x0008;
+    private const long SchemaVersionValue = 0x0009;
 
     private const string Metadata =
     @"CREATE TABLE Metadata (" +
@@ -226,6 +226,34 @@ public class AzureDataStoreSchema : IDataStoreSchema
         "TimeCreated INTEGER NOT NULL" +
     ");";
 
+    private const string Definition =
+    @"CREATE TABLE Definition (" +
+        "Id INTEGER PRIMARY KEY NOT NULL," +
+        "InternalId INTEGER NOT NULL," +
+        "Name TEXT NOT NULL COLLATE NOCASE," +
+        "ProjectId INTEGER NOT NULL," +
+        "CreationDate INTEGER NOT NULL," +
+        "HtmlUrl TEXT NOT NULL COLLATE NOCASE," +
+        "TimeUpdated INTEGER NOT NULL" +
+    ");";
+
+    private const string Build =
+    @"CREATE TABLE Build (" +
+        "Id INTEGER PRIMARY KEY NOT NULL," +
+        "InternalId INTEGER NOT NULL," +
+        "BuildNumber TEXT NOT NULL COLLATE NOCASE," +
+        "Status TEXT NOT NULL COLLATE NOCASE," +
+        "Result TEXT NOT NULL COLLATE NOCASE," +
+        "QueueTime INTEGER NOT NULL," +
+        "StartTime INTEGER NOT NULL," +
+        "FinishTime INTEGER NOT NULL," +
+        "Url TEXT NOT NULL COLLATE NOCASE," +
+        "DefinitionId INTEGER NOT NULL," +
+        "SourceBranch TEXT NOT NULL COLLATE NOCASE," +
+        "RequesterId INTEGER NOT NULL," +
+        "TimeUpdated INTEGER NOT NULL" +
+    ");";
+
     private const string Notification =
     @"CREATE TABLE Notification (" +
         "Id INTEGER PRIMARY KEY NOT NULL," +
@@ -259,6 +287,8 @@ public class AzureDataStoreSchema : IDataStoreSchema
         PullRequest,
         PullRequestSearchPullRequest,
         PullRequestPolicyStatus,
+        Definition,
+        Build,
         Notification,
     ];
 }

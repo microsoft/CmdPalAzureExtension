@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.Identity.Client;
+using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
@@ -153,5 +154,65 @@ public class AzureClientHelpers
     public InfoResult GetRepositoryInfo(Uri uri, IAccount account)
     {
         return GetRepositoryInfo(new AzureUri(uri), account);
+    }
+
+    public InfoResult GetDefinitionInfo(AzureUri azureUri, long definitionId, IAccount account)
+    {
+        var log = Log.ForContext("SourceContext", nameof(InfoResult));
+        if (account == null)
+        {
+            return new InfoResult(azureUri, InfoType.Project, ResultType.Failure, ErrorType.NullDeveloperId);
+        }
+
+        if (string.IsNullOrEmpty(azureUri.ToString()))
+        {
+            return new InfoResult(azureUri, InfoType.Project, ResultType.Failure, ErrorType.EmptyUri);
+        }
+
+        if (!azureUri.IsValid)
+        {
+            return new InfoResult(azureUri, InfoType.Project, ResultType.Failure, ErrorType.InvalidUri);
+        }
+
+        try
+        {
+            var connectionResult = _azureClientProvider.GetVssConnectionResult(azureUri.Connection, account);
+            if (connectionResult.Result != ResultType.Success)
+            {
+                return new InfoResult(azureUri, InfoType.Project, ResultType.Failure, connectionResult.Error, connectionResult.Exception);
+            }
+
+            var buildClient = connectionResult.Connection!.GetClient<BuildHttpClient>();
+            if (buildClient == null)
+            {
+                return new InfoResult(azureUri, InfoType.Project, ResultType.Failure, ErrorType.FailedGettingClient);
+            }
+
+            var getDefinitionResult = buildClient.GetDefinitionAsync(azureUri.Project, (int)definitionId).Result;
+            if (getDefinitionResult == null)
+            {
+                return new InfoResult(azureUri, InfoType.Project, ResultType.Failure, ErrorType.DefinitionNotFound);
+            }
+
+            return new InfoResult(azureUri, InfoType.Project, getDefinitionResult.Name, $"{getDefinitionResult.Id}");
+        }
+        catch (Exception ex)
+        {
+            if (ex.InnerException is VssResourceNotFoundException)
+            {
+                log.Error(ex, $"Vss Resource Not Found for {azureUri}");
+                return new InfoResult(azureUri, InfoType.Project, ResultType.Failure, ErrorType.VssResourceNotFound, ex);
+            }
+            else
+            {
+                log.Error(ex, $"Failed getting repository info for: {azureUri}");
+                return new InfoResult(azureUri, InfoType.Project, ResultType.Failure, ErrorType.Unknown, ex);
+            }
+        }
+    }
+
+    public InfoResult GetDefinitionInfo(string uri, long definitionId, IAccount account)
+    {
+        return GetDefinitionInfo(new AzureUri(uri), definitionId, account);
     }
 }
