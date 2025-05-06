@@ -84,6 +84,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
             {
                 new(_savedQueriesPage),
                 new(_savedPullRequestSearchesPage),
+                new(new SavedPipelineSearchesPage(_resources)),
                 new(new SavedPipelinesPage(_resources)),
                 new(_signOutPage)
                 {

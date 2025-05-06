@@ -16,5 +16,12 @@ namespace AzureExtension.Controls.ListItems
             Title = "Add Pipeline";
             Icon = IconLoader.GetIcon("Add");
         }
+
+        public AddPipelineListItem(SavePipelineSearchPage page)
+        : base(page)
+        {
+            Title = "Add Pipelines by Project";
+            Icon = IconLoader.GetIcon("Add");
+        }
     }
 }
