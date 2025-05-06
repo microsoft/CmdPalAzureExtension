@@ -14,7 +14,7 @@ using PullRequestSearch = AzureExtension.DataModel.PullRequestSearch;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, IDataPullRequestSearchProvider, IDataUpdater
+public class AzureDataPullRequestSearchManager : IDataPullRequestSearchProvider, IDataUpdater
 {
     private readonly TimeSpan _pullRequestSearchDeletionTime = TimeSpan.FromMinutes(2);
 

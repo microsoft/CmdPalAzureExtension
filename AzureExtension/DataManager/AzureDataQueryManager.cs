@@ -14,7 +14,7 @@ using WorkItem = AzureExtension.DataModel.WorkItem;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataQueryManager : IDataQueryUpdater, IDataQueryProvider, IDataUpdater
+public class AzureDataQueryManager : IDataQueryProvider, IDataUpdater
 {
     private readonly TimeSpan _queryWorkItemDeletionTime = TimeSpan.FromMinutes(2);
 

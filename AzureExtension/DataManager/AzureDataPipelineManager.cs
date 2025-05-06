@@ -12,7 +12,7 @@ using Build = AzureExtension.DataModel.Build;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataPipelineManager : IPipelineProvider, IPipelineUpdater, IDataUpdater
+public class AzureDataPipelineManager : IPipelineProvider, IDataUpdater
 {
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
