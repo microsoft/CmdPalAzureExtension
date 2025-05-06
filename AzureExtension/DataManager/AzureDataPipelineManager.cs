@@ -12,7 +12,7 @@ using Build = AzureExtension.DataModel.Build;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataPipelineManager : IPipelineProvider, IPipelineUpdater
+public class AzureDataPipelineManager : IPipelineProvider, IPipelineUpdater, IDataUpdater
 {
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
@@ -49,6 +49,11 @@ public class AzureDataPipelineManager : IPipelineProvider, IPipelineUpdater
         return dsDefinition == null || DateTime.UtcNow - dsDefinition.UpdatedAt > refreshCooldown;
     }
 
+    public bool IsNewOrStale(DataUpdateParameters parameters, TimeSpan refreshCooldown)
+    {
+        return IsNewOrStale((IDefinitionSearch)parameters.UpdateObject!, refreshCooldown);
+    }
+
     public async Task UpdatePipelineAsync(IDefinitionSearch definitionSearch, CancellationToken cancellationToken)
     {
         var azureUri = new AzureUri(definitionSearch.ProjectUrl);
@@ -74,5 +79,10 @@ public class AzureDataPipelineManager : IPipelineProvider, IPipelineUpdater
             var creator = Identity.GetOrCreateIdentity(_dataStore, build.RequestedBy, vssConnection, _liveDataProvider);
             var dsBuild = Build.GetOrCreate(_dataStore, build, dsDefinition.Id, creator.Id);
         }
+    }
+
+    public Task UpdateData(DataUpdateParameters parameters)
+    {
+        return UpdatePipelineAsync((IDefinitionSearch)parameters.UpdateObject!, parameters.CancellationToken.GetValueOrDefault());
     }
 }

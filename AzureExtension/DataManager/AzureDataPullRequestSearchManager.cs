@@ -14,7 +14,7 @@ using PullRequestSearch = AzureExtension.DataModel.PullRequestSearch;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, IDataPullRequestSearchProvider
+public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, IDataPullRequestSearchProvider, IDataUpdater
 {
     private readonly TimeSpan _pullRequestSearchDeletionTime = TimeSpan.FromMinutes(2);
 
@@ -70,6 +70,11 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
     {
         var dsPullRequestSearch = GetPullRequestSearch(pullRequestSearch);
         return dsPullRequestSearch == null || DateTime.UtcNow - dsPullRequestSearch.UpdatedAt > refreshCooldown;
+    }
+
+    public bool IsNewOrStale(DataUpdateParameters parameters, TimeSpan refreshCooldown)
+    {
+        return IsNewOrStale((parameters.UpdateObject as IPullRequestSearch)!, refreshCooldown);
     }
 
     public async Task UpdatePullRequestsAsync(IPullRequestSearch pullRequestSearch, CancellationToken cancellationToken)
@@ -240,5 +245,10 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchUpdater, 
                 status = PolicyStatus.Approved;
             }
         }
+    }
+
+    public Task UpdateData(DataUpdateParameters parameters)
+    {
+        return UpdatePullRequestsAsync((parameters.UpdateObject as IPullRequestSearch)!, parameters.CancellationToken.GetValueOrDefault());
     }
 }
