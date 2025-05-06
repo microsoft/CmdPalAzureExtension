@@ -90,7 +90,7 @@ public class SavedPipelineSearchesPage : ListPage
         var account = _accountProvider.GetDefaultAccount();
         var searches = _definitionRepository.GetAllDefinitionsAsync(true, account).Result.ToList();
 
-        if (searches.Any())
+        if (searches.Count != 0)
         {
             var searchPages = searches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch, _definitionRepository)).ToList();
 
