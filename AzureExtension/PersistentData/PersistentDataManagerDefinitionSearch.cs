@@ -136,16 +136,15 @@ public class PersistentDataManagerDefinitionSearch : IDefinitionRepository
         return Task.CompletedTask;
     }
 
-    public string ValidateDefinitionSearch(IDefinitionSearch definitionSearch, IAccount account)
+    public Task ValidateDefinitionSearch(IDefinitionSearch definitionSearch, IAccount account)
     {
-        var definitionInfo = _azureValidator.GetDefinitionInfo(definitionSearch.ProjectUrl, definitionSearch.InternalId, account);
-        return definitionInfo.Name;
+        return _azureValidator.GetDefinitionInfo(definitionSearch.ProjectUrl, definitionSearch.InternalId, account);
     }
 
     public void UpdateDefinitionSearchTopLevelStatus(IDefinitionSearch definitionSearch, bool isTopLevel, IAccount account)
     {
         ValidateDataStore();
-        ValidateDefinitionSearch(definitionSearch, account);
+        ValidateDefinitionSearch(definitionSearch, account).Wait();
         DefinitionSearch.AddOrUpdate(_dataStore, definitionSearch.InternalId, definitionSearch.ProjectUrl, isTopLevel);
     }
 }

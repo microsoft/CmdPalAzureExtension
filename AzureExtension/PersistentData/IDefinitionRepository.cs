@@ -15,5 +15,5 @@ public interface IDefinitionRepository
 
     void UpdateDefinitionSearchTopLevelStatus(IDefinitionSearch definitionSearch, bool isTopLevel, IAccount account);
 
-    string ValidateDefinitionSearch(IDefinitionSearch definitionSearch, IAccount account);
+    Task ValidateDefinitionSearch(IDefinitionSearch definitionSearch, IAccount account);
 }

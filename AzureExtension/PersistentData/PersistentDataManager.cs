@@ -105,8 +105,8 @@ public partial class PersistentDataManager : IQueryRepository
 
     public void UpdateQueryTopLevelStatus(IQuery query, bool isTopLevel, IAccount account)
     {
-        ValidateQuery(query, account);
         ValidateDataStore();
+        ValidateQuery(query, account).Wait();
         Query.AddOrUpdate(_dataStore, query.Name, query.Url, isTopLevel);
     }
 
@@ -117,11 +117,11 @@ public partial class PersistentDataManager : IQueryRepository
         var defaultTasks = new List<Task>();
         foreach (var query in queries)
         {
-            var task = Task.Run(() =>
+            var task = Task.Run(async () =>
             {
                 _log.Information($"Validating search: {query.Name} - {query.Url}.");
 
-                if (!ValidateQuery(query, account))
+                if (!await ValidateQuery(query, account))
                 {
                     _log.Error($"Search {query.Name}  -  {query.Url} is invalid.");
                     return;
@@ -143,9 +143,9 @@ public partial class PersistentDataManager : IQueryRepository
         await Task.WhenAll(defaultTasks);
     }
 
-    public bool ValidateQuery(IQuery query, IAccount account)
+    public async Task<bool> ValidateQuery(IQuery query, IAccount account)
     {
-        var queryInfo = _azureValidator.GetQueryInfo(query.Url, account);
+        var queryInfo = await _azureValidator.GetQueryInfo(query.Url, account);
         return queryInfo.Result == ResultType.Success;
     }
 

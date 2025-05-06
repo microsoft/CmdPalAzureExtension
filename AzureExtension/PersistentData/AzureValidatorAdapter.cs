@@ -16,57 +16,36 @@ public class AzureValidatorAdapter : IAzureValidator
         _azureClientHelpers = azureClientHelpers;
     }
 
-    public InfoResult GetQueryInfo(string queryUrl, IAccount account)
+    public async Task<InfoResult> GetQueryInfo(string queryUrl, IAccount account)
     {
-        if (string.IsNullOrEmpty(queryUrl))
-        {
-            throw new InvalidOperationException("Query URL or name cannot be null or empty.");
-        }
-
-        var queryInfo = _azureClientHelpers.GetQueryInfo(queryUrl, account);
+        var queryInfo = await _azureClientHelpers.GetInfo(queryUrl, account, InfoType.Query);
         if (queryInfo.Result != ResultType.Success)
         {
             throw new InvalidOperationException(queryInfo.ErrorMessage);
         }
-        else
-        {
-            return queryInfo;
-        }
+
+        return queryInfo;
     }
 
-    public InfoResult GetRepositoryInfo(string repositoryUrl, IAccount account)
+    public async Task<InfoResult> GetRepositoryInfo(string repositoryUrl, IAccount account)
     {
-        if (string.IsNullOrEmpty(repositoryUrl))
-        {
-            throw new InvalidOperationException("Repository URL cannot be null or empty.");
-        }
-
-        var repositoryInfo = _azureClientHelpers.GetRepositoryInfo(repositoryUrl, account);
+        var repositoryInfo = await _azureClientHelpers.GetInfo(repositoryUrl, account, InfoType.Repository);
         if (repositoryInfo.Result != ResultType.Success)
         {
             throw new InvalidOperationException(repositoryInfo.ErrorMessage);
         }
-        else
-        {
-            return repositoryInfo;
-        }
+
+        return repositoryInfo;
     }
 
-    public InfoResult GetDefinitionInfo(string searchUrl, long definitionId, IAccount account)
+    public async Task<InfoResult> GetDefinitionInfo(string searchUrl, long definitionId, IAccount account)
     {
-        if (string.IsNullOrEmpty(searchUrl))
-        {
-            throw new InvalidOperationException("Search URL cannot be null or empty.");
-        }
-
-        var searchInfo = _azureClientHelpers.GetDefinitionInfo(searchUrl, definitionId, account);
+        var searchInfo = await _azureClientHelpers.GetInfo(searchUrl, account, InfoType.Definition, definitionId);
         if (searchInfo.Result != ResultType.Success)
         {
             throw new InvalidOperationException(searchInfo.ErrorMessage);
         }
-        else
-        {
-            return searchInfo;
-        }
+
+        return searchInfo;
     }
 }

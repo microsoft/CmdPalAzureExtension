@@ -115,7 +115,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
         var account = _accountProvider.GetDefaultAccount();
-        var queryInfo = _azureClientHelpers.GetQueryInfo(queryUrl, account);
+        var queryInfo = _azureClientHelpers.GetInfo(queryUrl, account, InfoType.Query).Result;
 
         if (queryInfo.Result != ResultType.Success)
         {

@@ -9,9 +9,9 @@ namespace AzureExtension.PersistentData;
 
 public interface IAzureValidator
 {
-    InfoResult GetQueryInfo(string queryUrl, IAccount account);
+    Task<InfoResult> GetQueryInfo(string queryUrl, IAccount account);
 
-    InfoResult GetRepositoryInfo(string repositoryUrl, IAccount account);
+    Task<InfoResult> GetRepositoryInfo(string repositoryUrl, IAccount account);
 
-    InfoResult GetDefinitionInfo(string searchUrl, long definitionId, IAccount account);
+    Task<InfoResult> GetDefinitionInfo(string searchUrl, long definitionId, IAccount account);
 }
