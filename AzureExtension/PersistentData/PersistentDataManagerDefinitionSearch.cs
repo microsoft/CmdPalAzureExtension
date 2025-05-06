@@ -11,7 +11,7 @@ using Serilog;
 
 namespace AzureExtension.PersistentData;
 
-public class PersistentDataManagerDefinitionSearch
+public class PersistentDataManagerDefinitionSearch : IDefinitionRepository
 {
     private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", nameof(PersistentDataManager)));
     private static readonly ILogger _log = _logger.Value;
