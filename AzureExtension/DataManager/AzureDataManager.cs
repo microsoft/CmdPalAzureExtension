@@ -2,15 +2,11 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataManager.Cache;
 using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using Serilog;
-using PullRequestSearch = AzureExtension.DataModel.PullRequestSearch;
-using Query = AzureExtension.DataModel.Query;
-using WorkItem = AzureExtension.DataModel.WorkItem;
 
 namespace AzureExtension.DataManager;
 
@@ -20,9 +16,7 @@ public class AzureDataManager : IDataUpdateService
     private readonly DataStore _dataStore;
     private readonly IDictionary<DataUpdateType, IDataUpdater> _dataUpdaters;
 
-    public AzureDataManager(
-        DataStore dataStore,
-        IDictionary<DataUpdateType, IDataUpdater> dataUpdaters)
+    public AzureDataManager(DataStore dataStore, IDictionary<DataUpdateType, IDataUpdater> dataUpdaters)
     {
         _log = Log.ForContext("SourceContext", nameof(AzureDataManager));
         _dataStore = dataStore;
@@ -67,23 +61,6 @@ public class AzureDataManager : IDataUpdateService
         return (ex is OperationCanceledException) || (ex is TaskCanceledException);
     }
 
-    private readonly TimeSpan _queryRetentionTime = TimeSpan.FromDays(7);
-    private readonly TimeSpan _pullRequestSearchRetentionTime = TimeSpan.FromDays(7);
-    private readonly TimeSpan _pipelineRetentionTime = TimeSpan.FromDays(7);
-
-    // Removes unused data from the datastore.
-    private void PruneObsoleteData()
-    {
-        Query.DeleteBefore(_dataStore, DateTime.UtcNow - _queryRetentionTime);
-        PullRequestSearch.DeleteBefore(_dataStore, DateTime.UtcNow - _pullRequestSearchRetentionTime);
-        QueryWorkItem.DeleteUnreferenced(_dataStore);
-        PullRequestSearchPullRequest.DeleteUnreferenced(_dataStore);
-        WorkItem.DeleteNotReferencedByQuery(_dataStore);
-        PullRequest.DeleteNotReferencedBySearch(_dataStore);
-        Build.DeleteBefore(_dataStore, DateTime.UtcNow - _pipelineRetentionTime);
-        Definition.DeleteUnreferenced(_dataStore);
-    }
-
     private async Task PerformUpdateAsync(DataUpdateParameters parameters, Func<Task> asyncOperation)
     {
         using var tx = _dataStore.Connection!.BeginTransaction();
@@ -91,7 +68,6 @@ public class AzureDataManager : IDataUpdateService
         try
         {
             await asyncOperation();
-            PruneObsoleteData();
 
             // SetLastUpdatedInMetaData();
         }
@@ -118,12 +94,34 @@ public class AzureDataManager : IDataUpdateService
     {
         var type = parameters.UpdateType;
 
-        if (!_dataUpdaters.TryGetValue(type, out var updater))
+        Func<Task> updateOperation;
+
+        if (type == DataUpdateType.All)
         {
-            throw new NotImplementedException($"Update type {type} not implemented.");
+            updateOperation = async () =>
+            {
+                foreach (var updater in _dataUpdaters.Values)
+                {
+                    await updater.UpdateData(parameters);
+                    updater.PruneObsoleteData();
+                }
+            };
+        }
+        else
+        {
+            if (!_dataUpdaters.TryGetValue(type, out var updater))
+            {
+                throw new NotImplementedException($"Update type {type} not implemented.");
+            }
+
+            updateOperation = async () =>
+            {
+                await updater.UpdateData(parameters);
+                updater.PruneObsoleteData();
+            };
         }
 
-        await PerformUpdateAsync(parameters, async () => await updater.UpdateData(parameters));
+        await PerformUpdateAsync(parameters, updateOperation);
     }
 
     public bool IsNewOrStaleData(DataUpdateParameters parameters, TimeSpan refreshCooldown)

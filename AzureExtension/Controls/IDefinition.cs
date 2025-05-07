@@ -11,4 +11,6 @@ public interface IDefinition
     string Name { get; set; } // The name of the definition
 
     string HtmlUrl { get; set; } // The URL of the definition in Azure DevOps
+
+    string Status { get; } // The status of the most recent run
 }

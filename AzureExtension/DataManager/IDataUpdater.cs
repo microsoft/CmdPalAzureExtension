@@ -8,5 +8,7 @@ public interface IDataUpdater
 {
     Task UpdateData(DataUpdateParameters parameters);
 
+    void PruneObsoleteData();
+
     bool IsNewOrStale(DataUpdateParameters parameters, TimeSpan refreshCooldown);
 }

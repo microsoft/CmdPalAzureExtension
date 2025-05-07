@@ -13,4 +13,6 @@ public class Definition : IDefinition
     public string Name { get; set; } = string.Empty;
 
     public string HtmlUrl { get; set; } = string.Empty;
+
+    public string Status { get; set; } = string.Empty;
 }

@@ -7,45 +7,40 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
-using Microsoft.TeamFoundation.Build.WebApi;
+using AzureExtension.PersistentData;
 using Build = AzureExtension.DataModel.Build;
+using Definition = AzureExtension.DataModel.Definition;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataPipelineManager : IPipelineProvider, IDataUpdater
+public class AzureDataPipelineUpdater : IDataUpdater
 {
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
+    private readonly IDefinitionRepository _definitionRepository;
+    private readonly IPipelineProvider _pipelineProvider;
 
-    public AzureDataPipelineManager(DataStore dataStore, IAccountProvider accountProvider, IAzureLiveDataProvider liveDataProvider, IConnectionProvider connectionProvider)
+    public AzureDataPipelineUpdater(
+        DataStore dataStore,
+        IAccountProvider accountProvider,
+        IAzureLiveDataProvider liveDataProvider,
+        IConnectionProvider connectionProvider,
+        IDefinitionRepository definitionRepository,
+        IPipelineProvider pipelineProvider)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
         _liveDataProvider = liveDataProvider;
         _connectionProvider = connectionProvider;
-    }
-
-    public Definition? GetDefinition(IDefinitionSearch definitionSearch)
-    {
-         return Definition.GetByInternalId(_dataStore, definitionSearch.InternalId);
-    }
-
-    public IEnumerable<IBuild> GetBuilds(IDefinitionSearch definitionSearch)
-    {
-        var dsDefinition = GetDefinition(definitionSearch);
-        if (dsDefinition is null)
-        {
-            return Enumerable.Empty<IBuild>();
-        }
-
-        return Build.GetForDefinition(_dataStore, dsDefinition.Id);
+        _definitionRepository = definitionRepository;
+        _pipelineProvider = pipelineProvider;
     }
 
     public bool IsNewOrStale(IDefinitionSearch definitionSearch, TimeSpan refreshCooldown)
     {
-        var dsDefinition = GetDefinition(definitionSearch);
+        var dsDefinition = _pipelineProvider.GetDefinition(definitionSearch);
         return dsDefinition == null || DateTime.UtcNow - dsDefinition.UpdatedAt > refreshCooldown;
     }
 
@@ -81,8 +76,27 @@ public class AzureDataPipelineManager : IPipelineProvider, IDataUpdater
         }
     }
 
-    public Task UpdateData(DataUpdateParameters parameters)
+    private readonly TimeSpan _pipelineRetentionTime = TimeSpan.FromDays(7);
+
+    public void PruneObsoleteData()
     {
-        return UpdatePipelineAsync((IDefinitionSearch)parameters.UpdateObject!, parameters.CancellationToken.GetValueOrDefault());
+        Build.DeleteBefore(_dataStore, DateTime.UtcNow - _pipelineRetentionTime);
+        Definition.DeleteUnreferenced(_dataStore);
+    }
+
+    public async Task UpdateData(DataUpdateParameters parameters)
+    {
+        if (parameters.UpdateType == DataUpdateType.All)
+        {
+            var definitionSearches = await _definitionRepository.GetSavedDefinitionSearches();
+            foreach (var definitionSearch in definitionSearches)
+            {
+                await UpdatePipelineAsync(definitionSearch, parameters.CancellationToken.GetValueOrDefault());
+            }
+
+            return;
+        }
+
+        await UpdatePipelineAsync((IDefinitionSearch)parameters.UpdateObject!, parameters.CancellationToken.GetValueOrDefault());
     }
 }

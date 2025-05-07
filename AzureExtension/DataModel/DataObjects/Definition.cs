@@ -40,6 +40,10 @@ public class Definition : IDefinition
 
     [Write(false)]
     [Computed]
+    public string Status => Build.GetForDefinition(DataStore, Id).FirstOrDefault()?.Status ?? string.Empty;
+
+    [Write(false)]
+    [Computed]
     public DateTime UpdatedAt => TimeUpdated.ToDateTime();
 
     private static Definition Create(

@@ -8,6 +8,7 @@ using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataManager;
 using AzureExtension.DataModel;
+using AzureExtension.PersistentData;
 using Microsoft.Identity.Client;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.Policy.WebApi;
@@ -67,15 +68,7 @@ public class DataManagerTests
         var stubLiveDataProvider = new Mock<IAzureLiveDataProvider>().Object;
         var stubAuthProvider = new Mock<IConnectionProvider>().Object;
         var stubConnectionProvider = new Mock<IConnectionProvider>().Object;
-        var queryManager = new AzureDataQueryManager(dataStore, stubAccountProvider, stubLiveDataProvider, stubConnectionProvider);
-        var prsearchManager = new AzureDataPullRequestSearchManager(dataStore, stubAccountProvider, stubLiveDataProvider, stubAuthProvider);
-        var pipelineManager = new AzureDataPipelineManager(dataStore, stubAccountProvider, stubLiveDataProvider, stubConnectionProvider);
-        var stubUpdateDictionary = new Dictionary<DataUpdateType, IDataUpdater>
-        {
-            { DataUpdateType.Query, queryManager },
-            { DataUpdateType.PullRequests, prsearchManager },
-            { DataUpdateType.Pipeline, pipelineManager },
-        };
+        var stubUpdateDictionary = new Dictionary<DataUpdateType, IDataUpdater>();
         var azureDataManager = new AzureDataManager(dataStore, stubUpdateDictionary);
         Assert.IsNotNull(azureDataManager);
         CleanUpDataStore(dataStore);
@@ -88,7 +81,8 @@ public class DataManagerTests
         var mockAccountProvider = new Mock<IAccountProvider>();
         var mockLiveDataProvider = new Mock<IAzureLiveDataProvider>();
         var mockConnectionProvider = new Mock<IConnectionProvider>();
-        var queryManager = new AzureDataQueryManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object, mockConnectionProvider.Object);
+        var mockQueryRepository = new Mock<IQueryRepository>();
+        var queryManager = new AzureDataQueryManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object, mockConnectionProvider.Object, mockQueryRepository.Object);
 
         var mockVssConnection = new Mock<IVssConnection>();
         var stubIdentity = new Microsoft.VisualStudio.Services.Identity.Identity()
@@ -181,7 +175,8 @@ public class DataManagerTests
         var mockAccountProvider = new Mock<IAccountProvider>();
         var mockLiveDataProvider = new Mock<IAzureLiveDataProvider>();
         var mockConnectionProvider = new Mock<IConnectionProvider>();
-        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object, mockConnectionProvider.Object);
+        var mockPullRequestSearchRepository = new Mock<ISavedPullRequestSearchRepository>();
+        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object, mockConnectionProvider.Object, mockPullRequestSearchRepository.Object);
 
         var mockVssConnection = new Mock<IVssConnection>();
         var stubIdentity = new Microsoft.VisualStudio.Services.Identity.Identity()
