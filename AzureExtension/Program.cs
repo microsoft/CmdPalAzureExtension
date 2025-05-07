@@ -127,19 +127,29 @@ public sealed class Program
         using var azureClientProvider = new AzureClientProvider(accountProvider, vssConnectionFactory);
         var azureClientHelpers = new AzureClientHelpers(azureClientProvider);
 
+        var azureValidator = new AzureValidatorAdapter(azureClientHelpers);
+        var azureLiveDataProvider = new AzureLiveDataProvider();
+
         var dataStoreFolderPath = ApplicationData.Current.LocalFolder.Path;
+
+        var combinedPersistendDataStorePath = Path.Combine(dataStoreFolderPath, "PersistentAzureData.db");
+        var persistentDataStoreSchema = new PersistentDataSchema();
+        using var persistentDataStore = new DataStore("PersistentDataStore", combinedPersistendDataStorePath, persistentDataStoreSchema);
+
+        persistentDataStore.Create();
+
+        var persistentDataManager = new PersistentDataManager(persistentDataStore, azureValidator);
+        var pipelinePersistentDataManager = new PersistentDataManagerDefinitionSearch(persistentDataStore, azureValidator, azureLiveDataProvider, azureClientProvider);
 
         var combinedCachePath = Path.Combine(dataStoreFolderPath, "AzureData.db");
         var cacheDataStoreSchema = new AzureDataStoreSchema();
         using var cacheDataStore = new DataStore("DataStore", combinedCachePath, cacheDataStoreSchema);
         cacheDataStore.Create();
 
-        var azureLiveDataProvider = new AzureLiveDataProvider();
+        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, persistentDataManager);
+        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, persistentDataManager);
 
-        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
-        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
-
-        var pipelineManager = new AzureDataPipelineManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
+        var pipelineManager = new AzureDataPipelineManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, pipelinePersistentDataManager);
 
         var updatersDictionary = new Dictionary<DataUpdateType, IDataUpdater>
         {
@@ -151,16 +161,6 @@ public sealed class Program
         var azureDataManager = new AzureDataManager(cacheDataStore, updatersDictionary);
         var cacheManager = new CacheManager(azureDataManager);
         var dataProvider = new DataProvider(cacheManager, queryManager, pullRequestSearchManager, pipelineManager);
-
-        var azureValidator = new AzureValidatorAdapter(azureClientHelpers);
-
-        var combinedPersistendDataStorePath = Path.Combine(dataStoreFolderPath, "PersistentAzureData.db");
-        var persistentDataStoreSchema = new PersistentDataSchema();
-        using var persistentDataStore = new DataStore("PersistentDataStore", combinedPersistendDataStorePath, persistentDataStoreSchema);
-        persistentDataStore.Create();
-
-        var persistentDataManager = new PersistentDataManager(persistentDataStore, azureValidator);
-        var pipelinePersistentDataManager = new PersistentDataManagerDefinitionSearch(persistentDataStore, azureValidator, azureLiveDataProvider, azureClientProvider);
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);

@@ -7,6 +7,7 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
+using AzureExtension.PersistentData;
 using Serilog;
 using Query = AzureExtension.DataModel.Query;
 using TFModels = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
@@ -23,14 +24,21 @@ public class AzureDataQueryManager : IDataQueryProvider, IDataUpdater
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
+    private readonly IQueryRepository _queryRepository;
 
-    public AzureDataQueryManager(DataStore dataStore, IAccountProvider accountProvider, IAzureLiveDataProvider liveDataProvider, IConnectionProvider connectionProvider)
+    public AzureDataQueryManager(
+        DataStore dataStore,
+        IAccountProvider accountProvider,
+        IAzureLiveDataProvider liveDataProvider,
+        IConnectionProvider connectionProvider,
+        IQueryRepository queryRepository)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
         _log = Serilog.Log.ForContext("SourceContext", nameof(AzureDataQueryManager));
         _liveDataProvider = liveDataProvider;
         _connectionProvider = connectionProvider;
+        _queryRepository = queryRepository;
     }
 
     private void ValidateDataStore()
@@ -166,8 +174,19 @@ public class AzureDataQueryManager : IDataQueryProvider, IDataUpdater
         QueryWorkItem.DeleteBefore(_dataStore, dsQuery, DateTime.UtcNow - _queryWorkItemDeletionTime);
     }
 
-    public Task UpdateData(DataUpdateParameters parameters)
+    public async Task UpdateData(DataUpdateParameters parameters)
     {
-        return UpdateQueryAsync((parameters.UpdateObject as IQuery)!, parameters.CancellationToken.GetValueOrDefault());
+        if (parameters.UpdateType == DataUpdateType.All)
+        {
+            var queries = await _queryRepository.GetSavedQueries();
+            foreach (var query in queries)
+            {
+                await UpdateQueryAsync(query, parameters.CancellationToken.GetValueOrDefault());
+            }
+
+            return;
+        }
+
+        await UpdateQueryAsync((parameters.UpdateObject as IQuery)!, parameters.CancellationToken.GetValueOrDefault());
     }
 }

@@ -7,6 +7,7 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
+using AzureExtension.PersistentData;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Serilog;
@@ -23,18 +24,21 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchProvider,
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
+    private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
 
     public AzureDataPullRequestSearchManager(
         DataStore dataStore,
         IAccountProvider accountProvider,
         IAzureLiveDataProvider liveDataProvider,
-        IConnectionProvider connectionProvider)
+        IConnectionProvider connectionProvider,
+        ISavedPullRequestSearchRepository pullRequestSearchRepository)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
         _log = Log.ForContext("SourceContext", nameof(AzureDataPullRequestSearchManager));
         _liveDataProvider = liveDataProvider;
         _connectionProvider = connectionProvider;
+        _pullRequestSearchRepository = pullRequestSearchRepository;
     }
 
     private void ValidateDataStore()
@@ -247,8 +251,19 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchProvider,
         }
     }
 
-    public Task UpdateData(DataUpdateParameters parameters)
+    public async Task UpdateData(DataUpdateParameters parameters)
     {
-        return UpdatePullRequestsAsync((parameters.UpdateObject as IPullRequestSearch)!, parameters.CancellationToken.GetValueOrDefault());
+        if (parameters.UpdateType == DataUpdateType.All)
+        {
+            var pullRequestSearches = await _pullRequestSearchRepository.GetSavedPullRequestSearches();
+            foreach (var pullRequestSearch in pullRequestSearches)
+            {
+                await UpdatePullRequestsAsync(pullRequestSearch, parameters.CancellationToken.GetValueOrDefault());
+            }
+
+            return;
+        }
+
+        await UpdatePullRequestsAsync((parameters.UpdateObject as IPullRequestSearch)!, parameters.CancellationToken.GetValueOrDefault());
     }
 }

@@ -13,6 +13,8 @@ public interface IDefinitionRepository
 
     Task<IEnumerable<IDefinition>> GetAllDefinitionsAsync(bool includeTopLevel, IAccount account);
 
+    Task<IEnumerable<IDefinitionSearch>> GetSavedDefinitionSearches();
+
     void UpdateDefinitionSearchTopLevelStatus(IDefinitionSearch definitionSearch, bool isTopLevel, IAccount account);
 
     Task ValidateDefinitionSearch(IDefinitionSearch definitionSearch, IAccount account);

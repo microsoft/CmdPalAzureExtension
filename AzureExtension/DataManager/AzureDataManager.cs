@@ -118,6 +118,20 @@ public class AzureDataManager : IDataUpdateService
     {
         var type = parameters.UpdateType;
 
+        if (type == DataUpdateType.All)
+        {
+            async Task UpdateAll()
+            {
+                foreach (var dataUpdater in _dataUpdaters.Values)
+                {
+                    await dataUpdater.UpdateData(parameters);
+                }
+            }
+
+            await PerformUpdateAsync(parameters, UpdateAll);
+            return;
+        }
+
         if (!_dataUpdaters.TryGetValue(type, out var updater))
         {
             throw new NotImplementedException($"Update type {type} not implemented.");

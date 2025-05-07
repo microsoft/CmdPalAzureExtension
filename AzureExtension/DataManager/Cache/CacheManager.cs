@@ -63,6 +63,8 @@ public sealed class CacheManager : IDisposable, ICacheManager
         PeriodicUpdatingState = new PeriodicUpdatingState(this);
         PendingRefreshState = new PendingRefreshState(this);
         State = IdleState;
+
+        Start();
     }
 
     public void Start()
@@ -129,6 +131,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
         {
             case DataUpdateType.PullRequests:
             case DataUpdateType.Query:
+            case DataUpdateType.Pipeline:
             case DataUpdateType.All:
                 _ = _dataUpdateService.UpdateData(parameters);
                 break;

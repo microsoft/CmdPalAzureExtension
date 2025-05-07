@@ -7,8 +7,9 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
-using Microsoft.TeamFoundation.Build.WebApi;
+using AzureExtension.PersistentData;
 using Build = AzureExtension.DataModel.Build;
+using Definition = AzureExtension.DataModel.Definition;
 
 namespace AzureExtension.DataManager;
 
@@ -18,13 +19,20 @@ public class AzureDataPipelineManager : IPipelineProvider, IDataUpdater
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
+    private readonly IDefinitionRepository _definitionRepository;
 
-    public AzureDataPipelineManager(DataStore dataStore, IAccountProvider accountProvider, IAzureLiveDataProvider liveDataProvider, IConnectionProvider connectionProvider)
+    public AzureDataPipelineManager(
+        DataStore dataStore,
+        IAccountProvider accountProvider,
+        IAzureLiveDataProvider liveDataProvider,
+        IConnectionProvider connectionProvider,
+        IDefinitionRepository definitionRepository)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
         _liveDataProvider = liveDataProvider;
         _connectionProvider = connectionProvider;
+        _definitionRepository = definitionRepository;
     }
 
     public Definition? GetDefinition(IDefinitionSearch definitionSearch)
@@ -81,8 +89,19 @@ public class AzureDataPipelineManager : IPipelineProvider, IDataUpdater
         }
     }
 
-    public Task UpdateData(DataUpdateParameters parameters)
+    public async Task UpdateData(DataUpdateParameters parameters)
     {
-        return UpdatePipelineAsync((IDefinitionSearch)parameters.UpdateObject!, parameters.CancellationToken.GetValueOrDefault());
+        if (parameters.UpdateType == DataUpdateType.All)
+        {
+            var definitionSearches = await _definitionRepository.GetSavedDefinitionSearches();
+            foreach (var definitionSearch in definitionSearches)
+            {
+                await UpdatePipelineAsync(definitionSearch, parameters.CancellationToken.GetValueOrDefault());
+            }
+
+            return;
+        }
+
+        await UpdatePipelineAsync((IDefinitionSearch)parameters.UpdateObject!, parameters.CancellationToken.GetValueOrDefault());
     }
 }
