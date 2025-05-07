@@ -18,13 +18,11 @@ public class DataStore : IDisposable
     public const long NoForeignKey = 0;
 
     private readonly ILogger _log;
-    private readonly string _dataStoreFilePath;
-    private readonly IDataStoreSchema _schema;
 
     public DataStore(string name, string dataStoreFilePath, IDataStoreSchema schema)
     {
         Name = name;
-        _dataStoreFilePath = dataStoreFilePath;
+        DataStoreFilePath = dataStoreFilePath;
         _schema = schema;
         _log = Log.ForContext("SourceContext", Name);
     }
@@ -33,9 +31,17 @@ public class DataStore : IDisposable
 
     public bool IsConnected => Connection != null;
 
+    public string DataStoreFilePath
+    {
+        get;
+        private set;
+    }
+
+    private readonly IDataStoreSchema _schema;
+
     public bool Create(bool deleteExistingDatabase = false)
     {
-        if (File.Exists(_dataStoreFilePath))
+        if (File.Exists(DataStoreFilePath))
         {
             // If not deleting, check for schema version mismatch.
             // If we encounter problems or mismatch, we will delete existing db.
@@ -70,7 +76,7 @@ public class DataStore : IDisposable
             }
             else
             {
-                _log.Warning($"Deleting database: {_dataStoreFilePath}");
+                _log.Warning($"Deleting database: {DataStoreFilePath}");
 
                 if (IsConnected)
                 {
@@ -80,17 +86,17 @@ public class DataStore : IDisposable
 
                 try
                 {
-                    File.Delete(_dataStoreFilePath);
+                    File.Delete(DataStoreFilePath);
                 }
                 catch (IOException e)
                 {
                     if ((uint)e.HResult == 0x80070020)
                     {
-                        _log.Error(e, $"Sharing Violation Error; datastore exists and cannot be deleted ({_dataStoreFilePath})");
+                        _log.Error(e, $"Sharing Violation Error; datastore exists and cannot be deleted ({DataStoreFilePath})");
                     }
                     else
                     {
-                        _log.Error(e, $"I/O Error ({_dataStoreFilePath})");
+                        _log.Error(e, $"I/O Error ({DataStoreFilePath})");
                     }
 
                     throw;
@@ -104,14 +110,14 @@ public class DataStore : IDisposable
         }
 
         // Report creating new if it didn't exist or it was successfully deleted.
-        if (!File.Exists(_dataStoreFilePath))
+        if (!File.Exists(DataStoreFilePath))
         {
-            _log.Information($"Creating new DataStore at {_dataStoreFilePath}");
+            _log.Information($"Creating new DataStore at {DataStoreFilePath}");
         }
 
         // Ensure Directory exists. SQLite open database will create a file
         // that does not exist, but it will fail if the directory does not exist.
-        var directory = Path.GetDirectoryName(_dataStoreFilePath);
+        var directory = Path.GetDirectoryName(DataStoreFilePath);
         if (!Directory.Exists(directory))
         {
             // Create the directory.
@@ -143,11 +149,11 @@ public class DataStore : IDisposable
             return;
         }
 
-        _log.Debug($"Opening datastore {_dataStoreFilePath}");
+        _log.Debug($"Opening datastore {DataStoreFilePath}");
         _disposed = false;
         var builder = new SqliteConnectionStringBuilder
         {
-            DataSource = _dataStoreFilePath,
+            DataSource = DataStoreFilePath,
             Mode = SqliteOpenMode.ReadWriteCreate,
             Cache = SqliteCacheMode.Shared,
         };
@@ -164,7 +170,7 @@ public class DataStore : IDisposable
             _log.Error(e, $"Failed to open connection: {Connection.ConnectionString}");
         }
 
-        _log.Debug($"Opened DataStore at {_dataStoreFilePath}");
+        _log.Debug($"Opened DataStore at {DataStoreFilePath}");
     }
 
     private void CreateSchema()

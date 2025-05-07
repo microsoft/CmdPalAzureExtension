@@ -6,12 +6,12 @@ namespace AzureExtension.Data;
 
 public interface IDataStoreSchema
 {
-    long SchemaVersion
+    public long SchemaVersion
     {
         get;
     }
 
-    List<string> SchemaSqls
+    public List<string> SchemaSqls
     {
         get;
     }
