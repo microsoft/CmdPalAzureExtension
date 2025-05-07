@@ -8,7 +8,6 @@ using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Microsoft.Identity.Client;
 
 namespace AzureExtension.Controls.Pages;
 
@@ -35,9 +34,9 @@ public class SavedPipelineSearchesPage : ListPage
         ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
-        Title = _resources.GetResource("Pages_SavedPipelineSearches_Title");
-        Name = _resources.GetResource("Pages_SavedPipelineSearches_Title"); // Title is for the Page, Name is for the command
-        Icon = IconLoader.GetIcon("Pipeline");
+        Title = "Saved Pipeline Searches";
+        Name = "Saved Pipeline Searches"; // Title is for the Page, Name is for the command
+        Icon = IconLoader.GetIcon("Logo");
         _definitionRepository = definitionRepository;
         _addPipelineSearchListItem = addPipelineSearchListItem;
         _mediator = mediator;
@@ -88,7 +87,7 @@ public class SavedPipelineSearchesPage : ListPage
     public override IListItem[] GetItems()
     {
         var account = _accountProvider.GetDefaultAccount();
-        var searches = _definitionRepository.GetAllDefinitionsAsync(true, account).Result.ToList();
+        var searches = _definitionRepository.GetAllDefinitionSearchesAsync(true).Result.ToList();
 
         if (searches.Count != 0)
         {

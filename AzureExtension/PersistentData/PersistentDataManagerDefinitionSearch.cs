@@ -6,7 +6,6 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using Microsoft.Identity.Client;
-using Microsoft.TeamFoundation.Build.WebApi;
 using Serilog;
 
 namespace AzureExtension.PersistentData;
@@ -145,5 +144,10 @@ public class PersistentDataManagerDefinitionSearch : IDefinitionRepository
         ValidateDataStore();
         ValidateDefinitionSearch(definitionSearch, account).Wait();
         DefinitionSearch.AddOrUpdate(_dataStore, definitionSearch.InternalId, definitionSearch.ProjectUrl, isTopLevel);
+    }
+
+    public async Task Remove(IAzureSearch azureSearch)
+    {
+        await RemoveSavedDefinitionSearch((IDefinitionSearch)azureSearch);
     }
 }

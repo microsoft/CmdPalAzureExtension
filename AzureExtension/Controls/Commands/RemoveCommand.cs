@@ -7,14 +7,14 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Commands;
 
-public partial class RemoveCommand : InvokableCommand
+public partial class RemoveAzureSearchCommand : InvokableCommand
 {
     private readonly IAzureSearch _savedAzureSearch;
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _savedAzureSearchesMediator;
     private readonly IAzureSearchRepository _azureSearchRepository;
 
-    public RemoveCommand(IAzureSearch azureSearch, IResources resources, SavedAzureSearchesMediator savedAzureSearchesMediator, IAzureSearchRepository azureSearchRepository)
+    public RemoveAzureSearchCommand(IAzureSearch azureSearch, IResources resources, SavedAzureSearchesMediator savedAzureSearchesMediator, IAzureSearchRepository azureSearchRepository)
     {
         _resources = resources;
         _savedAzureSearchesMediator = savedAzureSearchesMediator;

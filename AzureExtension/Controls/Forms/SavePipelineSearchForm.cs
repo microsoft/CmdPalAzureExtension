@@ -129,7 +129,7 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
         var account = _accountProvider.GetDefaultAccount();
         var definitionId = ParseDefinitionIdFromUrl(definitionUrl);
-        var definitionInfo = _azureClientHelpers.GetDefinitionInfo(definitionUrl, definitionId, account);
+        var definitionInfo = _azureClientHelpers.GetInfo(new AzureUri(definitionUrl), account, InfoType.Definition).Result;
 
         if (definitionInfo.Result != ResultType.Success)
         {

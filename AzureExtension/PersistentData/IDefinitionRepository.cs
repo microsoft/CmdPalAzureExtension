@@ -7,11 +7,13 @@ using Microsoft.Identity.Client;
 
 namespace AzureExtension.PersistentData;
 
-public interface IDefinitionRepository
+public interface IDefinitionRepository : IAzureSearchRepository
 {
     Task<IDefinition> GetDefinition(IDefinitionSearch definitionSearch, IAccount account);
 
     Task<IEnumerable<IDefinition>> GetAllDefinitionsAsync(bool includeTopLevel, IAccount account);
+
+    public Task<IEnumerable<IDefinitionSearch>> GetAllDefinitionSearchesAsync(bool includeTopLevel);
 
     void UpdateDefinitionSearchTopLevelStatus(IDefinitionSearch definitionSearch, bool isTopLevel, IAccount account);
 

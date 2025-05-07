@@ -102,7 +102,7 @@ public class SearchPageFactory : ISearchPageFactory
             {
                 new(new LinkCommand(search is IQuery ? search.Url : $"{search.Url}/pullrequests", _resources)),
                 new(CreateEditPageForSearch(search)),
-                new(new RemoveAzureSearchCommand(search, _resources, _mediator, azureSearchRepository)),
+                new(new RemoveCommand(search, _resources, _mediator, azureSearchRepository)),
             },
         };
     }
