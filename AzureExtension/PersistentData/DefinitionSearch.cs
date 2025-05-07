@@ -33,6 +33,7 @@ public class DefinitionSearch : IDefinitionSearch
         }
     }
 
+    [Write(false)]
     public string Name => InternalId.ToStringInvariant();
 
     [Write(false)]
