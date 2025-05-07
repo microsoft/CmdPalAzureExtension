@@ -251,6 +251,15 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchProvider,
         }
     }
 
+    private readonly TimeSpan _pullRequestSearchRetentionTime = TimeSpan.FromDays(7);
+
+    public void PruneObsoleteData()
+    {
+        PullRequestSearch.DeleteBefore(_dataStore, DateTime.UtcNow - _pullRequestSearchRetentionTime);
+        PullRequest.DeleteNotReferencedBySearch(_dataStore);
+        PullRequestSearchPullRequest.DeleteUnreferenced(_dataStore);
+    }
+
     public async Task UpdateData(DataUpdateParameters parameters)
     {
         if (parameters.UpdateType == DataUpdateType.All)

@@ -67,23 +67,6 @@ public class AzureDataManager : IDataUpdateService
         return (ex is OperationCanceledException) || (ex is TaskCanceledException);
     }
 
-    private readonly TimeSpan _queryRetentionTime = TimeSpan.FromDays(7);
-    private readonly TimeSpan _pullRequestSearchRetentionTime = TimeSpan.FromDays(7);
-    private readonly TimeSpan _pipelineRetentionTime = TimeSpan.FromDays(7);
-
-    // Removes unused data from the datastore.
-    private void PruneObsoleteData()
-    {
-        Query.DeleteBefore(_dataStore, DateTime.UtcNow - _queryRetentionTime);
-        PullRequestSearch.DeleteBefore(_dataStore, DateTime.UtcNow - _pullRequestSearchRetentionTime);
-        QueryWorkItem.DeleteUnreferenced(_dataStore);
-        PullRequestSearchPullRequest.DeleteUnreferenced(_dataStore);
-        WorkItem.DeleteNotReferencedByQuery(_dataStore);
-        PullRequest.DeleteNotReferencedBySearch(_dataStore);
-        Build.DeleteBefore(_dataStore, DateTime.UtcNow - _pipelineRetentionTime);
-        Definition.DeleteUnreferenced(_dataStore);
-    }
-
     private async Task PerformUpdateAsync(DataUpdateParameters parameters, Func<Task> asyncOperation)
     {
         using var tx = _dataStore.Connection!.BeginTransaction();
@@ -91,7 +74,6 @@ public class AzureDataManager : IDataUpdateService
         try
         {
             await asyncOperation();
-            PruneObsoleteData();
 
             // SetLastUpdatedInMetaData();
         }
@@ -125,6 +107,7 @@ public class AzureDataManager : IDataUpdateService
                 foreach (var dataUpdater in _dataUpdaters.Values)
                 {
                     await dataUpdater.UpdateData(parameters);
+                    dataUpdater.PruneObsoleteData();
                 }
             }
 
@@ -137,7 +120,11 @@ public class AzureDataManager : IDataUpdateService
             throw new NotImplementedException($"Update type {type} not implemented.");
         }
 
-        await PerformUpdateAsync(parameters, async () => await updater.UpdateData(parameters));
+        await PerformUpdateAsync(parameters, async () =>
+        {
+            await updater.UpdateData(parameters);
+            updater.PruneObsoleteData();
+        });
     }
 
     public bool IsNewOrStaleData(DataUpdateParameters parameters, TimeSpan refreshCooldown)

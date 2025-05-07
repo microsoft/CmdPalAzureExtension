@@ -174,6 +174,14 @@ public class AzureDataQueryManager : IDataQueryProvider, IDataUpdater
         QueryWorkItem.DeleteBefore(_dataStore, dsQuery, DateTime.UtcNow - _queryWorkItemDeletionTime);
     }
 
+    private readonly TimeSpan _queryRetentionTime = TimeSpan.FromDays(7);
+
+    public void PruneObsoleteData()
+    {
+        Query.DeleteBefore(_dataStore, DateTime.UtcNow - _queryRetentionTime);
+        QueryWorkItem.DeleteUnreferenced(_dataStore);
+    }
+
     public async Task UpdateData(DataUpdateParameters parameters)
     {
         if (parameters.UpdateType == DataUpdateType.All)

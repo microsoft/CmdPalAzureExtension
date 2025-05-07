@@ -89,6 +89,14 @@ public class AzureDataPipelineManager : IPipelineProvider, IDataUpdater
         }
     }
 
+    private readonly TimeSpan _pipelineRetentionTime = TimeSpan.FromDays(7);
+
+    public void PruneObsoleteData()
+    {
+        Build.DeleteBefore(_dataStore, DateTime.UtcNow - _pipelineRetentionTime);
+        Definition.DeleteUnreferenced(_dataStore);
+    }
+
     public async Task UpdateData(DataUpdateParameters parameters)
     {
         if (parameters.UpdateType == DataUpdateType.All)
