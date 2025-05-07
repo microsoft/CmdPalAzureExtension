@@ -69,7 +69,7 @@ public class SearchPageFactory : ISearchPageFactory
 
     public ListPage CreatePageForSearch(IDefinitionSearch search)
     {
-        return new PipelineSearchPage(search, _resources, _dataProvider, new TimeSpanHelper(_resources));
+        return new BuildSearchPage(search, _resources, _dataProvider, new TimeSpanHelper(_resources));
     }
 
     public ContentPage CreateEditPageForSearch(IAzureSearch search)

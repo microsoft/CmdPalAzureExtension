@@ -11,7 +11,7 @@ using Serilog;
 
 namespace AzureExtension.Controls.Pages;
 
-public partial class PipelineSearchPage : ListPage
+public partial class BuildSearchPage : ListPage
 {
     protected ILogger Logger { get; }
 
@@ -25,7 +25,7 @@ public partial class PipelineSearchPage : ListPage
 
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public PipelineSearchPage(IDefinitionSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+    public BuildSearchPage(IDefinitionSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
     {
         _search = search;
         _resources = resources;
@@ -108,12 +108,33 @@ public partial class PipelineSearchPage : ListPage
 
     protected ListItem GetListItem(IBuild item, IDefinition definition)
     {
-        var title = $"{item.BuildNumber} - {item.SourceBranch} - {item.Status} - {item.Result}";
+        var title = $"#{item.BuildNumber}";
 
         return new ListItem(new LinkCommand(item.Url, _resources))
         {
             Title = title,
             Icon = IconLoader.GetIconForPipelineStatusAndResult(item.Status, item.Result),
+            Tags = new ITag[]
+            {
+                new Tag(_timeSpanHelper.DateTimeOffsetToDisplayString(new DateTime(item.StartTime), null)),
+            },
+            Details = new Details()
+            {
+                Title = definition.Name,
+                Metadata = new[]
+                {
+                    new DetailsElement()
+                    {
+                        Key = "Requester",
+                        Data = new DetailsLink() { Text = $"{item.Requester?.Name}" },
+                    },
+                    new DetailsElement()
+                    {
+                        Key = "Source Branch",
+                        Data = new DetailsLink() { Text = $"{item.SourceBranch}" },
+                    },
+                },
+            },
         };
     }
 
