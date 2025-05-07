@@ -136,12 +136,24 @@ public class IconLoader
         return new IconInfo(string.Empty);
     }
 
-    public static IconInfo GetIconForPipelineResult(string? pipelineStatus)
+    public static IconInfo GetIconForPipelineStatusAndResult(string? pipelineStatus, string? pipelineResult)
     {
+        var iconStringKey = string.Empty;
         pipelineStatus ??= string.Empty;
-        return pipelineStatus switch
+        pipelineResult ??= string.Empty;
+
+        if (!string.IsNullOrEmpty(pipelineResult))
         {
-            "Running" => GetIcon("StatusBlue"),
+            iconStringKey = pipelineResult;
+        }
+        else
+        {
+            iconStringKey = pipelineStatus;
+        }
+
+        return iconStringKey switch
+        {
+            "InProgress" => GetIcon("StatusBlue"),
             "Succeeded" => GetIcon("PipelineSucceeded"),
             "Failed" => GetIcon("PipelineFailed"),
             "Queued" => GetIcon("PipelineQueued"),

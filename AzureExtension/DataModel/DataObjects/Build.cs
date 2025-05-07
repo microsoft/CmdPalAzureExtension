@@ -59,7 +59,7 @@ public class Build : IBuild
             QueueTime = tfBuild.QueueTime?.ToDataStoreInteger() ?? DataStore.NoForeignKey,
             StartTime = tfBuild.StartTime?.ToDataStoreInteger() ?? DataStore.NoForeignKey,
             FinishTime = tfBuild.FinishTime?.ToDataStoreInteger() ?? DataStore.NoForeignKey,
-            Url = tfBuild.Url,
+            Url = ConvertBuildUrlToHtmlUrl(tfBuild.Url, tfBuild.Project.Name, tfBuild.Id),
             DefinitionId = definitionId,
             SourceBranch = tfBuild.SourceBranch,
             RequesterId = requesterId,
@@ -137,5 +137,32 @@ public class Build : IBuild
         command.CommandText = sql;
         command.Parameters.AddWithValue("$Time", date.ToDataStoreInteger());
         var rowsDeleted = command.ExecuteNonQuery();
+    }
+
+    public static string ConvertBuildUrlToHtmlUrl(string url, string projectName, long buildId)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            throw new ArgumentException("URL cannot be null or empty.", nameof(url));
+        }
+
+        try
+        {
+            var uri = new Uri(url);
+
+            var segments = uri.Segments;
+            if (segments.Length < 4)
+            {
+                throw new InvalidOperationException("The URL does not have the expected structure.");
+            }
+
+            var organization = segments[1].TrimEnd('/');
+
+            return $"https://dev.azure.com/{organization}/{projectName}/_build/results?buildId={buildId}&view=results";
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Failed to convert the URL to the desired format.", ex);
+        }
     }
 }

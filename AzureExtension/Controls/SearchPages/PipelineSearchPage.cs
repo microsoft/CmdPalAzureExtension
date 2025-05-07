@@ -110,10 +110,10 @@ public partial class PipelineSearchPage : ListPage
     {
         var title = $"{item.BuildNumber} - {item.SourceBranch} - {item.Status} - {item.Result}";
 
-        return new ListItem(new LinkCommand(definition.HtmlUrl, _resources))
+        return new ListItem(new LinkCommand(item.Url, _resources))
         {
             Title = title,
-            Icon = IconLoader.GetIconForPipelineResult(item.Result),
+            Icon = IconLoader.GetIconForPipelineStatusAndResult(item.Status, item.Result),
         };
     }
 
