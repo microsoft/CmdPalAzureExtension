@@ -18,21 +18,15 @@ public class AzureDataManager : IDataUpdateService
 {
     private readonly ILogger _log;
     private readonly DataStore _dataStore;
-    private readonly IDataPullRequestSearchUpdater _pullRequestSearchUpdater;
-    private readonly IDataQueryUpdater _queryUpdater;
-    private readonly IPipelineUpdater _pipelineUpdater;
+    private readonly IDictionary<DataUpdateType, IDataUpdater> _dataUpdaters;
 
     public AzureDataManager(
         DataStore dataStore,
-        IDataQueryUpdater queryUpdater,
-        IDataPullRequestSearchUpdater pullRequestSearchUpdater,
-        IPipelineUpdater pipelineUpdater)
+        IDictionary<DataUpdateType, IDataUpdater> dataUpdaters)
     {
         _log = Log.ForContext("SourceContext", nameof(AzureDataManager));
         _dataStore = dataStore;
-        _queryUpdater = queryUpdater;
-        _pullRequestSearchUpdater = pullRequestSearchUpdater;
-        _pipelineUpdater = pipelineUpdater;
+        _dataUpdaters = dataUpdaters;
     }
 
     private void ValidateDataStore()
@@ -124,25 +118,21 @@ public class AzureDataManager : IDataUpdateService
     {
         var type = parameters.UpdateType;
 
-        Func<Task> operation = type switch
+        if (!_dataUpdaters.TryGetValue(type, out var updater))
         {
-            DataUpdateType.Query => async () => await _queryUpdater.UpdateQueryAsync((parameters.UpdateObject as IQuery)!, parameters.CancellationToken.GetValueOrDefault()),
-            DataUpdateType.PullRequests => async () => await _pullRequestSearchUpdater.UpdatePullRequestsAsync((parameters.UpdateObject as IPullRequestSearch)!, parameters.CancellationToken.GetValueOrDefault()),
-            DataUpdateType.Pipeline => async () => await _pipelineUpdater.UpdatePipelineAsync((parameters.UpdateObject as IDefinitionSearch)!, parameters.CancellationToken.GetValueOrDefault()),
-            _ => throw new NotImplementedException($"Update type {type} not implemented."),
-        };
+            throw new NotImplementedException($"Update type {type} not implemented.");
+        }
 
-        await PerformUpdateAsync(parameters, operation);
+        await PerformUpdateAsync(parameters, async () => await updater.UpdateData(parameters));
     }
 
     public bool IsNewOrStaleData(DataUpdateParameters parameters, TimeSpan refreshCooldown)
     {
-        return parameters.UpdateObject switch
+        if (_dataUpdaters.TryGetValue(parameters.UpdateType, out var updater))
         {
-            IQuery query => _queryUpdater.IsNewOrStale(query, refreshCooldown),
-            IPullRequestSearch pullRequestSearch => _pullRequestSearchUpdater.IsNewOrStale(pullRequestSearch, refreshCooldown),
-            IDefinitionSearch pipeline => _pipelineUpdater.IsNewOrStale(pipeline, refreshCooldown),
-            _ => throw new NotImplementedException($"Update type {parameters.UpdateType} not implemented."),
-        };
+            return updater.IsNewOrStale(parameters, refreshCooldown);
+        }
+
+        throw new NotImplementedException($"Update type {parameters.UpdateType} not implemented.");
     }
 }

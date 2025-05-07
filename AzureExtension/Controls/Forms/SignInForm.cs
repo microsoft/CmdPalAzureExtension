@@ -95,9 +95,6 @@ public partial class SignInForm : FormContent, IAzureForm
         try
         {
             var account = await _accountProvider.ShowLogonSession();
-            var selectedQueryUrl = new AzureUri("https://microsoft.visualstudio.com/OS/_queries/query-edit/fd7ad0f5-17b0-46be-886a-92e4043c1c4f/");
-            var queryInfo = _azureClientHelpers.GetQueryInfo(selectedQueryUrl, account);
-            var selectedQueryId = queryInfo.AzureUri.Query;
             return true;
         }
         catch (Exception ex)

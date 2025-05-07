@@ -10,4 +10,5 @@ public enum InfoType
     Query,
     Repository,
     Project,
+    Definition,
 }

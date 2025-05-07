@@ -141,7 +141,14 @@ public sealed class Program
 
         var pipelineManager = new AzureDataPipelineManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider);
 
-        var azureDataManager = new AzureDataManager(cacheDataStore, queryManager, pullRequestSearchManager, pipelineManager);
+        var updatersDictionary = new Dictionary<DataUpdateType, IDataUpdater>
+        {
+            { DataUpdateType.Query, queryManager },
+            { DataUpdateType.PullRequests, pullRequestSearchManager },
+            { DataUpdateType.Pipeline, pipelineManager },
+        };
+
+        var azureDataManager = new AzureDataManager(cacheDataStore, updatersDictionary);
         var cacheManager = new CacheManager(azureDataManager);
         var dataProvider = new DataProvider(cacheManager, queryManager, pullRequestSearchManager, pipelineManager);
 
