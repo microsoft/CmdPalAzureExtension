@@ -13,47 +13,34 @@ using Definition = AzureExtension.DataModel.Definition;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataPipelineManager : IPipelineProvider, IDataUpdater
+public class AzureDataPipelineUpdater : IDataUpdater
 {
     private readonly DataStore _dataStore;
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
     private readonly IDefinitionRepository _definitionRepository;
+    private readonly IPipelineProvider _pipelineProvider;
 
-    public AzureDataPipelineManager(
+    public AzureDataPipelineUpdater(
         DataStore dataStore,
         IAccountProvider accountProvider,
         IAzureLiveDataProvider liveDataProvider,
         IConnectionProvider connectionProvider,
-        IDefinitionRepository definitionRepository)
+        IDefinitionRepository definitionRepository,
+        IPipelineProvider pipelineProvider)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
         _liveDataProvider = liveDataProvider;
         _connectionProvider = connectionProvider;
         _definitionRepository = definitionRepository;
-    }
-
-    public Definition? GetDefinition(IDefinitionSearch definitionSearch)
-    {
-         return Definition.GetByInternalId(_dataStore, definitionSearch.InternalId);
-    }
-
-    public IEnumerable<IBuild> GetBuilds(IDefinitionSearch definitionSearch)
-    {
-        var dsDefinition = GetDefinition(definitionSearch);
-        if (dsDefinition is null)
-        {
-            return Enumerable.Empty<IBuild>();
-        }
-
-        return Build.GetForDefinition(_dataStore, dsDefinition.Id);
+        _pipelineProvider = pipelineProvider;
     }
 
     public bool IsNewOrStale(IDefinitionSearch definitionSearch, TimeSpan refreshCooldown)
     {
-        var dsDefinition = GetDefinition(definitionSearch);
+        var dsDefinition = _pipelineProvider.GetDefinition(definitionSearch);
         return dsDefinition == null || DateTime.UtcNow - dsDefinition.UpdatedAt > refreshCooldown;
     }
 

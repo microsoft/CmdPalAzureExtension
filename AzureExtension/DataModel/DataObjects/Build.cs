@@ -109,8 +109,13 @@ public class Build : IBuild
         return AddOrUpdate(dataStore, newBuild);
     }
 
-    public static IEnumerable<Build> GetForDefinition(DataStore dataStore, long definitionId)
+    public static IEnumerable<Build> GetForDefinition(DataStore? dataStore, long definitionId)
     {
+        if (dataStore == null)
+        {
+            return [];
+        }
+
         var sql = @"SELECT * FROM Build WHERE DefinitionId = @DefinitionId ORDER BY TimeUpdated ASC";
         var param = new
         {

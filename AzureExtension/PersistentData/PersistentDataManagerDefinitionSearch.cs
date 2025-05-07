@@ -5,6 +5,7 @@
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
+using AzureExtension.DataManager;
 using Microsoft.Identity.Client;
 using Microsoft.TeamFoundation.Build.WebApi;
 using Serilog;
@@ -20,17 +21,20 @@ public class PersistentDataManagerDefinitionSearch : IDefinitionRepository
     private readonly DataStore _dataStore;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
+    private readonly IPipelineProvider _pipelineProvider;
 
     public PersistentDataManagerDefinitionSearch(
         DataStore dataStore,
         IAzureValidator azureValidator,
         IAzureLiveDataProvider liveDataProvider,
-        IConnectionProvider connectionProvider)
+        IConnectionProvider connectionProvider,
+        IPipelineProvider pipelineProvider)
     {
         _azureValidator = azureValidator;
         _dataStore = dataStore;
         _liveDataProvider = liveDataProvider;
         _connectionProvider = connectionProvider;
+        _pipelineProvider = pipelineProvider;
     }
 
     private void ValidateDataStore()
@@ -66,10 +70,18 @@ public class PersistentDataManagerDefinitionSearch : IDefinitionRepository
 
     public async Task<IDefinition> GetDefinition(IDefinitionSearch definitionSearch, IAccount account)
     {
+        var dsDefinition = _pipelineProvider.GetDefinition(definitionSearch);
+
+        if (dsDefinition != null)
+        {
+            dsDefinition.HtmlUrl = definitionSearch.ProjectUrl;
+            return dsDefinition;
+        }
+
         var azureUri = new AzureUri(definitionSearch.ProjectUrl);
         var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
         var definitionBuild = await _liveDataProvider.GetDefinitionAsync(vssConnection, azureUri.Project, definitionSearch.InternalId, CancellationToken.None);
-        return new Definition { InternalId = definitionBuild.Id, Name = definitionBuild.Name };
+        return new Definition { InternalId = definitionBuild.Id, Name = definitionBuild.Name, HtmlUrl = definitionSearch.ProjectUrl };
     }
 
     public async Task<IEnumerable<IDefinition>> GetAllDefinitionsAsync(bool includeTopLevel, IAccount account)
