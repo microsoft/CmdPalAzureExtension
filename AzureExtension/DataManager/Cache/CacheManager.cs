@@ -164,6 +164,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
         {
             case DataManagerUpdateKind.Success:
                 SendUpdateEvent(this, CacheManagerUpdateKind.Updated);
+                LastUpdated = DateTime.UtcNow;
                 break;
             case DataManagerUpdateKind.Cancel:
                 SendUpdateEvent(this, CacheManagerUpdateKind.Cancel);
