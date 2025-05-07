@@ -35,6 +35,7 @@ public class DefinitionSearch : IDefinitionSearch
 
     public string Name => InternalId.ToStringInvariant();
 
+    [Write(false)]
     public string Url => ProjectUrl;
 
     public static DefinitionSearch? Get(DataStore dataStore, long internalId, string projectUrl)

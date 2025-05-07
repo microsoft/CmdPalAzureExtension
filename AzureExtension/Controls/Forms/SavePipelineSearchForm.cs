@@ -98,11 +98,12 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
-            if (_savedDefinitionSearch.Url != string.Empty)
+            if (_savedDefinitionSearch.ProjectUrl != string.Empty)
             {
-                Log.Information($"Removing outdated search {_savedDefinitionSearch.Name}, {_savedDefinitionSearch.Url}");
+                var definition = _definitionRepository.GetDefinition(_savedDefinitionSearch, _accountProvider.GetDefaultAccount()).Result;
+                Log.Information($"Removing outdated search {definition.Name}, {definition.HtmlUrl}");
 
-                // await _definitionRepository.RemoveDefinitionSearch(_savedDefinitionSearch);
+                _definitionRepository.RemoveSavedDefinitionSearch(_savedDefinitionSearch);
             }
 
             LoadingStateChanged?.Invoke(this, false);
@@ -129,7 +130,7 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
         var account = _accountProvider.GetDefaultAccount();
         var definitionId = ParseDefinitionIdFromUrl(definitionUrl);
-        var definitionInfo = _azureClientHelpers.GetInfo(new AzureUri(definitionUrl), account, InfoType.Definition).Result;
+        var definitionInfo = _azureClientHelpers.GetInfo(new AzureUri(definitionUrl), account, InfoType.Definition, definitionId).Result;
 
         if (definitionInfo.Result != ResultType.Success)
         {

@@ -20,6 +20,13 @@ public class SavePipelineSearchPage : ContentPage
         Title = "Save Pipeline Search";
         _resources = resources;
         _savePipelineSearchForm = savePipelineSearchForm;
+
+        FormEventHelper.WireFormEvents(
+            _savePipelineSearchForm,
+            this,
+            new StatusMessage(),
+            "Pipeline search saved successfully!",
+            "Error saving pipeline search: ");
     }
 
     public override IContent[] GetContent()

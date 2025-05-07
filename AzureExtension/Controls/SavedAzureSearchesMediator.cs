@@ -38,10 +38,11 @@ public class SavedAzureSearchesMediator
         {
             PullRequestSearchRemoved?.Invoke(this, azureSearch);
         }
-        else if (azureSearch is IDefinitionSearch)
-        {
-            PipelineSearchRemoved?.Invoke(this, azureSearch);
-        }
+    }
+
+    public void Remove(IDefinitionSearch definitionSearch)
+    {
+        PipelineSearchRemoved?.Invoke(this, definitionSearch);
     }
 
     public void RemovingQuery(object args)

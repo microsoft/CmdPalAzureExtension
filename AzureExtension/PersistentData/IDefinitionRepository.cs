@@ -18,4 +18,6 @@ public interface IDefinitionRepository : IAzureSearchRepository
     void UpdateDefinitionSearchTopLevelStatus(IDefinitionSearch definitionSearch, bool isTopLevel, IAccount account);
 
     Task ValidateDefinitionSearch(IDefinitionSearch definitionSearch, IAccount account);
+
+    public Task RemoveSavedDefinitionSearch(IDefinitionSearch definitionSearch);
 }

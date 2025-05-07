@@ -27,7 +27,7 @@ public partial class RemoveDefinitionSearchCommand : InvokableCommand
 
     public override CommandResult Invoke()
     {
-        _definitionRepository.Remove(_savedDefinitionSearch).Wait();
+        _definitionRepository.RemoveSavedDefinitionSearch(_savedDefinitionSearch);
         _savedDefinitionSearchesMediator.Remove(_savedDefinitionSearch);
 
         return CommandResult.KeepOpen();

@@ -65,6 +65,12 @@ public class SearchPageFactory : ISearchPageFactory
         throw new NotImplementedException($"No page for search type {search.GetType()}");
     }
 
+    public ContentPage CreatePageForSearch(IDefinitionSearch search)
+    {
+        var savePipelineSearchForm = new SavePipelineSearchForm(search, _resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
+        return new SavePipelineSearchPage(_resources, savePipelineSearchForm);
+    }
+
     public ContentPage CreateEditPageForSearch(IAzureSearch search)
     {
         if (search is IQuery)
@@ -79,16 +85,17 @@ public class SearchPageFactory : ISearchPageFactory
             var statusMessage = new StatusMessage();
             return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage, "Pull request search edited successfully", "error in editing pull request search");
         }
-        else if (search is IDefinitionSearch)
-        {
-            var savePipelineSearchForm = new SavePipelineSearchForm(_resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
-            var statusMessage = new StatusMessage();
-            return new EditPipelineSearchPage(_resources, savePipelineSearchForm, statusMessage, "Pipeline search edited successfully", "error in editing pipeline search");
-        }
         else
         {
             throw new NotImplementedException($"No edit form for search type {search.GetType()}");
         }
+    }
+
+    public ContentPage CreateEditPageForSearch(IDefinitionSearch search)
+    {
+        var savePipelineSearchForm = new SavePipelineSearchForm(_resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
+        var statusMessage = new StatusMessage();
+        return new EditPipelineSearchPage(_resources, savePipelineSearchForm, statusMessage, "Pipeline search edited successfully", "error in editing pipeline search");
     }
 
     public IListItem CreateItemForSearch(IAzureSearch search, IAzureSearchRepository azureSearchRepository)
@@ -103,6 +110,23 @@ public class SearchPageFactory : ISearchPageFactory
                 new(new LinkCommand(search is IQuery ? search.Url : $"{search.Url}/pullrequests", _resources)),
                 new(CreateEditPageForSearch(search)),
                 new(new RemoveCommand(search, _resources, _mediator, azureSearchRepository)),
+            },
+        };
+    }
+
+    public IListItem CreateItemForSearch(IDefinitionSearch search, IDefinitionRepository definitionRepository)
+    {
+        var definition = _definitionRepository.GetDefinition(search, _accountProvider.GetDefaultAccount()).Result;
+        return new ListItem(CreatePageForSearch(search))
+        {
+            Title = definition.Name,
+            Subtitle = definition.HtmlUrl,
+            Icon = IconLoader.GetIcon("Pipeline"),
+            MoreCommands = new CommandContextItem[]
+            {
+                new(new LinkCommand(search.ProjectUrl, _resources)),
+                new(CreateEditPageForSearch(search)),
+                new(new RemoveDefinitionSearchCommand(search, _resources, _mediator, definitionRepository)),
             },
         };
     }
