@@ -87,7 +87,7 @@ public class SavedPipelineSearchesPage : ListPage
     public override IListItem[] GetItems()
     {
         var account = _accountProvider.GetDefaultAccount();
-        var searches = _definitionRepository.GetAllDefinitionSearchesAsync(true).Result.ToList();
+        var searches = _definitionRepository.GetAllDefinitionSearchesAsync(false).Result.ToList();
 
         if (searches.Count != 0)
         {

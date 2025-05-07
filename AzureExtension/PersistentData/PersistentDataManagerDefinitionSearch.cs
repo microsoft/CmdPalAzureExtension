@@ -101,10 +101,10 @@ public class PersistentDataManagerDefinitionSearch : IDefinitionRepository
         return definitions;
     }
 
-    public Task<IEnumerable<IDefinitionSearch>> GetAllDefinitionSearchesAsync(bool includeTopLevel)
+    public Task<IEnumerable<IDefinitionSearch>> GetAllDefinitionSearchesAsync(bool getTopLevelOnly)
     {
         ValidateDataStore();
-        if (includeTopLevel)
+        if (getTopLevelOnly)
         {
             return Task.FromResult(DefinitionSearch.GetTopLevel(_dataStore));
         }
