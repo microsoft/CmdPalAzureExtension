@@ -108,7 +108,7 @@ public class SearchPageFactory : ISearchPageFactory
             Icon = search is IQuery ? IconLoader.GetIcon("Query") : IconLoader.GetIcon("PullRequest"),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(search is IQuery ? search.Url : $"{search.Url}/pullrequests", _resources)),
+                new(new LinkCommand(search is IQuery ? search.Url : $"{search.Url}/pullrequests", _resources, null)),
                 new(CreateEditPageForSearch(search)),
                 new(new RemoveCommand(search, _resources, _mediator, azureSearchRepository)),
             },
@@ -118,18 +118,56 @@ public class SearchPageFactory : ISearchPageFactory
     public IListItem CreateItemForSearch(IDefinitionSearch search, IDefinitionRepository definitionRepository)
     {
         var definition = _definitionRepository.GetDefinition(search, _accountProvider.GetDefaultAccount()).Result;
-        return new ListItem(CreatePageForSearch(search))
+        var mostRecentBuild = _dataProvider.GetMostRecentBuild(search).Result;
+        var timeSpanHelper = new TimeSpanHelper(_resources);
+
+        if (mostRecentBuild != null)
         {
-            Title = definition.Name,
-            Subtitle = definition.HtmlUrl,
-            Icon = IconLoader.GetIcon("Pipeline"),
-            MoreCommands = new CommandContextItem[]
+            return new ListItem(CreatePageForSearch(search))
             {
-                new(new LinkCommand(search.ProjectUrl, _resources)),
-                new(CreateEditPageForSearch(search)),
-                new(new RemoveDefinitionSearchCommand(search, _resources, _mediator, definitionRepository)),
-            },
-        };
+                MoreCommands = new CommandContextItem[]
+                {
+                    new(new LinkCommand(definition.HtmlUrl, _resources, "Open link to all builds")),
+                    new(CreateEditPageForSearch(search)),
+                    new(new RemoveDefinitionSearchCommand(search, _resources, _mediator, definitionRepository)),
+                },
+                Tags = new ITag[]
+                {
+                    new Tag(timeSpanHelper.DateTimeOffsetToDisplayString(new DateTime(mostRecentBuild!.StartTime), null)),
+                },
+                Details = new Details()
+                {
+                    Title = $"{definition.Name} - {mostRecentBuild!.BuildNumber}",
+                    Metadata = new[]
+                    {
+                        new DetailsElement()
+                        {
+                            Key = "Requester",
+                            Data = new DetailsLink() { Text = $"{mostRecentBuild!.Requester?.Name}" },
+                        },
+                        new DetailsElement()
+                        {
+                            Key = "Source Branch",
+                            Data = new DetailsLink() { Text = $"{mostRecentBuild!.SourceBranch}" },
+                        },
+                    },
+                },
+            };
+        }
+        else
+        {
+            return new ListItem(CreatePageForSearch(search))
+            {
+                Title = definition.Name,
+                Icon = IconLoader.GetIcon("Pipeline"),
+                MoreCommands = new CommandContextItem[]
+                {
+                    new(new LinkCommand(definition.HtmlUrl, _resources, "Open link to all builds")),
+                    new(CreateEditPageForSearch(search)),
+                    new(new RemoveDefinitionSearchCommand(search, _resources, _mediator, definitionRepository)),
+                },
+            };
+        }
     }
 
     public async Task<List<IListItem>> CreateCommandsForTopLevelSearches()

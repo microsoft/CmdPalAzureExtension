@@ -12,9 +12,9 @@ internal sealed partial class LinkCommand : InvokableCommand
 {
     private readonly string _url;
 
-    internal LinkCommand(string url, IResources resources)
+    internal LinkCommand(string url, IResources resources, string? alternativeCommandName)
     {
-        Name = resources.GetResource("Commands_Open_Link");
+        Name = string.IsNullOrEmpty(alternativeCommandName) ? resources.GetResource("Commands_Open_Link") : alternativeCommandName;
         Icon = IconLoader.GetIcon("OpenLink");
         _url = url;
     }

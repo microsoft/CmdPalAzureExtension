@@ -36,7 +36,8 @@ public class SavedPipelineSearchesPage : ListPage
         _resources = resources;
         Title = "Saved Pipeline Searches";
         Name = "Saved Pipeline Searches"; // Title is for the Page, Name is for the command
-        Icon = IconLoader.GetIcon("Logo");
+        Icon = IconLoader.GetIcon("Pipeline");
+        ShowDetails = true;
         _definitionRepository = definitionRepository;
         _addPipelineSearchListItem = addPipelineSearchListItem;
         _mediator = mediator;

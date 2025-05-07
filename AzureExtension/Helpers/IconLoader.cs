@@ -26,6 +26,7 @@ public class IconLoader
             { "Feature", (@"Assets\Feature.png", @"Assets\Feature.png") },
             { "Impediment", (@"Assets\Impediment.png", @"Assets\Impediment.png") },
             { "Issue", (@"Assets\Issue.png", @"Assets\Issue.png") },
+            { "Pipeline", (@"Assets\Pipeline.png", @"Assets\Pipeline.png") },
             { "PipelineFailed", (@"Assets\PipelineFailed.png", @"Assets\PipelineFailed.png") },
             { "PipelineQueued", (@"Assets\PipelineQueued.png", @"Assets\PipelineQueued.png") },
             { "PipelineRunning", (@"Assets\PipelineRunning.png", @"Assets\PipelineRunning.png") },

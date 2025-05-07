@@ -115,6 +115,12 @@ public class DataProvider : IDataProvider
         return _pipelineProvider.GetBuilds(definitionSearch);
     }
 
+    public async Task<IBuild?> GetMostRecentBuild(IDefinitionSearch definitionSearch)
+    {
+        var builds = await GetBuilds(definitionSearch);
+        return builds.OrderByDescending(b => b.StartTime).FirstOrDefault() ?? null;
+    }
+
     public async Task<IDefinition> GetDefinition(IDefinitionSearch definitionSearch)
     {
         var parameters = new DataUpdateParameters

@@ -16,5 +16,7 @@ public interface IDataProvider
 
     Task<IDefinition> GetDefinition(IDefinitionSearch definitionSearch);
 
+    Task<IBuild?> GetMostRecentBuild(IDefinitionSearch definitionSearch);
+
     event CacheManagerUpdateEventHandler? OnUpdate;
 }

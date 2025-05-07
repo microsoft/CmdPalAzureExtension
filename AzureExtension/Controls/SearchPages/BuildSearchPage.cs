@@ -19,6 +19,8 @@ public partial class BuildSearchPage : ListPage
 
     private readonly IDefinitionSearch _search;
 
+    private readonly IDefinition _definition;
+
     private readonly IResources _resources;
 
     private readonly IDataProvider _dataProvider;
@@ -31,11 +33,23 @@ public partial class BuildSearchPage : ListPage
         _resources = resources;
         _dataProvider = dataProvider;
         _timeSpanHelper = timeSpanHelper;
-        Icon = IconLoader.GetIcon("Pipeline");
-        Name = search.InternalId.ToStringInvariant();
+        _definition = _dataProvider.GetDefinition(_search).GetAwaiter().GetResult();
+        Icon = GetIcon();
+        Name = _definition.Name;
         ShowDetails = true;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         DataProvider = dataProvider;
+    }
+
+    private IconInfo GetIcon()
+    {
+        var builds = _dataProvider.GetBuilds(_search).GetAwaiter().GetResult();
+        if (builds != null && builds.Any())
+        {
+            return IconLoader.GetIconForPipelineStatusAndResult(builds.First().Status, builds.First().Result);
+        }
+
+        return IconLoader.GetIcon("Logo");
     }
 
     protected void CacheManagerUpdateHandler(object? source, CacheManagerUpdateEventArgs e)
@@ -54,13 +68,12 @@ public partial class BuildSearchPage : ListPage
         try
         {
             var items = await GetSearchItemsAsync();
-            var definition = await _dataProvider.GetDefinition(_search);
             if (items != null && items.Any())
             {
                 var listItems = new List<IListItem>();
                 foreach (var item in items)
                 {
-                    var listItem = GetListItem(item, definition);
+                    var listItem = GetListItem(item);
                     listItems.Add(listItem);
                 }
 
@@ -106,11 +119,11 @@ public partial class BuildSearchPage : ListPage
         return items;
     }
 
-    protected ListItem GetListItem(IBuild item, IDefinition definition)
+    protected ListItem GetListItem(IBuild item)
     {
         var title = $"#{item.BuildNumber}";
 
-        return new ListItem(new LinkCommand(item.Url, _resources))
+        return new ListItem(new LinkCommand(item.Url, _resources, null))
         {
             Title = title,
             Icon = IconLoader.GetIconForPipelineStatusAndResult(item.Status, item.Result),
@@ -120,7 +133,7 @@ public partial class BuildSearchPage : ListPage
             },
             Details = new Details()
             {
-                Title = definition.Name,
+                Title = $"{_definition.Name} - {title}",
                 Metadata = new[]
                 {
                     new DetailsElement()
