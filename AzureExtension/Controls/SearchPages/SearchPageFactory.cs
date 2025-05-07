@@ -6,10 +6,12 @@ using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.Forms;
+using AzureExtension.DataManager;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using static Microsoft.Azure.Pipelines.WebApi.PipelinesResources;
 
 namespace AzureExtension.Controls.Pages;
 
@@ -65,10 +67,9 @@ public class SearchPageFactory : ISearchPageFactory
         throw new NotImplementedException($"No page for search type {search.GetType()}");
     }
 
-    public ContentPage CreatePageForSearch(IDefinitionSearch search)
+    public ListPage CreatePageForSearch(IDefinitionSearch search)
     {
-        var savePipelineSearchForm = new SavePipelineSearchForm(search, _resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
-        return new SavePipelineSearchPage(_resources, savePipelineSearchForm, new StatusMessage());
+        return new PipelineSearchPage(search, _resources, _dataProvider, new TimeSpanHelper(_resources));
     }
 
     public ContentPage CreateEditPageForSearch(IAzureSearch search)

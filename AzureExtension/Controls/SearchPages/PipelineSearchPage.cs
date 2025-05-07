@@ -54,12 +54,13 @@ public partial class PipelineSearchPage : ListPage
         try
         {
             var items = await GetSearchItemsAsync();
+            var definition = await _dataProvider.GetDefinition(_search);
             if (items != null && items.Any())
             {
                 var listItems = new List<IListItem>();
                 foreach (var item in items)
                 {
-                    var listItem = GetListItem(item);
+                    var listItem = GetListItem(item, definition);
                     listItems.Add(listItem);
                 }
 
@@ -94,7 +95,7 @@ public partial class PipelineSearchPage : ListPage
         }
     }
 
-    private async Task<IEnumerable<IDefinition>> GetSearchItemsAsync()
+    private async Task<IEnumerable<IBuild>> GetSearchItemsAsync()
     {
         DataProvider.OnUpdate += CacheManagerUpdateHandler;
 
@@ -105,20 +106,19 @@ public partial class PipelineSearchPage : ListPage
         return items;
     }
 
-    protected ListItem GetListItem(IDefinition item)
+    protected ListItem GetListItem(IBuild item, IDefinition definition)
     {
-        var title = item.Name;
-        var url = item.InternalId.ToStringInvariant();
+        var title = $"{item.BuildNumber} - {item.SourceBranch} - {item.Status} - {item.Result}";
 
-        return new ListItem(new LinkCommand(url, _resources))
+        return new ListItem(new LinkCommand(definition.HtmlUrl, _resources))
         {
             Title = title,
             Icon = IconLoader.GetIcon("Logo"),
         };
     }
 
-    protected Task<IEnumerable<IDefinition>> LoadContentData()
+    protected Task<IEnumerable<IBuild>> LoadContentData()
     {
-        return (Task<IEnumerable<IDefinition>>)_dataProvider.GetDefinition(_search).Result;
+        return _dataProvider.GetBuilds(_search);
     }
 }
