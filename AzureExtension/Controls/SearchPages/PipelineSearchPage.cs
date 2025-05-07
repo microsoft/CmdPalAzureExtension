@@ -113,7 +113,7 @@ public partial class PipelineSearchPage : ListPage
         return new ListItem(new LinkCommand(definition.HtmlUrl, _resources))
         {
             Title = title,
-            Icon = IconLoader.GetIcon("Logo"),
+            Icon = IconLoader.GetIconForPipelineResult(item.Result),
         };
     }
 
