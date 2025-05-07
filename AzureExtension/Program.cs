@@ -132,9 +132,9 @@ public sealed class Program
 
         var dataStoreFolderPath = ApplicationData.Current.LocalFolder.Path;
 
-        var combinedPersistendDataStorePath = Path.Combine(dataStoreFolderPath, "PersistentAzureData.db");
+        var combinedPersistentDataStorePath = Path.Combine(dataStoreFolderPath, "PersistentAzureData.db");
         var persistentDataStoreSchema = new PersistentDataSchema();
-        using var persistentDataStore = new DataStore("PersistentDataStore", combinedPersistendDataStorePath, persistentDataStoreSchema);
+        using var persistentDataStore = new DataStore("PersistentDataStore", combinedPersistentDataStorePath, persistentDataStoreSchema);
 
         persistentDataStore.Create();
 
