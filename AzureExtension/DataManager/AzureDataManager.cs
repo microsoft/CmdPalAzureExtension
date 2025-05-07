@@ -2,15 +2,11 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataManager.Cache;
 using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using Serilog;
-using PullRequestSearch = AzureExtension.DataModel.PullRequestSearch;
-using Query = AzureExtension.DataModel.Query;
-using WorkItem = AzureExtension.DataModel.WorkItem;
 
 namespace AzureExtension.DataManager;
 
@@ -20,9 +16,7 @@ public class AzureDataManager : IDataUpdateService
     private readonly DataStore _dataStore;
     private readonly IDictionary<DataUpdateType, IDataUpdater> _dataUpdaters;
 
-    public AzureDataManager(
-        DataStore dataStore,
-        IDictionary<DataUpdateType, IDataUpdater> dataUpdaters)
+    public AzureDataManager(DataStore dataStore, IDictionary<DataUpdateType, IDataUpdater> dataUpdaters)
     {
         _log = Log.ForContext("SourceContext", nameof(AzureDataManager));
         _dataStore = dataStore;
@@ -100,31 +94,34 @@ public class AzureDataManager : IDataUpdateService
     {
         var type = parameters.UpdateType;
 
+        Func<Task> updateOperation;
+
         if (type == DataUpdateType.All)
         {
-            async Task UpdateAll()
+            updateOperation = async () =>
             {
-                foreach (var dataUpdater in _dataUpdaters.Values)
+                foreach (var updater in _dataUpdaters.Values)
                 {
-                    await dataUpdater.UpdateData(parameters);
-                    dataUpdater.PruneObsoleteData();
+                    await updater.UpdateData(parameters);
+                    updater.PruneObsoleteData();
                 }
+            };
+        }
+        else
+        {
+            if (!_dataUpdaters.TryGetValue(type, out var updater))
+            {
+                throw new NotImplementedException($"Update type {type} not implemented.");
             }
 
-            await PerformUpdateAsync(parameters, UpdateAll);
-            return;
+            updateOperation = async () =>
+            {
+                await updater.UpdateData(parameters);
+                updater.PruneObsoleteData();
+            };
         }
 
-        if (!_dataUpdaters.TryGetValue(type, out var updater))
-        {
-            throw new NotImplementedException($"Update type {type} not implemented.");
-        }
-
-        await PerformUpdateAsync(parameters, async () =>
-        {
-            await updater.UpdateData(parameters);
-            updater.PruneObsoleteData();
-        });
+        await PerformUpdateAsync(parameters, updateOperation);
     }
 
     public bool IsNewOrStaleData(DataUpdateParameters parameters, TimeSpan refreshCooldown)
