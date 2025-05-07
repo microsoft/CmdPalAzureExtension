@@ -15,22 +15,28 @@ public class SavePipelineSearchPage : ContentPage
 
     private readonly SavePipelineSearchForm _savePipelineSearchForm;
 
-    public SavePipelineSearchPage(IResources resources, SavePipelineSearchForm savePipelineSearchForm)
+    private readonly StatusMessage _statusMessage;
+
+    public SavePipelineSearchPage(IResources resources, SavePipelineSearchForm savePipelineSearchForm, StatusMessage statusMessage)
     {
         Title = "Save Pipeline Search";
         _resources = resources;
         _savePipelineSearchForm = savePipelineSearchForm;
+        _statusMessage = statusMessage;
 
         FormEventHelper.WireFormEvents(
             _savePipelineSearchForm,
             this,
-            new StatusMessage(),
+            _statusMessage,
             "Pipeline search saved successfully!",
             "Error saving pipeline search: ");
+
+        ExtensionHost.HideStatus(_statusMessage);
     }
 
     public override IContent[] GetContent()
     {
-        return new[] { _savePipelineSearchForm };
+        ExtensionHost.HideStatus(_statusMessage);
+        return [_savePipelineSearchForm];
     }
 }

@@ -68,7 +68,7 @@ public class SearchPageFactory : ISearchPageFactory
     public ContentPage CreatePageForSearch(IDefinitionSearch search)
     {
         var savePipelineSearchForm = new SavePipelineSearchForm(search, _resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
-        return new SavePipelineSearchPage(_resources, savePipelineSearchForm);
+        return new SavePipelineSearchPage(_resources, savePipelineSearchForm, new StatusMessage());
     }
 
     public ContentPage CreateEditPageForSearch(IAzureSearch search)
