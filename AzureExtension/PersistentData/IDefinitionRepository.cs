@@ -19,5 +19,7 @@ public interface IDefinitionRepository
 
     Task ValidateDefinitionSearch(IDefinitionSearch definitionSearch, IAccount account);
 
+    public Task<IEnumerable<IDefinitionSearch>> GetAllDefinitionSearchesAsync(bool includeTopLevel);
+
     public Task RemoveSavedDefinitionSearch(IDefinitionSearch definitionSearch);
 }
