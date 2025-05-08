@@ -163,7 +163,7 @@ public sealed class Program
         };
 
         var azureDataManager = new AzureDataManager(cacheDataStore, updatersDictionary);
-        var cacheManager = new CacheManager(azureDataManager);
+        using var cacheManager = new CacheManager(azureDataManager);
         var dataProvider = new DataProvider(cacheManager, queryManager, pullRequestSearchManager, pipelineProvider);
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
