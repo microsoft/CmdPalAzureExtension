@@ -27,10 +27,12 @@ public class IconLoader
             { "Impediment", (@"Assets\Impediment.png", @"Assets\Impediment.png") },
             { "Issue", (@"Assets\Issue.png", @"Assets\Issue.png") },
             { "Pipeline", (@"Assets\Pipeline.png", @"Assets\Pipeline.png") },
+            { "PipelineCancelled", (@"Assets\PipelineCancelledLight.svg", @"Assets\PipelineCancelledDark.svg") },
             { "PipelineFailed", (@"Assets\PipelineFailed.png", @"Assets\PipelineFailed.png") },
             { "PipelineQueued", (@"Assets\PipelineQueued.png", @"Assets\PipelineQueued.png") },
             { "PipelineRunning", (@"Assets\PipelineRunning.png", @"Assets\PipelineRunning.png") },
             { "PipelineSucceeded", (@"Assets\PipelineSucceeded.png", @"Assets\PipelineSucceeded.png") },
+            { "PipelineWarning", (@"Assets\PipelineWarning.svg", @"Assets\PipelineWarning.svg") },
             { "ProductBacklogItem", (@"Assets\ProductBacklogItem.png", @"Assets\ProductBacklogItem.png") },
             { "PullRequest", (@"Assets\PullRequestLight.svg", @"Assets\PullRequestDark.svg") },
             { "PullRequestApproved", (@"Assets\PullRequestApproved.png", @"Assets\PullRequestApproved.png") },
@@ -154,10 +156,13 @@ public class IconLoader
 
         return iconStringKey switch
         {
+            "Canceled" => GetIcon("PipelineCancelled"),
+            "Failed" => GetIcon("PipelineFailed"),
             "InProgress" => GetIcon("StatusBlue"),
             "Succeeded" => GetIcon("PipelineSucceeded"),
-            "Failed" => GetIcon("PipelineFailed"),
             "Queued" => GetIcon("PipelineQueued"),
+            "Warning" => GetIcon("PipelineWarning"),
+            "PartiallySucceeded" => GetIcon("PipelineWarning"),
             _ => GetIcon("StatusGray"),
         };
     }

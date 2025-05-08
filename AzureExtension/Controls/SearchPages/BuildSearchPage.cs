@@ -33,12 +33,23 @@ public partial class BuildSearchPage : ListPage
         _resources = resources;
         _dataProvider = dataProvider;
         _timeSpanHelper = timeSpanHelper;
-        _definition = _dataProvider.GetDefinition(_search).GetAwaiter().GetResult();
+        _definition = GetDefinitionForPage(_search).Result;
         Icon = GetIcon();
         Name = _definition.Name ?? $"Definition #{_definition.InternalId}";
         ShowDetails = true;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         DataProvider = dataProvider;
+    }
+
+    private async Task<IDefinition> GetDefinitionForPage(IDefinitionSearch search)
+    {
+        var definition = await _dataProvider.GetDefinition(search);
+        if (definition == null)
+        {
+            throw new InvalidOperationException($"Definition not found for search {search.InternalId} - {search.ProjectUrl}");
+        }
+
+        return definition;
     }
 
     private IconInfo GetIcon()
