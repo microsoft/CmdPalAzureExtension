@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using AzureExtension.Controls;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace Microsoft.CmdPal.Ext.Calc.Helper;
@@ -25,8 +26,9 @@ public class SettingsManager : JsonSettingsManager
 
         var setting = new TextSetting("name", "defaultValue");
         var setting2 = new ToggleSetting("toggle", true);
-
+        var setting3 = new SignOutSetting();
         Settings.Add(setting);
+        Settings.Add(setting3);
 
         // Load settings from file upon initialization
         LoadSettings();
