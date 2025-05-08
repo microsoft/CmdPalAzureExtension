@@ -552,7 +552,7 @@
     <value>Saving pipeline failed: </value>
   </data>
   <data name="Pages_SavedPipelineSearches_Title" xml:space="preserve">
-    <value>Saved Pipelines</value>
+    <value>Saved Azure DevOps Pipelines</value>
     <comment>The title for the SavedPipelinesPage</comment>
   </data>
   <data name="Pages_EditPipelineSearch_SuccessMessage" xml:space="preserve">
