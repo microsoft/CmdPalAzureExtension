@@ -6,5 +6,5 @@ namespace AzureExtension.Controls;
 
 public interface IAzureSearchRepository
 {
-    public Task Remove(IAzureSearch azureSearch);
+    void Remove(IAzureSearch azureSearch);
 }

@@ -22,6 +22,10 @@ public class DefinitionSearch : IDefinitionSearch
 
     public bool IsTopLevel { get; set; }
 
+    public string Name => throw new NotImplementedException();
+
+    public string Url => ProjectUrl;
+
     [Computed]
     [Write(false)]
     public AzureUri AzureUri

@@ -81,7 +81,7 @@ public class DataManagerTests
         var mockAccountProvider = new Mock<IAccountProvider>();
         var mockLiveDataProvider = new Mock<IAzureLiveDataProvider>();
         var mockConnectionProvider = new Mock<IConnectionProvider>();
-        var mockQueryRepository = new Mock<IQueryRepository>();
+        var mockQueryRepository = new Mock<ISavedSearchesProvider<IQuery>>();
         var queryManager = new AzureDataQueryManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object, mockConnectionProvider.Object, mockQueryRepository.Object);
 
         var mockVssConnection = new Mock<IVssConnection>();
@@ -175,7 +175,7 @@ public class DataManagerTests
         var mockAccountProvider = new Mock<IAccountProvider>();
         var mockLiveDataProvider = new Mock<IAzureLiveDataProvider>();
         var mockConnectionProvider = new Mock<IConnectionProvider>();
-        var mockPullRequestSearchRepository = new Mock<ISavedPullRequestSearchRepository>();
+        var mockPullRequestSearchRepository = new Mock<ISavedSearchesProvider<IPullRequestSearch>>();
         var pullRequestSearchManager = new AzureDataPullRequestSearchManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object, mockConnectionProvider.Object, mockPullRequestSearchRepository.Object);
 
         var mockVssConnection = new Mock<IVssConnection>();

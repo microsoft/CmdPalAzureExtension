@@ -17,14 +17,14 @@ public partial class SavedQueriesPage : ListPage
     private readonly IListItem _addQueryListItem;
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _savedQueriesMediator;
-    private readonly IQueryRepository _queryRepository;
+    private readonly IPersistentDataRepository<IQuery> _queryRepository;
     private readonly ISearchPageFactory _searchPageFactory;
 
     public SavedQueriesPage(
        IResources resources,
        IListItem addQueryListItem,
        SavedAzureSearchesMediator savedQueriesMediator,
-       IQueryRepository queryRepository,
+       IPersistentDataRepository<IQuery> queryRepository,
        ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
@@ -79,11 +79,11 @@ public partial class SavedQueriesPage : ListPage
 
     public override IListItem[] GetItems()
     {
-        var searches = _queryRepository.GetSavedQueries().Result;
+        var searches = _queryRepository.GetAllSavedData();
 
         if (searches.Any())
         {
-            var searchPages = searches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch, _queryRepository)).ToList();
+            var searchPages = searches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch)).ToList();
 
             searchPages.Add(_addQueryListItem);
 

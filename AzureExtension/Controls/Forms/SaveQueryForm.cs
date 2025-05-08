@@ -21,11 +21,11 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     private readonly SavedAzureSearchesMediator _savedQueriesMediator;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
-    private readonly IQueryRepository _queryRepository;
+    private readonly IPersistentDataRepository<IQuery> _queryRepository;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
-    private string IsTopLevelChecked => GetIsTopLevel().Result.ToString().ToLower(CultureInfo.InvariantCulture);
+    private string IsTopLevelChecked => GetIsTopLevel().ToString().ToLower(CultureInfo.InvariantCulture);
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
@@ -44,7 +44,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     };
 
     // for saving a new query
-    public SaveQueryForm(IResources resources, SavedAzureSearchesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
+    public SaveQueryForm(IResources resources, SavedAzureSearchesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IPersistentDataRepository<IQuery> queryRepository)
     {
         _resources = resources;
         _savedQuery = new Query();
@@ -55,7 +55,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     }
 
     // for editing an existing query
-    public SaveQueryForm(IQuery savedQuery, IResources resources, SavedAzureSearchesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository)
+    public SaveQueryForm(IQuery savedQuery, IResources resources, SavedAzureSearchesMediator savedQueriesMediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IPersistentDataRepository<IQuery> queryRepository)
     {
         _resources = resources;
         _savedQuery = savedQuery;
@@ -92,11 +92,11 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             {
                 Log.Information($"Removing outdated search {_savedQuery.Name}, {_savedQuery.Url}");
 
-                await _queryRepository.RemoveSavedQueryAsync(_savedQuery);
+                _queryRepository.RemoveSavedData(_savedQuery);
             }
 
             LoadingStateChanged?.Invoke(this, false);
-            _queryRepository.UpdateQueryTopLevelStatus(query, query.IsTopLevel, _accountProvider.GetDefaultAccount());
+            await _queryRepository.AddOrUpdateData(query, query.IsTopLevel, _accountProvider.GetDefaultAccount());
             _savedQueriesMediator.AddQuery(query);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         }
@@ -132,8 +132,8 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
         return new Query(uri, name, queryInfo.Description, isTopLevel);
     }
 
-    public async Task<bool> GetIsTopLevel()
+    public bool GetIsTopLevel()
     {
-        return await _queryRepository.IsTopLevel(_savedQuery);
+        return _queryRepository.IsTopLevel(_savedQuery);
     }
 }

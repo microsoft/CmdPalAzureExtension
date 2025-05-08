@@ -7,7 +7,6 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
-using AzureExtension.PersistentData;
 using Serilog;
 using Query = AzureExtension.DataModel.Query;
 using TFModels = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
@@ -24,14 +23,14 @@ public class AzureDataQueryManager : IDataQueryProvider, IDataUpdater
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
-    private readonly IQueryRepository _queryRepository;
+    private readonly ISavedSearchesProvider<IQuery> _queryRepository;
 
     public AzureDataQueryManager(
         DataStore dataStore,
         IAccountProvider accountProvider,
         IAzureLiveDataProvider liveDataProvider,
         IConnectionProvider connectionProvider,
-        IQueryRepository queryRepository)
+        ISavedSearchesProvider<IQuery> queryRepository)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
@@ -186,7 +185,7 @@ public class AzureDataQueryManager : IDataQueryProvider, IDataUpdater
     {
         if (parameters.UpdateType == DataUpdateType.All)
         {
-            var queries = await _queryRepository.GetSavedQueries();
+            var queries = _queryRepository.GetSavedSearches();
             foreach (var query in queries)
             {
                 await UpdateQueryAsync(query, parameters.CancellationToken.GetValueOrDefault());

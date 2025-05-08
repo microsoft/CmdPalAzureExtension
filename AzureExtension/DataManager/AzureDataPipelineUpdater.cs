@@ -7,7 +7,6 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
-using AzureExtension.PersistentData;
 using Build = AzureExtension.DataModel.Build;
 using Definition = AzureExtension.DataModel.Definition;
 
@@ -19,7 +18,7 @@ public class AzureDataPipelineUpdater : IDataUpdater
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
-    private readonly IDefinitionRepository _definitionRepository;
+    private readonly ISavedSearchesProvider<IDefinitionSearch> _definitionRepository;
     private readonly IPipelineProvider _pipelineProvider;
 
     public AzureDataPipelineUpdater(
@@ -27,7 +26,7 @@ public class AzureDataPipelineUpdater : IDataUpdater
         IAccountProvider accountProvider,
         IAzureLiveDataProvider liveDataProvider,
         IConnectionProvider connectionProvider,
-        IDefinitionRepository definitionRepository,
+        ISavedSearchesProvider<IDefinitionSearch> definitionRepository,
         IPipelineProvider pipelineProvider)
     {
         _dataStore = dataStore;
@@ -88,7 +87,7 @@ public class AzureDataPipelineUpdater : IDataUpdater
     {
         if (parameters.UpdateType == DataUpdateType.All)
         {
-            var definitionSearches = await _definitionRepository.GetSavedDefinitionSearches();
+            var definitionSearches = _definitionRepository.GetSavedSearches();
             foreach (var definitionSearch in definitionSearches)
             {
                 await UpdatePipelineAsync(definitionSearch, parameters.CancellationToken.GetValueOrDefault());

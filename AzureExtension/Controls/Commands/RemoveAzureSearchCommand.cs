@@ -26,7 +26,7 @@ public partial class RemoveAzureSearchCommand : InvokableCommand
 
     public override CommandResult Invoke()
     {
-        _azureSearchRepository.Remove(_savedAzureSearch).Wait();
+        _azureSearchRepository.Remove(_savedAzureSearch);
         _savedAzureSearchesMediator.Remove(_savedAzureSearch);
 
         return CommandResult.KeepOpen();

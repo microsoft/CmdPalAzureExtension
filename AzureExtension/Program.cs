@@ -145,13 +145,14 @@ public sealed class Program
 
         var pipelineProvider = new AzureDataPipelineProvider(cacheDataStore);
 
-        var persistentDataManager = new PersistentDataManager(persistentDataStore, azureValidator);
-        var pipelinePersistentDataManager = new PersistentDataManagerDefinitionSearch(persistentDataStore, azureValidator, azureLiveDataProvider, azureClientProvider, pipelineProvider);
+        var queryRepository = new QueryRepository(persistentDataStore, azureValidator);
+        var pullRequestSearchRepository = new PullRequestSearchRepository(persistentDataStore, azureValidator);
+        var pipelineDefinitionRepository = new DefinitionRepository(persistentDataStore, azureValidator, azureLiveDataProvider, azureClientProvider, pipelineProvider, accountProvider);
 
-        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, persistentDataManager);
-        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, persistentDataManager);
+        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, new SavedSearchesProviderAdapter<IQuery>(queryRepository));
+        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, new SavedSearchesProviderAdapter<IPullRequestSearch>(pullRequestSearchRepository));
 
-        var pipelineUpdater = new AzureDataPipelineUpdater(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, pipelinePersistentDataManager, pipelineProvider);
+        var pipelineUpdater = new AzureDataPipelineUpdater(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, pipelineDefinitionRepository, pipelineProvider);
 
         var updatersDictionary = new Dictionary<DataUpdateType, IDataUpdater>
         {
@@ -180,16 +181,16 @@ public sealed class Program
 
         // The searchPageFactory requires an instance of IQueryRepository and ISavedPullRequestSearchRepository.
         // Currently, the PersistentDataManager implements both interfaces, so it is passed in twice.
-        var searchPageFactory = new SearchPageFactory(resources, dataProvider, savedAzureSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager, persistentDataManager);
+        var searchPageFactory = new SearchPageFactory(resources, dataProvider, savedAzureSearchesMediator, accountProvider, azureClientHelpers, queryRepository, pullRequestSearchRepository);
 
-        var addQueryForm = new SaveQueryForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, persistentDataManager);
+        var addQueryForm = new SaveQueryForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, queryRepository);
         var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources.GetResource("Message_Query_Saved"), resources.GetResource("Message_Query_Saved_Error"), resources.GetResource("ListItems_AddQuery")), resources);
-        var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedAzureSearchesMediator, persistentDataManager, searchPageFactory);
+        var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedAzureSearchesMediator, queryRepository, searchPageFactory);
 
-        var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedAzureSearchesMediator, accountProvider, persistentDataManager);
+        var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedAzureSearchesMediator, accountProvider, pullRequestSearchRepository);
         var savePullRequestSearchPage = new SavePullRequestSearchPage(savePullRequestSearchForm, new StatusMessage(), resources);
         var addPullRequestSearchListItem = new AddPullRequestSearchListItem(savePullRequestSearchPage, resources);
-        var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedAzureSearchesMediator, persistentDataManager, searchPageFactory);
+        var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedAzureSearchesMediator, pullRequestSearchRepository, searchPageFactory);
 
         var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator);
 

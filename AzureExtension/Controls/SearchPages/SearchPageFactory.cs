@@ -25,11 +25,18 @@ public class SearchPageFactory : ISearchPageFactory
 
     private readonly AzureClientHelpers _azureClientHelpers;
 
-    private readonly IQueryRepository _queryRepository;
+    private readonly IPersistentDataRepository<IQuery> _queryRepository;
 
-    private readonly ISavedPullRequestSearchRepository _savedPullRequestSearchRepository;
+    private readonly IPersistentDataRepository<IPullRequestSearch> _savedPullRequestSearchRepository;
 
-    public SearchPageFactory(IResources resources, IDataProvider dataProvider, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, IQueryRepository queryRepository, ISavedPullRequestSearchRepository savedPullRequestSearchRepository)
+    public SearchPageFactory(
+        IResources resources,
+        IDataProvider dataProvider,
+        SavedAzureSearchesMediator mediator,
+        IAccountProvider accountProvider,
+        AzureClientHelpers azureClientHelpers,
+        IPersistentDataRepository<IQuery> queryRepository,
+        IPersistentDataRepository<IPullRequestSearch> savedPullRequestSearchRepository)
     {
         _resources = resources;
         _dataProvider = dataProvider;
@@ -74,8 +81,12 @@ public class SearchPageFactory : ISearchPageFactory
         }
     }
 
-    public IListItem CreateItemForSearch(IAzureSearch search, IAzureSearchRepository azureSearchRepository)
+    public IListItem CreateItemForSearch(IAzureSearch search)
     {
+        IAzureSearchRepository azureSearchRepository = search is IQuery
+            ? new AzureSearchRepositoryAdapter<IQuery>(_queryRepository)
+            : new AzureSearchRepositoryAdapter<IPullRequestSearch>(_savedPullRequestSearchRepository);
+
         return new ListItem(CreatePageForSearch(search))
         {
             Title = search.Name,
@@ -90,24 +101,24 @@ public class SearchPageFactory : ISearchPageFactory
         };
     }
 
-    public async Task<List<IListItem>> CreateCommandsForTopLevelSearches()
+    public Task<List<IListItem>> CreateCommandsForTopLevelSearches()
     {
         var topLevelSearches = new List<IListItem>();
-        var topLevelQueries = await _queryRepository.GetTopLevelQueries();
-        var topLevelPullRequestSearches = await _savedPullRequestSearchRepository.GetTopLevelPullRequestSearches();
+        var topLevelQueries = _queryRepository.GetAllSavedData(true);
+        var topLevelPullRequestSearches = _savedPullRequestSearchRepository.GetAllSavedData(true);
 
         foreach (var query in topLevelQueries)
         {
-            var commandItem = CreateItemForSearch(query, _queryRepository);
+            var commandItem = CreateItemForSearch(query);
             topLevelSearches.Add(commandItem);
         }
 
         foreach (var pullRequestSearch in topLevelPullRequestSearches)
         {
-            var commandItem = CreateItemForSearch(pullRequestSearch, _savedPullRequestSearchRepository);
+            var commandItem = CreateItemForSearch(pullRequestSearch);
             topLevelSearches.Add(commandItem);
         }
 
-        return topLevelSearches;
+        return Task.FromResult(topLevelSearches);
     }
 }
