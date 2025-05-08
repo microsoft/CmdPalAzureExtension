@@ -166,7 +166,7 @@
     <comment>Shown as the label for the input text box for the Azure query</comment>
   </data>
   <data name="Forms_SavePipelineSearch_TemplateEnteredPipelineSearchLabel" xml:space="preserve">
-    <value>Project URL</value>
+    <value>Pipeline URL</value>
     <comment>Shown as the label for the input text box for the Azure query</comment>
   </data>
   <data name="Forms_SaveQuery_TemplateIsTopLevelTitle" xml:space="preserve">
@@ -530,11 +530,61 @@
     <comment>The title for the form to edit a pipeline search</comment>
   </data>
   <data name="Forms_SavePipelineSearch_TemplateEnteredPipelineSearchError" xml:space="preserve">
-    <value>Project URL is required</value>
+    <value>Pipeline URL is required</value>
     <comment>The error message if a pipeline search doesn't have a URL</comment>
   </data>
   <data name="Forms_SavePipelineSearch_URLPlaceholderSuffix" xml:space="preserve">
-    <value>project/_build?definitionId=######</value>
+    <value>organization/project/_build?definitionId=######</value>
     <comment>The suffix for the pipeline search URL placeholder</comment>
+  </data>
+  <data name="ListItems_AddPipelineSearch" xml:space="preserve">
+    <value>Add a pipeline by URL</value>
+    <comment>Title for the AddPipelineSearchListItem</comment>
+  </data>
+  <data name="Pages_SavePipelineSearch_Title" xml:space="preserve">
+    <value>Save Pipeline By URL</value>
+    <comment>Title for the SavePipelineSearchPage</comment>
+  </data>
+  <data name="Pages_SavePipelineSearch_SuccessMessage" xml:space="preserve">
+    <value>Pipeline saved successfully!</value>
+  </data>
+  <data name="Pages_SavePipelineSearch_FailureMessage" xml:space="preserve">
+    <value>Saving pipeline failed: </value>
+  </data>
+  <data name="Pages_SavedPipelineSearches_Title" xml:space="preserve">
+    <value>Saved Pipelines</value>
+    <comment>The title for the SavedPipelinesPage</comment>
+  </data>
+  <data name="Pages_EditPipelineSearch_SuccessMessage" xml:space="preserve">
+    <value>Pipeline search edited successfully!</value>
+    <comment>The success message when a pipeline search is saved</comment>
+  </data>
+  <data name="Pages_EditPipelineSearch_FailureMessage" xml:space="preserve">
+    <value>Editing pipeline search failed: </value>
+    <comment>The message shown when editing a pipeline search fails</comment>
+  </data>
+  <data name="PipelineBuild_Requester" xml:space="preserve">
+    <value>Requester</value>
+    <comment>The user or account that started the pipeline run</comment>
+  </data>
+  <data name="PipelineBuild_SourceBranch" xml:space="preserve">
+    <value>Source Branch</value>
+    <comment>The code branch the pipeline was run on</comment>
+  </data>
+  <data name="Pages_BuildSearch_ErrorMessage" xml:space="preserve">
+    <value>An error occurred with search</value>
+    <comment>A message displayed when an error occurs in page loading</comment>
+  </data>
+  <data name="Pages_BuildSearch_NoItemsMessage" xml:space="preserve">
+    <value>No items found</value>
+    <comment>A message shown if no builds are found</comment>
+  </data>
+  <data name="Pages_BuildSearch_PipelineNameAlternative" xml:space="preserve">
+    <value>Pipeline</value>
+    <comment>A replacement title if the definition/pipeline name is null or empty</comment>
+  </data>
+  <data name="Pages_PipelineSearch_LinkCommandName" xml:space="preserve">
+    <value>Open link to all runs</value>
+    <comment>Special name for the OpenLink command for the PipelineSearchPage</comment>
   </data>
 </root>

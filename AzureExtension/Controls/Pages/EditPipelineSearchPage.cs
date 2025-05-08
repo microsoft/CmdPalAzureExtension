@@ -17,23 +17,28 @@ internal sealed partial class EditPipelineSearchPage : ContentPage
     private readonly string _successMessage;
     private readonly string _errorMessage;
 
-    public EditPipelineSearchPage(IResources resources, SavePipelineSearchForm savePipelineSearchForm, StatusMessage statusMessage, string successMessage, string errorMessage)
+    public EditPipelineSearchPage(
+        IResources resources,
+        SavePipelineSearchForm savePipelineSearchForm,
+        StatusMessage statusMessage)
     {
         _resources = resources;
         _savePipelineSearchForm = savePipelineSearchForm;
         _statusMessage = statusMessage;
-        _successMessage = successMessage;
-        _errorMessage = errorMessage;
+        _successMessage = _resources.GetResource("Pages_EditPipelineSearch_SuccessMessage");
+        _errorMessage = _resources.GetResource("Pages_EditPipelineSearch_FailureMessage");
 
-        // Wire up events using the helper
-        FormEventHelper.WireFormEvents(_savePipelineSearchForm, this, _statusMessage, _successMessage, _errorMessage);
+        FormEventHelper.WireFormEvents(
+            _savePipelineSearchForm,
+            this,
+            _statusMessage,
+            _successMessage,
+            _errorMessage);
 
-        // Hide status message initially
         ExtensionHost.HideStatus(_statusMessage);
 
-        // Set page properties
         Title = _resources.GetResource("Pages_Edit");
-        Name = _resources.GetResource("Pages_Edit"); // Title is for the Page, Name is for the Command
+        Name = Title; // Title is for the Page, Name is for the Command
         Icon = IconLoader.GetIcon("Edit");
     }
 

@@ -35,7 +35,8 @@ public partial class BuildSearchPage : ListPage
         _timeSpanHelper = timeSpanHelper;
         _definition = GetDefinitionForPage(_search).Result;
         Icon = GetIcon();
-        Name = _definition.Name ?? $"Definition #{_definition.InternalId}";
+        Title = _definition.Name ?? $"{_resources.GetResource("Pages_BuildSearch_PipelineNameAlternative")} #{_definition.InternalId}";
+        Name = Title; // Title is for the Page, Name is for the Command
         ShowDetails = true;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         DataProvider = dataProvider;
@@ -96,7 +97,7 @@ public partial class BuildSearchPage : ListPage
                 {
                     new ListItem(new NoOpCommand())
                     {
-                        Title = "No items found",
+                        Title = _resources.GetResource("Pages_BuildSearch_NoItemsMessage"),
                         Icon = IconLoader.GetIcon("Logo"),
                     },
                 };
@@ -108,7 +109,7 @@ public partial class BuildSearchPage : ListPage
             {
                 new(new NoOpCommand())
                 {
-                    Title = "An error occurred with search",
+                    Title = _resources.GetResource("Pages_BuildSearch_ErrorMessage"),
                     Details = new Details()
                     {
                         Body = ex.Message,
@@ -132,11 +133,11 @@ public partial class BuildSearchPage : ListPage
 
     protected ListItem GetListItem(IBuild item)
     {
-        var title = $"#{item.BuildNumber}";
+        var listItemTitle = $"#{item.BuildNumber}";
 
         return new ListItem(new LinkCommand(item.Url, _resources, null))
         {
-            Title = title,
+            Title = listItemTitle,
             Icon = IconLoader.GetIconForPipelineStatusAndResult(item.Status, item.Result),
             Tags = new ITag[]
             {
@@ -144,17 +145,17 @@ public partial class BuildSearchPage : ListPage
             },
             Details = new Details()
             {
-                Title = $"{_definition.Name} - {title}",
+                Title = $"{_definition.Name} - {listItemTitle}",
                 Metadata = new[]
                 {
                     new DetailsElement()
                     {
-                        Key = "Requester",
+                        Key = _resources.GetResource("PipelineBuild_Requester"),
                         Data = new DetailsLink() { Text = $"{item.Requester?.Name}" },
                     },
                     new DetailsElement()
                     {
-                        Key = "Source Branch",
+                        Key = _resources.GetResource("PipelineBuild_SourceBranch"),
                         Data = new DetailsLink() { Text = $"{item.SourceBranch}" },
                     },
                 },

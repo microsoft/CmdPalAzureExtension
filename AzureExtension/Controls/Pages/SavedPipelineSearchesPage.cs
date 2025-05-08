@@ -34,8 +34,8 @@ public class SavedPipelineSearchesPage : ListPage
         ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
-        Title = "Saved Pipeline Searches";
-        Name = "Saved Pipeline Searches"; // Title is for the Page, Name is for the command
+        Title = _resources.GetResource("Pages_SavedPipelineSearches_Title");
+        Name = Title; // Title is for the Page, Name is for the command
         Icon = IconLoader.GetIcon("Pipeline");
         ShowDetails = true;
         _definitionRepository = definitionRepository;

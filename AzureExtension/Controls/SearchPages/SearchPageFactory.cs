@@ -6,12 +6,10 @@ using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.Forms;
-using AzureExtension.DataManager;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using static Microsoft.Azure.Pipelines.WebApi.PipelinesResources;
 
 namespace AzureExtension.Controls.Pages;
 
@@ -96,7 +94,7 @@ public class SearchPageFactory : ISearchPageFactory
     {
         var savePipelineSearchForm = new SavePipelineSearchForm(search, _resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
         var statusMessage = new StatusMessage();
-        return new EditPipelineSearchPage(_resources, savePipelineSearchForm, statusMessage, "Pipeline search edited successfully", "error in editing pipeline search");
+        return new EditPipelineSearchPage(_resources, savePipelineSearchForm, statusMessage);
     }
 
     public IListItem CreateItemForSearch(IAzureSearch search, IAzureSearchRepository azureSearchRepository)
@@ -126,7 +124,7 @@ public class SearchPageFactory : ISearchPageFactory
             {
                 MoreCommands = new CommandContextItem[]
                 {
-                    new(new LinkCommand(definition.HtmlUrl, _resources, "Open link to all runs")),
+                    new(new LinkCommand(definition.HtmlUrl, _resources, _resources.GetResource("Pages_PipelineSearch_LinkCommandName"))),
                     new(CreateEditPageForSearch(search)),
                     new(new RemoveDefinitionSearchCommand(search, _resources, _mediator, definitionRepository)),
                 },
@@ -141,12 +139,12 @@ public class SearchPageFactory : ISearchPageFactory
                     {
                         new DetailsElement()
                         {
-                            Key = "Requester",
+                            Key = _resources.GetResource("PipelineBuild_Requester"),
                             Data = new DetailsLink() { Text = $"{definition.MostRecentBuild!.Requester?.Name}" },
                         },
                         new DetailsElement()
                         {
-                            Key = "Source Branch",
+                            Key = _resources.GetResource("PipelineBuild_SourceBranch"),
                             Data = new DetailsLink() { Text = $"{definition.MostRecentBuild!.SourceBranch}" },
                         },
                     },
@@ -161,7 +159,7 @@ public class SearchPageFactory : ISearchPageFactory
                 Icon = IconLoader.GetIcon("Pipeline"),
                 MoreCommands = new CommandContextItem[]
                 {
-                    new(new LinkCommand(definition.HtmlUrl, _resources, "Open link to all runs")),
+                    new(new LinkCommand(definition.HtmlUrl, _resources, _resources.GetResource("Pages_PipelineSearch_LinkCommandName"))),
                     new(CreateEditPageForSearch(search)),
                     new(new RemoveDefinitionSearchCommand(search, _resources, _mediator, definitionRepository)),
                 },

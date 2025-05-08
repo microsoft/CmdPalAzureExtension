@@ -193,7 +193,7 @@ public sealed class Program
 
         var savePipelineSearchForm = new SavePipelineSearchForm(null, resources, pipelinePersistentDataManager, savedAzureSearchesMediator, accountProvider, azureClientHelpers);
         var savePipelineSearchPage = new SavePipelineSearchPage(resources, savePipelineSearchForm, new StatusMessage());
-        var addPipelineSearchListItem = new AddPipelineSearchListItem(savePipelineSearchPage);
+        var addPipelineSearchListItem = new AddPipelineSearchListItem(savePipelineSearchPage, resources);
         var savedPipelineSearchesPage = new SavedPipelineSearchesPage(resources, addPipelineSearchListItem, savedAzureSearchesMediator, pipelinePersistentDataManager, accountProvider, searchPageFactory);
 
         var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator, savedPipelineSearchesPage);

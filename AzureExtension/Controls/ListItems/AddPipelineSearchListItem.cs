@@ -10,17 +10,10 @@ namespace AzureExtension.Controls.ListItems
 {
     public partial class AddPipelineSearchListItem : ListItem
     {
-        public AddPipelineSearchListItem(SavePipelinePage page)
+        public AddPipelineSearchListItem(SavePipelineSearchPage page, IResources resources)
         : base(page)
         {
-            Title = "Add Pipeline";
-            Icon = IconLoader.GetIcon("Add");
-        }
-
-        public AddPipelineSearchListItem(SavePipelineSearchPage page)
-        : base(page)
-        {
-            Title = "Add Pipelines by Project";
+            Title = resources.GetResource("ListItems_AddPipelineSearch");
             Icon = IconLoader.GetIcon("Add");
         }
     }

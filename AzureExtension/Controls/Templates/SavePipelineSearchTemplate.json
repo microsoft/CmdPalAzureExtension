@@ -19,7 +19,7 @@
       "isRequired": true,
       "errorMessage": "{{EnteredPipelineSearchErrorMessage}}",
       "value": "{{SavedPipelineSearchString}}",
-      "placeholder": "https://microsoft.visualstudio.com/{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}"
+      "placeholder": "https://dev.azure.com/{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}"
     },
     {
       "type": "ColumnSet",
