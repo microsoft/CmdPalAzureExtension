@@ -7,7 +7,6 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataModel;
-using AzureExtension.PersistentData;
 using Microsoft.TeamFoundation.Policy.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Serilog;
@@ -24,14 +23,14 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchProvider,
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
-    private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
+    private readonly ISavedSearchesSource<IPullRequestSearch> _pullRequestSearchRepository;
 
     public AzureDataPullRequestSearchManager(
         DataStore dataStore,
         IAccountProvider accountProvider,
         IAzureLiveDataProvider liveDataProvider,
         IConnectionProvider connectionProvider,
-        ISavedPullRequestSearchRepository pullRequestSearchRepository)
+        ISavedSearchesSource<IPullRequestSearch> pullRequestSearchRepository)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
@@ -264,7 +263,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchProvider,
     {
         if (parameters.UpdateType == DataUpdateType.All)
         {
-            var pullRequestSearches = await _pullRequestSearchRepository.GetSavedPullRequestSearches();
+            var pullRequestSearches = _pullRequestSearchRepository.GetSavedSearches();
             foreach (var pullRequestSearch in pullRequestSearches)
             {
                 await UpdatePullRequestsAsync(pullRequestSearch, parameters.CancellationToken.GetValueOrDefault());

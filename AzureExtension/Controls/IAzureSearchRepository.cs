@@ -6,5 +6,7 @@ namespace AzureExtension.Controls;
 
 public interface IAzureSearchRepository
 {
-    public Task Remove(IAzureSearch azureSearch);
+    IEnumerable<IAzureSearch> GetAll(bool getTopLevelOnly = false);
+
+    void Remove(IAzureSearch azureSearch);
 }

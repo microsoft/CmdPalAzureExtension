@@ -9,9 +9,7 @@ namespace AzureExtension.Controls.Pages;
 
 public interface ISearchPageFactory
 {
-    IListItem CreateItemForSearch(IAzureSearch search, IAzureSearchRepository azureSearchRepository);
-
-    public IListItem CreateItemForSearch(IDefinitionSearch search, IDefinitionRepository definitionRepository);
+    IListItem CreateItemForSearch(IAzureSearch search);
 
     Task<List<IListItem>> CreateCommandsForTopLevelSearches();
 }

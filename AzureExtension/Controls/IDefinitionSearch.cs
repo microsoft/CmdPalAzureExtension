@@ -4,7 +4,7 @@
 
 namespace AzureExtension.Controls;
 
-public interface IDefinitionSearch
+public interface IDefinitionSearch : IAzureSearch
 {
     long InternalId { get; set; } // This is the ID of the definition in Azure DevOps
 

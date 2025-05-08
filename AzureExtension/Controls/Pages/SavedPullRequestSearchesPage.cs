@@ -4,7 +4,6 @@
 
 using AzureExtension.Controls.ListItems;
 using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
@@ -15,14 +14,14 @@ public class SavedPullRequestSearchesPage : ListPage
     private readonly IResources _resources;
     private readonly AddPullRequestSearchListItem _addPullRequestSearchListItem;
     private readonly SavedAzureSearchesMediator _mediator;
-    private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
+    private readonly ISavedSearchesProvider<IPullRequestSearch> _pullRequestSearchRepository;
     private readonly ISearchPageFactory _searchPageFactory;
 
     public SavedPullRequestSearchesPage(
         IResources resources,
         AddPullRequestSearchListItem addPullRequestSearchListItem,
         SavedAzureSearchesMediator mediator,
-        ISavedPullRequestSearchRepository pullRequestSearchRepository,
+        ISavedSearchesProvider<IPullRequestSearch> pullRequestSearchRepository,
         ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
@@ -77,11 +76,11 @@ public class SavedPullRequestSearchesPage : ListPage
 
     public override IListItem[] GetItems()
     {
-        var searches = _pullRequestSearchRepository.GetSavedPullRequestSearches().Result;
+        var searches = _pullRequestSearchRepository.GetSavedSearches(false);
 
         if (searches.Any())
         {
-            var searchPages = searches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch, _pullRequestSearchRepository)).ToList();
+            var searchPages = searches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch)).ToList();
 
             searchPages.Add(_addPullRequestSearchListItem);
 

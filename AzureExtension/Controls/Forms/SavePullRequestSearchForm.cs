@@ -18,7 +18,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 {
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _mediator;
-    private readonly ISavedPullRequestSearchRepository _pullRequestSearchRepository;
+    private readonly ISavedSearchesUpdater<IPullRequestSearch> _pullRequestSearchRepository;
     private readonly IPullRequestSearch _savedPullRequestSearch;
     private readonly IAccountProvider _accountProvider;
 
@@ -26,7 +26,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
-    private string IsTopLevelChecked => GetIsTopLevel().Result.ToString().ToLower(CultureInfo.InvariantCulture);
+    private string IsTopLevelChecked => GetIsTopLevel().ToString().ToLower(CultureInfo.InvariantCulture);
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
@@ -49,7 +49,11 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("SavePullRequestSearch", TemplateSubstitutions);
 
     // for saving a new pull request search
-    public SavePullRequestSearchForm(IResources resources, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, ISavedPullRequestSearchRepository pullRequestSearchRepository)
+    public SavePullRequestSearchForm(
+        IResources resources,
+        SavedAzureSearchesMediator mediator,
+        IAccountProvider accountProvider,
+        ISavedSearchesUpdater<IPullRequestSearch> pullRequestSearchRepository)
     {
         _resources = resources;
         _mediator = mediator;
@@ -59,7 +63,12 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     }
 
     // for editing an existing pull request search
-    public SavePullRequestSearchForm(IPullRequestSearch savedPullRequestSearch, IResources resources, SavedAzureSearchesMediator mediator, IAccountProvider accountProvider, ISavedPullRequestSearchRepository pullRequestSearchRepository)
+    public SavePullRequestSearchForm(
+        IPullRequestSearch savedPullRequestSearch,
+        IResources resources,
+        SavedAzureSearchesMediator mediator,
+        IAccountProvider accountProvider,
+        ISavedSearchesUpdater<IPullRequestSearch> pullRequestSearchRepository)
     {
         _resources = resources;
         _mediator = mediator;
@@ -93,12 +102,12 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             {
                 Log.Information($"Removing outdated search {_savedPullRequestSearch.Name}, {_savedPullRequestSearch.Url}");
 
-                await _pullRequestSearchRepository.RemoveSavedPullRequestSearch(_savedPullRequestSearch);
+                _pullRequestSearchRepository.RemoveSavedSearch(_savedPullRequestSearch);
             }
 
             LoadingStateChanged?.Invoke(this, false);
 
-            _pullRequestSearchRepository.UpdatePullRequestSearchTopLevelStatus(pullRequestSearch, pullRequestSearch.IsTopLevel, _accountProvider.GetDefaultAccount());
+            await _pullRequestSearchRepository.AddOrUpdateSearch(pullRequestSearch, pullRequestSearch.IsTopLevel, _accountProvider.GetDefaultAccount());
 
             _mediator.AddPullRequestSearch(pullRequestSearch);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
@@ -127,8 +136,8 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
         return new PullRequestSearch(searchUri, name, view, isTopLevel);
     }
 
-    public async Task<bool> GetIsTopLevel()
+    public bool GetIsTopLevel()
     {
-        return await _pullRequestSearchRepository.IsTopLevel(_savedPullRequestSearch);
+        return _pullRequestSearchRepository.IsTopLevel(_savedPullRequestSearch);
     }
 }
