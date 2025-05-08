@@ -12,7 +12,7 @@ using Serilog;
 
 namespace AzureExtension.PersistentData;
 
-public class DefinitionRepository : IPersistentDataRepository<IDefinitionSearch, IDefinition>, ISavedSearchesProvider<IDefinitionSearch>
+public class DefinitionRepository : IPersistentDataRepository<IDefinitionSearch, IDefinition>, ISavedSearchesSource<IDefinitionSearch>
 {
     private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", nameof(QueryRepository)));
     private static readonly ILogger _log = _logger.Value;
@@ -78,7 +78,7 @@ public class DefinitionRepository : IPersistentDataRepository<IDefinitionSearch,
         DefinitionSearch.AddOrUpdate(_dataStore, definitionSearch.InternalId, definitionSearch.ProjectUrl, isTopLevel);
     }
 
-    public void RemoveSavedData(IDefinitionSearch dataSearch)
+    public void RemoveSavedSearch(IDefinitionSearch dataSearch)
     {
         ValidateDataStore();
         var internalId = dataSearch.InternalId;
@@ -131,7 +131,7 @@ public class DefinitionRepository : IPersistentDataRepository<IDefinitionSearch,
         return definitions;
     }
 
-    public async Task AddOrUpdateData(IDefinitionSearch dataSearch, bool isTopLevel, IAccount account)
+    public async Task AddOrUpdateSearch(IDefinitionSearch dataSearch, bool isTopLevel, IAccount account)
     {
         ValidateDataStore();
         await ValidateDefinitionSearch(dataSearch, account);
@@ -142,5 +142,11 @@ public class DefinitionRepository : IPersistentDataRepository<IDefinitionSearch,
     {
         ValidateDataStore();
         return GetAllDefinitionSearches(false);
+    }
+
+    public IEnumerable<IDefinitionSearch> GetSavedSearches(bool getTopLevelOnly = false)
+    {
+        ValidateDataStore();
+        return GetAllDefinitionSearches(getTopLevelOnly);
     }
 }

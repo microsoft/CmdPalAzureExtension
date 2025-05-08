@@ -23,14 +23,14 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchProvider,
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
-    private readonly ISavedSearchesProvider<IPullRequestSearch> _pullRequestSearchRepository;
+    private readonly ISavedSearchesSource<IPullRequestSearch> _pullRequestSearchRepository;
 
     public AzureDataPullRequestSearchManager(
         DataStore dataStore,
         IAccountProvider accountProvider,
         IAzureLiveDataProvider liveDataProvider,
         IConnectionProvider connectionProvider,
-        ISavedSearchesProvider<IPullRequestSearch> pullRequestSearchRepository)
+        ISavedSearchesSource<IPullRequestSearch> pullRequestSearchRepository)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;

@@ -23,14 +23,14 @@ public class AzureDataQueryManager : IDataQueryProvider, IDataUpdater
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
-    private readonly ISavedSearchesProvider<IQuery> _queryRepository;
+    private readonly ISavedSearchesSource<IQuery> _queryRepository;
 
     public AzureDataQueryManager(
         DataStore dataStore,
         IAccountProvider accountProvider,
         IAzureLiveDataProvider liveDataProvider,
         IConnectionProvider connectionProvider,
-        ISavedSearchesProvider<IQuery> queryRepository)
+        ISavedSearchesSource<IQuery> queryRepository)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;

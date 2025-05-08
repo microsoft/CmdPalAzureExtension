@@ -5,7 +5,6 @@
 using AzureExtension.Controls;
 using AzureExtension.Controls.Pages;
 using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Query = AzureExtension.Controls.Query;
@@ -17,14 +16,14 @@ public partial class SavedQueriesPage : ListPage
     private readonly IListItem _addQueryListItem;
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _savedQueriesMediator;
-    private readonly IPersistentDataRepository<IQuery> _queryRepository;
+    private readonly ISavedSearchesProvider<IQuery> _queryRepository;
     private readonly ISearchPageFactory _searchPageFactory;
 
     public SavedQueriesPage(
        IResources resources,
        IListItem addQueryListItem,
        SavedAzureSearchesMediator savedQueriesMediator,
-       IPersistentDataRepository<IQuery> queryRepository,
+       ISavedSearchesProvider<IQuery> queryRepository,
        ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
@@ -79,7 +78,7 @@ public partial class SavedQueriesPage : ListPage
 
     public override IListItem[] GetItems()
     {
-        var searches = _queryRepository.GetAllSavedData();
+        var searches = _queryRepository.GetSavedSearches(false);
 
         if (searches.Any())
         {

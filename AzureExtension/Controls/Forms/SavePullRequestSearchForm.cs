@@ -18,7 +18,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 {
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _mediator;
-    private readonly IPersistentDataRepository<IPullRequestSearch> _pullRequestSearchRepository;
+    private readonly ISavedSearchesUpdater<IPullRequestSearch> _pullRequestSearchRepository;
     private readonly IPullRequestSearch _savedPullRequestSearch;
     private readonly IAccountProvider _accountProvider;
 
@@ -53,7 +53,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
         IResources resources,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
-        IPersistentDataRepository<IPullRequestSearch> pullRequestSearchRepository)
+        ISavedSearchesUpdater<IPullRequestSearch> pullRequestSearchRepository)
     {
         _resources = resources;
         _mediator = mediator;
@@ -68,7 +68,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
         IResources resources,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
-        IPersistentDataRepository<IPullRequestSearch> pullRequestSearchRepository)
+        ISavedSearchesUpdater<IPullRequestSearch> pullRequestSearchRepository)
     {
         _resources = resources;
         _mediator = mediator;
@@ -102,12 +102,12 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             {
                 Log.Information($"Removing outdated search {_savedPullRequestSearch.Name}, {_savedPullRequestSearch.Url}");
 
-                _pullRequestSearchRepository.RemoveSavedData(_savedPullRequestSearch);
+                _pullRequestSearchRepository.RemoveSavedSearch(_savedPullRequestSearch);
             }
 
             LoadingStateChanged?.Invoke(this, false);
 
-            await _pullRequestSearchRepository.AddOrUpdateData(pullRequestSearch, pullRequestSearch.IsTopLevel, _accountProvider.GetDefaultAccount());
+            await _pullRequestSearchRepository.AddOrUpdateSearch(pullRequestSearch, pullRequestSearch.IsTopLevel, _accountProvider.GetDefaultAccount());
 
             _mediator.AddPullRequestSearch(pullRequestSearch);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));

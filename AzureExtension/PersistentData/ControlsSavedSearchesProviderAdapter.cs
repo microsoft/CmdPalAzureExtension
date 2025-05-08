@@ -7,19 +7,19 @@ using AzureExtension.Controls;
 namespace AzureExtension.PersistentData;
 
 #pragma warning disable SA1649 // File name should match first type name
-public class SavedSearchesProviderAdapter<TDataSearch> : DataManager.ISavedSearchesSource<TDataSearch>
+public class ControlsSavedSearchesProviderAdapter<TDataSearch> : ISavedSearchesProvider<TDataSearch>
 #pragma warning restore SA1649 // File name should match first type name
     where TDataSearch : IAzureSearch
 {
     private readonly IPersistentDataRepository<TDataSearch> _repository;
 
-    public SavedSearchesProviderAdapter(IPersistentDataRepository<TDataSearch> repository)
+    public ControlsSavedSearchesProviderAdapter(IPersistentDataRepository<TDataSearch> repository)
     {
         _repository = repository;
     }
 
-    public IEnumerable<TDataSearch> GetSavedSearches()
+    public IEnumerable<TDataSearch> GetSavedSearches(bool getTopLevelOnly)
     {
-        return _repository.GetAllSavedData();
+        return _repository.GetAllSavedData(getTopLevelOnly);
     }
 }

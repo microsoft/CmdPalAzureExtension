@@ -46,7 +46,7 @@ public partial class QueryRepository : IPersistentDataRepository<IQuery>
         return queryInfo.Result == ResultType.Success;
     }
 
-    public void RemoveSavedData(IQuery dataSearch)
+    public void RemoveSavedSearch(IQuery dataSearch)
     {
         ValidateDataStore();
 
@@ -72,7 +72,7 @@ public partial class QueryRepository : IPersistentDataRepository<IQuery>
         return Query.Get(_dataStore, name, url) ?? throw new InvalidOperationException($"Search {name} - {url} not found.");
     }
 
-    public IEnumerable<IQuery> GetAllSavedData(bool getTopLevelOnly = false)
+    public IEnumerable<IQuery> GetSavedSearches(bool getTopLevelOnly = false)
     {
         ValidateDataStore();
         if (getTopLevelOnly)
@@ -83,10 +83,15 @@ public partial class QueryRepository : IPersistentDataRepository<IQuery>
         return Query.GetAll(_dataStore);
     }
 
-    public async Task AddOrUpdateData(IQuery dataSearch, bool isTopLevel, IAccount account)
+    public async Task AddOrUpdateSearch(IQuery dataSearch, bool isTopLevel, IAccount account)
     {
         ValidateDataStore();
         await ValidateQuery(dataSearch, account);
         Query.AddOrUpdate(_dataStore, dataSearch.Name, dataSearch.Url, isTopLevel);
+    }
+
+    public IEnumerable<IQuery> GetAllSavedData(bool getTopLevelOnly = false)
+    {
+        return GetSavedSearches(getTopLevelOnly);
     }
 }

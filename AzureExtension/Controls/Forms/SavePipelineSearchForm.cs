@@ -18,7 +18,7 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
     private readonly IDefinitionSearch? _savedDefinitionSearch;
 
-    private readonly IDefinitionRepository _definitionRepository;
+    private readonly ISavedSearchesUpdater<IDefinitionSearch> _definitionRepository;
 
     private readonly SavedAzureSearchesMediator _mediator;
 
@@ -30,7 +30,7 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
-    private string IsTopLevelChecked => GetIsTopLevel().Result.ToString().ToLower(CultureInfo.InvariantCulture);
+    private string IsTopLevelChecked => GetIsTopLevel().ToString().ToLower(CultureInfo.InvariantCulture);
 
     public Dictionary<string, string> TemplateSubstitutions => new Dictionary<string, string>
     {
@@ -47,7 +47,7 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
     public SavePipelineSearchForm(
         IDefinitionSearch? definitionSearch,
         IResources resources,
-        IDefinitionRepository definitionRepository,
+        ISavedSearchesUpdater<IDefinitionSearch> definitionRepository,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers)
@@ -63,7 +63,7 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName(TemplateKey, TemplateSubstitutions);
 
-    public override Task HandleInputs(string inputs)
+    public override async Task HandleInputs(string inputs)
     {
         LoadingStateChanged?.Invoke(this, true);
 
@@ -79,11 +79,11 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
             {
                 Log.Information($"Removing outdated search {_savedDefinitionSearch!.InternalId}");
 
-                _definitionRepository.RemoveSavedDefinitionSearch(_savedDefinitionSearch!);
+                _definitionRepository.RemoveSavedSearch(_savedDefinitionSearch!);
             }
 
             LoadingStateChanged?.Invoke(this, false);
-            _definitionRepository.UpdateDefinitionSearchTopLevelStatus(pipelineSearch, pipelineSearch.IsTopLevel, _accountProvider.GetDefaultAccount());
+            await _definitionRepository.AddOrUpdateSearch(pipelineSearch, pipelineSearch.IsTopLevel, _accountProvider.GetDefaultAccount());
             _mediator.AddPipelineSearch(pipelineSearch);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         }
@@ -93,8 +93,6 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
             _mediator.AddPipelineSearch(ex);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
         }
-
-        return Task.CompletedTask;
     }
 
     // Creates a DefinitionSearch based on a URL in the following format
@@ -149,13 +147,13 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
         }
     }
 
-    public async Task<bool> GetIsTopLevel()
+    public bool GetIsTopLevel()
     {
         if (_savedDefinitionSearch == null || string.IsNullOrEmpty(_savedDefinitionSearch.ProjectUrl))
         {
             return false;
         }
 
-        return await _definitionRepository.IsTopLevel(_savedDefinitionSearch!);
+        return _definitionRepository.IsTopLevel(_savedDefinitionSearch!);
     }
 }

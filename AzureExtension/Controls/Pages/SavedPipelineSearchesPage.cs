@@ -5,7 +5,6 @@
 using AzureExtension.Account;
 using AzureExtension.Controls.ListItems;
 using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
@@ -19,7 +18,7 @@ public class SavedPipelineSearchesPage : ListPage
 
     private readonly SavedAzureSearchesMediator _mediator;
 
-    private readonly IDefinitionRepository _definitionRepository;
+    private readonly ISavedSearchesProvider<IDefinitionSearch> _definitionRepository;
 
     private readonly IAccountProvider _accountProvider;
 
@@ -29,7 +28,7 @@ public class SavedPipelineSearchesPage : ListPage
         IResources resources,
         AddPipelineSearchListItem addPipelineSearchListItem,
         SavedAzureSearchesMediator mediator,
-        IDefinitionRepository definitionRepository,
+        ISavedSearchesProvider<IDefinitionSearch> definitionRepository,
         IAccountProvider accountProvider,
         ISearchPageFactory searchPageFactory)
     {
@@ -88,11 +87,11 @@ public class SavedPipelineSearchesPage : ListPage
     public override IListItem[] GetItems()
     {
         var account = _accountProvider.GetDefaultAccount();
-        var searches = _definitionRepository.GetAllDefinitionSearchesAsync(false).Result.ToList();
+        var searches = _definitionRepository.GetSavedSearches(false);
 
-        if (searches.Count != 0)
+        if (searches.Any())
         {
-            var searchPages = searches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch, _definitionRepository)).ToList();
+            var searchPages = searches.Select(savedSearch => _searchPageFactory.CreateItemForSearch(savedSearch)).ToList();
 
             searchPages.Add(_addPipelineSearchListItem);
 

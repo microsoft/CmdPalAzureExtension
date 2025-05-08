@@ -37,7 +37,7 @@ public class PullRequestSearchRepository : IPersistentDataRepository<IPullReques
         return _azureValidator.GetRepositoryInfo(pullRequestSearch.Url, account);
     }
 
-    public void RemoveSavedData(IPullRequestSearch dataSearch)
+    public void RemoveSavedSearch(IPullRequestSearch dataSearch)
     {
         ValidateDataStore();
 
@@ -65,7 +65,7 @@ public class PullRequestSearchRepository : IPersistentDataRepository<IPullReques
         return PullRequestSearch.Get(_dataStore, url, title, view) ?? throw new InvalidOperationException($"Pull request search {title} - {url} - {view} not found.");
     }
 
-    public IEnumerable<IPullRequestSearch> GetAllSavedData(bool getTopLevelOnly = false)
+    public IEnumerable<IPullRequestSearch> GetSavedSearches(bool getTopLevelOnly = false)
     {
         ValidateDataStore();
         if (getTopLevelOnly)
@@ -76,17 +76,22 @@ public class PullRequestSearchRepository : IPersistentDataRepository<IPullReques
         return PullRequestSearch.GetAll(_dataStore);
     }
 
-    bool IPersistentDataRepository<IPullRequestSearch, IPullRequestSearch>.IsTopLevel(IPullRequestSearch dataSearch)
+    public bool IsTopLevel(IPullRequestSearch dataSearch)
     {
         ValidateDataStore();
         var dstorePullRequestSearch = PullRequestSearch.Get(_dataStore, dataSearch.Url, dataSearch.Name, dataSearch.View);
         return dstorePullRequestSearch != null && dstorePullRequestSearch.IsTopLevel;
     }
 
-    public async Task AddOrUpdateData(IPullRequestSearch dataSearch, bool isTopLevel, IAccount account)
+    public async Task AddOrUpdateSearch(IPullRequestSearch dataSearch, bool isTopLevel, IAccount account)
     {
         ValidateDataStore();
         await ValidatePullRequestSearch(dataSearch, account);
         PullRequestSearch.AddOrUpdate(_dataStore, dataSearch.Url, dataSearch.Name, dataSearch.View, isTopLevel);
+    }
+
+    public IEnumerable<IPullRequestSearch> GetAllSavedData(bool getTopLevelOnly = false)
+    {
+        return GetSavedSearches(getTopLevelOnly);
     }
 }
