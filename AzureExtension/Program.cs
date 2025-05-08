@@ -14,6 +14,7 @@ using AzureExtension.DataManager.Cache;
 using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
+using Microsoft.CmdPal.Ext.Calc.Helper;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Extensions.Configuration;
@@ -201,7 +202,8 @@ public sealed class Program
         var addPipelineSearchListItem = new AddPipelineSearchListItem(savePipelineSearchPage, resources);
         var savedPipelineSearchesPage = new SavedPipelineSearchesPage(resources, addPipelineSearchListItem, savedAzureSearchesMediator, pipelineDefinitionRepository, accountProvider, searchPageFactory);
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator, savedPipelineSearchesPage);
+        var settings = new SettingsManager();
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator, savedPipelineSearchesPage, settings);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 
