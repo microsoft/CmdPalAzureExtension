@@ -18,16 +18,16 @@ public class AzureDataPipelineUpdater : IDataUpdater
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
-    private readonly ISavedSearchesSource<IDefinitionSearch> _definitionRepository;
-    private readonly IPipelineProvider _pipelineProvider;
+    private readonly ISavedSearchesSource<IPipelineDefinitionSearch> _definitionRepository;
+    private readonly IDefinitionProvider _pipelineProvider;
 
     public AzureDataPipelineUpdater(
         DataStore dataStore,
         IAccountProvider accountProvider,
         IAzureLiveDataProvider liveDataProvider,
         IConnectionProvider connectionProvider,
-        ISavedSearchesSource<IDefinitionSearch> definitionRepository,
-        IPipelineProvider pipelineProvider)
+        ISavedSearchesSource<IPipelineDefinitionSearch> definitionRepository,
+        IDefinitionProvider pipelineProvider)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
@@ -37,7 +37,7 @@ public class AzureDataPipelineUpdater : IDataUpdater
         _pipelineProvider = pipelineProvider;
     }
 
-    public bool IsNewOrStale(IDefinitionSearch definitionSearch, TimeSpan refreshCooldown)
+    public bool IsNewOrStale(IPipelineDefinitionSearch definitionSearch, TimeSpan refreshCooldown)
     {
         var dsDefinition = _pipelineProvider.GetDefinition(definitionSearch);
         return dsDefinition == null || DateTime.UtcNow - dsDefinition.UpdatedAt > refreshCooldown;
@@ -45,10 +45,10 @@ public class AzureDataPipelineUpdater : IDataUpdater
 
     public bool IsNewOrStale(DataUpdateParameters parameters, TimeSpan refreshCooldown)
     {
-        return IsNewOrStale((IDefinitionSearch)parameters.UpdateObject!, refreshCooldown);
+        return IsNewOrStale((IPipelineDefinitionSearch)parameters.UpdateObject!, refreshCooldown);
     }
 
-    public async Task UpdatePipelineAsync(IDefinitionSearch definitionSearch, CancellationToken cancellationToken)
+    public async Task UpdatePipelineAsync(IPipelineDefinitionSearch definitionSearch, CancellationToken cancellationToken)
     {
         var azureUri = new AzureUri(definitionSearch.ProjectUrl);
         var account = await _accountProvider.GetDefaultAccountAsync();
@@ -96,6 +96,6 @@ public class AzureDataPipelineUpdater : IDataUpdater
             return;
         }
 
-        await UpdatePipelineAsync((IDefinitionSearch)parameters.UpdateObject!, parameters.CancellationToken.GetValueOrDefault());
+        await UpdatePipelineAsync((IPipelineDefinitionSearch)parameters.UpdateObject!, parameters.CancellationToken.GetValueOrDefault());
     }
 }

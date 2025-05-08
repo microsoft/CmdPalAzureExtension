@@ -14,13 +14,13 @@ public class AzureSearchRepositoryAdapter<TDataSearch, TDataResult> : IAzureSear
     private readonly ISavedSearchesUpdater<TDataSearch> _updater;
     private readonly ISavedSearchesProvider<TDataSearch> _provider;
 
-    public AzureSearchRepositoryAdapter(IPersistentDataRepository<TDataSearch> repository)
+    public AzureSearchRepositoryAdapter(IPersistentSearchRepository<TDataSearch> repository)
     {
         _provider = repository;
         _updater = repository;
     }
 
-    public AzureSearchRepositoryAdapter(IPersistentDataRepository<TDataSearch, TDataResult> repository)
+    public AzureSearchRepositoryAdapter(IPersistentSearchRepository<TDataSearch, TDataResult> repository)
     {
         _provider = repository;
         _updater = repository;
@@ -44,7 +44,7 @@ public class AzureSearchRepositoryAdapter<TDataSearch> : AzureSearchRepositoryAd
 #pragma warning restore SA1402 // File may only contain a single type
     where TDataSearch : IAzureSearch
 {
-    public AzureSearchRepositoryAdapter(IPersistentDataRepository<TDataSearch> repository)
+    public AzureSearchRepositoryAdapter(IPersistentSearchRepository<TDataSearch> repository)
         : base(repository)
     {
     }

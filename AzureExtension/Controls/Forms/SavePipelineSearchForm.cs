@@ -16,9 +16,9 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 {
     private readonly IResources _resources;
 
-    private readonly IDefinitionSearch? _savedDefinitionSearch;
+    private readonly IPipelineDefinitionSearch? _savedDefinitionSearch;
 
-    private readonly ISavedSearchesUpdater<IDefinitionSearch> _definitionRepository;
+    private readonly ISavedSearchesUpdater<IPipelineDefinitionSearch> _definitionRepository;
 
     private readonly SavedAzureSearchesMediator _mediator;
 
@@ -45,9 +45,9 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
     };
 
     public SavePipelineSearchForm(
-        IDefinitionSearch? definitionSearch,
+        IPipelineDefinitionSearch? definitionSearch,
         IResources resources,
-        ISavedSearchesUpdater<IDefinitionSearch> definitionRepository,
+        ISavedSearchesUpdater<IPipelineDefinitionSearch> definitionRepository,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers)

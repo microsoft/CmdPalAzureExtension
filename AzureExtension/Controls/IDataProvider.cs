@@ -12,9 +12,9 @@ public interface IDataProvider
 
     Task<IEnumerable<IPullRequest>> GetPullRequests(IPullRequestSearch pullRequestSearch);
 
-    Task<IEnumerable<IBuild>> GetBuilds(IDefinitionSearch definitionSearch);
+    Task<IEnumerable<IBuild>> GetBuilds(IPipelineDefinitionSearch definitionSearch);
 
-    Task<IDefinition> GetDefinition(IDefinitionSearch definitionSearch);
+    Task<IDefinition> GetDefinition(IPipelineDefinitionSearch definitionSearch);
 
     event CacheManagerUpdateEventHandler? OnUpdate;
 }

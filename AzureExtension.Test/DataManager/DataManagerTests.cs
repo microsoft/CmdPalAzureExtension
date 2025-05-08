@@ -31,7 +31,7 @@ public class DataManagerTests
     {
         var path = TestHelpers.GetUniqueFolderPath("AZT");
         var combinedPath = Path.Combine(path, "AzureData.db");
-        var dataStoreSchema = new AzureDataStoreSchema();
+        var dataStoreSchema = new AzureCacheDataStoreSchema();
         var dataStore = new DataStore("TestStore", combinedPath, dataStoreSchema);
         dataStore.Create();
         return dataStore;

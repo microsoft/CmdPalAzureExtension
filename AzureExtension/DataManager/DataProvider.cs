@@ -15,7 +15,7 @@ public class DataProvider : IDataProvider
     private readonly ICacheManager _cacheManager;
     private readonly IDataQueryProvider _queryProvider;
     private readonly IDataPullRequestSearchProvider _pullRequestSearchProvider;
-    private readonly IPipelineProvider _pipelineProvider;
+    private readonly IDefinitionProvider _pipelineProvider;
 
     private CacheManagerUpdateEventHandler? _onUpdate;
 
@@ -29,7 +29,7 @@ public class DataProvider : IDataProvider
         ICacheManager cacheManager,
         IDataQueryProvider queryProvider,
         IDataPullRequestSearchProvider pullRequestSearchProvider,
-        IPipelineProvider pipelineProvider)
+        IDefinitionProvider pipelineProvider)
     {
         _log = Log.ForContext("SourceContext", nameof(IDataProvider));
         _cacheManager = cacheManager;
@@ -102,7 +102,7 @@ public class DataProvider : IDataProvider
         return _pullRequestSearchProvider.GetPullRequests(pullRequestSearch);
     }
 
-    public async Task<IEnumerable<IBuild>> GetBuilds(IDefinitionSearch definitionSearch)
+    public async Task<IEnumerable<IBuild>> GetBuilds(IPipelineDefinitionSearch definitionSearch)
     {
         var parameters = new DataUpdateParameters
         {
@@ -115,7 +115,7 @@ public class DataProvider : IDataProvider
         return _pipelineProvider.GetBuilds(definitionSearch);
     }
 
-    public async Task<IDefinition> GetDefinition(IDefinitionSearch definitionSearch)
+    public async Task<IDefinition> GetDefinition(IPipelineDefinitionSearch definitionSearch)
     {
         var parameters = new DataUpdateParameters
         {

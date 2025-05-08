@@ -17,7 +17,7 @@ public partial class BuildSearchPage : ListPage
 
     public IDataProvider DataProvider { get; private set; }
 
-    private readonly IDefinitionSearch _search;
+    private readonly IPipelineDefinitionSearch _search;
 
     private readonly IDefinition _definition;
 
@@ -27,7 +27,7 @@ public partial class BuildSearchPage : ListPage
 
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public BuildSearchPage(IDefinitionSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+    public BuildSearchPage(IPipelineDefinitionSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
     {
         _search = search;
         _resources = resources;
@@ -42,7 +42,7 @@ public partial class BuildSearchPage : ListPage
         DataProvider = dataProvider;
     }
 
-    private async Task<IDefinition> GetDefinitionForPage(IDefinitionSearch search)
+    private async Task<IDefinition> GetDefinitionForPage(IPipelineDefinitionSearch search)
     {
         var definition = await _dataProvider.GetDefinition(search);
         if (definition == null)

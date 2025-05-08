@@ -11,9 +11,9 @@ public class SavedSearchesProviderAdapter<TDataSearch> : DataManager.ISavedSearc
 #pragma warning restore SA1649 // File name should match first type name
     where TDataSearch : IAzureSearch
 {
-    private readonly IPersistentDataRepository<TDataSearch> _repository;
+    private readonly IPersistentSearchRepository<TDataSearch> _repository;
 
-    public SavedSearchesProviderAdapter(IPersistentDataRepository<TDataSearch> repository)
+    public SavedSearchesProviderAdapter(IPersistentSearchRepository<TDataSearch> repository)
     {
         _repository = repository;
     }

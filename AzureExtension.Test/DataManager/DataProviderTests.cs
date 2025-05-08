@@ -19,7 +19,7 @@ public class DataProviderTests
             new Mock<ICacheManager>().Object,
             new Mock<IDataQueryProvider>().Object,
             new Mock<IDataPullRequestSearchProvider>().Object,
-            new Mock<IPipelineProvider>().Object);
+            new Mock<IDefinitionProvider>().Object);
 
         Assert.IsNotNull(dataProvider);
     }
@@ -30,7 +30,7 @@ public class DataProviderTests
         var mockCacheManager = new Mock<ICacheManager>();
         var mockQueryProvider = new Mock<IDataQueryProvider>();
         var stubPullRequestSearchProvider = new Mock<IDataPullRequestSearchProvider>();
-        var stubPipelineProvider = new Mock<IPipelineProvider>();
+        var stubPipelineProvider = new Mock<IDefinitionProvider>();
         var dataProvider = new DataProvider(
             mockCacheManager.Object,
             mockQueryProvider.Object,
@@ -55,7 +55,7 @@ public class DataProviderTests
         var mockCacheManager = new Mock<ICacheManager>();
         var mockQueryProvider = new Mock<IDataQueryProvider>();
         var stubPullRequestSearchProvider = new Mock<IDataPullRequestSearchProvider>();
-        var stubPipelineProvider = new Mock<IPipelineProvider>();
+        var stubPipelineProvider = new Mock<IDefinitionProvider>();
         var dataProvider = new DataProvider(
             mockCacheManager.Object,
             mockQueryProvider.Object,
@@ -87,7 +87,7 @@ public class DataProviderTests
         var mockCacheManager = new Mock<ICacheManager>();
         var stubQueryProvider = new Mock<IDataQueryProvider>();
         var mockPullRequestSearchProvider = new Mock<IDataPullRequestSearchProvider>();
-        var stubPipelineProvider = new Mock<IPipelineProvider>();
+        var stubPipelineProvider = new Mock<IDefinitionProvider>();
         var dataProvider = new DataProvider(
             mockCacheManager.Object,
             stubQueryProvider.Object,
@@ -113,7 +113,7 @@ public class DataProviderTests
         var mockCacheManager = new Mock<ICacheManager>();
         var stubQueryProvider = new Mock<IDataQueryProvider>();
         var mockPullRequestSearchProvider = new Mock<IDataPullRequestSearchProvider>();
-        var stubPipelineProvider = new Mock<IPipelineProvider>();
+        var stubPipelineProvider = new Mock<IDefinitionProvider>();
         var dataProvider = new DataProvider(
             mockCacheManager.Object,
             stubQueryProvider.Object,
@@ -144,24 +144,24 @@ public class DataProviderTests
         var mockCacheManager = new Mock<ICacheManager>();
         var stubQueryProvider = new Mock<IDataQueryProvider>();
         var stubPullRequestSearchProvider = new Mock<IDataPullRequestSearchProvider>();
-        var mockPipelineProvider = new Mock<IPipelineProvider>();
+        var mockPipelineProvider = new Mock<IDefinitionProvider>();
         var dataProvider = new DataProvider(
             mockCacheManager.Object,
             stubQueryProvider.Object,
             stubPullRequestSearchProvider.Object,
             mockPipelineProvider.Object);
 
-        var stubDefinitionSearch = new Mock<IDefinitionSearch>();
+        var stubDefinitionSearch = new Mock<IPipelineDefinitionSearch>();
 
         var getBuildTask = dataProvider.GetBuilds(stubDefinitionSearch.Object);
 
         mockCacheManager.Verify(m => m.RequestRefresh(It.IsAny<DataUpdateParameters>()), Times.Once);
-        mockPipelineProvider.Verify(m => m.GetBuilds(It.IsAny<IDefinitionSearch>()), Times.Never);
+        mockPipelineProvider.Verify(m => m.GetBuilds(It.IsAny<IPipelineDefinitionSearch>()), Times.Never);
         mockCacheManager.Raise(m => m.OnUpdate += null, new CacheManagerUpdateEventArgs(CacheManagerUpdateKind.Updated));
 
         await getBuildTask;
 
-        mockPipelineProvider.Verify(m => m.GetBuilds(It.IsAny<IDefinitionSearch>()), Times.Once);
+        mockPipelineProvider.Verify(m => m.GetBuilds(It.IsAny<IPipelineDefinitionSearch>()), Times.Once);
     }
 
     [TestMethod]
@@ -170,29 +170,29 @@ public class DataProviderTests
         var mockCacheManager = new Mock<ICacheManager>();
         var stubQueryProvider = new Mock<IDataQueryProvider>();
         var stubPullRequestSearchProvider = new Mock<IDataPullRequestSearchProvider>();
-        var mockPipelineProvider = new Mock<IPipelineProvider>();
+        var mockPipelineProvider = new Mock<IDefinitionProvider>();
         var dataProvider = new DataProvider(
             mockCacheManager.Object,
             stubQueryProvider.Object,
             stubPullRequestSearchProvider.Object,
             mockPipelineProvider.Object);
 
-        var stubDefinitionSearch = new Mock<IDefinitionSearch>();
+        var stubDefinitionSearch = new Mock<IPipelineDefinitionSearch>();
 
         var dsDefinition = new DataModel.Definition();
 
         mockPipelineProvider
-            .Setup(m => m.GetDefinition(It.IsAny<IDefinitionSearch>()))
+            .Setup(m => m.GetDefinition(It.IsAny<IPipelineDefinitionSearch>()))
             .Returns(dsDefinition);
 
         var getBuildTask = dataProvider.GetBuilds(stubDefinitionSearch.Object);
 
         mockCacheManager.Verify(m => m.RequestRefresh(It.IsAny<DataUpdateParameters>()), Times.Once);
-        mockPipelineProvider.Verify(m => m.GetBuilds(It.IsAny<IDefinitionSearch>()), Times.Once);
+        mockPipelineProvider.Verify(m => m.GetBuilds(It.IsAny<IPipelineDefinitionSearch>()), Times.Once);
         mockCacheManager.Raise(m => m.OnUpdate += null, new CacheManagerUpdateEventArgs(CacheManagerUpdateKind.Updated));
 
         await getBuildTask;
 
-        mockPipelineProvider.Verify(m => m.GetBuilds(It.IsAny<IDefinitionSearch>()), Times.Once);
+        mockPipelineProvider.Verify(m => m.GetBuilds(It.IsAny<IPipelineDefinitionSearch>()), Times.Once);
     }
 }

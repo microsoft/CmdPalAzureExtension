@@ -12,7 +12,7 @@ using Serilog;
 
 namespace AzureExtension.PersistentData;
 
-public class DefinitionRepository : IPersistentDataRepository<IDefinitionSearch, IDefinition>, ISavedSearchesSource<IDefinitionSearch>
+public class DefinitionSearchRepository : IPersistentSearchRepository<IPipelineDefinitionSearch, IDefinition>, ISavedSearchesSource<IPipelineDefinitionSearch>
 {
     private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", nameof(QueryRepository)));
     private static readonly ILogger _log = _logger.Value;
@@ -21,15 +21,15 @@ public class DefinitionRepository : IPersistentDataRepository<IDefinitionSearch,
     private readonly DataStore _dataStore;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
-    private readonly IPipelineProvider _pipelineProvider;
+    private readonly IDefinitionProvider _pipelineProvider;
     private readonly IAccountProvider _accountProvider;
 
-    public DefinitionRepository(
+    public DefinitionSearchRepository(
         DataStore dataStore,
         IAzureValidator azureValidator,
         IAzureLiveDataProvider liveDataProvider,
         IConnectionProvider connectionProvider,
-        IPipelineProvider pipelineProvider,
+        IDefinitionProvider pipelineProvider,
         IAccountProvider accountProvider)
     {
         _azureValidator = azureValidator;
@@ -48,7 +48,7 @@ public class DefinitionRepository : IPersistentDataRepository<IDefinitionSearch,
         }
     }
 
-    private IEnumerable<IDefinitionSearch> GetAllDefinitionSearches(bool getTopLevelOnly)
+    private IEnumerable<IPipelineDefinitionSearch> GetAllDefinitionSearches(bool getTopLevelOnly)
     {
         ValidateDataStore();
         if (getTopLevelOnly)
@@ -59,26 +59,26 @@ public class DefinitionRepository : IPersistentDataRepository<IDefinitionSearch,
         return DefinitionSearch.GetAll(_dataStore);
     }
 
-    public bool IsTopLevel(IDefinitionSearch definitionSearch)
+    public bool IsTopLevel(IPipelineDefinitionSearch definitionSearch)
     {
         ValidateDataStore();
         var dsDefinitionSearch = DefinitionSearch.Get(_dataStore, definitionSearch.InternalId, definitionSearch.ProjectUrl);
         return dsDefinitionSearch != null && dsDefinitionSearch.IsTopLevel;
     }
 
-    public Task ValidateDefinitionSearch(IDefinitionSearch definitionSearch, IAccount account)
+    public Task ValidateDefinitionSearch(IPipelineDefinitionSearch definitionSearch, IAccount account)
     {
         return _azureValidator.GetDefinitionInfo(definitionSearch.ProjectUrl, definitionSearch.InternalId, account);
     }
 
-    public void UpdateDefinitionSearchTopLevelStatus(IDefinitionSearch definitionSearch, bool isTopLevel, IAccount account)
+    public void UpdateDefinitionSearchTopLevelStatus(IPipelineDefinitionSearch definitionSearch, bool isTopLevel, IAccount account)
     {
         ValidateDataStore();
         ValidateDefinitionSearch(definitionSearch, account).Wait();
         DefinitionSearch.AddOrUpdate(_dataStore, definitionSearch.InternalId, definitionSearch.ProjectUrl, isTopLevel);
     }
 
-    public void RemoveSavedSearch(IDefinitionSearch dataSearch)
+    public void RemoveSavedSearch(IPipelineDefinitionSearch dataSearch)
     {
         ValidateDataStore();
         var internalId = dataSearch.InternalId;
@@ -93,7 +93,7 @@ public class DefinitionRepository : IPersistentDataRepository<IDefinitionSearch,
         DefinitionSearch.Remove(_dataStore, internalId, projectUrl);
     }
 
-    public IDefinition GetSavedData(IDefinitionSearch dataSearch)
+    public IDefinition GetSavedData(IPipelineDefinitionSearch dataSearch)
     {
         var dsDefinition = _pipelineProvider.GetDefinition(dataSearch);
 
@@ -131,20 +131,20 @@ public class DefinitionRepository : IPersistentDataRepository<IDefinitionSearch,
         return definitions;
     }
 
-    public async Task AddOrUpdateSearch(IDefinitionSearch dataSearch, bool isTopLevel, IAccount account)
+    public async Task AddOrUpdateSearch(IPipelineDefinitionSearch dataSearch, bool isTopLevel, IAccount account)
     {
         ValidateDataStore();
         await ValidateDefinitionSearch(dataSearch, account);
         DefinitionSearch.AddOrUpdate(_dataStore, dataSearch.InternalId, dataSearch.ProjectUrl, isTopLevel);
     }
 
-    public IEnumerable<IDefinitionSearch> GetSavedSearches()
+    public IEnumerable<IPipelineDefinitionSearch> GetSavedSearches()
     {
         ValidateDataStore();
         return GetAllDefinitionSearches(false);
     }
 
-    public IEnumerable<IDefinitionSearch> GetSavedSearches(bool getTopLevelOnly = false)
+    public IEnumerable<IPipelineDefinitionSearch> GetSavedSearches(bool getTopLevelOnly = false)
     {
         ValidateDataStore();
         return GetAllDefinitionSearches(getTopLevelOnly);

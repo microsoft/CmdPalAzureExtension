@@ -62,7 +62,7 @@ public partial class TestHelpers
         options.LogFileName = LogFileName;
         options.DataStoreOptions.DataStoreFileName = DataBaseFileName;
         options.DataStoreOptions.DataStoreFolderPath = path;
-        options.DataStoreOptions.DataStoreSchema = new AzureDataStoreSchema();
+        options.DataStoreOptions.DataStoreSchema = new AzureCacheDataStoreSchema();
 
         context?.WriteLine($"Temp folder for test run is: {GetTempTestFolderPath(options)}");
         context?.WriteLine($"Temp DataStore file path for test run is: {GetDataStoreFilePath(options)}");

@@ -6,7 +6,7 @@ using Serilog;
 
 namespace AzureExtension.DataManager.Cache;
 
-public class DataUpdater : IDisposable
+public class PeriodicDataUpdater : IDisposable
 {
     // This is the default interval the timer will run. It is not the interval that we necessarily do work.
     private static readonly TimeSpan _timerUpdateInterval = TimeSpan.FromMinutes(5);
@@ -19,16 +19,16 @@ public class DataUpdater : IDisposable
 
     public bool IsRunning => _started;
 
-    public DataUpdater(TimeSpan interval, Func<Task> action)
+    public PeriodicDataUpdater(TimeSpan interval, Func<Task> action)
     {
-        _logger = Log.Logger.ForContext("SourceContext", nameof(DataUpdater));
+        _logger = Log.Logger.ForContext("SourceContext", nameof(PeriodicDataUpdater));
         _timer = new PeriodicTimer(interval);
         _cancelSource = new CancellationTokenSource();
         _started = false;
         _action = action;
     }
 
-    public DataUpdater(Func<Task> action)
+    public PeriodicDataUpdater(Func<Task> action)
         : this(_timerUpdateInterval, action)
     {
     }

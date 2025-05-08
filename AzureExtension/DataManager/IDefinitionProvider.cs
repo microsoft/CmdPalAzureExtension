@@ -7,9 +7,9 @@ using AzureExtension.DataModel;
 
 namespace AzureExtension.DataManager;
 
-public interface IPipelineProvider
+public interface IDefinitionProvider
 {
-    Definition? GetDefinition(IDefinitionSearch definitionSearch);
+    Definition? GetDefinition(IPipelineDefinitionSearch definitionSearch);
 
-    IEnumerable<IBuild> GetBuilds(IDefinitionSearch definitionSearch);
+    IEnumerable<IBuild> GetBuilds(IPipelineDefinitionSearch definitionSearch);
 }

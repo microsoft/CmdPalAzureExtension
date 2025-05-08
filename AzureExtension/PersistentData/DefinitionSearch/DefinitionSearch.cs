@@ -12,7 +12,7 @@ using Dapper.Contrib.Extensions;
 namespace AzureExtension.PersistentData;
 
 [Table("DefinitionSearch")]
-public class DefinitionSearch : IDefinitionSearch
+public class DefinitionSearch : IPipelineDefinitionSearch
 {
     [Key]
     public long Id { get; set; } = DataStore.NoForeignKey;
@@ -67,14 +67,14 @@ public class DefinitionSearch : IDefinitionSearch
         var deleted = command.ExecuteNonQuery();
     }
 
-    public static IEnumerable<IDefinitionSearch> GetAll(DataStore dataStore)
+    public static IEnumerable<IPipelineDefinitionSearch> GetAll(DataStore dataStore)
     {
         var sql = "SELECT * FROM DefinitionSearch";
         var definitionSearches = dataStore.Connection.Query<DefinitionSearch>(sql);
         return definitionSearches;
     }
 
-    public static IEnumerable<IDefinitionSearch> GetTopLevel(DataStore dataStore)
+    public static IEnumerable<IPipelineDefinitionSearch> GetTopLevel(DataStore dataStore)
     {
         var sql = "SELECT * FROM DefinitionSearch WHERE IsTopLevel = 1";
         var definitionSearches = dataStore.Connection.Query<DefinitionSearch>(sql);
