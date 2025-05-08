@@ -27,7 +27,7 @@ namespace AzureExtension.Test.DataManager;
 [TestClass]
 public class DataManagerTests
 {
-    public DataStore GetTestDataStore()
+    public static DataStore GetTestDataStore()
     {
         var path = TestHelpers.GetUniqueFolderPath("AZT");
         var combinedPath = Path.Combine(path, "AzureData.db");
@@ -37,7 +37,7 @@ public class DataManagerTests
         return dataStore;
     }
 
-    public void CleanUpDataStore(DataStore dataStore)
+    public static void CleanUpDataStore(DataStore dataStore)
     {
         var path = dataStore.DataStoreFilePath;
         dataStore.Dispose();
