@@ -36,7 +36,7 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         var title = item.SystemTitle;
         var url = item.HtmlUrl;
 
-        return new ListItem(new LinkCommand(url, _resources))
+        return new ListItem(new LinkCommand(url, _resources, null))
         {
             Title = title,
             Icon = IconLoader.GetIcon(item.WorkItemTypeName),

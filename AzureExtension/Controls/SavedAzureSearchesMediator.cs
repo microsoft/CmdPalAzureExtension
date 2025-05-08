@@ -18,6 +18,12 @@ public class SavedAzureSearchesMediator
 
     public event EventHandler<object?>? PullRequestSearchRemoving;
 
+    public event EventHandler<object?>? PipelineSearchSaved;
+
+    public event EventHandler<object?>? PipelineSearchRemoved;
+
+    public event EventHandler<object?>? PipelineSearchRemoving;
+
     public SavedAzureSearchesMediator()
     {
     }
@@ -32,6 +38,11 @@ public class SavedAzureSearchesMediator
         {
             PullRequestSearchRemoved?.Invoke(this, azureSearch);
         }
+    }
+
+    public void Remove(IDefinitionSearch definitionSearch)
+    {
+        PipelineSearchRemoved?.Invoke(this, definitionSearch);
     }
 
     public void RemovingQuery(object args)
@@ -52,5 +63,15 @@ public class SavedAzureSearchesMediator
     public void RemovingPullRequestSearch(object args)
     {
         PullRequestSearchRemoving?.Invoke(this, args);
+    }
+
+    public void AddPipelineSearch(object args)
+    {
+        PipelineSearchSaved?.Invoke(this, args);
+    }
+
+    public void RemovingPipelineSearch(object args)
+    {
+        PipelineSearchRemoving?.Invoke(this, args);
     }
 }

@@ -29,14 +29,25 @@ public class SearchPageFactory : ISearchPageFactory
 
     private readonly IPersistentDataRepository<IPullRequestSearch> _savedPullRequestSearchRepository;
 
+<<<<<<< HEAD
+=======
+    private readonly IDefinitionRepository _definitionRepository;
+
+>>>>>>> main
     public SearchPageFactory(
         IResources resources,
         IDataProvider dataProvider,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
+<<<<<<< HEAD
         IPersistentDataRepository<IQuery> queryRepository,
         IPersistentDataRepository<IPullRequestSearch> savedPullRequestSearchRepository)
+=======
+        IQueryRepository queryRepository,
+        ISavedPullRequestSearchRepository savedPullRequestSearchRepository,
+        IDefinitionRepository definitionRepository)
+>>>>>>> main
     {
         _resources = resources;
         _dataProvider = dataProvider;
@@ -45,6 +56,7 @@ public class SearchPageFactory : ISearchPageFactory
         _azureClientHelpers = azureClientHelpers;
         _queryRepository = queryRepository;
         _savedPullRequestSearchRepository = savedPullRequestSearchRepository;
+        _definitionRepository = definitionRepository;
     }
 
     public ListPage CreatePageForSearch(IAzureSearch search)
@@ -59,6 +71,11 @@ public class SearchPageFactory : ISearchPageFactory
         }
 
         throw new NotImplementedException($"No page for search type {search.GetType()}");
+    }
+
+    public ListPage CreatePageForSearch(IDefinitionSearch search)
+    {
+        return new BuildSearchPage(search, _resources, _dataProvider, new TimeSpanHelper(_resources));
     }
 
     public ContentPage CreateEditPageForSearch(IAzureSearch search)
@@ -81,7 +98,18 @@ public class SearchPageFactory : ISearchPageFactory
         }
     }
 
+<<<<<<< HEAD
     public IListItem CreateItemForSearch(IAzureSearch search)
+=======
+    public ContentPage CreateEditPageForSearch(IDefinitionSearch search)
+    {
+        var savePipelineSearchForm = new SavePipelineSearchForm(search, _resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
+        var statusMessage = new StatusMessage();
+        return new EditPipelineSearchPage(_resources, savePipelineSearchForm, statusMessage);
+    }
+
+    public IListItem CreateItemForSearch(IAzureSearch search, IAzureSearchRepository azureSearchRepository)
+>>>>>>> main
     {
         IAzureSearchRepository azureSearchRepository = search is IQuery
             ? new AzureSearchRepositoryAdapter<IQuery>(_queryRepository)
@@ -94,18 +122,81 @@ public class SearchPageFactory : ISearchPageFactory
             Icon = search is IQuery ? IconLoader.GetIcon("Query") : IconLoader.GetIcon("PullRequest"),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(search is IQuery ? search.Url : $"{search.Url}/pullrequests", _resources)),
+                new(new LinkCommand(search is IQuery ? search.Url : $"{search.Url}/pullrequests", _resources, null)),
                 new(CreateEditPageForSearch(search)),
-                new(new RemoveAzureSearchCommand(search, _resources, _mediator, azureSearchRepository)),
+                new(new RemoveCommand(search, _resources, _mediator, azureSearchRepository)),
             },
         };
     }
 
+<<<<<<< HEAD
     public Task<List<IListItem>> CreateCommandsForTopLevelSearches()
     {
         var topLevelSearches = new List<IListItem>();
         var topLevelQueries = _queryRepository.GetAllSavedData(true);
         var topLevelPullRequestSearches = _savedPullRequestSearchRepository.GetAllSavedData(true);
+=======
+    public IListItem CreateItemForSearch(IDefinitionSearch search, IDefinitionRepository definitionRepository)
+    {
+        var definition = _definitionRepository.GetDefinition(search, _accountProvider.GetDefaultAccount()).Result;
+        var timeSpanHelper = new TimeSpanHelper(_resources);
+
+        if (definition.MostRecentBuild != null)
+        {
+            return new ListItem(CreatePageForSearch(search))
+            {
+                MoreCommands = new CommandContextItem[]
+                {
+                    new(new LinkCommand(definition.HtmlUrl, _resources, _resources.GetResource("Pages_PipelineSearch_LinkCommandName"))),
+                    new(CreateEditPageForSearch(search)),
+                    new(new RemoveDefinitionSearchCommand(search, _resources, _mediator, definitionRepository)),
+                },
+                Tags = new ITag[]
+                {
+                    new Tag(timeSpanHelper.DateTimeOffsetToDisplayString(new DateTime(definition.MostRecentBuild!.StartTime), null)),
+                },
+                Details = new Details()
+                {
+                    Title = $"{definition.Name} - {definition.MostRecentBuild!.BuildNumber}",
+                    Metadata = new[]
+                    {
+                        new DetailsElement()
+                        {
+                            Key = _resources.GetResource("PipelineBuild_Requester"),
+                            Data = new DetailsLink() { Text = $"{definition.MostRecentBuild!.Requester?.Name}" },
+                        },
+                        new DetailsElement()
+                        {
+                            Key = _resources.GetResource("PipelineBuild_SourceBranch"),
+                            Data = new DetailsLink() { Text = $"{definition.MostRecentBuild!.SourceBranch}" },
+                        },
+                    },
+                },
+            };
+        }
+        else
+        {
+            return new ListItem(CreatePageForSearch(search))
+            {
+                Title = definition.Name,
+                Icon = IconLoader.GetIcon("Pipeline"),
+                MoreCommands = new CommandContextItem[]
+                {
+                    new(new LinkCommand(definition.HtmlUrl, _resources, _resources.GetResource("Pages_PipelineSearch_LinkCommandName"))),
+                    new(CreateEditPageForSearch(search)),
+                    new(new RemoveDefinitionSearchCommand(search, _resources, _mediator, definitionRepository)),
+                },
+            };
+        }
+    }
+
+    public async Task<List<IListItem>> CreateCommandsForTopLevelSearches()
+    {
+        var topLevelSearches = new List<IListItem>();
+        var topLevelQueries = await _queryRepository.GetTopLevelQueries();
+        var topLevelPullRequestSearches = await _savedPullRequestSearchRepository.GetTopLevelPullRequestSearches();
+        var topLevelPipelineSearches = await _definitionRepository.GetAllDefinitionSearchesAsync(true);
+>>>>>>> main
 
         foreach (var query in topLevelQueries)
         {
@@ -119,6 +210,16 @@ public class SearchPageFactory : ISearchPageFactory
             topLevelSearches.Add(commandItem);
         }
 
+<<<<<<< HEAD
         return Task.FromResult(topLevelSearches);
+=======
+        foreach (var pipelineSearch in topLevelPipelineSearches)
+        {
+            var commandItem = CreateItemForSearch(pipelineSearch, _definitionRepository);
+            topLevelSearches.Add(commandItem);
+        }
+
+        return topLevelSearches;
+>>>>>>> main
     }
 }

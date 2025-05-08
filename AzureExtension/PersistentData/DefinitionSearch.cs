@@ -1,10 +1,11 @@
-﻿// Copyright (c) Microsoft Corporation
+// Copyright (c) Microsoft Corporation
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
+using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
 
@@ -22,10 +23,6 @@ public class DefinitionSearch : IDefinitionSearch
 
     public bool IsTopLevel { get; set; }
 
-    public string Name => throw new NotImplementedException();
-
-    public string Url => ProjectUrl;
-
     [Computed]
     [Write(false)]
     public AzureUri AzureUri
@@ -35,6 +32,12 @@ public class DefinitionSearch : IDefinitionSearch
             return new AzureUri(ProjectUrl);
         }
     }
+
+    [Write(false)]
+    public string Name => InternalId.ToStringInvariant();
+
+    [Write(false)]
+    public string Url => ProjectUrl;
 
     public static DefinitionSearch? Get(DataStore dataStore, long internalId, string projectUrl)
     {

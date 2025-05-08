@@ -26,6 +26,13 @@ public class IconLoader
             { "Feature", (@"Assets\Feature.png", @"Assets\Feature.png") },
             { "Impediment", (@"Assets\Impediment.png", @"Assets\Impediment.png") },
             { "Issue", (@"Assets\Issue.png", @"Assets\Issue.png") },
+            { "Pipeline", (@"Assets\Pipeline.png", @"Assets\Pipeline.png") },
+            { "PipelineCancelled", (@"Assets\PipelineCancelledLight.svg", @"Assets\PipelineCancelledDark.svg") },
+            { "PipelineFailed", (@"Assets\PipelineFailed.png", @"Assets\PipelineFailed.png") },
+            { "PipelineQueued", (@"Assets\PipelineQueued.png", @"Assets\PipelineQueued.png") },
+            { "PipelineRunning", (@"Assets\PipelineRunning.png", @"Assets\PipelineRunning.png") },
+            { "PipelineSucceeded", (@"Assets\PipelineSucceeded.png", @"Assets\PipelineSucceeded.png") },
+            { "PipelineWarning", (@"Assets\PipelineWarning.svg", @"Assets\PipelineWarning.svg") },
             { "ProductBacklogItem", (@"Assets\ProductBacklogItem.png", @"Assets\ProductBacklogItem.png") },
             { "PullRequest", (@"Assets\PullRequestLight.svg", @"Assets\PullRequestDark.svg") },
             { "PullRequestApproved", (@"Assets\PullRequestApproved.png", @"Assets\PullRequestApproved.png") },
@@ -130,6 +137,34 @@ public class IconLoader
         }
 
         return new IconInfo(string.Empty);
+    }
+
+    public static IconInfo GetIconForPipelineStatusAndResult(string? pipelineStatus, string? pipelineResult)
+    {
+        var iconStringKey = string.Empty;
+        pipelineStatus ??= string.Empty;
+        pipelineResult ??= string.Empty;
+
+        if (!string.IsNullOrEmpty(pipelineResult))
+        {
+            iconStringKey = pipelineResult;
+        }
+        else
+        {
+            iconStringKey = pipelineStatus;
+        }
+
+        return iconStringKey switch
+        {
+            "Canceled" => GetIcon("PipelineCancelled"),
+            "Failed" => GetIcon("PipelineFailed"),
+            "InProgress" => GetIcon("StatusBlue"),
+            "Succeeded" => GetIcon("PipelineSucceeded"),
+            "Queued" => GetIcon("PipelineQueued"),
+            "Warning" => GetIcon("PipelineWarning"),
+            "PartiallySucceeded" => GetIcon("PipelineWarning"),
+            _ => GetIcon("StatusGray"),
+        };
     }
 
     public static string ConvertBase64ToDataUri(string base64String, string mimeType = "image/png")

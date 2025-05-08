@@ -1,0 +1,54 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "Medium",
+      "weight": "Bolder",
+      "text": "{{SavePipelineSearchFormTitle}}",
+      "horizontalAlignment": "Center",
+      "wrap": true,
+      "style": "heading"
+    },
+    {
+      "type": "Input.Text",
+      "id": "EnteredPipelineSearch",
+      "label": "{{EnteredPipelineSearchLabel}}",
+      "isRequired": true,
+      "errorMessage": "{{EnteredPipelineSearchErrorMessage}}",
+      "value": "{{SavedPipelineSearchString}}",
+      "placeholder": "https://dev.azure.com/{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}"
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "auto",
+          "verticalContentAlignment": "Center",
+          "items": [
+            {
+              "type": "Input.Toggle",
+              "id": "IsTopLevel",
+              "title": "{{IsTopLevelTitle}}",
+              "valueOn": "true",
+              "valueOff": "false",
+              "value": "{{IsTopLevel}}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "{{SavePipelineSearchActionTitle}}",
+      "data": {
+        "id": "SavePipelineSearchAction"
+      }
+    }
+  ]
+}

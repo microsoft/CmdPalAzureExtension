@@ -40,7 +40,7 @@ public class Definition : IDefinition
 
     [Write(false)]
     [Computed]
-    public string Status => Build.GetForDefinition(DataStore, Id).FirstOrDefault()?.Status ?? string.Empty;
+    public IBuild? MostRecentBuild => Build.GetForDefinition(DataStore, Id).FirstOrDefault();
 
     [Write(false)]
     [Computed]
@@ -57,7 +57,7 @@ public class Definition : IDefinition
             Name = definitionReference.Name,
             ProjectId = projectId,
             CreationDate = definitionReference.CreatedDate.ToDataStoreInteger(),
-            HtmlUrl = definitionReference.Url,
+            HtmlUrl = CreateDefinitionHtmlUrl(definitionReference.Url, definitionReference.Project.Name, definitionReference.Id),
             TimeUpdated = DateTime.UtcNow.ToDataStoreInteger(),
         };
         definition.DataStore = dataStore;
@@ -129,5 +129,32 @@ public class Definition : IDefinition
         var command = dataStore.Connection!.CreateCommand();
         command.CommandText = sql;
         command.ExecuteNonQuery();
+    }
+
+    private static string CreateDefinitionHtmlUrl(string url, string projectName, long definitionId)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            throw new ArgumentException("URL cannot be null or empty.", nameof(url));
+        }
+
+        try
+        {
+            var uri = new Uri(url);
+
+            var segments = uri.Segments;
+            if (segments.Length < 4)
+            {
+                throw new InvalidOperationException("The URL does not have the expected structure.");
+            }
+
+            var organization = segments[1].TrimEnd('/');
+
+            return $"https://dev.azure.com/{organization}/{projectName}/_build?definitionId={definitionId}";
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Failed to convert the URL to the desired format.", ex);
+        }
     }
 }
