@@ -75,7 +75,7 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
-            if (_savedDefinitionSearch?.ProjectUrl != string.Empty)
+            if (!string.IsNullOrEmpty(_savedDefinitionSearch?.ProjectUrl))
             {
                 Log.Information($"Removing outdated search {_savedDefinitionSearch!.InternalId}");
 

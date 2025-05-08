@@ -35,7 +35,7 @@ public partial class BuildSearchPage : ListPage
         _timeSpanHelper = timeSpanHelper;
         _definition = _dataProvider.GetDefinition(_search).GetAwaiter().GetResult();
         Icon = GetIcon();
-        Name = _definition.Name;
+        Name = _definition.Name ?? $"Definition #{_definition.InternalId}";
         ShowDetails = true;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         DataProvider = dataProvider;
