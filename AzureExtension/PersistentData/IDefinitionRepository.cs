@@ -22,4 +22,6 @@ public interface IDefinitionRepository
     public Task<IEnumerable<IDefinitionSearch>> GetAllDefinitionSearchesAsync(bool getTopLevelOnly);
 
     public Task RemoveSavedDefinitionSearch(IDefinitionSearch definitionSearch);
+
+    public Task<bool> IsTopLevel(IDefinitionSearch definitionSearch);
 }

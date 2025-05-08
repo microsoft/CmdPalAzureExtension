@@ -174,6 +174,7 @@ public class SearchPageFactory : ISearchPageFactory
         var topLevelSearches = new List<IListItem>();
         var topLevelQueries = await _queryRepository.GetTopLevelQueries();
         var topLevelPullRequestSearches = await _savedPullRequestSearchRepository.GetTopLevelPullRequestSearches();
+        var topLevelPipelineSearches = await _definitionRepository.GetAllDefinitionSearchesAsync(true);
 
         foreach (var query in topLevelQueries)
         {
@@ -184,6 +185,12 @@ public class SearchPageFactory : ISearchPageFactory
         foreach (var pullRequestSearch in topLevelPullRequestSearches)
         {
             var commandItem = CreateItemForSearch(pullRequestSearch, _savedPullRequestSearchRepository);
+            topLevelSearches.Add(commandItem);
+        }
+
+        foreach (var pipelineSearch in topLevelPipelineSearches)
+        {
+            var commandItem = CreateItemForSearch(pipelineSearch, _definitionRepository);
             topLevelSearches.Add(commandItem);
         }
 

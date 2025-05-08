@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
@@ -29,7 +30,7 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
-    private string IsTopLevelChecked => "false";
+    private string IsTopLevelChecked => GetIsTopLevel().Result.ToString().ToLower(CultureInfo.InvariantCulture);
 
     public Dictionary<string, string> TemplateSubstitutions => new Dictionary<string, string>
     {
@@ -146,5 +147,15 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
         {
             throw new InvalidOperationException("Failed to parse definitionId from the URL.", ex);
         }
+    }
+
+    public async Task<bool> GetIsTopLevel()
+    {
+        if (_savedDefinitionSearch == null || string.IsNullOrEmpty(_savedDefinitionSearch.ProjectUrl))
+        {
+            return false;
+        }
+
+        return await _definitionRepository.IsTopLevel(_savedDefinitionSearch!);
     }
 }
