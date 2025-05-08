@@ -37,7 +37,7 @@ public partial class DataStoreTests
 
         var dsDefinition = Definition.GetByInternalId(dataStore, 1);
 
-        var status = dsDefinition!.Status;
+        var status = dsDefinition!.MostRecentBuild!.Status;
 
         Assert.AreEqual("Failed", status);
     }
@@ -56,8 +56,7 @@ public partial class DataStoreTests
         tx.Commit();
 
         var dsDefinition = Definition.GetByInternalId(dataStore, 1);
-        var status = dsDefinition!.Status;
 
-        Assert.AreEqual(string.Empty, status);
+        Assert.IsNull(dsDefinition!.MostRecentBuild);
     }
 }
