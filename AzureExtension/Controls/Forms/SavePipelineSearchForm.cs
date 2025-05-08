@@ -15,7 +15,7 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 {
     private readonly IResources _resources;
 
-    private readonly IDefinitionSearch _savedDefinitionSearch;
+    private readonly IDefinitionSearch? _savedDefinitionSearch;
 
     private readonly IDefinitionRepository _definitionRepository;
 
@@ -31,60 +31,36 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
     private string IsTopLevelChecked => "false";
 
-    public SavePipelineSearchForm(
-        IResources resources,
-        IDefinitionRepository definitionRepository,
-        SavedAzureSearchesMediator mediator,
-        IAccountProvider accountProvider,
-        AzureClientHelpers azureClientHelpers)
+    public Dictionary<string, string> TemplateSubstitutions => new Dictionary<string, string>
     {
-        _resources = resources;
-        _savedDefinitionSearch = new DefinitionSearch();
-        _definitionRepository = definitionRepository;
-        _mediator = mediator;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
-        TemplateKey = "SavePipelineSearch";
-        TemplateSubstitutions = new Dictionary<string, string>()
-        {
-            { "{{SavePipelineSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(string.Empty) ? "Forms_Save_PipelineSearch" : "Forms_Edit_PipelineSearch") },
-            { "{{SavedPipelineSearchString}}", string.Empty }, // pipeline URL
-            { "{{EnteredPipelineSearchErrorMessage}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchError") },
-            { "{{EnteredPipelineSearchLabel}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchLabel") },
-            { "{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}", _resources.GetResource("Forms_SavePipelineSearch_URLPlaceholderSuffix") },
-            { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateIsTopLevelTitle") },
-            { "{{IsTopLevel}}", IsTopLevelChecked },
-            { "{{SavePipelineSearchActionTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateSavePipelineSearchActionTitle") },
-        };
-    }
+        { "{{SavePipelineSearchFormTitle}}", !string.IsNullOrEmpty(_savedDefinitionSearch?.ProjectUrl) ? _resources.GetResource("Forms_Edit_PipelineSearch") : _resources.GetResource("Forms_Save_PipelineSearch") },
+        { "{{SavedPipelineSearchString}}", !string.IsNullOrEmpty(_savedDefinitionSearch?.ProjectUrl) ? _savedDefinitionSearch!.ProjectUrl : string.Empty }, // pipeline URL
+        { "{{EnteredPipelineSearchErrorMessage}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchError") },
+        { "{{EnteredPipelineSearchLabel}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchLabel") },
+        { "{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}", _resources.GetResource("Forms_SavePipelineSearch_URLPlaceholderSuffix") },
+        { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateIsTopLevelTitle") },
+        { "{{IsTopLevel}}", IsTopLevelChecked },
+        { "{{SavePipelineSearchActionTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateSavePipelineSearchActionTitle") },
+    };
 
     public SavePipelineSearchForm(
-        IDefinitionSearch definitionSearch,
+        IDefinitionSearch? definitionSearch,
         IResources resources,
         IDefinitionRepository definitionRepository,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers)
     {
-        _resources = resources;
         _savedDefinitionSearch = definitionSearch;
+        _resources = resources;
         _definitionRepository = definitionRepository;
         _mediator = mediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
         TemplateKey = "SavePipelineSearch";
-        TemplateSubstitutions = new Dictionary<string, string>()
-        {
-            { "{{SavePipelineSearchFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(string.Empty) ? "Forms_Save_PipelineSearch" : "Forms_Edit_PipelineSearch") },
-            { "{{SavedPipelineSearchString}}", string.Empty }, // pipeline URL
-            { "{{EnteredPipelineSearchErrorMessage}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchError") },
-            { "{{EnteredPipelineSearchLabel}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchLabel") },
-            { "{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}", _resources.GetResource("Forms_SavePipelineSearch_URLPlaceholderSuffix") },
-            { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateIsTopLevelTitle") },
-            { "{{IsTopLevel}}", IsTopLevelChecked },
-            { "{{SavePipelineSearchActionTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateSavePipelineSearchActionTitle") },
-        };
     }
+
+    public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName(TemplateKey, TemplateSubstitutions);
 
     public override Task HandleInputs(string inputs)
     {
@@ -98,12 +74,11 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
-            if (_savedDefinitionSearch.ProjectUrl != string.Empty)
+            if (_savedDefinitionSearch?.ProjectUrl != string.Empty)
             {
-                var definition = _definitionRepository.GetDefinition(_savedDefinitionSearch, _accountProvider.GetDefaultAccount()).Result;
-                Log.Information($"Removing outdated search {definition.Name}, {definition.HtmlUrl}");
+                Log.Information($"Removing outdated search {_savedDefinitionSearch!.InternalId}");
 
-                _definitionRepository.RemoveSavedDefinitionSearch(_savedDefinitionSearch);
+                _definitionRepository.RemoveSavedDefinitionSearch(_savedDefinitionSearch!);
             }
 
             LoadingStateChanged?.Invoke(this, false);

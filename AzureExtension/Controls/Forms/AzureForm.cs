@@ -10,16 +10,11 @@ namespace AzureExtension.Controls.Forms;
 
 public abstract class AzureForm : FormContent
 {
-    public Dictionary<string, string> TemplateSubstitutions { get; set; }
-
     public string TemplateKey { get; set; } = string.Empty;
 
     public AzureForm()
     {
-        TemplateSubstitutions = new Dictionary<string, string>();
     }
-
-    public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName(TemplateKey, TemplateSubstitutions);
 
     public override ICommandResult SubmitForm(string inputs, string data)
     {

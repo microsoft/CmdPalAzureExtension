@@ -94,7 +94,7 @@ public class SearchPageFactory : ISearchPageFactory
 
     public ContentPage CreateEditPageForSearch(IDefinitionSearch search)
     {
-        var savePipelineSearchForm = new SavePipelineSearchForm(_resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
+        var savePipelineSearchForm = new SavePipelineSearchForm(search, _resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
         var statusMessage = new StatusMessage();
         return new EditPipelineSearchPage(_resources, savePipelineSearchForm, statusMessage, "Pipeline search edited successfully", "error in editing pipeline search");
     }
@@ -118,37 +118,36 @@ public class SearchPageFactory : ISearchPageFactory
     public IListItem CreateItemForSearch(IDefinitionSearch search, IDefinitionRepository definitionRepository)
     {
         var definition = _definitionRepository.GetDefinition(search, _accountProvider.GetDefaultAccount()).Result;
-        var mostRecentBuild = _dataProvider.GetMostRecentBuild(search).Result;
         var timeSpanHelper = new TimeSpanHelper(_resources);
 
-        if (mostRecentBuild != null)
+        if (definition.MostRecentBuild != null)
         {
             return new ListItem(CreatePageForSearch(search))
             {
                 MoreCommands = new CommandContextItem[]
                 {
-                    new(new LinkCommand(definition.HtmlUrl, _resources, "Open link to all builds")),
+                    new(new LinkCommand(definition.HtmlUrl, _resources, "Open link to all runs")),
                     new(CreateEditPageForSearch(search)),
                     new(new RemoveDefinitionSearchCommand(search, _resources, _mediator, definitionRepository)),
                 },
                 Tags = new ITag[]
                 {
-                    new Tag(timeSpanHelper.DateTimeOffsetToDisplayString(new DateTime(mostRecentBuild!.StartTime), null)),
+                    new Tag(timeSpanHelper.DateTimeOffsetToDisplayString(new DateTime(definition.MostRecentBuild!.StartTime), null)),
                 },
                 Details = new Details()
                 {
-                    Title = $"{definition.Name} - {mostRecentBuild!.BuildNumber}",
+                    Title = $"{definition.Name} - {definition.MostRecentBuild!.BuildNumber}",
                     Metadata = new[]
                     {
                         new DetailsElement()
                         {
                             Key = "Requester",
-                            Data = new DetailsLink() { Text = $"{mostRecentBuild!.Requester?.Name}" },
+                            Data = new DetailsLink() { Text = $"{definition.MostRecentBuild!.Requester?.Name}" },
                         },
                         new DetailsElement()
                         {
                             Key = "Source Branch",
-                            Data = new DetailsLink() { Text = $"{mostRecentBuild!.SourceBranch}" },
+                            Data = new DetailsLink() { Text = $"{definition.MostRecentBuild!.SourceBranch}" },
                         },
                     },
                 },
@@ -162,7 +161,7 @@ public class SearchPageFactory : ISearchPageFactory
                 Icon = IconLoader.GetIcon("Pipeline"),
                 MoreCommands = new CommandContextItem[]
                 {
-                    new(new LinkCommand(definition.HtmlUrl, _resources, "Open link to all builds")),
+                    new(new LinkCommand(definition.HtmlUrl, _resources, "Open link to all runs")),
                     new(CreateEditPageForSearch(search)),
                     new(new RemoveDefinitionSearchCommand(search, _resources, _mediator, definitionRepository)),
                 },

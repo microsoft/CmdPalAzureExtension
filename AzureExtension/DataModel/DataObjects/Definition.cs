@@ -40,7 +40,7 @@ public class Definition : IDefinition
 
     [Write(false)]
     [Computed]
-    public string Status => Build.GetForDefinition(DataStore, Id).FirstOrDefault()?.Status ?? string.Empty;
+    public IBuild? MostRecentBuild => Build.GetForDefinition(DataStore, Id).FirstOrDefault();
 
     [Write(false)]
     [Computed]
