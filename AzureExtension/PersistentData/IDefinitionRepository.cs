@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation
+// Copyright (c) Microsoft Corporation
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -18,4 +18,10 @@ public interface IDefinitionRepository
     void UpdateDefinitionSearchTopLevelStatus(IDefinitionSearch definitionSearch, bool isTopLevel, IAccount account);
 
     Task ValidateDefinitionSearch(IDefinitionSearch definitionSearch, IAccount account);
+
+    public Task<IEnumerable<IDefinitionSearch>> GetAllDefinitionSearchesAsync(bool getTopLevelOnly);
+
+    public Task RemoveSavedDefinitionSearch(IDefinitionSearch definitionSearch);
+
+    public Task<bool> IsTopLevel(IDefinitionSearch definitionSearch);
 }

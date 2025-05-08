@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Data;
 using AzureExtension.DataModel;
 
 namespace AzureExtension.Controls;
@@ -19,4 +20,8 @@ public interface IBuild
     string SourceBranch { get; set; }
 
     Identity? Requester { get; }
+
+    string Url { get; set; } // The URL of the build in Azure DevOps
+
+    public long StartTime { get; set; }
 }

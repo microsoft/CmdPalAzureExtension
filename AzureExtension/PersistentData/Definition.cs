@@ -14,5 +14,5 @@ public class Definition : IDefinition
 
     public string HtmlUrl { get; set; } = string.Empty;
 
-    public string Status { get; set; } = string.Empty;
+    public IBuild? MostRecentBuild { get; set; }
 }
