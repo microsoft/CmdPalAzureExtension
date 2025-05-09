@@ -21,6 +21,7 @@ public sealed partial class SignOutPage : ContentPage
     {
         _resources = resources;
         _signOutForm = signOutForm;
+        _signOutForm.PropChanged += UpdatePage;
         _signOutCommand = signOutCommand;
         _authenticationMediator = authenticationMediator;
         _authenticationMediator.LoadingStateChanged += OnLoadingStateChanged;
@@ -34,6 +35,11 @@ public sealed partial class SignOutPage : ContentPage
         [
             new CommandContextItem(_signOutCommand),
         ];
+    }
+
+    private void UpdatePage(object sender, IPropChangedEventArgs args)
+    {
+        RaiseItemsChanged();
     }
 
     private void OnLoadingStateChanged(object? sender, bool isLoading)

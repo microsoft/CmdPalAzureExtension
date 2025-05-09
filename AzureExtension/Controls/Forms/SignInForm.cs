@@ -24,20 +24,14 @@ public partial class SignInForm : FormContent
     public SignInForm(AuthenticationMediator authenticationMediator, IResources resources, SignInCommand signInCommand)
     {
         _authenticationMediator = authenticationMediator;
-        _authenticationMediator.SignInAction += OnSignInAction;
-        _authenticationMediator.SignOutAction += OnSignOutAction;
+        _authenticationMediator.LoadingStateChanged += OnLoadingStateChanged;
         _resources = resources;
         _signInCommand = signInCommand;
     }
 
-    private void OnSignInAction(object? sender, SignInStatusChangedEventArgs e)
+    private void OnLoadingStateChanged(object? sender, bool isLoading)
     {
-        SetButtonEnabled(!e.IsSignedIn);
-    }
-
-    private void OnSignOutAction(object? sender, SignInStatusChangedEventArgs e)
-    {
-        SetButtonEnabled(!e.IsSignedIn);
+        SetButtonEnabled(!isLoading);
     }
 
     private void SetButtonEnabled(bool isEnabled)

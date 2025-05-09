@@ -26,7 +26,6 @@ public class SignInCommand : InvokableCommand
 
     public override CommandResult Invoke()
     {
-        _authenticationMediator.SetLoadingState(true);
         Task.Run(async () =>
         {
             _authenticationMediator.SetLoadingState(true);

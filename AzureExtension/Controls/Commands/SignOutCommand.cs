@@ -26,9 +26,9 @@ public class SignOutCommand : InvokableCommand
 
     public override CommandResult Invoke()
     {
-        _authenticationMediator.SetLoadingState(true);
         Task.Run(async () =>
         {
+            _authenticationMediator.SetLoadingState(true);
             try
             {
                 var accounts = await _accountProvider.GetLoggedInAccounts();
