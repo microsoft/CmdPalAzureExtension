@@ -6,15 +6,15 @@ using AzureExtension.DataManager.Cache;
 
 namespace AzureExtension.Controls;
 
-public interface IDataProvider
+public interface ILiveDataProvider
 {
     Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query);
 
     Task<IEnumerable<IPullRequest>> GetPullRequests(IPullRequestSearch pullRequestSearch);
 
-    Task<IEnumerable<IBuild>> GetBuilds(IDefinitionSearch definitionSearch);
+    Task<IEnumerable<IBuild>> GetBuilds(IPipelineDefinitionSearch definitionSearch);
 
-    Task<IDefinition> GetDefinition(IDefinitionSearch definitionSearch);
+    Task<IDefinition> GetDefinition(IPipelineDefinitionSearch definitionSearch);
 
     event CacheManagerUpdateEventHandler? OnUpdate;
 }

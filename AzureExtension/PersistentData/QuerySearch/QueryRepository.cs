@@ -10,7 +10,7 @@ using Serilog;
 
 namespace AzureExtension.PersistentData;
 
-public partial class QueryRepository : IPersistentDataRepository<IQuery>
+public partial class QueryRepository : IPersistentSearchRepository<IQuery>
 {
     private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", nameof(QueryRepository)));
 

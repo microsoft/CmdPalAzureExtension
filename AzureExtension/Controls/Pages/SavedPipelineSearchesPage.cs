@@ -18,7 +18,7 @@ public class SavedPipelineSearchesPage : ListPage
 
     private readonly SavedAzureSearchesMediator _mediator;
 
-    private readonly ISavedSearchesProvider<IDefinitionSearch> _definitionRepository;
+    private readonly ISavedSearchesProvider<IPipelineDefinitionSearch> _definitionRepository;
 
     private readonly IAccountProvider _accountProvider;
 
@@ -28,7 +28,7 @@ public class SavedPipelineSearchesPage : ListPage
         IResources resources,
         AddPipelineSearchListItem addPipelineSearchListItem,
         SavedAzureSearchesMediator mediator,
-        ISavedSearchesProvider<IDefinitionSearch> definitionRepository,
+        ISavedSearchesProvider<IPipelineDefinitionSearch> definitionRepository,
         IAccountProvider accountProvider,
         ISearchPageFactory searchPageFactory)
     {
@@ -61,7 +61,7 @@ public class SavedPipelineSearchesPage : ListPage
 
             toast.Show();
         }
-        else if (args != null && args is IDefinitionSearch search)
+        else if (args != null && args is IPipelineDefinitionSearch search)
         {
             RaiseItemsChanged(0);
 
@@ -107,7 +107,7 @@ public class SavedPipelineSearchesPage : ListPage
     {
         IsLoading = false;
 
-        if (args != null && args is IDefinitionSearch)
+        if (args != null && args is IPipelineDefinitionSearch)
         {
             RaiseItemsChanged();
         }

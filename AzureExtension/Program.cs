@@ -140,7 +140,7 @@ public sealed class Program
         persistentDataStore.Create();
 
         var combinedCachePath = Path.Combine(dataStoreFolderPath, "AzureData.db");
-        var cacheDataStoreSchema = new AzureDataStoreSchema();
+        var cacheDataStoreSchema = new AzureCacheDataStoreSchema();
         using var cacheDataStore = new DataStore("DataStore", combinedCachePath, cacheDataStoreSchema);
         cacheDataStore.Create();
 
@@ -148,7 +148,7 @@ public sealed class Program
 
         var queryRepository = new QueryRepository(persistentDataStore, azureValidator);
         var pullRequestSearchRepository = new PullRequestSearchRepository(persistentDataStore, azureValidator);
-        var pipelineDefinitionRepository = new DefinitionRepository(persistentDataStore, azureValidator, azureLiveDataProvider, azureClientProvider, pipelineProvider, accountProvider);
+        var pipelineDefinitionRepository = new DefinitionSearchRepository(persistentDataStore, azureValidator, azureLiveDataProvider, azureClientProvider, pipelineProvider, accountProvider);
 
         var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, new SavedSearchesProviderAdapter<IQuery>(queryRepository));
         var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, new SavedSearchesProviderAdapter<IPullRequestSearch>(pullRequestSearchRepository));
@@ -164,7 +164,7 @@ public sealed class Program
 
         var azureDataManager = new AzureDataManager(cacheDataStore, updatersDictionary);
         using var cacheManager = new CacheManager(azureDataManager);
-        var dataProvider = new DataProvider(cacheManager, queryManager, pullRequestSearchManager, pipelineProvider);
+        var dataProvider = new LiveDataProvider(cacheManager, queryManager, pullRequestSearchManager, pipelineProvider);
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);
@@ -186,7 +186,7 @@ public sealed class Program
         {
             { typeof(IQuery), new AzureSearchRepositoryAdapter<IQuery>(queryRepository) },
             { typeof(IPullRequestSearch), new AzureSearchRepositoryAdapter<IPullRequestSearch>(pullRequestSearchRepository) },
-            { typeof(IDefinitionSearch), new AzureSearchRepositoryAdapter<IDefinitionSearch, IDefinition>(pipelineDefinitionRepository) },
+            { typeof(IPipelineDefinitionSearch), new AzureSearchRepositoryAdapter<IPipelineDefinitionSearch, IDefinition>(pipelineDefinitionRepository) },
         };
         var searchPageFactory = new SearchPageFactory(resources, dataProvider, savedAzureSearchesMediator, accountProvider, azureClientHelpers, azureSearchRepositories, queryRepository, pullRequestSearchRepository, pipelineDefinitionRepository);
 

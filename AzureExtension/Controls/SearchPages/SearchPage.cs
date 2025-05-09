@@ -16,9 +16,9 @@ public abstract partial class SearchPage<T> : ListPage
 
     public IAzureSearch CurrentSearch { get; private set; }
 
-    public IDataProvider DataProvider { get; private set; }
+    public ILiveDataProvider DataProvider { get; private set; }
 
-    public SearchPage(IAzureSearch search, IDataProvider dataProvider)
+    public SearchPage(IAzureSearch search, ILiveDataProvider dataProvider)
     {
         CurrentSearch = search;
         Name = search.Name;

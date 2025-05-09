@@ -17,7 +17,7 @@ public class SearchPageFactory : ISearchPageFactory
 {
     private readonly IResources _resources;
 
-    private readonly IDataProvider _dataProvider;
+    private readonly ILiveDataProvider _dataProvider;
 
     private readonly SavedAzureSearchesMediator _mediator;
 
@@ -25,24 +25,24 @@ public class SearchPageFactory : ISearchPageFactory
 
     private readonly AzureClientHelpers _azureClientHelpers;
 
-    private readonly IPersistentDataRepository<IQuery> _queryRepository;
+    private readonly IPersistentSearchRepository<IQuery> _queryRepository;
 
-    private readonly IPersistentDataRepository<IPullRequestSearch> _savedPullRequestSearchRepository;
+    private readonly IPersistentSearchRepository<IPullRequestSearch> _savedPullRequestSearchRepository;
 
-    private readonly IPersistentDataRepository<IDefinitionSearch, IDefinition> _definitionRepository;
+    private readonly IPersistentSearchRepository<IPipelineDefinitionSearch, IDefinition> _definitionRepository;
 
     private readonly IDictionary<Type, IAzureSearchRepository> _azureSearchRepositories;
 
     public SearchPageFactory(
         IResources resources,
-        IDataProvider dataProvider,
+        ILiveDataProvider dataProvider,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
         IDictionary<Type, IAzureSearchRepository> azureSearchRepositories,
-        IPersistentDataRepository<IQuery> queryRepository,
-        IPersistentDataRepository<IPullRequestSearch> savedPullRequestSearchRepository,
-        IPersistentDataRepository<IDefinitionSearch, IDefinition> definitionRepository)
+        IPersistentSearchRepository<IQuery> queryRepository,
+        IPersistentSearchRepository<IPullRequestSearch> savedPullRequestSearchRepository,
+        IPersistentSearchRepository<IPipelineDefinitionSearch, IDefinition> definitionRepository)
     {
         _resources = resources;
         _dataProvider = dataProvider;
@@ -65,9 +65,9 @@ public class SearchPageFactory : ISearchPageFactory
         {
             return new PullRequestSearchPage((IPullRequestSearch)search, _resources, _dataProvider, new TimeSpanHelper(_resources));
         }
-        else if (search is IDefinitionSearch)
+        else if (search is IPipelineDefinitionSearch)
         {
-            return new BuildSearchPage((IDefinitionSearch)search, _resources, _dataProvider, new TimeSpanHelper(_resources));
+            return new BuildSearchPage((IPipelineDefinitionSearch)search, _resources, _dataProvider, new TimeSpanHelper(_resources));
         }
 
         throw new NotImplementedException($"No page for search type {search.GetType()}");
@@ -87,9 +87,9 @@ public class SearchPageFactory : ISearchPageFactory
             var statusMessage = new StatusMessage();
             return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage, "Pull request search edited successfully", "error in editing pull request search");
         }
-        else if (search is IDefinitionSearch)
+        else if (search is IPipelineDefinitionSearch)
         {
-            var savePipelineSearchForm = new SavePipelineSearchForm((IDefinitionSearch)search, _resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
+            var savePipelineSearchForm = new SavePipelineSearchForm((IPipelineDefinitionSearch)search, _resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
             var statusMessage = new StatusMessage();
             return new EditPipelineSearchPage(_resources, savePipelineSearchForm, statusMessage);
         }
@@ -109,9 +109,9 @@ public class SearchPageFactory : ISearchPageFactory
         {
             return typeof(IPullRequestSearch);
         }
-        else if (search is IDefinitionSearch)
+        else if (search is IPipelineDefinitionSearch)
         {
-            return typeof(IDefinitionSearch);
+            return typeof(IPipelineDefinitionSearch);
         }
 
         throw new NotImplementedException($"No type for search {search.GetType()}");
@@ -119,9 +119,9 @@ public class SearchPageFactory : ISearchPageFactory
 
     public IListItem CreateItemForSearch(IAzureSearch search)
     {
-        if (search is IDefinitionSearch)
+        if (search is IPipelineDefinitionSearch)
         {
-            return CreateItemForDefinitionSearch((IDefinitionSearch)search);
+            return CreateItemForDefinitionSearch((IPipelineDefinitionSearch)search);
         }
 
         IAzureSearchRepository azureSearchRepository = _azureSearchRepositories[GetAzureSearchType(search)];
@@ -140,12 +140,12 @@ public class SearchPageFactory : ISearchPageFactory
         };
     }
 
-    public IListItem CreateItemForDefinitionSearch(IDefinitionSearch search)
+    public IListItem CreateItemForDefinitionSearch(IPipelineDefinitionSearch search)
     {
         var definition = _definitionRepository.GetSavedData(search);
         var timeSpanHelper = new TimeSpanHelper(_resources);
 
-        var azureSearchRepository = _azureSearchRepositories[typeof(IDefinitionSearch)];
+        var azureSearchRepository = _azureSearchRepositories[typeof(IPipelineDefinitionSearch)];
 
         if (definition.MostRecentBuild != null)
         {

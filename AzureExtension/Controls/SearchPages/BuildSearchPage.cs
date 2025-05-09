@@ -15,19 +15,19 @@ public partial class BuildSearchPage : ListPage
 {
     protected ILogger Logger { get; }
 
-    public IDataProvider DataProvider { get; private set; }
+    public ILiveDataProvider DataProvider { get; private set; }
 
-    private readonly IDefinitionSearch _search;
+    private readonly IPipelineDefinitionSearch _search;
 
     private readonly IDefinition _definition;
 
     private readonly IResources _resources;
 
-    private readonly IDataProvider _dataProvider;
+    private readonly ILiveDataProvider _dataProvider;
 
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public BuildSearchPage(IDefinitionSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+    public BuildSearchPage(IPipelineDefinitionSearch search, IResources resources, ILiveDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
     {
         _search = search;
         _resources = resources;
@@ -42,7 +42,7 @@ public partial class BuildSearchPage : ListPage
         DataProvider = dataProvider;
     }
 
-    private async Task<IDefinition> GetDefinitionForPage(IDefinitionSearch search)
+    private async Task<IDefinition> GetDefinitionForPage(IPipelineDefinitionSearch search)
     {
         var definition = await _dataProvider.GetDefinition(search);
         if (definition == null)

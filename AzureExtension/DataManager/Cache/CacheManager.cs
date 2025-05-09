@@ -44,7 +44,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
 
     public event CacheManagerUpdateEventHandler? OnUpdate;
 
-    private DataUpdater DataUpdater { get; set; }
+    private PeriodicDataUpdater DataUpdater { get; set; }
 
     public DateTime LastUpdateTime { get; set; } = DateTime.MinValue;
 
@@ -53,7 +53,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
         _dataUpdateService = dataUpdateService;
         _dataUpdateService.OnUpdate += HandleDataManagerUpdate;
 
-        DataUpdater = new DataUpdater(PeriodicUpdate);
+        DataUpdater = new PeriodicDataUpdater(PeriodicUpdate);
         _cancelSource = new CancellationTokenSource();
         _logger = Log.Logger.ForContext("SourceContext", nameof(CacheManager));
 

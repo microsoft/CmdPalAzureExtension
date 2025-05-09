@@ -7,7 +7,7 @@ using AzureExtension.Controls;
 namespace AzureExtension.PersistentData;
 
 #pragma warning disable SA1649 // File name should match first type name
-public interface IPersistentDataRepository<TDataSearch, TDataResult> : ISavedSearchesUpdater<TDataSearch>, ISavedSearchesProvider<TDataSearch>
+public interface IPersistentSearchRepository<TDataSearch, TDataResult> : ISavedSearchesUpdater<TDataSearch>, ISavedSearchesProvider<TDataSearch>
     where TDataSearch : IAzureSearch
 {
     TDataResult GetSavedData(TDataSearch dataSearch);
@@ -15,7 +15,7 @@ public interface IPersistentDataRepository<TDataSearch, TDataResult> : ISavedSea
     IEnumerable<TDataResult> GetAllSavedData(bool getTopLevelOnly = false);
 }
 
-public interface IPersistentDataRepository<TData> : IPersistentDataRepository<TData, TData>
+public interface IPersistentSearchRepository<TData> : IPersistentSearchRepository<TData, TData>
     where TData : IAzureSearch
 {
 }

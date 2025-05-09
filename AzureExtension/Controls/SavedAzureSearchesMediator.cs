@@ -40,7 +40,7 @@ public class SavedAzureSearchesMediator
         }
     }
 
-    public void Remove(IDefinitionSearch definitionSearch)
+    public void Remove(IPipelineDefinitionSearch definitionSearch)
     {
         PipelineSearchRemoved?.Invoke(this, definitionSearch);
     }
