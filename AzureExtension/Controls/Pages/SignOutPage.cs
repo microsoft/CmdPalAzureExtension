@@ -13,38 +13,36 @@ namespace AzureExtension.Controls.Pages;
 public sealed partial class SignOutPage : ContentPage
 {
     private readonly SignOutForm _signOutForm;
-    private readonly StatusMessage _statusMessage;
-    private readonly string _successMessage;
-    private readonly string _errorMessage;
     private readonly IResources _resources;
     private readonly SignOutCommand _signOutCommand;
+    private readonly AuthenticationMediator _authenticationMediator; // corrected spelling
 
-    public SignOutPage(SignOutForm signOutForm, StatusMessage statusMessage, IResources resources, SignOutCommand signOutCommand)
+    public SignOutPage(SignOutForm signOutForm, IResources resources, SignOutCommand signOutCommand, AuthenticationMediator authenticationMediator)
     {
         _resources = resources;
         _signOutForm = signOutForm;
-        _statusMessage = statusMessage;
-        _successMessage = _resources.GetResource("Message_Sign_Out_Success");
-        _errorMessage = _resources.GetResource("Message_Sign_Out_Fail");
         _signOutCommand = signOutCommand;
+        _authenticationMediator = authenticationMediator;
+        _authenticationMediator.LoadingStateChanged += OnLoadingStateChanged;
         Icon = IconLoader.GetIcon("Logo");
         Title = _resources.GetResource("ExtensionTitle");
 
         // Subtitle in CommandProvider = _resources.GetResource("ExtensionSubtitle"); - subtitle is not part of the page interface
-        Name = _resources.GetResource("ExtensionTitle"); // Title is for the Page, Name is for the command
+        Name = Title; // Title is for the Page, Name is for the command
 
-        // Hide status message initially
-        ExtensionHost.HideStatus(_statusMessage);
-
-        Commands = new CommandContextItem[]
-        {
+        Commands =
+        [
             new CommandContextItem(_signOutCommand),
-        };
+        ];
+    }
+
+    private void OnLoadingStateChanged(object? sender, bool isLoading)
+    {
+        IsLoading = isLoading;
     }
 
     public override IContent[] GetContent()
     {
-        ExtensionHost.HideStatus(_statusMessage);
         return [_signOutForm];
     }
 }
