@@ -20,7 +20,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
     private readonly ISavedSearchesUpdater<IQuery> _queryRepository;
-    private IQuery _savedQuery;
+    private IQuery? _savedQuery;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
@@ -30,9 +30,9 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "{{SaveQueryFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery.Name) ? "Forms_Save_Query" : "Forms_Edit_Query") },
-        { "{{SavedQueryString}}", _savedQuery.Url },
-        { "{{SavedQueryName}}", _savedQuery.Name },
+        { "{{SaveQueryFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery?.Name) ? "Forms_Save_Query" : "Forms_Edit_Query") },
+        { "{{SavedQueryString}}", _savedQuery?.Url ?? string.Empty },
+        { "{{SavedQueryName}}", _savedQuery?.Name ?? string.Empty },
         { "{{EnteredQueryErrorMessage}}", _resources.GetResource("Forms_SaveQuery_TemplateEnteredQueryError") },
         { "{{EnteredQueryLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateEnteredQueryLabel") },
         { "{{NameLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateNameLabel") },
@@ -51,7 +51,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
         ISavedSearchesUpdater<IQuery> queryRepository)
     {
         _resources = resources;
-        _savedQuery = new Query();
+        _savedQuery = null;
         _savedQueriesMediator = savedQueriesMediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
@@ -100,7 +100,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
-            if (_savedQuery.Url != string.Empty)
+            if (_savedQuery != null)
             {
                 Log.Information($"Removing outdated search {_savedQuery.Name}, {_savedQuery.Url}");
 
@@ -111,6 +111,7 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             _queryRepository.AddOrUpdateSearch(query, query.IsTopLevel);
             _savedQueriesMediator.AddQuery(query);
 
+            // update the saved query reference if we are editing
             if (_savedQuery != null)
             {
                 _savedQuery = query;
@@ -141,7 +142,8 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             throw new InvalidOperationException($"Failed to get query info {queryInfo.Error}: {queryInfo.ErrorMessage}");
         }
 
-        if (string.IsNullOrEmpty(name))
+        var shouldUpdateQueryName = string.IsNullOrEmpty(name) || (string.Equals(name, _savedQuery?.Name, StringComparison.Ordinal) && !string.Equals(queryUrl, _savedQuery?.Url, StringComparison.Ordinal));
+        if (shouldUpdateQueryName)
         {
             name = queryInfo.Name;
         }
@@ -152,6 +154,11 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
     public bool GetIsTopLevel()
     {
-        return _queryRepository.IsTopLevel(_savedQuery);
+        if (_savedQuery == null)
+        {
+            return false;
+        }
+
+        return _queryRepository.IsTopLevel(_savedQuery!);
     }
 }

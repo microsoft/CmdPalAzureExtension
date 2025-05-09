@@ -10,6 +10,7 @@ using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Microsoft.TeamFoundation.TestManagement.WebApi;
 
 namespace AzureExtension.Controls.Pages;
 
@@ -133,7 +134,7 @@ public class SearchPageFactory : ISearchPageFactory
             Icon = search is IQuery ? IconLoader.GetIcon("Query") : IconLoader.GetIcon("PullRequest"),
             MoreCommands = new CommandContextItem[]
             {
-                new(new LinkCommand(search is IQuery ? search.Url : $"{search.Url}/pullrequests", _resources, null)),
+                new(new LinkCommand(search.Url, _resources, null)),
                 new(CreateEditPageForSearch(search)),
                 new(new RemoveCommand(search, _resources, _mediator, azureSearchRepository)),
             },
