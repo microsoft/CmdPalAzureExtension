@@ -167,7 +167,10 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             { "Mine", "mine" },
         };
 
-        enteredViewToUrlView.TryGetValue(view ?? _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAllTitle"), out var viewValue);
+        if (!enteredViewToUrlView.TryGetValue(view ?? _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAllTitle"), out var viewValue))
+        {
+            viewValue = "active";
+        }
 
         try
         {

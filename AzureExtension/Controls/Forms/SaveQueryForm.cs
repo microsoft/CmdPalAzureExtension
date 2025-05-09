@@ -142,7 +142,8 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             throw new InvalidOperationException($"Failed to get query info {queryInfo.Error}: {queryInfo.ErrorMessage}");
         }
 
-        if (string.IsNullOrEmpty(name) || (string.Equals(name, _savedQuery?.Name, StringComparison.Ordinal) && !string.Equals(queryUrl, _savedQuery?.Url, StringComparison.Ordinal)))
+        var shouldUpdateQueryName = string.IsNullOrEmpty(name) || (string.Equals(name, _savedQuery?.Name, StringComparison.Ordinal) && !string.Equals(queryUrl, _savedQuery?.Url, StringComparison.Ordinal));
+        if (shouldUpdateQueryName)
         {
             name = queryInfo.Name;
         }
