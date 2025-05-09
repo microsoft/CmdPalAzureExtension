@@ -27,7 +27,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
-    private string IsTopLevelChecked => _savedPullRequestSearch != null ? GetIsTopLevel().ToString().ToLower(CultureInfo.InvariantCulture) : "false";
+    private string IsTopLevelChecked => GetIsTopLevel().ToString().ToLower(CultureInfo.InvariantCulture);
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
@@ -147,6 +147,11 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
     public bool GetIsTopLevel()
     {
+        if (_savedPullRequestSearch == null)
+        {
+            return false;
+        }
+
         return _pullRequestSearchRepository.IsTopLevel(_savedPullRequestSearch!);
     }
 
