@@ -13,9 +13,9 @@ public sealed partial class AzureExtension : IExtension
 {
     private readonly ManualResetEvent _extensionDisposedEvent;
 
-    private readonly Microsoft.CommandPalette.Extensions.Toolkit.CommandProvider _provider;
+    private readonly CommandProvider _provider;
 
-    public AzureExtension(ManualResetEvent extensionDisposedEvent, Microsoft.CommandPalette.Extensions.Toolkit.CommandProvider commandProvider)
+    public AzureExtension(ManualResetEvent extensionDisposedEvent, CommandProvider commandProvider)
     {
         _extensionDisposedEvent = extensionDisposedEvent;
         _provider = commandProvider;
