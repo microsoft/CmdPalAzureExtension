@@ -176,8 +176,8 @@ public sealed class Program
         var signInForm = new SignInForm(accountProvider, azureClientHelpers, authenticationMediator, resources);
         var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"), resources);
         var signOutCommand = new SignOutCommand(resources, accountProvider, authenticationMediator);
-        var signOutForm = new SignOutForm(accountProvider, resources, authenticationMediator, signOutCommand);
-        var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"), resources, signOutCommand);
+        var signOutForm = new SignOutForm(resources, signOutCommand);
+        var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources, signOutCommand);
 
         var savedAzureSearchesMediator = new SavedAzureSearchesMediator();
 

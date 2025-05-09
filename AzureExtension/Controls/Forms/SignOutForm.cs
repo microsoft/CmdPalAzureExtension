@@ -2,7 +2,6 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Account;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -10,20 +9,14 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Forms;
 
-public sealed partial class SignOutForm : FormContent, IAzureForm
+public sealed partial class SignOutForm : FormContent
 {
-    // public event EventHandler<bool>? LoadingStateChanged;
-    // public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
-    private readonly IAccountProvider _accountProvider;
     private readonly IResources _resources;
-    private readonly AuthenticationMediator _authenticationMediator;
     private readonly SignOutCommand _signOutCommand;
 
-    public SignOutForm(IAccountProvider accountProvider, IResources resources, AuthenticationMediator authenticationMediator, SignOutCommand signOutCommand)
+    public SignOutForm(IResources resources, SignOutCommand signOutCommand)
     {
-        _accountProvider = accountProvider;
         _resources = resources;
-        _authenticationMediator = authenticationMediator;
         _signOutCommand = signOutCommand;
     }
 
@@ -41,6 +34,6 @@ public sealed partial class SignOutForm : FormContent, IAzureForm
 
     public override ICommandResult SubmitForm(string inputs, string data)
     {
-        return _signOutCommand.Invoke();
+       return _signOutCommand.Invoke();
     }
 }

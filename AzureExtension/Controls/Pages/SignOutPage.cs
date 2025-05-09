@@ -33,9 +33,6 @@ public sealed partial class SignOutPage : ContentPage
         // Subtitle in CommandProvider = _resources.GetResource("ExtensionSubtitle"); - subtitle is not part of the page interface
         Name = _resources.GetResource("ExtensionTitle"); // Title is for the Page, Name is for the command
 
-        // Wire up events using the helper
-        FormEventHelper.WireFormEvents(_signOutForm, this, _statusMessage, _successMessage, _errorMessage);
-
         // Hide status message initially
         ExtensionHost.HideStatus(_statusMessage);
 

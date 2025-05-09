@@ -17,8 +17,8 @@ public static class FormEventHelper
         string successMessage,
         string errorMessage)
     {
-        // form.FormSubmitted += (sender, args) => OnFormSubmit(statusMessage, successMessage, errorMessage, args);
-        // form.LoadingStateChanged += (sender, isLoading) => OnLoadingStateChanged(page, isLoading);
+         form.FormSubmitted += (sender, args) => OnFormSubmit(statusMessage, successMessage, errorMessage, args);
+         form.LoadingStateChanged += (sender, isLoading) => OnLoadingStateChanged(page, isLoading);
     }
 
     public static void OnFormSubmit(
