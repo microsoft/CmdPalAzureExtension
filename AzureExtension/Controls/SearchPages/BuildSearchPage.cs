@@ -133,7 +133,7 @@ public partial class BuildSearchPage : ListPage
 
     protected ListItem GetListItem(IBuild item)
     {
-        var listItemTitle = $"#{item.BuildNumber}";
+        var listItemTitle = $"#{item.BuildNumber} • {item.TriggerMessage}";
 
         return new ListItem(new LinkCommand(item.Url, _resources, null))
         {

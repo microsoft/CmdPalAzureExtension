@@ -17,7 +17,7 @@ public class AzureCacheDataStoreSchema : IDataStoreSchema
     }
 
     // Update this anytime incompatible changes happen with a released version.
-    private const long SchemaVersionValue = 0x0009;
+    private const long SchemaVersionValue = 0x0010;
 
     private const string Metadata =
     @"CREATE TABLE Metadata (" +
@@ -250,6 +250,7 @@ public class AzureCacheDataStoreSchema : IDataStoreSchema
         "Url TEXT NOT NULL COLLATE NOCASE," +
         "DefinitionId INTEGER NOT NULL," +
         "SourceBranch TEXT NOT NULL COLLATE NOCASE," +
+        "TriggerMessage TEXT NOT NULL COLLATE NOCASE," +
         "RequesterId INTEGER NOT NULL," +
         "TimeUpdated INTEGER NOT NULL" +
     ");";
