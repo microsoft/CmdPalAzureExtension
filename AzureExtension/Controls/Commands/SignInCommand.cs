@@ -31,16 +31,17 @@ public class SignInCommand : InvokableCommand
         LoadingStateChanged?.Invoke(this, true);
         Task.Run(async () =>
         {
+            _authenticationMediator.SetLoadingState(true);
             try
             {
                 var signInSucceeded = await HandleSignIn();
-                LoadingStateChanged?.Invoke(this, false);
+                _authenticationMediator.SetLoadingState(false);
                 _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(signInSucceeded, null));
                 ToastHelper.ShowToast(_resources.GetResource("Message_Sign_In_Success"), MessageState.Success);
             }
             catch (Exception ex)
             {
-                LoadingStateChanged?.Invoke(this, false);
+                _authenticationMediator.SetLoadingState(false);
                 _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(false, ex));
                 ToastHelper.ShowToast($"{_resources.GetResource("Message_Sign_In_Fail")} {ex.Message}", MessageState.Error);
             }

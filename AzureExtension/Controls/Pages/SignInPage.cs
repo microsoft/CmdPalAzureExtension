@@ -25,17 +25,17 @@ public partial class SignInPage : ContentPage
         _resources = resources;
         Icon = IconLoader.GetIcon("Logo");
         Title = _resources.GetResource("Forms_SignIn_PageTitle");
-        Name = _resources.GetResource("Forms_SignIn_PageTitle"); // Title is for the Page, Name is for the command
+        Name = Title; // Title is for the Page, Name is for the command
         _signInForm = signInForm;
         _statusMessage = statusMessage;
         _successMessage = resources.GetResource("Message_Sign_In_Success");
         _errorMessage = resources.GetResource("Message_Sign_In_Fail");
         _signInCommand = signInCommand;
         _authenticationMediator = authenticationMediator;
+        _authenticationMediator.LoadingStateChanged += OnLoadingStateChanged;
 
         // Wire up events using the helper
-        FormEventHelper.WireFormEvents(_signInForm, this, _statusMessage, _successMessage, _errorMessage);
-
+        // FormEventHelper.WireFormEvents(_signInForm, this, _statusMessage, _successMessage, _errorMessage);
         _signInForm.PropChanged += UpdatePage;
 
         // Hide status message initially
@@ -45,6 +45,11 @@ public partial class SignInPage : ContentPage
         {
             new CommandContextItem(_signInCommand),
         };
+    }
+
+    private void OnLoadingStateChanged(object? sender, bool isLoading)
+    {
+        IsLoading = isLoading;
     }
 
     private void UpdatePage(object sender, IPropChangedEventArgs args)

@@ -5,36 +5,33 @@
 using System.Globalization;
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Forms;
 
-public partial class SignInForm : FormContent, IAzureForm
+public partial class SignInForm : FormContent
 {
-    public event EventHandler<bool>? LoadingStateChanged;
-
-    public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
-
     private readonly IAccountProvider _accountProvider;
-    private readonly AzureClientHelpers _azureClientHelpers;
     private readonly IResources _resources;
     private readonly AuthenticationMediator _authenticationMediator;
+    private readonly SignInCommand _signInCommand;
 
     private bool _isButtonEnabled = true;
 
     private string IsButtonEnabled =>
         _isButtonEnabled.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture);
 
-    public SignInForm(IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, AuthenticationMediator authenticationMediator, IResources resources)
+    public SignInForm(IAccountProvider accountProvider, AuthenticationMediator authenticationMediator, IResources resources, SignInCommand signInCommand)
     {
         _accountProvider = accountProvider;
         _authenticationMediator = authenticationMediator;
         _authenticationMediator.SignInAction += OnSignInAction;
         _authenticationMediator.SignOutAction += OnSignOutAction;
-        _azureClientHelpers = azureClientHelpers;
         _resources = resources;
+        _signInCommand = signInCommand;
     }
 
     private void OnSignInAction(object? sender, SignInStatusChangedEventArgs e)
@@ -67,37 +64,6 @@ public partial class SignInForm : FormContent, IAzureForm
 
     public override ICommandResult SubmitForm(string inputs, string data)
     {
-        LoadingStateChanged?.Invoke(this, true);
-        Task.Run(async () =>
-        {
-            try
-            {
-                var signInSucceeded = await HandleSignIn();
-                LoadingStateChanged?.Invoke(this, false);
-                _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(signInSucceeded, null));
-                FormSubmitted?.Invoke(this, new FormSubmitEventArgs(signInSucceeded, null));
-            }
-            catch (Exception ex)
-            {
-                LoadingStateChanged?.Invoke(this, false);
-                _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(false, ex));
-                FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
-            }
-        });
-        return CommandResult.KeepOpen();
-    }
-
-    private async Task<bool> HandleSignIn()
-    {
-        try
-        {
-            var account = await _accountProvider.ShowLogonSession();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            var errorMessage = $"{ex.Message}";
-            throw new InvalidOperationException(errorMessage);
-        }
+        return _signInCommand.Invoke();
     }
 }

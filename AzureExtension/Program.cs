@@ -174,7 +174,7 @@ public sealed class Program
         var authenticationMediator = new AuthenticationMediator();
 
         var signInCommand = new SignInCommand(resources, accountProvider, authenticationMediator);
-        var signInForm = new SignInForm(accountProvider, azureClientHelpers, authenticationMediator, resources);
+        var signInForm = new SignInForm(accountProvider, authenticationMediator, resources, signInCommand);
         var signInPage = new SignInPage(signInForm, new StatusMessage(), resources, signInCommand, authenticationMediator);
         var signOutCommand = new SignOutCommand(resources, accountProvider, authenticationMediator);
         var signOutForm = new SignOutForm(resources, signOutCommand);
