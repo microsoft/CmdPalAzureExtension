@@ -3,10 +3,12 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
+using AzureExtension.Account;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Microsoft.Identity.Client;
 
 namespace AzureExtension.Controls.Forms;
 
@@ -15,12 +17,13 @@ public sealed partial class SignOutForm : FormContent
     private readonly IResources _resources;
     private readonly SignOutCommand _signOutCommand;
     private readonly AuthenticationMediator _authenticationMediator;
+    private readonly IAccountProvider _accountProvider;
     private bool _isButtonEnabled = true;
 
     private string IsButtonEnabled =>
         _isButtonEnabled.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture);
 
-    public SignOutForm(IResources resources, SignOutCommand signOutCommand, AuthenticationMediator authenticationMediator)
+    public SignOutForm(IResources resources, SignOutCommand signOutCommand, AuthenticationMediator authenticationMediator, IAccountProvider accountProvider)
     {
         _resources = resources;
         _signOutCommand = signOutCommand;
@@ -28,6 +31,7 @@ public sealed partial class SignOutForm : FormContent
         _authenticationMediator.LoadingStateChanged += OnLoadingStateChanged;
         _authenticationMediator.SignInAction += ResetButton;
         _authenticationMediator.SignOutAction += ResetButton;
+        _accountProvider = accountProvider;
     }
 
     private void ResetButton(object? sender, SignInStatusChangedEventArgs e)
@@ -47,7 +51,7 @@ public sealed partial class SignOutForm : FormContent
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{AuthTitle}}", _resources.GetResource("Forms_SignOut_TemplateAuthTitle") },
-        { "{{AuthButtonTitle}}", _resources.GetResource("Forms_SignOut_TemplateAuthButtonTitle") },
+        { "{{AuthButtonTitle}}", $"{_resources.GetResource("Forms_SignOut_TemplateAuthButtonTitle")} {_accountProvider.GetDefaultAccount().Username}" },
         { "{{AuthIcon}}", $"data:image/png;base64,{IconLoader.GetIconAsBase64("Logo")}" },
         { "{{AuthButtonTooltip}}", _resources.GetResource("Forms_SignOut_TemplateAuthButtonTooltip") },
         { "{{ButtonIsEnabled}}", IsButtonEnabled },
