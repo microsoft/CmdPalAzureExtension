@@ -13,7 +13,7 @@ using Serilog;
 
 namespace AzureExtension.PersistentData;
 
-public class DefinitionSearchRepository : IPersistentSearchRepository<IPipelineDefinitionSearch, IDefinition>, ISavedSearchesSource<IPipelineDefinitionSearch>
+public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefinitionSearch>, ISavedSearchesUpdater<IPipelineDefinitionSearch>, ISavedSearchesSource<IPipelineDefinitionSearch>
 {
     private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", nameof(QueryRepository)));
     private static readonly ILogger _log = _logger.Value;
@@ -97,44 +97,6 @@ public class DefinitionSearchRepository : IPersistentSearchRepository<IPipelineD
         }
 
         DefinitionSearch.Remove(_dataStore, internalId, projectUrl);
-    }
-
-    public IDefinition GetSavedData(IPipelineDefinitionSearch dataSearch)
-    {
-        var dsDefinition = _pipelineProvider.GetDataForSearch(dataSearch);
-
-        if (dsDefinition != null)
-        {
-            dsDefinition.HtmlUrl = dataSearch.ProjectUrl;
-            return dsDefinition;
-        }
-
-        return Task.Run(async () =>
-        {
-            var account = await _accountProvider.GetDefaultAccountAsync();
-            var azureUri = new AzureUri(dataSearch.ProjectUrl);
-            var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Connection, account);
-            var definitionBuild = await _liveDataProvider.GetDefinitionAsync(vssConnection, azureUri.Project, dataSearch.InternalId, CancellationToken.None);
-            return new Definition { InternalId = definitionBuild.Id, Name = definitionBuild.Name, HtmlUrl = dataSearch.ProjectUrl };
-        }).Result;
-    }
-
-    public IEnumerable<IDefinition> GetAllSavedData(bool getTopLevelOnly = false)
-    {
-        ValidateDataStore();
-        var definitions = new List<IDefinition>();
-        var definitionSearches = GetAllDefinitionSearches(getTopLevelOnly);
-
-        // This for is needed because there can be different projects.
-        // If this need to be sped up, we can group by project and run them in parallel.
-        // For each project, we could use one single API call to ADO.
-        foreach (var definitionSearch in definitionSearches)
-        {
-            var definition = GetSavedData(definitionSearch);
-            definitions.Add(definition);
-        }
-
-        return definitions;
     }
 
     public void AddOrUpdateSearch(IPipelineDefinitionSearch dataSearch, bool isTopLevel)

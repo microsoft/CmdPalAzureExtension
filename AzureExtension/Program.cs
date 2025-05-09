@@ -150,8 +150,8 @@ public sealed class Program
         var pullRequestSearchRepository = new PullRequestSearchRepository(persistentDataStore, azureValidator);
         var pipelineDefinitionRepository = new DefinitionSearchRepository(persistentDataStore, azureValidator, azureLiveDataProvider, azureClientProvider, pipelineProvider, accountProvider);
 
-        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, new SavedSearchesProviderAdapter<IQuery>(queryRepository));
-        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, new SavedSearchesProviderAdapter<IPullRequestSearch>(pullRequestSearchRepository));
+        var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, queryRepository);
+        var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, pullRequestSearchRepository);
 
         var pipelineUpdater = new AzureDataPipelineUpdater(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, pipelineDefinitionRepository, pipelineProvider);
 
@@ -184,9 +184,9 @@ public sealed class Program
 
         var azureSearchRepositories = new Dictionary<Type, IAzureSearchRepository>
         {
-            { typeof(IQuery), new AzureSearchRepositoryAdapter<IQuery>(queryRepository) },
-            { typeof(IPullRequestSearch), new AzureSearchRepositoryAdapter<IPullRequestSearch>(pullRequestSearchRepository) },
-            { typeof(IPipelineDefinitionSearch), new AzureSearchRepositoryAdapter<IPipelineDefinitionSearch, IDefinition>(pipelineDefinitionRepository) },
+            { typeof(IQuery), new AzureSearchRepositoryAdapter<IQuery>(queryRepository, queryRepository) },
+            { typeof(IPullRequestSearch), new AzureSearchRepositoryAdapter<IPullRequestSearch>(pullRequestSearchRepository, pullRequestSearchRepository) },
+            { typeof(IPipelineDefinitionSearch), new AzureSearchRepositoryAdapter<IPipelineDefinitionSearch>(pipelineDefinitionRepository, pipelineDefinitionRepository) },
         };
         var searchPageFactory = new SearchPageFactory(resources, dataProvider, savedAzureSearchesMediator, accountProvider, azureClientHelpers, azureSearchRepositories, queryRepository, pullRequestSearchRepository, pipelineDefinitionRepository);
 

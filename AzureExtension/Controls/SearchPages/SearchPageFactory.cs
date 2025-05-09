@@ -25,11 +25,11 @@ public class SearchPageFactory : ISearchPageFactory
 
     private readonly AzureClientHelpers _azureClientHelpers;
 
-    private readonly IPersistentSearchRepository<IQuery> _queryRepository;
+    private readonly ISavedSearchesUpdater<IQuery> _queryUpdater;
 
-    private readonly IPersistentSearchRepository<IPullRequestSearch> _savedPullRequestSearchRepository;
+    private readonly ISavedSearchesUpdater<IPullRequestSearch> _savedPullRequestSearchUpdater;
 
-    private readonly IPersistentSearchRepository<IPipelineDefinitionSearch, IDefinition> _definitionRepository;
+    private readonly ISavedSearchesUpdater<IPipelineDefinitionSearch> _definitionUpdater;
 
     private readonly IDictionary<Type, IAzureSearchRepository> _azureSearchRepositories;
 
@@ -40,18 +40,18 @@ public class SearchPageFactory : ISearchPageFactory
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
         IDictionary<Type, IAzureSearchRepository> azureSearchRepositories,
-        IPersistentSearchRepository<IQuery> queryRepository,
-        IPersistentSearchRepository<IPullRequestSearch> savedPullRequestSearchRepository,
-        IPersistentSearchRepository<IPipelineDefinitionSearch, IDefinition> definitionRepository)
+        ISavedSearchesUpdater<IQuery> queryUpdater,
+        ISavedSearchesUpdater<IPullRequestSearch> savedPullRequestSearchUpdater,
+        ISavedSearchesUpdater<IPipelineDefinitionSearch> definitionUpdater)
     {
         _resources = resources;
         _dataProvider = dataProvider;
         _mediator = mediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
-        _queryRepository = queryRepository;
-        _savedPullRequestSearchRepository = savedPullRequestSearchRepository;
-        _definitionRepository = definitionRepository;
+        _queryUpdater = queryUpdater;
+        _savedPullRequestSearchUpdater = savedPullRequestSearchUpdater;
+        _definitionUpdater = definitionUpdater;
         _azureSearchRepositories = azureSearchRepositories;
     }
 
@@ -77,19 +77,19 @@ public class SearchPageFactory : ISearchPageFactory
     {
         if (search is IQuery)
         {
-            var saveQueryForm = new SaveQueryForm((IQuery)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _queryRepository);
+            var saveQueryForm = new SaveQueryForm((IQuery)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _queryUpdater);
             var statusMessage = new StatusMessage();
             return new EditQueryPage(_resources, saveQueryForm, statusMessage, "Query edited successfully", "Error in editing query");
         }
         else if (search is IPullRequestSearch)
         {
-            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _savedPullRequestSearchRepository);
+            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _savedPullRequestSearchUpdater);
             var statusMessage = new StatusMessage();
             return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage, "Pull request search edited successfully", "error in editing pull request search");
         }
         else if (search is IPipelineDefinitionSearch)
         {
-            var savePipelineSearchForm = new SavePipelineSearchForm((IPipelineDefinitionSearch)search, _resources, _definitionRepository, _mediator, _accountProvider, _azureClientHelpers);
+            var savePipelineSearchForm = new SavePipelineSearchForm((IPipelineDefinitionSearch)search, _resources, _definitionUpdater, _mediator, _accountProvider, _azureClientHelpers);
             var statusMessage = new StatusMessage();
             return new EditPipelineSearchPage(_resources, savePipelineSearchForm, statusMessage);
         }

@@ -7,23 +7,17 @@ using AzureExtension.PersistentData;
 namespace AzureExtension.Controls;
 
 #pragma warning disable SA1649 // File name should match first type name
-public class AzureSearchRepositoryAdapter<TDataSearch, TDataResult> : IAzureSearchRepository
+public class AzureSearchRepositoryAdapter<TDataSearch> : IAzureSearchRepository
 #pragma warning restore SA1649 // File name should match first type name
     where TDataSearch : IAzureSearch
 {
     private readonly ISavedSearchesUpdater<TDataSearch> _updater;
     private readonly ISavedSearchesProvider<TDataSearch> _provider;
 
-    public AzureSearchRepositoryAdapter(IPersistentSearchRepository<TDataSearch> repository)
+    public AzureSearchRepositoryAdapter(ISavedSearchesUpdater<TDataSearch> updater, ISavedSearchesProvider<TDataSearch> provider)
     {
-        _provider = repository;
-        _updater = repository;
-    }
-
-    public AzureSearchRepositoryAdapter(IPersistentSearchRepository<TDataSearch, TDataResult> repository)
-    {
-        _provider = repository;
-        _updater = repository;
+        _provider = provider;
+        _updater = updater;
     }
 
     public IEnumerable<IAzureSearch> GetAll(bool getTopLevelOnly = false)
@@ -36,16 +30,5 @@ public class AzureSearchRepositoryAdapter<TDataSearch, TDataResult> : IAzureSear
     public void Remove(IAzureSearch azureSearch)
     {
         _updater.RemoveSavedSearch((TDataSearch)azureSearch);
-    }
-}
-
-#pragma warning disable SA1402 // File may only contain a single type
-public class AzureSearchRepositoryAdapter<TDataSearch> : AzureSearchRepositoryAdapter<TDataSearch, TDataSearch>
-#pragma warning restore SA1402 // File may only contain a single type
-    where TDataSearch : IAzureSearch
-{
-    public AzureSearchRepositoryAdapter(IPersistentSearchRepository<TDataSearch> repository)
-        : base(repository)
-    {
     }
 }
