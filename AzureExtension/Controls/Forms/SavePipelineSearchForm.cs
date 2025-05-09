@@ -82,7 +82,12 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
             LoadingStateChanged?.Invoke(this, false);
             _definitionRepository.AddOrUpdateSearch(pipelineSearch, pipelineSearch.IsTopLevel);
             _mediator.AddPipelineSearch(pipelineSearch);
-            _savedDefinitionSearch = pipelineSearch;
+
+            if (_savedDefinitionSearch != null)
+            {
+                _savedDefinitionSearch = pipelineSearch;
+            }
+
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         }
         catch (Exception ex)

@@ -110,7 +110,12 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             LoadingStateChanged?.Invoke(this, false);
             _pullRequestSearchRepository.AddOrUpdateSearch(pullRequestSearch, pullRequestSearch.IsTopLevel);
             _mediator.AddPullRequestSearch(pullRequestSearch);
-            _savedPullRequestSearch = pullRequestSearch;
+
+            if (_savedPullRequestSearch != null)
+            {
+                _savedPullRequestSearch = pullRequestSearch;
+            }
+
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         }
         catch (Exception ex)
