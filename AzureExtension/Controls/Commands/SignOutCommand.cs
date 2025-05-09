@@ -4,6 +4,7 @@
 
 using AzureExtension.Account;
 using AzureExtension.Helpers;
+using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Commands;
@@ -15,8 +16,6 @@ public class SignOutCommand : InvokableCommand
     private readonly AuthenticationMediator _authenticationMediator;
 
     public event EventHandler<bool>? LoadingStateChanged;
-
-    public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
     public SignOutCommand(IResources resources, IAccountProvider accountProvider, AuthenticationMediator authenticationMediator)
     {
@@ -45,7 +44,7 @@ public class SignOutCommand : InvokableCommand
 
                 LoadingStateChanged?.Invoke(this, false);
                 _authenticationMediator.SignOut(new SignInStatusChangedEventArgs(!signOutSucceeded, null));
-                FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
+                ToastHelper.ShowToast(_resources.GetResource("Message_Sign_Out_Success"), MessageState.Success);
             }
             catch (Exception ex)
             {
@@ -53,7 +52,7 @@ public class SignOutCommand : InvokableCommand
 
                 // if sign out fails, the user is still signed in (true)
                 _authenticationMediator.SignOut(new SignInStatusChangedEventArgs(true, ex));
-                FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
+                ToastHelper.ShowToast($"{_resources.GetResource("Message_Sign_Out_Fail")} {ex.Message}", MessageState.Error);
             }
         });
         return CommandResult.KeepOpen();
