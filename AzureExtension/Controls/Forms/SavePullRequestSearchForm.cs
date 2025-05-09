@@ -6,10 +6,12 @@ using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Serilog;
+using static System.Net.WebRequestMethods;
 
 namespace AzureExtension.Controls.Forms;
 
@@ -19,27 +21,27 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     private readonly SavedAzureSearchesMediator _mediator;
     private readonly ISavedSearchesUpdater<IPullRequestSearch> _pullRequestSearchRepository;
     private readonly IAccountProvider _accountProvider;
-    private IPullRequestSearch _savedPullRequestSearch;
+    private IPullRequestSearch? _savedPullRequestSearch;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
     public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
-    private string IsTopLevelChecked => GetIsTopLevel().ToString().ToLower(CultureInfo.InvariantCulture);
+    private string IsTopLevelChecked => _savedPullRequestSearch != null ? GetIsTopLevel().ToString().ToLower(CultureInfo.InvariantCulture) : "false";
 
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{RepositoryUrlPlaceholder}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateRepositoryUrlPlaceholder") },
         { "{{RepositoryUrlLabel}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateRepositoryUrlLabel") },
-        { "{{PullRequestSearchRepositoryUrl}}", _savedPullRequestSearch.Url },
+        { "{{PullRequestSearchRepositoryUrl}}", _savedPullRequestSearch?.Url ?? string.Empty },
         { "{{RepositoryUrlError}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateRepositoryUrlError") },
         { "{{PullRequestSearchTitlePlaceholder}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplatePullRequestSearchTitlePlaceholder") },
         { "{{PullRequestSearchTitleLabel}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplatePullRequestSearchTitleLabel") },
-        { "{{EnteredPullRequestSearchTitle}}", _savedPullRequestSearch.Name },
+        { "{{EnteredPullRequestSearchTitle}}", _savedPullRequestSearch?.Name ?? string.Empty },
         { "{{PullRequestSearchViewMineTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewMineTitle") },
         { "{{PullRequestSearchViewAssignedToMeTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAssignedToMeTitle") },
         { "{{PullRequestSearchViewAllTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAllTitle") },
-        { "{{PullRequestSearchSelectedView}}", string.IsNullOrEmpty(_savedPullRequestSearch.View) ? _resources.GetResource("Forms_SavePullRequestSearch_TemplateDefaultView") : _savedPullRequestSearch.View },
+        { "{{PullRequestSearchSelectedView}}", string.IsNullOrEmpty(_savedPullRequestSearch?.View) ? _resources.GetResource("Forms_SavePullRequestSearch_TemplateDefaultView") : _savedPullRequestSearch.View },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateIsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SavePullRequestSearchActionTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateSavePullRequestSearchActionTitle") },
@@ -58,7 +60,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
         _mediator = mediator;
         _accountProvider = accountProvider;
         _pullRequestSearchRepository = pullRequestSearchRepository;
-        _savedPullRequestSearch = new PullRequestSearch();
+        _savedPullRequestSearch = null;
     }
 
     // for editing an existing pull request search
@@ -99,7 +101,7 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
-            if (!string.IsNullOrEmpty(_savedPullRequestSearch.Url))
+            if (_savedPullRequestSearch != null)
             {
                 Log.Information($"Removing outdated search {_savedPullRequestSearch.Name}, {_savedPullRequestSearch.Url}");
 
@@ -132,8 +134,10 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
         var view = jsonNode?["view"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
-        var searchUri = new AzureUri(CreatePullRequestUrl(enteredUrl, view));
-        if (string.IsNullOrEmpty(name))
+        var testUri = new AzureUri(enteredUrl);
+        var url = CreatePullRequestUrl(testUri, view);
+        var searchUri = new AzureUri(url);
+        if (string.IsNullOrEmpty(name) || !string.Equals(name, $"{searchUri.Repository} - {_savedPullRequestSearch?.View}", StringComparison.OrdinalIgnoreCase))
         {
             name = $"{searchUri.Repository} - {view}";
         }
@@ -143,23 +147,32 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
     public bool GetIsTopLevel()
     {
-        return _pullRequestSearchRepository.IsTopLevel(_savedPullRequestSearch);
+        return _pullRequestSearchRepository.IsTopLevel(_savedPullRequestSearch!);
     }
 
     // The form enforces that the URL is not null or empty, so we can assume it is valid
     // This assumes the URL is for a repository, not the list of pull requests
-    public string CreatePullRequestUrl(string url, string? view)
+    public string CreatePullRequestUrl(AzureUri uri, string? view)
     {
+        // the View values are hardcoded in SavePullRequestSearchForm.json
         var enteredViewToUrlView = new Dictionary<string, string>()
         {
-            { _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAllTitle"), "active" },
-            { _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAssignedToMeTitle"), "mine" },
-            { _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewMineTitle"), "mine" },
+            { "All", "active" },
+            { "Assigned", "mine" },
+            { "Mine", "mine" },
         };
 
         enteredViewToUrlView.TryGetValue(view ?? _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAllTitle"), out var viewValue);
 
-        var pullRequestUrl = url + $"/pullrequests?_a={viewValue}";
-        return pullRequestUrl;
+        try
+        {
+            var baseUrl = $"https://dev.azure.com/{uri.Organization.ToString()}/{uri.Project.ToString()}/_git/{uri.Repository.ToString()}".TrimEnd('/');
+
+            return $"{baseUrl}/pullrequests?_a={viewValue}";
+        }
+        catch (UriFormatException ex)
+        {
+            throw new FormatException("The provided URL is not valid.", ex);
+        }
     }
 }
