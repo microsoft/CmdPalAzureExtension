@@ -27,26 +27,24 @@ public partial class SignInForm : FormContent, IAzureForm
     private string IsButtonEnabled =>
         _isButtonEnabled.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture);
 
-    private Page? page;
-
     public SignInForm(IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, AuthenticationMediator authenticationMediator, IResources resources)
     {
         _accountProvider = accountProvider;
         _authenticationMediator = authenticationMediator;
-        _authenticationMediator.SignOutAction += SignOutForm_SignOutAction;
-        page = null;
+        _authenticationMediator.SignInAction += OnSignInAction;
+        _authenticationMediator.SignOutAction += OnSignOutAction;
         _azureClientHelpers = azureClientHelpers;
         _resources = resources;
     }
 
-    public void SetPage(Page page)
+    private void OnSignInAction(object? sender, SignInStatusChangedEventArgs e)
     {
-        this.page = page;
+        SetButtonEnabled(!e.IsSignedIn);
     }
 
-    private void SignOutForm_SignOutAction(object? sender, SignInStatusChangedEventArgs e)
+    private void OnSignOutAction(object? sender, SignInStatusChangedEventArgs e)
     {
-        _isButtonEnabled = !e.IsSignedIn;
+        SetButtonEnabled(!e.IsSignedIn);
     }
 
     private void SetButtonEnabled(bool isEnabled)
@@ -82,7 +80,6 @@ public partial class SignInForm : FormContent, IAzureForm
             catch (Exception ex)
             {
                 LoadingStateChanged?.Invoke(this, false);
-                SetButtonEnabled(true);
                 _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(false, ex));
                 FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
             }
