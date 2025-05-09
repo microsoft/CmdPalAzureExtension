@@ -6,12 +6,10 @@ using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
-using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Serilog;
-using static System.Net.WebRequestMethods;
 
 namespace AzureExtension.Controls.Forms;
 
