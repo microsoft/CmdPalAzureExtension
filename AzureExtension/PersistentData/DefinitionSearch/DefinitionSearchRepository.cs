@@ -54,7 +54,7 @@ public class DefinitionSearchRepository : IPersistentSearchRepository<IPipelineD
         ValidateDataStore();
         if (getTopLevelOnly)
         {
-            DefinitionSearch.GetTopLevel(_dataStore);
+            return DefinitionSearch.GetTopLevel(_dataStore);
         }
 
         return DefinitionSearch.GetAll(_dataStore);
