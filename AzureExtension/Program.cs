@@ -174,8 +174,8 @@ public sealed class Program
         var authenticationMediator = new AuthenticationMediator();
 
         var signInCommand = new SignInCommand(resources, accountProvider, authenticationMediator);
-        var signInForm = new SignInForm(accountProvider, authenticationMediator, resources, signInCommand);
-        var signInPage = new SignInPage(signInForm, new StatusMessage(), resources, signInCommand, authenticationMediator);
+        var signInForm = new SignInForm(authenticationMediator, resources, signInCommand);
+        var signInPage = new SignInPage(signInForm, resources, signInCommand, authenticationMediator);
         var signOutCommand = new SignOutCommand(resources, accountProvider, authenticationMediator);
         var signOutForm = new SignOutForm(resources, signOutCommand);
         var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources, signOutCommand);

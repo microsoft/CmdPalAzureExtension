@@ -3,8 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
-using AzureExtension.Account;
-using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -14,7 +12,6 @@ namespace AzureExtension.Controls.Forms;
 
 public partial class SignInForm : FormContent
 {
-    private readonly IAccountProvider _accountProvider;
     private readonly IResources _resources;
     private readonly AuthenticationMediator _authenticationMediator;
     private readonly SignInCommand _signInCommand;
@@ -24,9 +21,8 @@ public partial class SignInForm : FormContent
     private string IsButtonEnabled =>
         _isButtonEnabled.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture);
 
-    public SignInForm(IAccountProvider accountProvider, AuthenticationMediator authenticationMediator, IResources resources, SignInCommand signInCommand)
+    public SignInForm(AuthenticationMediator authenticationMediator, IResources resources, SignInCommand signInCommand)
     {
-        _accountProvider = accountProvider;
         _authenticationMediator = authenticationMediator;
         _authenticationMediator.SignInAction += OnSignInAction;
         _authenticationMediator.SignOutAction += OnSignOutAction;

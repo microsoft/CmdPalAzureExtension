@@ -15,8 +15,6 @@ public class SignInCommand : InvokableCommand
     private readonly IAccountProvider _accountProvider;
     private readonly AuthenticationMediator _authenticationMediator;
 
-    public event EventHandler<bool>? LoadingStateChanged;
-
     public SignInCommand(IResources resources, IAccountProvider accountProvider, AuthenticationMediator authenticationMediator)
     {
         _resources = resources;
@@ -28,15 +26,15 @@ public class SignInCommand : InvokableCommand
 
     public override CommandResult Invoke()
     {
-        LoadingStateChanged?.Invoke(this, true);
+        _authenticationMediator.SetLoadingState(true);
         Task.Run(async () =>
         {
             _authenticationMediator.SetLoadingState(true);
             try
             {
-                var signInSucceeded = await HandleSignIn();
+                await _accountProvider.ShowLogonSession();
                 _authenticationMediator.SetLoadingState(false);
-                _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(signInSucceeded, null));
+                _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(true, null));
                 ToastHelper.ShowToast(_resources.GetResource("Message_Sign_In_Success"), MessageState.Success);
             }
             catch (Exception ex)
@@ -47,19 +45,5 @@ public class SignInCommand : InvokableCommand
             }
         });
         return CommandResult.KeepOpen();
-    }
-
-    private async Task<bool> HandleSignIn()
-    {
-        try
-        {
-            var account = await _accountProvider.ShowLogonSession();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            var errorMessage = $"{ex.Message}";
-            throw new InvalidOperationException(errorMessage);
-        }
     }
 }
