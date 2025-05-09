@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -12,34 +13,42 @@ namespace AzureExtension.Controls.Pages;
 public sealed partial class SignOutPage : ContentPage
 {
     private readonly SignOutForm _signOutForm;
-    private readonly StatusMessage _statusMessage;
-    private readonly string _successMessage;
-    private readonly string _errorMessage;
     private readonly IResources _resources;
+    private readonly SignOutCommand _signOutCommand;
+    private readonly AuthenticationMediator _authenticationMediator; // corrected spelling
 
-    public SignOutPage(SignOutForm signOutForm, StatusMessage statusMessage, string successMessage, string errorMessage, IResources resources)
+    public SignOutPage(SignOutForm signOutForm, IResources resources, SignOutCommand signOutCommand, AuthenticationMediator authenticationMediator)
     {
         _resources = resources;
         _signOutForm = signOutForm;
-        _statusMessage = statusMessage;
-        _successMessage = successMessage;
-        _errorMessage = errorMessage;
+        _signOutForm.PropChanged += UpdatePage;
+        _signOutCommand = signOutCommand;
+        _authenticationMediator = authenticationMediator;
+        _authenticationMediator.LoadingStateChanged += OnLoadingStateChanged;
         Icon = IconLoader.GetIcon("Logo");
         Title = _resources.GetResource("ExtensionTitle");
 
         // Subtitle in CommandProvider = _resources.GetResource("ExtensionSubtitle"); - subtitle is not part of the page interface
-        Name = _resources.GetResource("ExtensionTitle"); // Title is for the Page, Name is for the command
+        Name = Title; // Title is for the Page, Name is for the command
 
-        // Wire up events using the helper
-        FormEventHelper.WireFormEvents(_signOutForm, this, _statusMessage, _successMessage, _errorMessage);
+        Commands =
+        [
+            new CommandContextItem(_signOutCommand),
+        ];
+    }
 
-        // Hide status message initially
-        ExtensionHost.HideStatus(_statusMessage);
+    private void UpdatePage(object sender, IPropChangedEventArgs args)
+    {
+        RaiseItemsChanged();
+    }
+
+    private void OnLoadingStateChanged(object? sender, bool isLoading)
+    {
+        IsLoading = isLoading;
     }
 
     public override IContent[] GetContent()
     {
-        ExtensionHost.HideStatus(_statusMessage);
         return [_signOutForm];
     }
 }

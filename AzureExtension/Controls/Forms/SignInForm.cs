@@ -3,50 +3,45 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
-using AzureExtension.Account;
-using AzureExtension.Client;
+using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Forms;
 
-public partial class SignInForm : FormContent, IAzureForm
+public partial class SignInForm : FormContent
 {
-    public event EventHandler<bool>? LoadingStateChanged;
-
-    public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
-
-    private readonly IAccountProvider _accountProvider;
-    private readonly AzureClientHelpers _azureClientHelpers;
     private readonly IResources _resources;
     private readonly AuthenticationMediator _authenticationMediator;
+    private readonly SignInCommand _signInCommand;
 
     private bool _isButtonEnabled = true;
 
     private string IsButtonEnabled =>
         _isButtonEnabled.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture);
 
-    private Page? page;
-
-    public SignInForm(IAccountProvider accountProvider, AzureClientHelpers azureClientHelpers, AuthenticationMediator authenticationMediator, IResources resources)
+    public SignInForm(AuthenticationMediator authenticationMediator, IResources resources, SignInCommand signInCommand)
     {
-        _accountProvider = accountProvider;
         _authenticationMediator = authenticationMediator;
-        _authenticationMediator.SignOutAction += SignOutForm_SignOutAction;
-        page = null;
-        _azureClientHelpers = azureClientHelpers;
+        _authenticationMediator.LoadingStateChanged += OnLoadingStateChanged;
+        _authenticationMediator.SignInAction += ResetButton;
+        _authenticationMediator.SignOutAction += ResetButton;
         _resources = resources;
+        _signInCommand = signInCommand;
     }
 
-    public void SetPage(Page page)
+    private void ResetButton(object? sender, SignInStatusChangedEventArgs e)
     {
-        this.page = page;
+        SetButtonEnabled(!e.IsSignedIn);
     }
 
-    private void SignOutForm_SignOutAction(object? sender, SignInStatusChangedEventArgs e)
+    private void OnLoadingStateChanged(object? sender, bool isLoading)
     {
-        _isButtonEnabled = !e.IsSignedIn;
+        if (isLoading)
+        {
+            SetButtonEnabled(false);
+        }
     }
 
     private void SetButtonEnabled(bool isEnabled)
@@ -69,38 +64,6 @@ public partial class SignInForm : FormContent, IAzureForm
 
     public override ICommandResult SubmitForm(string inputs, string data)
     {
-        LoadingStateChanged?.Invoke(this, true);
-        Task.Run(async () =>
-        {
-            try
-            {
-                var signInSucceeded = await HandleSignIn();
-                LoadingStateChanged?.Invoke(this, false);
-                _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(signInSucceeded, null));
-                FormSubmitted?.Invoke(this, new FormSubmitEventArgs(signInSucceeded, null));
-            }
-            catch (Exception ex)
-            {
-                LoadingStateChanged?.Invoke(this, false);
-                SetButtonEnabled(true);
-                _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(false, ex));
-                FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
-            }
-        });
-        return CommandResult.KeepOpen();
-    }
-
-    private async Task<bool> HandleSignIn()
-    {
-        try
-        {
-            var account = await _accountProvider.ShowLogonSession();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            var errorMessage = $"{ex.Message}";
-            throw new InvalidOperationException(errorMessage);
-        }
+        return _signInCommand.Invoke();
     }
 }
