@@ -5,6 +5,7 @@
 using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls;
+using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.ListItems;
 using AzureExtension.Controls.Pages;
@@ -172,10 +173,12 @@ public sealed class Program
         var timeSpanHelper = new TimeSpanHelper(resources);
         var authenticationMediator = new AuthenticationMediator();
 
-        var signInForm = new SignInForm(accountProvider, azureClientHelpers, authenticationMediator, resources);
-        var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"), resources);
-        var signOutForm = new SignOutForm(accountProvider, resources, authenticationMediator);
-        var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"), resources);
+        var signInCommand = new SignInCommand(resources, accountProvider, authenticationMediator);
+        var signInForm = new SignInForm(authenticationMediator, resources, signInCommand);
+        var signInPage = new SignInPage(signInForm, resources, signInCommand, authenticationMediator);
+        var signOutCommand = new SignOutCommand(resources, accountProvider, authenticationMediator);
+        var signOutForm = new SignOutForm(resources, signOutCommand, authenticationMediator);
+        var signOutPage = new SignOutPage(signOutForm, resources, signOutCommand, authenticationMediator);
 
         var savedAzureSearchesMediator = new SavedAzureSearchesMediator();
 
