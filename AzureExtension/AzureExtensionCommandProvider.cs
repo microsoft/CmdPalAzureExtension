@@ -6,10 +6,8 @@ using AzureExtension.Account;
 using AzureExtension.Controls;
 using AzureExtension.Controls.Pages;
 using AzureExtension.Helpers;
-using Microsoft.CmdPal.Ext.Calc.Helper;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using static Dapper.SqlMapper;
 
 namespace AzureExtension;
 
@@ -35,8 +33,6 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private readonly SavedPipelineSearchesPage _savedPipelineSearchesPage;
 
-    private readonly SettingsManager _settingsManager;
-
     public AzureExtensionCommandProvider(
         SignInPage signInPage,
         SignOutPage signOutPage,
@@ -47,8 +43,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         ISearchPageFactory searchPageFactory,
         SavedAzureSearchesMediator mediator,
         AuthenticationMediator authenticationMediator,
-        SavedPipelineSearchesPage savedPipelineSearchesPage,
-        SettingsManager settingsManager)
+        SavedPipelineSearchesPage savedPipelineSearchesPage)
     {
         _signInPage = signInPage;
         _signOutPage = signOutPage;
@@ -60,8 +55,6 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _savedSearchesMediator = mediator;
         _authenticationMediator = authenticationMediator;
         _savedPipelineSearchesPage = savedPipelineSearchesPage;
-        _settingsManager = settingsManager;
-        Settings = _settingsManager.Settings;
         DisplayName = "Azure Extension"; // hard-coded because it's a product title
 
         _savedSearchesMediator.QuerySaved += OnSearchUpdated;

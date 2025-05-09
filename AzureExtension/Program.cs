@@ -5,6 +5,7 @@
 using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls;
+using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Controls.ListItems;
 using AzureExtension.Controls.Pages;
@@ -14,7 +15,6 @@ using AzureExtension.DataManager.Cache;
 using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
-using Microsoft.CmdPal.Ext.Calc.Helper;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Extensions.Configuration;
@@ -175,8 +175,9 @@ public sealed class Program
 
         var signInForm = new SignInForm(accountProvider, azureClientHelpers, authenticationMediator, resources);
         var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"), resources);
-        var signOutForm = new SignOutForm(accountProvider, resources, authenticationMediator);
-        var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"), resources);
+        var signOutCommand = new SignOutCommand(resources, accountProvider, authenticationMediator);
+        var signOutForm = new SignOutForm(accountProvider, resources, authenticationMediator, signOutCommand);
+        var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources.GetResource("Message_Sign_Out_Success"), resources.GetResource("Message_Sign_Out_Fail"), resources, signOutCommand);
 
         var savedAzureSearchesMediator = new SavedAzureSearchesMediator();
 
@@ -202,8 +203,7 @@ public sealed class Program
         var addPipelineSearchListItem = new AddPipelineSearchListItem(savePipelineSearchPage, resources);
         var savedPipelineSearchesPage = new SavedPipelineSearchesPage(resources, addPipelineSearchListItem, savedAzureSearchesMediator, pipelineDefinitionRepository, accountProvider, searchPageFactory);
 
-        var settings = new SettingsManager();
-        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator, savedPipelineSearchesPage, settings);
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator, savedPipelineSearchesPage);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 

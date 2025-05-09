@@ -8,9 +8,7 @@ namespace AzureExtension.Controls.Forms;
 
 public interface IAzureForm
 {
-    event EventHandler<bool>? LoadingStateChanged;
-
-    event EventHandler<FormSubmitEventArgs>? FormSubmitted;
-
+    // event EventHandler<bool>? LoadingStateChanged;
+    // event EventHandler<FormSubmitEventArgs>? FormSubmitted;
     Dictionary<string, string> TemplateSubstitutions { get; }
 }

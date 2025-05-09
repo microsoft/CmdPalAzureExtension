@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -16,14 +17,16 @@ public sealed partial class SignOutPage : ContentPage
     private readonly string _successMessage;
     private readonly string _errorMessage;
     private readonly IResources _resources;
+    private readonly SignOutCommand _signOutCommand;
 
-    public SignOutPage(SignOutForm signOutForm, StatusMessage statusMessage, string successMessage, string errorMessage, IResources resources)
+    public SignOutPage(SignOutForm signOutForm, StatusMessage statusMessage, string successMessage, string errorMessage, IResources resources, SignOutCommand signOutCommand)
     {
         _resources = resources;
         _signOutForm = signOutForm;
         _statusMessage = statusMessage;
         _successMessage = successMessage;
         _errorMessage = errorMessage;
+        _signOutCommand = signOutCommand;
         Icon = IconLoader.GetIcon("Logo");
         Title = _resources.GetResource("ExtensionTitle");
 
@@ -35,6 +38,11 @@ public sealed partial class SignOutPage : ContentPage
 
         // Hide status message initially
         ExtensionHost.HideStatus(_statusMessage);
+
+        Commands = new CommandContextItem[]
+        {
+            new CommandContextItem(_signOutCommand),
+        };
     }
 
     public override IContent[] GetContent()
