@@ -110,7 +110,12 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             LoadingStateChanged?.Invoke(this, false);
             _queryRepository.AddOrUpdateSearch(query, query.IsTopLevel);
             _savedQueriesMediator.AddQuery(query);
-            _savedQuery = query;
+
+            if (_savedQuery != null)
+            {
+                _savedQuery = query;
+            }
+
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         }
         catch (Exception ex)
