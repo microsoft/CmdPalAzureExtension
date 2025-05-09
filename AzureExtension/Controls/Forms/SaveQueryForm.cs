@@ -15,12 +15,12 @@ namespace AzureExtension.Controls.Forms;
 
 public sealed partial class SaveQueryForm : FormContent, IAzureForm
 {
-    private readonly IQuery _savedQuery;
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _savedQueriesMediator;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
     private readonly ISavedSearchesUpdater<IQuery> _queryRepository;
+    private IQuery _savedQuery;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
@@ -96,6 +96,8 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
 
             var query = CreateQueryFromJson(payloadJson);
 
+            await _queryRepository.Validate(query, _accountProvider.GetDefaultAccount());
+
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
             if (_savedQuery.Url != string.Empty)
@@ -106,8 +108,9 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             }
 
             LoadingStateChanged?.Invoke(this, false);
-            await _queryRepository.AddOrUpdateSearch(query, query.IsTopLevel, _accountProvider.GetDefaultAccount());
+            _queryRepository.AddOrUpdateSearch(query, query.IsTopLevel);
             _savedQueriesMediator.AddQuery(query);
+            _savedQuery = query;
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         }
         catch (Exception ex)

@@ -40,10 +40,15 @@ public partial class QueryRepository : IPersistentSearchRepository<IQuery>
         return dsQuery != null && dsQuery.IsTopLevel;
     }
 
-    public async Task<bool> ValidateQuery(IQuery query, IAccount account)
+    private async Task<bool> ValidateQuery(IQuery query, IAccount account)
     {
         var queryInfo = await _azureValidator.GetQueryInfo(query.Url, account);
         return queryInfo.Result == ResultType.Success;
+    }
+
+    public Task Validate(IQuery search, IAccount account)
+    {
+        return ValidateQuery(search, account);
     }
 
     public void RemoveSavedSearch(IQuery dataSearch)
@@ -83,10 +88,9 @@ public partial class QueryRepository : IPersistentSearchRepository<IQuery>
         return Query.GetAll(_dataStore);
     }
 
-    public async Task AddOrUpdateSearch(IQuery dataSearch, bool isTopLevel, IAccount account)
+    public void AddOrUpdateSearch(IQuery dataSearch, bool isTopLevel)
     {
         ValidateDataStore();
-        await ValidateQuery(dataSearch, account);
         Query.AddOrUpdate(_dataStore, dataSearch.Name, dataSearch.Url, isTopLevel);
     }
 

@@ -32,9 +32,14 @@ public class PullRequestSearchRepository : IPersistentSearchRepository<IPullRequ
         _dataStore = dataStore;
     }
 
-    public Task ValidatePullRequestSearch(IPullRequestSearch pullRequestSearch, IAccount account)
+    private Task ValidatePullRequestSearch(IPullRequestSearch pullRequestSearch, IAccount account)
     {
         return _azureValidator.GetRepositoryInfo(pullRequestSearch.Url, account);
+    }
+
+    public Task Validate(IPullRequestSearch search, IAccount account)
+    {
+        return ValidatePullRequestSearch(search, account);
     }
 
     public void RemoveSavedSearch(IPullRequestSearch dataSearch)
@@ -83,10 +88,9 @@ public class PullRequestSearchRepository : IPersistentSearchRepository<IPullRequ
         return dstorePullRequestSearch != null && dstorePullRequestSearch.IsTopLevel;
     }
 
-    public async Task AddOrUpdateSearch(IPullRequestSearch dataSearch, bool isTopLevel, IAccount account)
+    public void AddOrUpdateSearch(IPullRequestSearch dataSearch, bool isTopLevel)
     {
         ValidateDataStore();
-        await ValidatePullRequestSearch(dataSearch, account);
         PullRequestSearch.AddOrUpdate(_dataStore, dataSearch.Url, dataSearch.Name, dataSearch.View, isTopLevel);
     }
 
