@@ -173,8 +173,9 @@ public sealed class Program
         var timeSpanHelper = new TimeSpanHelper(resources);
         var authenticationMediator = new AuthenticationMediator();
 
+        var signInCommand = new SignInCommand(resources, accountProvider, authenticationMediator);
         var signInForm = new SignInForm(accountProvider, azureClientHelpers, authenticationMediator, resources);
-        var signInPage = new SignInPage(signInForm, new StatusMessage(), resources.GetResource("Message_Sign_In_Success"), resources.GetResource("Message_Sign_In_Fail"), resources);
+        var signInPage = new SignInPage(signInForm, new StatusMessage(), resources, signInCommand);
         var signOutCommand = new SignOutCommand(resources, accountProvider, authenticationMediator);
         var signOutForm = new SignOutForm(resources, signOutCommand);
         var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources, signOutCommand);
