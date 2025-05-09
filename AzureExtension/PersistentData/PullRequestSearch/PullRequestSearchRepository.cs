@@ -4,12 +4,13 @@
 
 using AzureExtension.Controls;
 using AzureExtension.Data;
+using AzureExtension.DataManager;
 using Microsoft.Identity.Client;
 using Serilog;
 
 namespace AzureExtension.PersistentData;
 
-public class PullRequestSearchRepository : IPersistentSearchRepository<IPullRequestSearch>
+public class PullRequestSearchRepository : ISavedSearchesProvider<IPullRequestSearch>, ISavedSearchesUpdater<IPullRequestSearch>, ISavedSearchesSource<IPullRequestSearch>
 {
     private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", nameof(QueryRepository)));
 
@@ -59,17 +60,6 @@ public class PullRequestSearchRepository : IPersistentSearchRepository<IPullRequ
         PullRequestSearch.Remove(_dataStore, url, title, view);
     }
 
-    public IPullRequestSearch GetSavedData(IPullRequestSearch dataSearch)
-    {
-        ValidateDataStore();
-
-        var title = dataSearch.Name;
-        var url = dataSearch.Url;
-        var view = dataSearch.View;
-
-        return PullRequestSearch.Get(_dataStore, url, title, view) ?? throw new InvalidOperationException($"Pull request search {title} - {url} - {view} not found.");
-    }
-
     public IEnumerable<IPullRequestSearch> GetSavedSearches(bool getTopLevelOnly = false)
     {
         ValidateDataStore();
@@ -94,8 +84,8 @@ public class PullRequestSearchRepository : IPersistentSearchRepository<IPullRequ
         PullRequestSearch.AddOrUpdate(_dataStore, dataSearch.Url, dataSearch.Name, dataSearch.View, isTopLevel);
     }
 
-    public IEnumerable<IPullRequestSearch> GetAllSavedData(bool getTopLevelOnly = false)
+    public IEnumerable<IPullRequestSearch> GetSavedSearches()
     {
-        return GetSavedSearches(getTopLevelOnly);
+        return GetSavedSearches(false);
     }
 }

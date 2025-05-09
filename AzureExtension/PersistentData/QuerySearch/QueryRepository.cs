@@ -5,12 +5,13 @@
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
+using AzureExtension.DataManager;
 using Microsoft.Identity.Client;
 using Serilog;
 
 namespace AzureExtension.PersistentData;
 
-public partial class QueryRepository : IPersistentSearchRepository<IQuery>
+public partial class QueryRepository : ISavedSearchesProvider<IQuery>, ISavedSearchesUpdater<IQuery>, ISavedSearchesSource<IQuery>
 {
     private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", nameof(QueryRepository)));
 
@@ -67,16 +68,6 @@ public partial class QueryRepository : IPersistentSearchRepository<IQuery>
         Query.Remove(_dataStore, name, url);
     }
 
-    public IQuery GetSavedData(IQuery dataSearch)
-    {
-        ValidateDataStore();
-
-        var name = dataSearch.Name;
-        var url = dataSearch.Url;
-
-        return Query.Get(_dataStore, name, url) ?? throw new InvalidOperationException($"Search {name} - {url} not found.");
-    }
-
     public IEnumerable<IQuery> GetSavedSearches(bool getTopLevelOnly = false)
     {
         ValidateDataStore();
@@ -94,8 +85,8 @@ public partial class QueryRepository : IPersistentSearchRepository<IQuery>
         Query.AddOrUpdate(_dataStore, dataSearch.Name, dataSearch.Url, isTopLevel);
     }
 
-    public IEnumerable<IQuery> GetAllSavedData(bool getTopLevelOnly = false)
+    public IEnumerable<IQuery> GetSavedSearches()
     {
-        return GetSavedSearches(getTopLevelOnly);
+        return GetSavedSearches(false);
     }
 }
