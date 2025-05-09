@@ -14,20 +14,34 @@ public class SignOutCommand : InvokableCommand
     private readonly IResources _resources;
     private readonly IAccountProvider _accountProvider;
     private readonly AuthenticationMediator _authenticationMediator;
+    private bool _invoked;
 
     public SignOutCommand(IResources resources, IAccountProvider accountProvider, AuthenticationMediator authenticationMediator)
     {
         _resources = resources;
         _accountProvider = accountProvider;
         _authenticationMediator = authenticationMediator;
+        _authenticationMediator.SignInAction += ResetCommand;
+        _authenticationMediator.SignOutAction += ResetCommand;
         Name = _resources.GetResource("Forms_SignOut_PageTitle");
         Icon = IconLoader.GetIcon("Logo");
     }
 
+    private void ResetCommand(object? sender, SignInStatusChangedEventArgs e)
+    {
+        _invoked = !e.IsSignedIn;
+    }
+
     public override CommandResult Invoke()
     {
+        if (_invoked)
+        {
+            return CommandResult.KeepOpen();
+        }
+
         Task.Run(async () =>
         {
+            _invoked = true;
             _authenticationMediator.SetLoadingState(true);
             try
             {
@@ -53,6 +67,8 @@ public class SignOutCommand : InvokableCommand
                 ToastHelper.ShowToast($"{_resources.GetResource("Message_Sign_Out_Fail")} {ex.Message}", MessageState.Error);
             }
         });
+
+        _invoked = false;
         return CommandResult.KeepOpen();
     }
 }

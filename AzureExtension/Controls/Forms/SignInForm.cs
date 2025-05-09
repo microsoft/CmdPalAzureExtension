@@ -25,13 +25,23 @@ public partial class SignInForm : FormContent
     {
         _authenticationMediator = authenticationMediator;
         _authenticationMediator.LoadingStateChanged += OnLoadingStateChanged;
+        _authenticationMediator.SignInAction += ResetButton;
+        _authenticationMediator.SignOutAction += ResetButton;
         _resources = resources;
         _signInCommand = signInCommand;
     }
 
+    private void ResetButton(object? sender, SignInStatusChangedEventArgs e)
+    {
+        SetButtonEnabled(!e.IsSignedIn);
+    }
+
     private void OnLoadingStateChanged(object? sender, bool isLoading)
     {
-        SetButtonEnabled(!isLoading);
+        if (isLoading)
+        {
+            SetButtonEnabled(false);
+        }
     }
 
     private void SetButtonEnabled(bool isEnabled)

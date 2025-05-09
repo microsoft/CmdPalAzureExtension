@@ -26,11 +26,21 @@ public sealed partial class SignOutForm : FormContent
         _signOutCommand = signOutCommand;
         _authenticationMediator = authenticationMediator;
         _authenticationMediator.LoadingStateChanged += OnLoadingStateChanged;
+        _authenticationMediator.SignInAction += ResetButton;
+        _authenticationMediator.SignOutAction += ResetButton;
+    }
+
+    private void ResetButton(object? sender, SignInStatusChangedEventArgs e)
+    {
+        SetButtonEnabled(e.IsSignedIn);
     }
 
     private void OnLoadingStateChanged(object? sender, bool isLoading)
     {
-        SetButtonEnabled(!isLoading);
+        if (isLoading)
+        {
+            SetButtonEnabled(false);
+        }
     }
 
     // ButtonIsEnabled is set to true by default. Nothing currently changes this value

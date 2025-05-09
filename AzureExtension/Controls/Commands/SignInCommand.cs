@@ -14,20 +14,34 @@ public class SignInCommand : InvokableCommand
     private readonly IResources _resources;
     private readonly IAccountProvider _accountProvider;
     private readonly AuthenticationMediator _authenticationMediator;
+    private bool _invoked;
 
     public SignInCommand(IResources resources, IAccountProvider accountProvider, AuthenticationMediator authenticationMediator)
     {
         _resources = resources;
         _accountProvider = accountProvider;
         _authenticationMediator = authenticationMediator;
+        _authenticationMediator.SignInAction += ResetCommand;
+        _authenticationMediator.SignOutAction += ResetCommand;
         Name = _resources.GetResource("Forms_SignIn_PageTitle");
         Icon = IconLoader.GetIcon("Logo");
     }
 
+    private void ResetCommand(object? sender, SignInStatusChangedEventArgs e)
+    {
+        _invoked = e.IsSignedIn;
+    }
+
     public override CommandResult Invoke()
     {
+        if (_invoked)
+        {
+            return CommandResult.KeepOpen();
+        }
+
         Task.Run(async () =>
         {
+            _invoked = true;
             _authenticationMediator.SetLoadingState(true);
             try
             {
