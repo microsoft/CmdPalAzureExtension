@@ -13,7 +13,9 @@ public interface ISavedSearchesUpdater<TDataSearch>
 {
     void RemoveSavedSearch(TDataSearch search);
 
-    Task AddOrUpdateSearch(TDataSearch search, bool isTopLevel, IAccount account);
+    void AddOrUpdateSearch(TDataSearch search, bool isTopLevel);
 
     bool IsTopLevel(TDataSearch search);
+
+    Task Validate(TDataSearch search, IAccount account);
 }

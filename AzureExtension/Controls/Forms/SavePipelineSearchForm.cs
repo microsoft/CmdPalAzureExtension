@@ -15,16 +15,11 @@ namespace AzureExtension.Controls.Forms;
 public class SavePipelineSearchForm : AzureForm, IAzureForm
 {
     private readonly IResources _resources;
-
-    private readonly IPipelineDefinitionSearch? _savedDefinitionSearch;
-
     private readonly ISavedSearchesUpdater<IPipelineDefinitionSearch> _definitionRepository;
-
     private readonly SavedAzureSearchesMediator _mediator;
-
     private readonly IAccountProvider _accountProvider;
-
     private readonly AzureClientHelpers _azureClientHelpers;
+    private IPipelineDefinitionSearch? _savedDefinitionSearch;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
@@ -73,6 +68,8 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
             var pipelineSearch = CreatePipelineSearchFromJson(payloadJson);
 
+            await _definitionRepository.Validate(pipelineSearch, _accountProvider.GetDefaultAccount());
+
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
             if (!string.IsNullOrEmpty(_savedDefinitionSearch?.ProjectUrl))
@@ -83,8 +80,9 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
             }
 
             LoadingStateChanged?.Invoke(this, false);
-            await _definitionRepository.AddOrUpdateSearch(pipelineSearch, pipelineSearch.IsTopLevel, _accountProvider.GetDefaultAccount());
+            _definitionRepository.AddOrUpdateSearch(pipelineSearch, pipelineSearch.IsTopLevel);
             _mediator.AddPipelineSearch(pipelineSearch);
+            _savedDefinitionSearch = pipelineSearch;
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         }
         catch (Exception ex)

@@ -19,8 +19,8 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _mediator;
     private readonly ISavedSearchesUpdater<IPullRequestSearch> _pullRequestSearchRepository;
-    private readonly IPullRequestSearch _savedPullRequestSearch;
     private readonly IAccountProvider _accountProvider;
+    private IPullRequestSearch _savedPullRequestSearch;
 
     public event EventHandler<bool>? LoadingStateChanged;
 
@@ -96,6 +96,8 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
             var pullRequestSearch = CreatePullRequestSearchFromJson(payloadJson);
 
+            await _pullRequestSearchRepository.Validate(pullRequestSearch, _accountProvider.GetDefaultAccount());
+
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
             if (!string.IsNullOrEmpty(_savedPullRequestSearch.Url))
@@ -106,10 +108,9 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
             }
 
             LoadingStateChanged?.Invoke(this, false);
-
-            await _pullRequestSearchRepository.AddOrUpdateSearch(pullRequestSearch, pullRequestSearch.IsTopLevel, _accountProvider.GetDefaultAccount());
-
+            _pullRequestSearchRepository.AddOrUpdateSearch(pullRequestSearch, pullRequestSearch.IsTopLevel);
             _mediator.AddPullRequestSearch(pullRequestSearch);
+            _savedPullRequestSearch = pullRequestSearch;
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
         }
         catch (Exception ex)

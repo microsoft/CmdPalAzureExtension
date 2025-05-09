@@ -72,6 +72,11 @@ public class DefinitionSearchRepository : IPersistentSearchRepository<IPipelineD
         return _azureValidator.GetDefinitionInfo(definitionSearch.ProjectUrl, definitionSearch.InternalId, account);
     }
 
+    public Task Validate(IPipelineDefinitionSearch search, IAccount account)
+    {
+        return ValidateDefinitionSearch(search, account);
+    }
+
     public void UpdateDefinitionSearchTopLevelStatus(IPipelineDefinitionSearch definitionSearch, bool isTopLevel, IAccount account)
     {
         ValidateDataStore();
@@ -132,10 +137,9 @@ public class DefinitionSearchRepository : IPersistentSearchRepository<IPipelineD
         return definitions;
     }
 
-    public async Task AddOrUpdateSearch(IPipelineDefinitionSearch dataSearch, bool isTopLevel, IAccount account)
+    public void AddOrUpdateSearch(IPipelineDefinitionSearch dataSearch, bool isTopLevel)
     {
         ValidateDataStore();
-        await ValidateDefinitionSearch(dataSearch, account);
         DefinitionSearch.AddOrUpdate(_dataStore, dataSearch.InternalId, dataSearch.ProjectUrl, isTopLevel);
     }
 
