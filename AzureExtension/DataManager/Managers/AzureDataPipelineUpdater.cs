@@ -19,7 +19,7 @@ public class AzureDataPipelineUpdater : IDataUpdater
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
     private readonly ISavedSearchesSource<IPipelineDefinitionSearch> _definitionRepository;
-    private readonly IDefinitionProvider _pipelineProvider;
+    private readonly IDataProvider<IPipelineDefinitionSearch, Definition, Build> _pipelineProvider;
 
     public AzureDataPipelineUpdater(
         DataStore dataStore,
@@ -27,7 +27,7 @@ public class AzureDataPipelineUpdater : IDataUpdater
         IAzureLiveDataProvider liveDataProvider,
         IConnectionProvider connectionProvider,
         ISavedSearchesSource<IPipelineDefinitionSearch> definitionRepository,
-        IDefinitionProvider pipelineProvider)
+        IDataProvider<IPipelineDefinitionSearch, Definition, Build> pipelineProvider)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
@@ -39,7 +39,7 @@ public class AzureDataPipelineUpdater : IDataUpdater
 
     public bool IsNewOrStale(IPipelineDefinitionSearch definitionSearch, TimeSpan refreshCooldown)
     {
-        var dsDefinition = _pipelineProvider.GetDefinition(definitionSearch);
+        var dsDefinition = _pipelineProvider.GetDataForSearch(definitionSearch);
         return dsDefinition == null || DateTime.UtcNow - dsDefinition.UpdatedAt > refreshCooldown;
     }
 

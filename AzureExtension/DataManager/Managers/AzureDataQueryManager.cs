@@ -14,7 +14,8 @@ using WorkItem = AzureExtension.DataModel.WorkItem;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataQueryManager : IDataQueryProvider, IDataUpdater
+public class AzureDataQueryManager
+    : IDataProvider<IQuery, Query, WorkItem>, IDataUpdater
 {
     private readonly TimeSpan _queryWorkItemDeletionTime = TimeSpan.FromMinutes(2);
 
@@ -48,7 +49,7 @@ public class AzureDataQueryManager : IDataQueryProvider, IDataUpdater
         }
     }
 
-    public Query? GetQuery(IQuery query)
+    public Query? GetDataForSearch(IQuery query)
     {
         ValidateDataStore();
         var account = _accountProvider.GetDefaultAccount();
@@ -58,7 +59,7 @@ public class AzureDataQueryManager : IDataQueryProvider, IDataUpdater
 
     public bool IsNewOrStale(IQuery query, TimeSpan refreshCooldown)
     {
-        var dsQuery = GetQuery(query);
+        var dsQuery = GetDataForSearch(query);
         return dsQuery == null || DateTime.UtcNow - dsQuery.UpdatedAt > refreshCooldown;
     }
 
@@ -67,10 +68,10 @@ public class AzureDataQueryManager : IDataQueryProvider, IDataUpdater
         return IsNewOrStale((parameters.UpdateObject as IQuery)!, refreshCooldown);
     }
 
-    public IEnumerable<IWorkItem> GetWorkItems(IQuery query)
+    public IEnumerable<WorkItem> GetDataObjects(IQuery query)
     {
         ValidateDataStore();
-        var dsQuery = GetQuery(query);
+        var dsQuery = GetDataForSearch(query);
         return dsQuery != null ? WorkItem.GetForQuery(_dataStore, dsQuery) : [];
     }
 

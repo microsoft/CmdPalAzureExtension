@@ -6,7 +6,7 @@ using AzureExtension.DataManager.Cache;
 
 namespace AzureExtension.Controls;
 
-public interface IDataProvider
+public interface ILiveDataProvider
 {
     Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query);
 

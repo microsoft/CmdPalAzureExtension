@@ -14,11 +14,11 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
 
     private readonly IResources _resources;
 
-    private readonly IDataProvider _dataProvider;
+    private readonly ILiveDataProvider _dataProvider;
 
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public PullRequestSearchPage(IPullRequestSearch search, IResources resources, IDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+    public PullRequestSearchPage(IPullRequestSearch search, IResources resources, ILiveDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
         : base(search, dataProvider)
     {
         _search = search;

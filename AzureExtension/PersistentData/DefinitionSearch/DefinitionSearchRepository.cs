@@ -7,6 +7,7 @@ using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataManager;
+using AzureExtension.DataModel;
 using Microsoft.Identity.Client;
 using Serilog;
 
@@ -21,7 +22,7 @@ public class DefinitionSearchRepository : IPersistentSearchRepository<IPipelineD
     private readonly DataStore _dataStore;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
-    private readonly IDefinitionProvider _pipelineProvider;
+    private readonly IDataProvider<IPipelineDefinitionSearch, DataModel.Definition, Build> _pipelineProvider;
     private readonly IAccountProvider _accountProvider;
 
     public DefinitionSearchRepository(
@@ -29,7 +30,7 @@ public class DefinitionSearchRepository : IPersistentSearchRepository<IPipelineD
         IAzureValidator azureValidator,
         IAzureLiveDataProvider liveDataProvider,
         IConnectionProvider connectionProvider,
-        IDefinitionProvider pipelineProvider,
+        IDataProvider<IPipelineDefinitionSearch, DataModel.Definition, Build> pipelineProvider,
         IAccountProvider accountProvider)
     {
         _azureValidator = azureValidator;
@@ -95,7 +96,7 @@ public class DefinitionSearchRepository : IPersistentSearchRepository<IPipelineD
 
     public IDefinition GetSavedData(IPipelineDefinitionSearch dataSearch)
     {
-        var dsDefinition = _pipelineProvider.GetDefinition(dataSearch);
+        var dsDefinition = _pipelineProvider.GetDataForSearch(dataSearch);
 
         if (dsDefinition != null)
         {

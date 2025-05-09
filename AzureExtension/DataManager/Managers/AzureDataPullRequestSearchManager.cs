@@ -14,7 +14,8 @@ using PullRequestSearch = AzureExtension.DataModel.PullRequestSearch;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataPullRequestSearchManager : IDataPullRequestSearchProvider, IDataUpdater
+public class AzureDataPullRequestSearchManager
+    : IDataProvider<IPullRequestSearch, PullRequestSearch, PullRequest>, IDataUpdater
 {
     private readonly TimeSpan _pullRequestSearchDeletionTime = TimeSpan.FromMinutes(2);
 
@@ -48,7 +49,7 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchProvider,
         }
     }
 
-    public PullRequestSearch? GetPullRequestSearch(IPullRequestSearch pullRequestSearch)
+    public PullRequestSearch? GetDataForSearch(IPullRequestSearch pullRequestSearch)
     {
         ValidateDataStore();
         var account = _accountProvider.GetDefaultAccount();
@@ -62,16 +63,16 @@ public class AzureDataPullRequestSearchManager : IDataPullRequestSearchProvider,
             GetPullRequestView(pullRequestSearch.View));
     }
 
-    public IEnumerable<IPullRequest> GetPullRequests(IPullRequestSearch pullRequestSearch)
+    public IEnumerable<PullRequest> GetDataObjects(IPullRequestSearch pullRequestSearch)
     {
         ValidateDataStore();
-        var dsPullRequestSearch = GetPullRequestSearch(pullRequestSearch);
+        var dsPullRequestSearch = GetDataForSearch(pullRequestSearch);
         return dsPullRequestSearch != null ? PullRequest.GetForPullRequestSearch(_dataStore, dsPullRequestSearch!) : [];
     }
 
     public bool IsNewOrStale(IPullRequestSearch pullRequestSearch, TimeSpan refreshCooldown)
     {
-        var dsPullRequestSearch = GetPullRequestSearch(pullRequestSearch);
+        var dsPullRequestSearch = GetDataForSearch(pullRequestSearch);
         return dsPullRequestSearch == null || DateTime.UtcNow - dsPullRequestSearch.UpdatedAt > refreshCooldown;
     }
 

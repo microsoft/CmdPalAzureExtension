@@ -17,7 +17,7 @@ public class SearchPageFactory : ISearchPageFactory
 {
     private readonly IResources _resources;
 
-    private readonly IDataProvider _dataProvider;
+    private readonly ILiveDataProvider _dataProvider;
 
     private readonly SavedAzureSearchesMediator _mediator;
 
@@ -35,7 +35,7 @@ public class SearchPageFactory : ISearchPageFactory
 
     public SearchPageFactory(
         IResources resources,
-        IDataProvider dataProvider,
+        ILiveDataProvider dataProvider,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,

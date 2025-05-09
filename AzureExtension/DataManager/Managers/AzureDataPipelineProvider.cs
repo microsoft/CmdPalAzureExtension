@@ -8,7 +8,7 @@ using AzureExtension.DataModel;
 
 namespace AzureExtension.DataManager;
 
-public class AzureDataPipelineProvider : IDefinitionProvider
+public class AzureDataPipelineProvider : IDataProvider<IPipelineDefinitionSearch, Definition, Build>
 {
     private readonly DataStore _dataStore;
 
@@ -17,17 +17,17 @@ public class AzureDataPipelineProvider : IDefinitionProvider
         _dataStore = dataStore;
     }
 
-    public Definition? GetDefinition(IPipelineDefinitionSearch definitionSearch)
+    public Definition? GetDataForSearch(IPipelineDefinitionSearch definitionSearch)
     {
          return Definition.GetByInternalId(_dataStore, definitionSearch.InternalId);
     }
 
-    public IEnumerable<IBuild> GetBuilds(IPipelineDefinitionSearch definitionSearch)
+    public IEnumerable<Build> GetDataObjects(IPipelineDefinitionSearch definitionSearch)
     {
-        var dsDefinition = GetDefinition(definitionSearch);
+        var dsDefinition = GetDataForSearch(definitionSearch);
         if (dsDefinition is null)
         {
-            return Enumerable.Empty<IBuild>();
+            return Enumerable.Empty<Build>();
         }
 
         return Build.GetForDefinition(_dataStore, dsDefinition.Id);
