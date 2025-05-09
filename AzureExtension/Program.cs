@@ -178,7 +178,7 @@ public sealed class Program
         var signInPage = new SignInPage(signInForm, resources, signInCommand, authenticationMediator);
         var signOutCommand = new SignOutCommand(resources, accountProvider, authenticationMediator);
         var signOutForm = new SignOutForm(resources, signOutCommand);
-        var signOutPage = new SignOutPage(signOutForm, new StatusMessage(), resources, signOutCommand);
+        var signOutPage = new SignOutPage(signOutForm, resources, signOutCommand, authenticationMediator);
 
         var savedAzureSearchesMediator = new SavedAzureSearchesMediator();
 

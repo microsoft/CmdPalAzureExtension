@@ -15,8 +15,6 @@ public class SignOutCommand : InvokableCommand
     private readonly IAccountProvider _accountProvider;
     private readonly AuthenticationMediator _authenticationMediator;
 
-    public event EventHandler<bool>? LoadingStateChanged;
-
     public SignOutCommand(IResources resources, IAccountProvider accountProvider, AuthenticationMediator authenticationMediator)
     {
         _resources = resources;
@@ -28,7 +26,7 @@ public class SignOutCommand : InvokableCommand
 
     public override CommandResult Invoke()
     {
-        LoadingStateChanged?.Invoke(this, true);
+        _authenticationMediator.SetLoadingState(true);
         Task.Run(async () =>
         {
             try
@@ -42,13 +40,13 @@ public class SignOutCommand : InvokableCommand
 
                 var signOutSucceeded = !_accountProvider.IsSignedIn();
 
-                LoadingStateChanged?.Invoke(this, false);
+                _authenticationMediator.SetLoadingState(false);
                 _authenticationMediator.SignOut(new SignInStatusChangedEventArgs(!signOutSucceeded, null));
                 ToastHelper.ShowToast(_resources.GetResource("Message_Sign_Out_Success"), MessageState.Success);
             }
             catch (Exception ex)
             {
-                LoadingStateChanged?.Invoke(this, false);
+                _authenticationMediator.SetLoadingState(false);
 
                 // if sign out fails, the user is still signed in (true)
                 _authenticationMediator.SignOut(new SignInStatusChangedEventArgs(true, ex));
