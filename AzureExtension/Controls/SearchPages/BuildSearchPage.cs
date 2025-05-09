@@ -55,10 +55,10 @@ public partial class BuildSearchPage : ListPage
 
     private IconInfo GetIcon()
     {
-        var builds = _dataProvider.GetBuilds(_search).GetAwaiter().GetResult();
-        if (builds != null && builds.Any())
+        var lastBuild = _definition.MostRecentBuild;
+        if (lastBuild != null)
         {
-            return IconLoader.GetIconForPipelineStatusAndResult(builds.First().Status, builds.First().Result);
+            return IconLoader.GetIconForPipelineStatusAndResult(lastBuild.Status, lastBuild.Result);
         }
 
         return IconLoader.GetIcon("Logo");
