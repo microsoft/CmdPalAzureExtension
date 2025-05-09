@@ -19,13 +19,13 @@ public sealed partial class SignOutPage : ContentPage
     private readonly IResources _resources;
     private readonly SignOutCommand _signOutCommand;
 
-    public SignOutPage(SignOutForm signOutForm, StatusMessage statusMessage, string successMessage, string errorMessage, IResources resources, SignOutCommand signOutCommand)
+    public SignOutPage(SignOutForm signOutForm, StatusMessage statusMessage, IResources resources, SignOutCommand signOutCommand)
     {
         _resources = resources;
         _signOutForm = signOutForm;
         _statusMessage = statusMessage;
-        _successMessage = successMessage;
-        _errorMessage = errorMessage;
+        _successMessage = _resources.GetResource("Message_Sign_Out_Success");
+        _errorMessage = _resources.GetResource("Message_Sign_Out_Fail");
         _signOutCommand = signOutCommand;
         Icon = IconLoader.GetIcon("Logo");
         Title = _resources.GetResource("ExtensionTitle");
