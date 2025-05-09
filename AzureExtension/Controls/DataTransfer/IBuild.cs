@@ -18,6 +18,8 @@ public interface IBuild
 
     string SourceBranch { get; set; }
 
+    string TriggerMessage { get; set; }
+
     Identity? Requester { get; }
 
     string Url { get; set; } // The URL of the build in Azure DevOps

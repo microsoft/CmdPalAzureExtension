@@ -7,6 +7,7 @@ using AzureExtension.Data;
 using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
+using Microsoft.VisualStudio.Services.Common;
 using TFModels = Microsoft.TeamFoundation.Build.WebApi;
 
 namespace AzureExtension.DataModel;
@@ -37,6 +38,8 @@ public class Build : IBuild
 
     public string SourceBranch { get; set; } = string.Empty;
 
+    public string TriggerMessage { get; set; } = string.Empty;
+
     public long RequesterId { get; set; } = DataStore.NoForeignKey;
 
     public long TimeUpdated { get; set; } = DataStore.NoForeignKey;
@@ -62,6 +65,7 @@ public class Build : IBuild
             Url = ConvertBuildUrlToHtmlUrl(tfBuild.Url, tfBuild.Project.Name, tfBuild.Id),
             DefinitionId = definitionId,
             SourceBranch = tfBuild.SourceBranch,
+            TriggerMessage = tfBuild.TriggerInfo.GetValueOrDefault("ci.message", string.Empty),
             RequesterId = requesterId,
             TimeUpdated = DateTime.UtcNow.ToDataStoreInteger(),
         };
