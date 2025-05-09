@@ -7,7 +7,6 @@ using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Serilog;
@@ -128,12 +127,12 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
 
     public PullRequestSearch CreatePullRequestSearchFromJson(JsonNode? jsonNode)
     {
-        var searchUrl = jsonNode?["url"]?.ToString() ?? string.Empty;
-        var searchUri = new AzureUri(searchUrl);
+        var enteredUrl = jsonNode?["url"]?.ToString() ?? string.Empty;
         var name = jsonNode?["title"]?.ToString() ?? string.Empty;
         var view = jsonNode?["view"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
+        var searchUri = new AzureUri(CreatePullRequestUrl(enteredUrl, view));
         if (string.IsNullOrEmpty(name))
         {
             name = $"{searchUri.Repository} - {view}";
@@ -145,5 +144,22 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     public bool GetIsTopLevel()
     {
         return _pullRequestSearchRepository.IsTopLevel(_savedPullRequestSearch);
+    }
+
+    // The form enforces that the URL is not null or empty, so we can assume it is valid
+    // This assumes the URL is for a repository, not the list of pull requests
+    public string CreatePullRequestUrl(string url, string? view)
+    {
+        var enteredViewToUrlView = new Dictionary<string, string>()
+        {
+            { _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAllTitle"), "active" },
+            { _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAssignedToMeTitle"), "mine" },
+            { _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewMineTitle"), "mine" },
+        };
+
+        enteredViewToUrlView.TryGetValue(view ?? _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAllTitle"), out var viewValue);
+
+        var pullRequestUrl = url + $"/pullrequests?_a={viewValue}";
+        return pullRequestUrl;
     }
 }

@@ -31,15 +31,7 @@ public class PullRequestSearch : IPullRequestSearch
         AzureUri = azureUri;
         Name = title;
         View = view;
-        PullRequestUrl = CreatePullRequestUrl(azureUri.OriginalString, view);
+        PullRequestUrl = azureUri.Uri.ToString();
         IsTopLevel = isTopLevel;
-    }
-
-    public string CreatePullRequestUrl(string url, string? view)
-    {
-        // The AzureUri url is the repo url
-        var pullRequestView = string.IsNullOrEmpty(view) ? "active" : view;
-        var pullRequestUrl = url + $"/pullrequests?_a={pullRequestView}";
-        return pullRequestUrl;
     }
 }
