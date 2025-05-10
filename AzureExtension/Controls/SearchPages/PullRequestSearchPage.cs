@@ -91,6 +91,6 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
 
     protected override Task<IEnumerable<IPullRequest>> LoadContentData()
     {
-        return _dataProvider.GetPullRequests(_search);
+        return _dataProvider.GetContentData<IPullRequest>(_search);
     }
 }

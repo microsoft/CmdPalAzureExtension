@@ -148,7 +148,7 @@ public sealed class Program
 
         var queryRepository = new QueryRepository(persistentDataStore, azureValidator);
         var pullRequestSearchRepository = new PullRequestSearchRepository(persistentDataStore, azureValidator);
-        var pipelineDefinitionRepository = new DefinitionSearchRepository(persistentDataStore, azureValidator, azureLiveDataProvider, azureClientProvider, pipelineProvider, accountProvider);
+        var pipelineDefinitionRepository = new DefinitionSearchRepository(persistentDataStore, azureValidator);
 
         var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, queryRepository);
         var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, pullRequestSearchRepository);
@@ -164,7 +164,22 @@ public sealed class Program
 
         var azureDataManager = new AzureDataManager(cacheDataStore, updatersDictionary);
         using var cacheManager = new CacheManager(azureDataManager);
-        var dataProvider = new LiveDataProvider(cacheManager, queryManager, pullRequestSearchManager, pipelineProvider);
+
+        var contentProvidersDictionary = new Dictionary<Type, IContentDataProvider>
+        {
+            { typeof(IQuery), queryManager },
+            { typeof(IPullRequestSearch), pullRequestSearchManager },
+            { typeof(IPipelineDefinitionSearch), pipelineProvider },
+        };
+
+        var searchDataProvidersDictionary = new Dictionary<Type, ISearchDataProvider>
+        {
+            { typeof(IQuery), queryManager },
+            { typeof(IPullRequestSearch), pullRequestSearchManager },
+            { typeof(IPipelineDefinitionSearch), pipelineProvider },
+        };
+
+        var dataProvider = new LiveDataProvider(cacheManager, contentProvidersDictionary, searchDataProvidersDictionary);
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);

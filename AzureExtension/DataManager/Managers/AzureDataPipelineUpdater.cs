@@ -19,7 +19,7 @@ public class AzureDataPipelineUpdater : IDataUpdater
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
     private readonly ISavedSearchesSource<IPipelineDefinitionSearch> _definitionRepository;
-    private readonly IDataProvider<IPipelineDefinitionSearch, Definition, Build> _pipelineProvider;
+    private readonly ISearchDataProvider<IPipelineDefinitionSearch, Definition> _pipelineProvider;
 
     public AzureDataPipelineUpdater(
         DataStore dataStore,
@@ -27,7 +27,7 @@ public class AzureDataPipelineUpdater : IDataUpdater
         IAzureLiveDataProvider liveDataProvider,
         IConnectionProvider connectionProvider,
         ISavedSearchesSource<IPipelineDefinitionSearch> definitionRepository,
-        IDataProvider<IPipelineDefinitionSearch, Definition, Build> pipelineProvider)
+        ISearchDataProvider<IPipelineDefinitionSearch, Definition> pipelineProvider)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;

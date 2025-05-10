@@ -20,25 +20,13 @@ public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefini
 
     private readonly IAzureValidator _azureValidator;
     private readonly DataStore _dataStore;
-    private readonly IAzureLiveDataProvider _liveDataProvider;
-    private readonly IConnectionProvider _connectionProvider;
-    private readonly IDataProvider<IPipelineDefinitionSearch, DataModel.Definition, Build> _pipelineProvider;
-    private readonly IAccountProvider _accountProvider;
 
     public DefinitionSearchRepository(
         DataStore dataStore,
-        IAzureValidator azureValidator,
-        IAzureLiveDataProvider liveDataProvider,
-        IConnectionProvider connectionProvider,
-        IDataProvider<IPipelineDefinitionSearch, DataModel.Definition, Build> pipelineProvider,
-        IAccountProvider accountProvider)
+        IAzureValidator azureValidator)
     {
         _azureValidator = azureValidator;
         _dataStore = dataStore;
-        _liveDataProvider = liveDataProvider;
-        _connectionProvider = connectionProvider;
-        _pipelineProvider = pipelineProvider;
-        _accountProvider = accountProvider;
     }
 
     private void ValidateDataStore()

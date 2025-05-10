@@ -15,7 +15,7 @@ using PullRequestSearch = AzureExtension.DataModel.PullRequestSearch;
 namespace AzureExtension.DataManager;
 
 public class AzureDataPullRequestSearchManager
-    : IDataProvider<IPullRequestSearch, PullRequestSearch, PullRequest>, IDataUpdater
+    : ISearchDataProvider<IPullRequestSearch, PullRequestSearch>, IContentDataProvider<IPullRequestSearch, PullRequest>, IDataUpdater, IContentDataProvider, ISearchDataProvider
 {
     private readonly TimeSpan _pullRequestSearchDeletionTime = TimeSpan.FromMinutes(2);
 
@@ -68,6 +68,16 @@ public class AzureDataPullRequestSearchManager
         ValidateDataStore();
         var dsPullRequestSearch = GetDataForSearch(pullRequestSearch);
         return dsPullRequestSearch != null ? PullRequest.GetForPullRequestSearch(_dataStore, dsPullRequestSearch!) : [];
+    }
+
+    public IEnumerable<object> GetDataObjects(IAzureSearch search)
+    {
+        return GetDataObjects(search as IPullRequestSearch ?? throw new InvalidOperationException("Invalid search type"));
+    }
+
+    public object? GetDataForSearch(IAzureSearch search)
+    {
+        return GetDataForSearch(search as IPullRequestSearch ?? throw new InvalidOperationException("Invalid search type"));
     }
 
     public bool IsNewOrStale(IPullRequestSearch pullRequestSearch, TimeSpan refreshCooldown)

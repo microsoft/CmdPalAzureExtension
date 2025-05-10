@@ -143,7 +143,7 @@ public class SearchPageFactory : ISearchPageFactory
 
     public IListItem CreateItemForDefinitionSearch(IPipelineDefinitionSearch search)
     {
-        var definition = _dataProvider.GetDefinition(search).Result;
+        var definition = _dataProvider.GetSearchData<IDefinition>(search).Result;
         var timeSpanHelper = new TimeSpanHelper(_resources);
 
         var azureSearchRepository = _azureSearchRepositories[typeof(IPipelineDefinitionSearch)];

@@ -15,7 +15,7 @@ using WorkItem = AzureExtension.DataModel.WorkItem;
 namespace AzureExtension.DataManager;
 
 public class AzureDataQueryManager
-    : IDataProvider<IQuery, Query, WorkItem>, IDataUpdater
+    : ISearchDataProvider<IQuery, Query>, IContentDataProvider<IQuery, WorkItem>, ISearchDataProvider, IContentDataProvider,  IDataUpdater
 {
     private readonly TimeSpan _queryWorkItemDeletionTime = TimeSpan.FromMinutes(2);
 
@@ -73,6 +73,16 @@ public class AzureDataQueryManager
         ValidateDataStore();
         var dsQuery = GetDataForSearch(query);
         return dsQuery != null ? WorkItem.GetForQuery(_dataStore, dsQuery) : [];
+    }
+
+    public object? GetDataForSearch(IAzureSearch search)
+    {
+        return GetDataForSearch(search as IQuery ?? throw new InvalidOperationException("Invalid search type"));
+    }
+
+    public IEnumerable<object> GetDataObjects(IAzureSearch search)
+    {
+        return GetDataObjects(search as IQuery ?? throw new InvalidOperationException("Invalid search type"));
     }
 
     public async Task UpdateQueryAsync(IQuery query, CancellationToken cancellationToken)

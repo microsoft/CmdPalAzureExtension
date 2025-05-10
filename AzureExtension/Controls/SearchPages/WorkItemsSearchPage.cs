@@ -88,7 +88,7 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
 
     protected async override Task<IEnumerable<IWorkItem>> LoadContentData()
     {
-        return await _dataProvider.GetWorkItems(_query);
+        return await _dataProvider.GetContentData<IWorkItem>(_query);
     }
 
     protected ITag GetStatusTag(IWorkItem item)

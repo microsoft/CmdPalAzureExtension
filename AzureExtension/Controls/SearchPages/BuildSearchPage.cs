@@ -44,7 +44,7 @@ public partial class BuildSearchPage : ListPage
 
     private async Task<IDefinition> GetDefinitionForPage(IPipelineDefinitionSearch search)
     {
-        var definition = await _dataProvider.GetDefinition(search);
+        var definition = await _dataProvider.GetSearchData<IDefinition>(search);
         if (definition == null)
         {
             throw new InvalidOperationException($"Definition not found for search {search.InternalId} - {search.ProjectUrl}");
@@ -165,6 +165,6 @@ public partial class BuildSearchPage : ListPage
 
     protected Task<IEnumerable<IBuild>> LoadContentData()
     {
-        return _dataProvider.GetBuilds(_search);
+        return _dataProvider.GetContentData<IBuild>(_search);
     }
 }
