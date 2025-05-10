@@ -32,7 +32,6 @@ public class LiveDataProvider : ILiveDataProvider
         _searchDataProvidersDictionary = searchDataProvidersDictionary;
 
         _cacheManager.OnUpdate += OnCacheManagerUpdate;
-        _searchDataProvidersDictionary = searchDataProvidersDictionary;
     }
 
     public void OnCacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
