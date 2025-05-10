@@ -127,10 +127,51 @@ public class DataProviderTests
 
         mockCacheManager.Verify(m => m.RequestRefresh(It.IsAny<DataUpdateParameters>()), Times.Once);
         mockPipelineProvider.Verify(m => m.GetDataForSearch(It.IsAny<IPipelineDefinitionSearch>()), Times.Once);
+
+        mockPipelineProvider
+            .Setup(m => m.GetDataForSearch(It.IsAny<IPipelineDefinitionSearch>()))
+            .Returns(new Definition());
+
         mockCacheManager.Raise(m => m.OnUpdate += null, new CacheManagerUpdateEventArgs(CacheManagerUpdateKind.Updated));
 
         await getDefinitionTask;
 
         mockPipelineProvider.Verify(m => m.GetDataForSearch(It.IsAny<IPipelineDefinitionSearch>()), Times.Exactly(2));
+        Assert.IsNotNull(getDefinitionTask.Result);
+    }
+
+    [TestMethod]
+    public async Task DataProviderDefinitionFromCachedDefinition()
+    {
+        var mockCacheManager = new Mock<ICacheManager>();
+        var mockPipelineProvider = new Mock<ISearchDataProvider>();
+        var stubContentDataDictionary = new Dictionary<Type, IContentDataProvider>();
+        var stubSearchDataDictionary = new Dictionary<Type, ISearchDataProvider>
+        {
+            { typeof(IPipelineDefinitionSearch), mockPipelineProvider.Object },
+        };
+
+        var dataProvider = new LiveDataProvider(
+            mockCacheManager.Object,
+            stubContentDataDictionary,
+            stubSearchDataDictionary);
+
+        var stubDefinitionSearch = new Mock<IPipelineDefinitionSearch>();
+        var dsDefinition = new Definition();
+
+        mockPipelineProvider
+            .Setup(m => m.GetDataForSearch(It.IsAny<IPipelineDefinitionSearch>()))
+            .Returns(dsDefinition);
+
+        var getDefinitionTask = dataProvider.GetSearchData<IDefinition>(stubDefinitionSearch.Object);
+
+        mockCacheManager.Verify(m => m.RequestRefresh(It.IsAny<DataUpdateParameters>()), Times.Once);
+        mockPipelineProvider.Verify(m => m.GetDataForSearch(It.IsAny<IPipelineDefinitionSearch>()), Times.Exactly(2));
+        mockCacheManager.Raise(m => m.OnUpdate += null, new CacheManagerUpdateEventArgs(CacheManagerUpdateKind.Updated));
+
+        await getDefinitionTask;
+
+        mockPipelineProvider.Verify(m => m.GetDataForSearch(It.IsAny<IPipelineDefinitionSearch>()), Times.Exactly(2));
+        Assert.IsNotNull(getDefinitionTask.Result);
     }
 }
