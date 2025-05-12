@@ -128,17 +128,13 @@ public class SavePullRequestSearchForm : FormContent, IAzureForm
     public PullRequestSearch CreatePullRequestSearchFromJson(JsonNode? jsonNode)
     {
         var enteredUrl = jsonNode?["url"]?.ToString() ?? string.Empty;
-        var name = jsonNode?["title"]?.ToString() ?? string.Empty;
         var view = jsonNode?["view"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
         var testUri = new AzureUri(enteredUrl);
         var url = CreatePullRequestUrl(testUri, view);
         var searchUri = new AzureUri(url);
-        if (string.IsNullOrEmpty(name) || !string.Equals(name, $"{searchUri.Repository} - {_savedPullRequestSearch?.View}", StringComparison.OrdinalIgnoreCase))
-        {
-            name = $"{searchUri.Repository} - {view}";
-        }
+        var name = $"{searchUri.Repository} - {view}";
 
         return new PullRequestSearch(searchUri, name, view, isTopLevel);
     }
