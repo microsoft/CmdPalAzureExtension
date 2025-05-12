@@ -173,14 +173,6 @@
     <value>Pin query to top-level commands</value>
     <comment>The label text for the checkbox that determines if the query should be pinned as a top level command</comment>
   </data>
-  <data name="Forms_SaveQuery_TemplateNameError" xml:space="preserve">
-    <value>A query name is required</value>
-    <comment>Shown if the user submits the SaveSearchForm without a name</comment>
-  </data>
-  <data name="Forms_SaveQuery_TemplateNameLabel" xml:space="preserve">
-    <value>Name:</value>
-    <comment>Shown as the name for the saved query</comment>
-  </data>
   <data name="Forms_SaveQuery_TemplateSaveQueryActionTitle" xml:space="preserve">
     <value>Save</value>
     <comment>The title for the button that submits the form and saves the query</comment>
