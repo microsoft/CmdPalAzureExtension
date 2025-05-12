@@ -21,6 +21,15 @@ public partial class SignInForm : FormContent
     private string IsButtonEnabled =>
         _isButtonEnabled.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture);
 
+    public Dictionary<string, string> TemplateSubstitutions => new()
+    {
+        { "{{AuthTitle}}", _resources.GetResource("Forms_SignIn_TemplateAuthTitle") },
+        { "{{AuthButtonTitle}}", _resources.GetResource("Forms_SignIn_TemplateAuthButtonTitle") },
+        { "{{AuthIcon}}", $"data:image/png;base64,{IconLoader.GetIconAsBase64("Logo")}" },
+        { "{{AuthButtonTooltip}}", _resources.GetResource("Forms_SignIn_TemplateAuthButtonTooltip") },
+        { "{{ButtonIsEnabled}}", IsButtonEnabled },
+    };
+
     public SignInForm(AuthenticationMediator authenticationMediator, IResources resources, SignInCommand signInCommand)
     {
         _authenticationMediator = authenticationMediator;
@@ -50,15 +59,6 @@ public partial class SignInForm : FormContent
         TemplateJson = TemplateHelper.LoadTemplateJsonFromTemplateName("AuthTemplate", TemplateSubstitutions);
         OnPropertyChanged(nameof(TemplateJson));
     }
-
-    public Dictionary<string, string> TemplateSubstitutions => new()
-    {
-        { "{{AuthTitle}}", _resources.GetResource("Forms_SignIn_TemplateAuthTitle") },
-        { "{{AuthButtonTitle}}", _resources.GetResource("Forms_SignIn_TemplateAuthButtonTitle") },
-        { "{{AuthIcon}}", $"data:image/png;base64,{IconLoader.GetIconAsBase64("Logo")}" },
-        { "{{AuthButtonTooltip}}", _resources.GetResource("Forms_SignIn_TemplateAuthButtonTooltip") },
-        { "{{ButtonIsEnabled}}", IsButtonEnabled },
-    };
 
     public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName("AuthTemplate", TemplateSubstitutions);
 

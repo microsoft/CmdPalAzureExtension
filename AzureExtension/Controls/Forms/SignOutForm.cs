@@ -8,7 +8,6 @@ using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Microsoft.Identity.Client;
 
 namespace AzureExtension.Controls.Forms;
 
@@ -19,6 +18,15 @@ public sealed partial class SignOutForm : FormContent
     private readonly AuthenticationMediator _authenticationMediator;
     private readonly IAccountProvider _accountProvider;
     private bool _isButtonEnabled = true;
+
+    public Dictionary<string, string> TemplateSubstitutions => new()
+    {
+        { "{{AuthTitle}}", _resources.GetResource("Forms_SignOut_TemplateAuthTitle") },
+        { "{{AuthButtonTitle}}", $"{_resources.GetResource("Forms_SignOut_TemplateAuthButtonTitle")} {_accountProvider.GetDefaultAccount()?.Username ?? string.Empty}" },
+        { "{{AuthIcon}}", $"data:image/png;base64,{IconLoader.GetIconAsBase64("Logo")}" },
+        { "{{AuthButtonTooltip}}", _resources.GetResource("Forms_SignOut_TemplateAuthButtonTooltip") },
+        { "{{ButtonIsEnabled}}", IsButtonEnabled },
+    };
 
     private string IsButtonEnabled =>
         _isButtonEnabled.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture);
@@ -46,16 +54,6 @@ public sealed partial class SignOutForm : FormContent
             SetButtonEnabled(false);
         }
     }
-
-    // ButtonIsEnabled is set to true by default. Nothing currently changes this value
-    public Dictionary<string, string> TemplateSubstitutions => new()
-    {
-        { "{{AuthTitle}}", _resources.GetResource("Forms_SignOut_TemplateAuthTitle") },
-        { "{{AuthButtonTitle}}", $"{_resources.GetResource("Forms_SignOut_TemplateAuthButtonTitle")} {_accountProvider.GetDefaultAccount().Username}" },
-        { "{{AuthIcon}}", $"data:image/png;base64,{IconLoader.GetIconAsBase64("Logo")}" },
-        { "{{AuthButtonTooltip}}", _resources.GetResource("Forms_SignOut_TemplateAuthButtonTooltip") },
-        { "{{ButtonIsEnabled}}", IsButtonEnabled },
-    };
 
     private void SetButtonEnabled(bool isEnabled)
     {

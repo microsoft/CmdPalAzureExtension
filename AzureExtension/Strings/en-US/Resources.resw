@@ -173,14 +173,6 @@
     <value>Pin query to top-level commands</value>
     <comment>The label text for the checkbox that determines if the query should be pinned as a top level command</comment>
   </data>
-  <data name="Forms_SaveQuery_TemplateNameError" xml:space="preserve">
-    <value>A query name is required</value>
-    <comment>Shown if the user submits the SaveSearchForm without a name</comment>
-  </data>
-  <data name="Forms_SaveQuery_TemplateNameLabel" xml:space="preserve">
-    <value>Name:</value>
-    <comment>Shown as the name for the saved query</comment>
-  </data>
   <data name="Forms_SaveQuery_TemplateSaveQueryActionTitle" xml:space="preserve">
     <value>Save</value>
     <comment>The title for the button that submits the form and saves the query</comment>
@@ -352,14 +344,6 @@
   <data name="Forms_SavePullRequestSearch_TemplateRepositoryUrlError" xml:space="preserve">
     <value>Must enter repository URL</value>
     <comment>The error that appears if a user does not enter a repository URL when saving a pull request search</comment>
-  </data>
-  <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchTitlePlaceholder" xml:space="preserve">
-    <value>My team's pull requests</value>
-    <comment>A sample title for a pull request search</comment>
-  </data>
-  <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchTitleLabel" xml:space="preserve">
-    <value>Pull Request Search Title</value>
-    <comment>The label for the text input where a user enters a pull request search title</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplateDefaultView" xml:space="preserve">
     <value>Mine</value>
@@ -586,5 +570,17 @@
   <data name="Pages_PipelineSearch_LinkCommandName" xml:space="preserve">
     <value>Open link to all runs</value>
     <comment>Special name for the OpenLink command for the PipelineSearchPage</comment>
+  </data>
+  <data name="Forms_SaveQuery_TemplateNameError" xml:space="preserve">
+    <value>A query name is required</value>
+    <comment>Shown if the user submits the SaveSearchForm without a name</comment>
+  </data>
+  <data name="Forms_SaveQuery_TemplateNameLabel" xml:space="preserve">
+    <value>Name:</value>
+    <comment>Shown as the name for the saved query</comment>
+  </data>
+  <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchTitlePlaceholder" xml:space="preserve">
+    <value>My team's pull requests</value>
+    <comment>A sample title for a pull request search</comment>
   </data>
 </root>

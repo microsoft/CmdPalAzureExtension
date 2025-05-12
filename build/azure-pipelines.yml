@@ -16,7 +16,7 @@ parameters:
     - release
 
 variables:
-  MSIXVersion: '0.101'
+  MSIXVersion: '0.200'
   solution: '**/AzureExtension.sln'
   appxPackageDir: 'AppxPackages'
   testOutputArtifactDir: 'TestResults'
