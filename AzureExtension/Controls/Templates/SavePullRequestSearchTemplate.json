@@ -17,13 +17,6 @@
           "errorMessage": "{{RepositoryUrlError}}"
         },
         {
-          "type": "Input.Text",
-          "placeholder": "{{PullRequestSearchTitlePlaceholder}}",
-          "id": "title",
-          "label": "{{PullRequestSearchTitleLabel}}",
-          "value": "{{EnteredPullRequestSearchTitle}}"
-        },
-        {
           "type": "Input.ChoiceSet",
           "choices": [
             {
