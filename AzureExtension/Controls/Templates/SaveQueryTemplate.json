@@ -14,13 +14,6 @@
     },
     {
       "type": "Input.Text",
-      "id": "Name",
-      "label": "{{NameLabel}}",
-      "errorMessage": "{{NameErrorMessage}}",
-      "value": "{{SavedQueryName}}"
-    },
-    {
-      "type": "Input.Text",
       "id": "EnteredQuery",
       "label": "{{EnteredQueryLabel}}",
       "isRequired": true,
