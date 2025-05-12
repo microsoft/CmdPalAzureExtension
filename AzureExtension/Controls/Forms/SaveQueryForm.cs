@@ -32,11 +32,8 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     {
         { "{{SaveQueryFormTitle}}", _resources.GetResource(string.IsNullOrEmpty(_savedQuery?.Name) ? "Forms_Save_Query" : "Forms_Edit_Query") },
         { "{{SavedQueryString}}", _savedQuery?.Url ?? string.Empty },
-        { "{{SavedQueryName}}", _savedQuery?.Name ?? string.Empty },
         { "{{EnteredQueryErrorMessage}}", _resources.GetResource("Forms_SaveQuery_TemplateEnteredQueryError") },
         { "{{EnteredQueryLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateEnteredQueryLabel") },
-        { "{{NameLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateNameLabel") },
-        { "{{NameErrorMessage}}", _resources.GetResource("Forms_SaveQuery_TemplateNameError") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveQueryTemplate_IsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SaveQueryActionTitle}}", _resources.GetResource("Forms_SaveQuery_TemplateSaveQueryActionTitle") },
@@ -130,7 +127,6 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
     public Query CreateQueryFromJson(JsonNode? jsonNode)
     {
         var queryUrl = jsonNode?["EnteredQuery"]?.ToString() ?? string.Empty;
-        var name = jsonNode?["Name"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
         var account = _accountProvider.GetDefaultAccount();
@@ -142,14 +138,8 @@ public sealed partial class SaveQueryForm : FormContent, IAzureForm
             throw new InvalidOperationException($"Failed to get query info {queryInfo.Error}: {queryInfo.ErrorMessage}");
         }
 
-        var shouldUpdateQueryName = string.IsNullOrEmpty(name) || (string.Equals(name, _savedQuery?.Name, StringComparison.Ordinal) && !string.Equals(queryUrl, _savedQuery?.Url, StringComparison.Ordinal));
-        if (shouldUpdateQueryName)
-        {
-            name = queryInfo.Name;
-        }
-
         var uri = queryInfo.AzureUri;
-        return new Query(uri, name, queryInfo.Description, isTopLevel);
+        return new Query(uri, queryInfo.Name, queryInfo.Description, isTopLevel);
     }
 
     public bool GetIsTopLevel()
