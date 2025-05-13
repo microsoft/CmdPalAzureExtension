@@ -10,7 +10,7 @@ public static class AzureSearchTypeHelper
     {
         return search switch
         {
-            IQuery => typeof(IQuery),
+            IQuerySearch => typeof(IQuerySearch),
             IPullRequestSearch => typeof(IPullRequestSearch),
             IPipelineDefinitionSearch => typeof(IPipelineDefinitionSearch),
             _ => throw new ArgumentException($"Unknown search type: {search.GetType().Name}"),
@@ -21,7 +21,7 @@ public static class AzureSearchTypeHelper
     {
         return search switch
         {
-            IQuery => typeof(IWorkItem),
+            IQuerySearch => typeof(IWorkItem),
             IPullRequestSearch => typeof(IPullRequest),
             IPipelineDefinitionSearch => typeof(IBuild),
             _ => throw new ArgumentException($"Unknown search type: {search.GetType().Name}"),
@@ -32,7 +32,7 @@ public static class AzureSearchTypeHelper
     {
         return search switch
         {
-            IQuery => typeof(IQuery),
+            IQuerySearch => typeof(IQuerySearch),
             IPullRequestSearch => typeof(IPullRequestSearch),
             IPipelineDefinitionSearch => typeof(IDefinition),
             _ => throw new ArgumentException($"Unknown search type: {search.GetType().Name}"),

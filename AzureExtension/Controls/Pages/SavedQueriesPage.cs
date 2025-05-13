@@ -16,14 +16,14 @@ public partial class SavedQueriesPage : ListPage
     private readonly IListItem _addQueryListItem;
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _savedQueriesMediator;
-    private readonly ISavedSearchesProvider<IQuery> _queryRepository;
+    private readonly ISavedSearchesProvider<IQuerySearch> _queryRepository;
     private readonly ISearchPageFactory _searchPageFactory;
 
     public SavedQueriesPage(
        IResources resources,
        IListItem addQueryListItem,
        SavedAzureSearchesMediator savedQueriesMediator,
-       ISavedSearchesProvider<IQuery> queryRepository,
+       ISavedSearchesProvider<IQuerySearch> queryRepository,
        ISearchPageFactory searchPageFactory)
     {
         _resources = resources;
@@ -53,7 +53,7 @@ public partial class SavedQueriesPage : ListPage
 
             toast.Show();
         }
-        else if (args != null && args is IQuery query)
+        else if (args != null && args is IQuerySearch query)
         {
             RaiseItemsChanged(0);
 

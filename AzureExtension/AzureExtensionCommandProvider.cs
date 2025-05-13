@@ -74,7 +74,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
 
     private void OnSearchUpdated(object? sender, object? args)
     {
-        if (args is IQuery || args is IPullRequestSearch || args is IPipelineDefinitionSearch)
+        if (args is IQuerySearch || args is IPullRequestSearch || args is IPipelineDefinitionSearch)
         {
             RaiseItemsChanged();
         }

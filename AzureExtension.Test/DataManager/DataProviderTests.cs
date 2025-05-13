@@ -37,12 +37,12 @@ public class DataProviderTests
         var mockQueryContentProvider = new Mock<IContentDataProvider>();
         var stubContentDataDictionary = new Dictionary<Type, IContentDataProvider>
         {
-            { typeof(IQuery), mockQueryContentProvider.Object },
+            { typeof(IQuerySearch), mockQueryContentProvider.Object },
         };
 
         var stubSearchDataDictionary = new Dictionary<Type, ISearchDataProvider>
         {
-            { typeof(IQuery), mockQueryProvider.Object },
+            { typeof(IQuerySearch), mockQueryProvider.Object },
         };
 
         var dataProvider = new LiveDataProvider(
@@ -50,16 +50,16 @@ public class DataProviderTests
             stubContentDataDictionary,
             stubSearchDataDictionary);
 
-        var stubQuery = new Mock<IQuery>();
+        var stubQuery = new Mock<IQuerySearch>();
 
         var getWorkItemsTask = dataProvider.GetContentData<IWorkItem>(stubQuery.Object);
 
         mockCacheManager.Verify(m => m.RequestRefresh(It.IsAny<DataUpdateParameters>()), Times.Once);
-        mockQueryContentProvider.Verify(m => m.GetDataObjects(It.IsAny<IQuery>()), Times.Never);
+        mockQueryContentProvider.Verify(m => m.GetDataObjects(It.IsAny<IQuerySearch>()), Times.Never);
         mockCacheManager.Raise(m => m.OnUpdate += null, new CacheManagerUpdateEventArgs(CacheManagerUpdateKind.Updated));
         await getWorkItemsTask;
 
-        mockQueryContentProvider.Verify(m => m.GetDataObjects(It.IsAny<IQuery>()), Times.Once);
+        mockQueryContentProvider.Verify(m => m.GetDataObjects(It.IsAny<IQuerySearch>()), Times.Once);
     }
 
     [TestMethod]
@@ -70,12 +70,12 @@ public class DataProviderTests
         var mockQueryContentProvider = new Mock<IContentDataProvider>();
         var stubContentDataDictionary = new Dictionary<Type, IContentDataProvider>
         {
-            { typeof(IQuery), mockQueryContentProvider.Object },
+            { typeof(IQuerySearch), mockQueryContentProvider.Object },
         };
 
         var stubSearchDataDictionary = new Dictionary<Type, ISearchDataProvider>
         {
-            { typeof(IQuery), mockQueryProvider.Object },
+            { typeof(IQuerySearch), mockQueryProvider.Object },
         };
 
         var dataProvider = new LiveDataProvider(
@@ -83,22 +83,22 @@ public class DataProviderTests
             stubContentDataDictionary,
             stubSearchDataDictionary);
 
-        var stubQuery = new Mock<IQuery>();
+        var stubQuery = new Mock<IQuerySearch>();
 
         var dsQuery = new Query();
 
         mockQueryProvider
-            .Setup(m => m.GetDataForSearch(It.IsAny<IQuery>()))
+            .Setup(m => m.GetDataForSearch(It.IsAny<IQuerySearch>()))
             .Returns(dsQuery);
 
         var getWorkItemsTask = dataProvider.GetContentData<IWorkItem>(stubQuery.Object);
 
         mockCacheManager.Verify(m => m.RequestRefresh(It.IsAny<DataUpdateParameters>()), Times.Once);
-        mockQueryContentProvider.Verify(m => m.GetDataObjects(It.IsAny<IQuery>()), Times.Once);
+        mockQueryContentProvider.Verify(m => m.GetDataObjects(It.IsAny<IQuerySearch>()), Times.Once);
         mockCacheManager.Raise(m => m.OnUpdate += null, new CacheManagerUpdateEventArgs(CacheManagerUpdateKind.Updated));
         await getWorkItemsTask;
 
-        mockQueryContentProvider.Verify(m => m.GetDataObjects(It.IsAny<IQuery>()), Times.Once);
+        mockQueryContentProvider.Verify(m => m.GetDataObjects(It.IsAny<IQuerySearch>()), Times.Once);
     }
 
     [TestMethod]

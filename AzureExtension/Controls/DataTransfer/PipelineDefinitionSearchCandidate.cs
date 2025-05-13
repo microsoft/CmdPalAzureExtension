@@ -18,7 +18,5 @@ internal class PipelineDefinitionSearchCandidate : IPipelineDefinitionSearch
 
     public string Name { get; set; } = string.Empty;
 
-    public string Url { get; set; } = string.Empty;
-
     public bool IsTopLevel { get; set; }
 }

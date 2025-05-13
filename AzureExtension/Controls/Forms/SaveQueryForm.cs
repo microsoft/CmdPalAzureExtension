@@ -9,7 +9,7 @@ using AzureExtension.Helpers;
 
 namespace AzureExtension.Controls.Forms;
 
-public sealed partial class SaveQueryForm : AzureForm<IQuery>
+public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
 {
     private readonly IResources _resources;
     private readonly IAccountProvider _accountProvider;
@@ -32,7 +32,7 @@ public sealed partial class SaveQueryForm : AzureForm<IQuery>
         SavedAzureSearchesMediator savedQueriesMediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
-        ISavedSearchesUpdater<IQuery> queryRepository)
+        ISavedSearchesUpdater<IQuerySearch> queryRepository)
         : base(null, queryRepository, savedQueriesMediator, accountProvider)
     {
         _resources = resources;
@@ -43,12 +43,12 @@ public sealed partial class SaveQueryForm : AzureForm<IQuery>
 
     // for editing an existing query
     public SaveQueryForm(
-        IQuery savedQuery,
+        IQuerySearch savedQuery,
         IResources resources,
         SavedAzureSearchesMediator savedQueriesMediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
-        ISavedSearchesUpdater<IQuery> queryRepository)
+        ISavedSearchesUpdater<IQuerySearch> queryRepository)
         : base(savedQuery, queryRepository, savedQueriesMediator, accountProvider)
     {
         _resources = resources;
@@ -57,7 +57,7 @@ public sealed partial class SaveQueryForm : AzureForm<IQuery>
         TemplateKey = "SaveQuery";
     }
 
-    protected override IQuery CreateSearchFromJson(JsonNode? jsonNode)
+    protected override IQuerySearch CreateSearchFromJson(JsonNode? jsonNode)
     {
         var queryUrl = jsonNode?["EnteredQuery"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";

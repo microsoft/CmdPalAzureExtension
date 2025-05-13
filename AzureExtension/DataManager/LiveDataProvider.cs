@@ -72,7 +72,7 @@ public class LiveDataProvider : ILiveDataProvider
     {
         return search switch
         {
-            IQuery => DataUpdateType.Query,
+            IQuerySearch => DataUpdateType.Query,
             IPullRequestSearch => DataUpdateType.PullRequests,
             IPipelineDefinitionSearch => DataUpdateType.Pipeline,
             _ => throw new NotSupportedException($"No provider found for {search.GetType()}"),

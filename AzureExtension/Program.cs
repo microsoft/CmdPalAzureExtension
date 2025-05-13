@@ -167,14 +167,14 @@ public sealed class Program
 
         var contentProvidersDictionary = new Dictionary<Type, IContentDataProvider>
         {
-            { typeof(IQuery), queryManager },
+            { typeof(IQuerySearch), queryManager },
             { typeof(IPullRequestSearch), pullRequestSearchManager },
             { typeof(IPipelineDefinitionSearch), pipelineProvider },
         };
 
         var searchDataProvidersDictionary = new Dictionary<Type, ISearchDataProvider>
         {
-            { typeof(IQuery), queryManager },
+            { typeof(IQuerySearch), queryManager },
             { typeof(IPullRequestSearch), pullRequestSearchManager },
             { typeof(IPipelineDefinitionSearch), pipelineProvider },
         };
@@ -199,7 +199,7 @@ public sealed class Program
 
         var azureSearchRepositories = new Dictionary<Type, IAzureSearchRepository>
         {
-            { typeof(IQuery), new AzureSearchRepositoryAdapter<IQuery>(queryRepository, queryRepository) },
+            { typeof(IQuerySearch), new AzureSearchRepositoryAdapter<IQuerySearch>(queryRepository, queryRepository) },
             { typeof(IPullRequestSearch), new AzureSearchRepositoryAdapter<IPullRequestSearch>(pullRequestSearchRepository, pullRequestSearchRepository) },
             { typeof(IPipelineDefinitionSearch), new AzureSearchRepositoryAdapter<IPipelineDefinitionSearch>(pipelineDefinitionRepository, pipelineDefinitionRepository) },
         };

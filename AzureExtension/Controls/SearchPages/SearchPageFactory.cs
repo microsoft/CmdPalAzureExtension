@@ -26,7 +26,7 @@ public class SearchPageFactory : ISearchPageFactory
 
     private readonly AzureClientHelpers _azureClientHelpers;
 
-    private readonly ISavedSearchesUpdater<IQuery> _queryUpdater;
+    private readonly ISavedSearchesUpdater<IQuerySearch> _queryUpdater;
 
     private readonly ISavedSearchesUpdater<IPullRequestSearch> _savedPullRequestSearchUpdater;
 
@@ -41,7 +41,7 @@ public class SearchPageFactory : ISearchPageFactory
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
         IDictionary<Type, IAzureSearchRepository> azureSearchRepositories,
-        ISavedSearchesUpdater<IQuery> queryUpdater,
+        ISavedSearchesUpdater<IQuerySearch> queryUpdater,
         ISavedSearchesUpdater<IPullRequestSearch> savedPullRequestSearchUpdater,
         ISavedSearchesUpdater<IPipelineDefinitionSearch> definitionUpdater)
     {
@@ -58,9 +58,9 @@ public class SearchPageFactory : ISearchPageFactory
 
     public ListPage CreatePageForSearch(IAzureSearch search)
     {
-        if (search is IQuery)
+        if (search is IQuerySearch)
         {
-            return new WorkItemsSearchPage((IQuery)search, _resources, _dataProvider, new TimeSpanHelper(_resources));
+            return new WorkItemsSearchPage((IQuerySearch)search, _resources, _dataProvider, new TimeSpanHelper(_resources));
         }
         else if (search is IPullRequestSearch)
         {
@@ -76,9 +76,9 @@ public class SearchPageFactory : ISearchPageFactory
 
     public ContentPage CreateEditPageForSearch(IAzureSearch search)
     {
-        if (search is IQuery)
+        if (search is IQuerySearch)
         {
-            var saveQueryForm = new SaveQueryForm((IQuery)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _queryUpdater);
+            var saveQueryForm = new SaveQueryForm((IQuerySearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _queryUpdater);
             var statusMessage = new StatusMessage();
             return new EditQueryPage(_resources, saveQueryForm, statusMessage, "Query edited successfully", "Error in editing query");
         }
@@ -102,9 +102,9 @@ public class SearchPageFactory : ISearchPageFactory
 
     private Type GetAzureSearchType(IAzureSearch search)
     {
-        if (search is IQuery)
+        if (search is IQuerySearch)
         {
-            return typeof(IQuery);
+            return typeof(IQuerySearch);
         }
         else if (search is IPullRequestSearch)
         {
@@ -131,7 +131,7 @@ public class SearchPageFactory : ISearchPageFactory
         {
             Title = search.Name,
             Subtitle = search.Url,
-            Icon = search is IQuery ? IconLoader.GetIcon("Query") : IconLoader.GetIcon("PullRequest"),
+            Icon = search is IQuerySearch ? IconLoader.GetIcon("Query") : IconLoader.GetIcon("PullRequest"),
             MoreCommands = new CommandContextItem[]
             {
                 new(new LinkCommand(search.Url, _resources, null)),

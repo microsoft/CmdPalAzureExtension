@@ -6,7 +6,7 @@ using AzureExtension.Client;
 
 namespace AzureExtension.Controls;
 
-public class Query : IQuery
+public class Query : IQuerySearch
 {
     public AzureUri AzureUri { get; set; }
 

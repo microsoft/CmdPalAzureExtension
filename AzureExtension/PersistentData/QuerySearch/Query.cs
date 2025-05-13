@@ -12,7 +12,7 @@ using Serilog;
 namespace AzureExtension.PersistentData;
 
 [Table("Query")]
-public class Query : IQuery
+public class Query : IQuerySearch
 {
     private static readonly Lazy<ILogger> _logger = new(() => Log.ForContext("SourceContext", $"PersistentData/{nameof(Query)}"));
 
@@ -80,14 +80,14 @@ public class Query : IQuery
         _log.Verbose($"Deleted {deleted} rows from Query table.");
     }
 
-    public static IEnumerable<IQuery> GetAll(DataStore datastore)
+    public static IEnumerable<IQuerySearch> GetAll(DataStore datastore)
     {
         var sql = "SELECT * FROM Query";
         var query = datastore.Connection.Query<Query>(sql);
         return query;
     }
 
-    public static IEnumerable<IQuery> GetTopLevel(DataStore datastore)
+    public static IEnumerable<IQuerySearch> GetTopLevel(DataStore datastore)
     {
         var sql = "SELECT * FROM Query WHERE IsTopLevel = 1";
         var query = datastore.Connection.Query<Query>(sql);
