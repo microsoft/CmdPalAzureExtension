@@ -12,11 +12,8 @@ namespace AzureExtension.Controls.Pages;
 public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
 {
     private readonly IQuery _query;
-
     private readonly IResources _resources;
-
     private readonly ILiveDataProvider _dataProvider;
-
     private readonly TimeSpanHelper _timeSpanHelper;
 
     public WorkItemsSearchPage(IQuery query, IResources resources, ILiveDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
