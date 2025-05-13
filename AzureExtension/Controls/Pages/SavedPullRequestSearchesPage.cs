@@ -5,7 +5,6 @@
 using AzureExtension.Controls.ListItems;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
-using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
@@ -16,7 +15,7 @@ public class SavedPullRequestSearchesPage : SavedSearchesPage
     private readonly ISavedSearchesProvider<IPullRequestSearch> _pullRequestSearchRepository;
     private readonly ISearchPageFactory _searchPageFactory;
 
-    protected override SearchUpdatedType SearchUpdatedType => SearchUpdatedType.Pipeline;
+    protected override SearchUpdatedType SearchUpdatedType => SearchUpdatedType.PullRequest;
 
     protected override string ExceptionMessage => _resources.GetResource("Pages_SavedPullRequestSearches_Error");
 
