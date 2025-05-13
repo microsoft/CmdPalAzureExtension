@@ -15,7 +15,7 @@ using WorkItem = AzureExtension.DataModel.WorkItem;
 namespace AzureExtension.DataManager;
 
 public class AzureDataQueryManager
-    : IDataProvider<IQuery, Query, WorkItem>, IDataUpdater
+    : ISearchDataProvider<IQuerySearch, Query>, IContentDataProvider<IQuerySearch, WorkItem>, ISearchDataProvider, IContentDataProvider,  IDataUpdater
 {
     private readonly TimeSpan _queryWorkItemDeletionTime = TimeSpan.FromMinutes(2);
 
@@ -24,14 +24,14 @@ public class AzureDataQueryManager
     private readonly IAccountProvider _accountProvider;
     private readonly IAzureLiveDataProvider _liveDataProvider;
     private readonly IConnectionProvider _connectionProvider;
-    private readonly ISavedSearchesSource<IQuery> _queryRepository;
+    private readonly ISavedSearchesSource<IQuerySearch> _queryRepository;
 
     public AzureDataQueryManager(
         DataStore dataStore,
         IAccountProvider accountProvider,
         IAzureLiveDataProvider liveDataProvider,
         IConnectionProvider connectionProvider,
-        ISavedSearchesSource<IQuery> queryRepository)
+        ISavedSearchesSource<IQuerySearch> queryRepository)
     {
         _dataStore = dataStore;
         _accountProvider = accountProvider;
@@ -49,7 +49,7 @@ public class AzureDataQueryManager
         }
     }
 
-    public Query? GetDataForSearch(IQuery query)
+    public Query? GetDataForSearch(IQuerySearch query)
     {
         ValidateDataStore();
         var account = _accountProvider.GetDefaultAccount();
@@ -57,7 +57,7 @@ public class AzureDataQueryManager
         return Query.Get(_dataStore, azureUri.Query, account.Username);
     }
 
-    public bool IsNewOrStale(IQuery query, TimeSpan refreshCooldown)
+    public bool IsNewOrStale(IQuerySearch query, TimeSpan refreshCooldown)
     {
         var dsQuery = GetDataForSearch(query);
         return dsQuery == null || DateTime.UtcNow - dsQuery.UpdatedAt > refreshCooldown;
@@ -65,17 +65,27 @@ public class AzureDataQueryManager
 
     public bool IsNewOrStale(DataUpdateParameters parameters, TimeSpan refreshCooldown)
     {
-        return IsNewOrStale((parameters.UpdateObject as IQuery)!, refreshCooldown);
+        return IsNewOrStale((parameters.UpdateObject as IQuerySearch)!, refreshCooldown);
     }
 
-    public IEnumerable<WorkItem> GetDataObjects(IQuery query)
+    public IEnumerable<WorkItem> GetDataObjects(IQuerySearch query)
     {
         ValidateDataStore();
         var dsQuery = GetDataForSearch(query);
         return dsQuery != null ? WorkItem.GetForQuery(_dataStore, dsQuery) : [];
     }
 
-    public async Task UpdateQueryAsync(IQuery query, CancellationToken cancellationToken)
+    public object? GetDataForSearch(IAzureSearch search)
+    {
+        return GetDataForSearch(search as IQuerySearch ?? throw new InvalidOperationException("Invalid search type"));
+    }
+
+    public IEnumerable<object> GetDataObjects(IAzureSearch search)
+    {
+        return GetDataObjects(search as IQuerySearch ?? throw new InvalidOperationException("Invalid search type"));
+    }
+
+    public async Task UpdateQueryAsync(IQuerySearch query, CancellationToken cancellationToken)
     {
         var azureUri = new AzureUri(query.Url);
 
@@ -195,6 +205,6 @@ public class AzureDataQueryManager
             return;
         }
 
-        await UpdateQueryAsync((parameters.UpdateObject as IQuery)!, parameters.CancellationToken.GetValueOrDefault());
+        await UpdateQueryAsync((parameters.UpdateObject as IQuerySearch)!, parameters.CancellationToken.GetValueOrDefault());
     }
 }

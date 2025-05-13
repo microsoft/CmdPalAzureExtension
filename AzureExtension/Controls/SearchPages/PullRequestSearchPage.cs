@@ -11,11 +11,8 @@ namespace AzureExtension.Controls.Pages;
 public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
 {
     private readonly IPullRequestSearch _search;
-
     private readonly IResources _resources;
-
     private readonly ILiveDataProvider _dataProvider;
-
     private readonly TimeSpanHelper _timeSpanHelper;
 
     public PullRequestSearchPage(IPullRequestSearch search, IResources resources, ILiveDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
@@ -91,6 +88,6 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
 
     protected override Task<IEnumerable<IPullRequest>> LoadContentData()
     {
-        return _dataProvider.GetPullRequests(_search);
+        return _dataProvider.GetContentData<IPullRequest>(_search);
     }
 }

@@ -7,73 +7,35 @@ using AzureExtension.Controls.Pages;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Query = AzureExtension.Controls.Query;
 
 namespace AzureExtension;
 
-public partial class SavedQueriesPage : ListPage
+public partial class SavedQueriesPage : SavedSearchesPage
 {
     private readonly IListItem _addQueryListItem;
     private readonly IResources _resources;
-    private readonly SavedAzureSearchesMediator _savedQueriesMediator;
-    private readonly ISavedSearchesProvider<IQuery> _queryRepository;
+    private readonly ISavedSearchesProvider<IQuerySearch> _queryRepository;
     private readonly ISearchPageFactory _searchPageFactory;
+
+    protected override SearchUpdatedType SearchUpdatedType => SearchUpdatedType.Query;
+
+    protected override string ExceptionMessage => _resources.GetResource("Pages_SavedQueries_Error");
 
     public SavedQueriesPage(
        IResources resources,
        IListItem addQueryListItem,
-       SavedAzureSearchesMediator savedQueriesMediator,
-       ISavedSearchesProvider<IQuery> queryRepository,
+       SavedAzureSearchesMediator mediator,
+       ISavedSearchesProvider<IQuerySearch> queryRepository,
        ISearchPageFactory searchPageFactory)
+        : base(mediator)
     {
         _resources = resources;
         Title = _resources.GetResource("Pages_SavedQueries");
         Name = _resources.GetResource("Pages_SavedQueries"); // Title is for the Page, Name is for the command
         Icon = IconLoader.GetIcon("QueryList");
-        _savedQueriesMediator = savedQueriesMediator;
-        _savedQueriesMediator.QueryRemoved += OnQueryRemoved;
-        _savedQueriesMediator.QueryRemoving += OnQueryRemoving;
         _addQueryListItem = addQueryListItem;
-        _savedQueriesMediator.QuerySaved += OnQuerySaved;
         _queryRepository = queryRepository;
         _searchPageFactory = searchPageFactory;
-    }
-
-    private void OnQueryRemoved(object? sender, object? args)
-    {
-        IsLoading = false;
-
-        if (args is Exception e)
-        {
-            var toast = new ToastStatusMessage(new StatusMessage()
-            {
-                Message = $"{_resources.GetResource("Pages_SavedQueries_Error")} {e.Message}",
-                State = MessageState.Error,
-            });
-
-            toast.Show();
-        }
-        else if (args != null && args is IQuery query)
-        {
-            RaiseItemsChanged(0);
-
-            // no toast yet
-        }
-        else if (args is false)
-        {
-            var toast = new ToastStatusMessage(new StatusMessage()
-            {
-                Message = _resources.GetResource("Pages_SavedQueries_Failure"),
-                State = MessageState.Error,
-            });
-
-            toast.Show();
-        }
-    }
-
-    private void OnQueryRemoving(object? sender, object? e)
-    {
-        IsLoading = true;
     }
 
     public override IListItem[] GetItems()
@@ -98,7 +60,7 @@ public partial class SavedQueriesPage : ListPage
     {
         IsLoading = false;
 
-        if (args != null && args is Query query)
+        if (args != null && args is IQuerySearch)
         {
             RaiseItemsChanged(0);
         }

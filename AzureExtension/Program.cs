@@ -148,7 +148,7 @@ public sealed class Program
 
         var queryRepository = new QueryRepository(persistentDataStore, azureValidator);
         var pullRequestSearchRepository = new PullRequestSearchRepository(persistentDataStore, azureValidator);
-        var pipelineDefinitionRepository = new DefinitionSearchRepository(persistentDataStore, azureValidator, azureLiveDataProvider, azureClientProvider, pipelineProvider, accountProvider);
+        var pipelineDefinitionRepository = new DefinitionSearchRepository(persistentDataStore, azureValidator);
 
         var queryManager = new AzureDataQueryManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, queryRepository);
         var pullRequestSearchManager = new AzureDataPullRequestSearchManager(cacheDataStore, accountProvider, azureLiveDataProvider, azureClientProvider, pullRequestSearchRepository);
@@ -164,7 +164,22 @@ public sealed class Program
 
         var azureDataManager = new AzureDataManager(cacheDataStore, updatersDictionary);
         using var cacheManager = new CacheManager(azureDataManager);
-        var dataProvider = new LiveDataProvider(cacheManager, queryManager, pullRequestSearchManager, pipelineProvider);
+
+        var contentProvidersDictionary = new Dictionary<Type, IContentDataProvider>
+        {
+            { typeof(IQuerySearch), queryManager },
+            { typeof(IPullRequestSearch), pullRequestSearchManager },
+            { typeof(IPipelineDefinitionSearch), pipelineProvider },
+        };
+
+        var searchDataProvidersDictionary = new Dictionary<Type, ISearchDataProvider>
+        {
+            { typeof(IQuerySearch), queryManager },
+            { typeof(IPullRequestSearch), pullRequestSearchManager },
+            { typeof(IPipelineDefinitionSearch), pipelineProvider },
+        };
+
+        var dataProvider = new LiveDataProvider(cacheManager, contentProvidersDictionary, searchDataProvidersDictionary);
 
         var path = ResourceLoader.GetDefaultResourceFilePath();
         var resourceLoader = new ResourceLoader(path);
@@ -184,10 +199,11 @@ public sealed class Program
 
         var azureSearchRepositories = new Dictionary<Type, IAzureSearchRepository>
         {
-            { typeof(IQuery), new AzureSearchRepositoryAdapter<IQuery>(queryRepository, queryRepository) },
+            { typeof(IQuerySearch), new AzureSearchRepositoryAdapter<IQuerySearch>(queryRepository, queryRepository) },
             { typeof(IPullRequestSearch), new AzureSearchRepositoryAdapter<IPullRequestSearch>(pullRequestSearchRepository, pullRequestSearchRepository) },
             { typeof(IPipelineDefinitionSearch), new AzureSearchRepositoryAdapter<IPipelineDefinitionSearch>(pipelineDefinitionRepository, pipelineDefinitionRepository) },
         };
+
         var searchPageFactory = new SearchPageFactory(resources, dataProvider, savedAzureSearchesMediator, accountProvider, azureClientHelpers, azureSearchRepositories, queryRepository, pullRequestSearchRepository, pipelineDefinitionRepository);
 
         var addQueryForm = new SaveQueryForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, queryRepository);

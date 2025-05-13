@@ -6,31 +6,32 @@ using AzureExtension.Client;
 
 namespace AzureExtension.Controls;
 
-public class Query : IQuerySearch
+public class PullRequestSearchCandidate : IPullRequestSearch
 {
-    public AzureUri AzureUri { get; set; }
-
     public string Name { get; set; } = string.Empty;
 
     public string Url => AzureUri.OriginalString;
 
-    public string Description { get; set; } = string.Empty;
+    public AzureUri AzureUri { get; set; }
+
+    public string View { get; set; } = string.Empty;
+
+    public string PullRequestUrl { get; set; } = string.Empty;
 
     public bool IsTopLevel { get; set; }
 
-    public Query()
+    public PullRequestSearchCandidate()
     {
         AzureUri = new AzureUri();
         Name = string.Empty;
-        Description = string.Empty;
-        IsTopLevel = false;
     }
 
-    public Query(AzureUri azureUri, string name, string description, bool isTopLevel)
+    public PullRequestSearchCandidate(AzureUri azureUri, string title, string view, bool isTopLevel)
     {
         AzureUri = azureUri;
-        Name = name;
-        Description = description;
+        Name = title;
+        View = view;
+        PullRequestUrl = azureUri.Uri.ToString();
         IsTopLevel = isTopLevel;
     }
 }

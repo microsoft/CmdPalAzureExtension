@@ -4,7 +4,7 @@
 
 namespace AzureExtension.Controls;
 
-public interface IPipelineDefinitionSearch : IAzureSearch
+public interface IQuerySearch : IAzureSearch
 {
-    long InternalId { get; set; } // This is the ID of the definition in Azure DevOps
+    // currently, there are no unique IQuery properties
 }

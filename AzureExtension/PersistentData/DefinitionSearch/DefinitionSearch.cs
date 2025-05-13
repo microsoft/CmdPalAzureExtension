@@ -19,7 +19,7 @@ public class DefinitionSearch : IPipelineDefinitionSearch
 
     public long InternalId { get; set; } = DataStore.NoForeignKey;
 
-    public string ProjectUrl { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
 
     public bool IsTopLevel { get; set; }
 
@@ -29,41 +29,38 @@ public class DefinitionSearch : IPipelineDefinitionSearch
     {
         get
         {
-            return new AzureUri(ProjectUrl);
+            return new AzureUri(Url);
         }
     }
 
     [Write(false)]
     public string Name => InternalId.ToStringInvariant();
 
-    [Write(false)]
-    public string Url => ProjectUrl;
-
-    public static DefinitionSearch? Get(DataStore dataStore, long internalId, string projectUrl)
+    public static DefinitionSearch? Get(DataStore dataStore, long internalId, string url)
     {
-        var sql = "SELECT * FROM DefinitionSearch WHERE InternalId = @InternalId AND ProjectUrl = @ProjectUrl";
-        var definitionSearch = dataStore.Connection.QueryFirstOrDefault<DefinitionSearch>(sql, new { InternalId = internalId, ProjectUrl = projectUrl });
+        var sql = "SELECT * FROM DefinitionSearch WHERE InternalId = @InternalId AND Url = @Url";
+        var definitionSearch = dataStore.Connection.QueryFirstOrDefault<DefinitionSearch>(sql, new { InternalId = internalId, Url = url });
         return definitionSearch;
     }
 
-    public static DefinitionSearch Add(DataStore dataStore, long internalId, string projectUrl)
+    public static DefinitionSearch Add(DataStore dataStore, long internalId, string url)
     {
         var definitionSearch = new DefinitionSearch
         {
             InternalId = internalId,
-            ProjectUrl = projectUrl,
+            Url = url,
         };
         dataStore.Connection.Insert(definitionSearch);
         return definitionSearch;
     }
 
-    public static void Remove(DataStore dataStore, long internalId, string projectUrl)
+    public static void Remove(DataStore dataStore, long internalId, string url)
     {
-        var sql = "DELETE FROM DefinitionSearch WHERE InternalId = @InternalId AND ProjectUrl = @ProjectUrl";
+        var sql = "DELETE FROM DefinitionSearch WHERE InternalId = @InternalId AND Url = @Url";
         var command = dataStore.Connection!.CreateCommand();
         command.CommandText = sql;
         command.Parameters.AddWithValue("@InternalId", internalId);
-        command.Parameters.AddWithValue("@ProjectUrl", projectUrl);
+        command.Parameters.AddWithValue("@Url", url);
         var deleted = command.ExecuteNonQuery();
     }
 
@@ -81,10 +78,10 @@ public class DefinitionSearch : IPipelineDefinitionSearch
         return definitionSearches;
     }
 
-    public static void AddOrUpdate(DataStore dataStore, long internalId, string projectUrl, bool isTopLevel)
+    public static void AddOrUpdate(DataStore dataStore, long internalId, string url, bool isTopLevel)
     {
-        var definitionSearch = Get(dataStore, internalId, projectUrl);
-        definitionSearch ??= Add(dataStore, internalId, projectUrl);
+        var definitionSearch = Get(dataStore, internalId, url);
+        definitionSearch ??= Add(dataStore, internalId, url);
         definitionSearch.IsTopLevel = isTopLevel;
         dataStore.Connection.Update(definitionSearch);
     }

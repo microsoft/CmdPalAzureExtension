@@ -4,7 +4,11 @@
 
 namespace AzureExtension.Controls;
 
-public interface IPipelineDefinitionSearch : IAzureSearch
+public interface IAzureSearch
 {
-    long InternalId { get; set; } // This is the ID of the definition in Azure DevOps
+    string Name { get; }
+
+    string Url { get; }
+
+    bool IsTopLevel { get; }
 }

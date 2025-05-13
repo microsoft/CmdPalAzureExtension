@@ -4,11 +4,7 @@
 
 using AzureExtension.Controls;
 using AzureExtension.DataManager.Cache;
-using AzureExtension.DataModel;
 using Serilog;
-using PullRequestSearch = AzureExtension.DataModel.PullRequestSearch;
-using Query = AzureExtension.DataModel.Query;
-using WorkItem = AzureExtension.DataModel.WorkItem;
 
 namespace AzureExtension.DataManager;
 
@@ -17,9 +13,8 @@ public class LiveDataProvider : ILiveDataProvider
     private readonly ILogger _log;
 
     private readonly ICacheManager _cacheManager;
-    private readonly IDataProvider<IQuery, Query, WorkItem> _queryProvider;
-    private readonly IDataProvider<IPullRequestSearch, PullRequestSearch, PullRequest> _pullRequestSearchProvider;
-    private readonly IDataProvider<IPipelineDefinitionSearch, Definition, Build> _pipelineProvider;
+    private readonly IDictionary<Type, IContentDataProvider> _contentProvidersDictionary;
+    private readonly IDictionary<Type, ISearchDataProvider> _searchDataProvidersDictionary;
 
     private CacheManagerUpdateEventHandler? _onUpdate;
 
@@ -29,17 +24,12 @@ public class LiveDataProvider : ILiveDataProvider
         remove => _onUpdate -= value;
     }
 
-    public LiveDataProvider(
-        ICacheManager cacheManager,
-        IDataProvider<IQuery, Query, WorkItem> queryProvider,
-        IDataProvider<IPullRequestSearch, PullRequestSearch, PullRequest> pullRequestSearchProvider,
-        IDataProvider<IPipelineDefinitionSearch, Definition, Build> pipelineProvider)
+    public LiveDataProvider(ICacheManager cacheManager, IDictionary<Type, IContentDataProvider> providersDictionary, IDictionary<Type, ISearchDataProvider> searchDataProvidersDictionary)
     {
         _log = Log.ForContext("SourceContext", nameof(ILiveDataProvider));
         _cacheManager = cacheManager;
-        _queryProvider = queryProvider;
-        _pullRequestSearchProvider = pullRequestSearchProvider;
-        _pipelineProvider = pipelineProvider;
+        _contentProvidersDictionary = providersDictionary;
+        _searchDataProvidersDictionary = searchDataProvidersDictionary;
 
         _cacheManager.OnUpdate += OnCacheManagerUpdate;
     }
@@ -78,57 +68,45 @@ public class LiveDataProvider : ILiveDataProvider
         }
     }
 
-    public async Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query)
+    private DataUpdateType GetUpdateTypeForSearch(IAzureSearch search)
     {
-        var parameters = new DataUpdateParameters
+        return search switch
         {
-            UpdateType = DataUpdateType.Query,
-            UpdateObject = query,
+            IQuerySearch => DataUpdateType.Query,
+            IPullRequestSearch => DataUpdateType.PullRequests,
+            IPipelineDefinitionSearch => DataUpdateType.Pipeline,
+            _ => throw new NotSupportedException($"No provider found for {search.GetType()}"),
         };
-
-        var dsQuery = _queryProvider.GetDataForSearch(query);
-        await WaitForLoadingDataIfNull(dsQuery, parameters);
-
-        return _queryProvider.GetDataObjects(query);
     }
 
-    public async Task<IEnumerable<IPullRequest>> GetPullRequests(IPullRequestSearch pullRequestSearch)
+    public async Task<IEnumerable<TContentDataType>> GetContentData<TContentDataType>(IAzureSearch search)
     {
-        var parameters = new DataUpdateParameters
+        var searchType = search.GetSearchType();
+
+        var contentProvider = _contentProvidersDictionary[searchType];
+        var searchDataProvider = _searchDataProvidersDictionary[searchType];
+
+        var searchDataObject = searchDataProvider.GetDataForSearch(search);
+        await WaitForLoadingDataIfNull(searchDataObject, new DataUpdateParameters
         {
-            UpdateType = DataUpdateType.PullRequests,
-            UpdateObject = pullRequestSearch,
-        };
-
-        var dsPullRequestSearch = _pullRequestSearchProvider.GetDataForSearch(pullRequestSearch);
-        await WaitForLoadingDataIfNull(dsPullRequestSearch, parameters);
-
-        return _pullRequestSearchProvider.GetDataObjects(pullRequestSearch);
+            UpdateType = GetUpdateTypeForSearch(search),
+            UpdateObject = search,
+        });
+        return contentProvider.GetDataObjects(search).Cast<TContentDataType>();
     }
 
-    public async Task<IEnumerable<IBuild>> GetBuilds(IPipelineDefinitionSearch definitionSearch)
+    public async Task<TSearchDataType> GetSearchData<TSearchDataType>(IAzureSearch search)
     {
-        var parameters = new DataUpdateParameters
+        var searchType = search.GetSearchType();
+
+        var searchDataProvider = _searchDataProvidersDictionary[searchType];
+
+        var searchDataObject = searchDataProvider.GetDataForSearch(search);
+        await WaitForLoadingDataIfNull(searchDataObject, new DataUpdateParameters
         {
-            UpdateType = DataUpdateType.Pipeline,
-            UpdateObject = definitionSearch,
-        };
-
-        var dsDefinition = _pipelineProvider.GetDataForSearch(definitionSearch);
-        await WaitForLoadingDataIfNull(dsDefinition, parameters);
-        return _pipelineProvider.GetDataObjects(definitionSearch);
-    }
-
-    public async Task<IDefinition> GetDefinition(IPipelineDefinitionSearch definitionSearch)
-    {
-        var parameters = new DataUpdateParameters
-        {
-            UpdateType = DataUpdateType.Pipeline,
-            UpdateObject = definitionSearch,
-        };
-
-        var dsDefinition = _pipelineProvider.GetDataForSearch(definitionSearch);
-        await WaitForLoadingDataIfNull(dsDefinition, parameters);
-        return _pipelineProvider.GetDataForSearch(definitionSearch)!;
+            UpdateType = GetUpdateTypeForSearch(search),
+            UpdateObject = search,
+        });
+        return (TSearchDataType)searchDataProvider.GetDataForSearch(search)!;
     }
 }

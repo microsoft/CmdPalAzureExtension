@@ -52,7 +52,7 @@ public class CacheTests
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 
-        var stubQuery = new Mock<IQuery>();
+        var stubQuery = new Mock<IQuerySearch>();
 
         await cacheManager.Refresh(new DataUpdateParameters() { UpdateType = DataUpdateType.Query, UpdateObject = stubQuery.Object });
 
@@ -73,7 +73,7 @@ public class CacheTests
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 
-        var stubQuery = new Mock<IQuery>();
+        var stubQuery = new Mock<IQuerySearch>();
         await cacheManager.Refresh(new DataUpdateParameters() { UpdateType = DataUpdateType.Query, UpdateObject = stubQuery.Object });
 
         Assert.AreEqual(cacheManager.RefreshingState, cacheManager.State);
@@ -94,7 +94,7 @@ public class CacheTests
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 
-        var stubQuery = new Mock<IQuery>();
+        var stubQuery = new Mock<IQuerySearch>();
         stubQuery.SetupGet(x => x.Name).Returns("Query 1");
         stubQuery.SetupGet(x => x.Url).Returns("testUrl");
 
@@ -120,10 +120,10 @@ public class CacheTests
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 
-        var stubQuery1 = new Mock<IQuery>();
+        var stubQuery1 = new Mock<IQuerySearch>();
         stubQuery1.SetupGet(x => x.Name).Returns("Query 1");
         stubQuery1.SetupGet(x => x.Url).Returns("testUrl1");
-        var stubQuery2 = new Mock<IQuery>();
+        var stubQuery2 = new Mock<IQuerySearch>();
         stubQuery2.SetupGet(x => x.Name).Returns("Query 2");
         stubQuery2.SetupGet(x => x.Url).Returns("testUrl2");
 
@@ -161,7 +161,7 @@ public class CacheTests
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 
-        var stubQuery = new Mock<IQuery>();
+        var stubQuery = new Mock<IQuerySearch>();
         stubQuery.SetupGet(x => x.Name).Returns("Query 1");
         stubQuery.SetupGet(x => x.Url).Returns("testUrl");
 
@@ -198,7 +198,7 @@ public class CacheTests
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 
-        var stubQuery = new Mock<IQuery>();
+        var stubQuery = new Mock<IQuerySearch>();
         stubQuery.SetupGet(x => x.Name).Returns("Query 1");
         stubQuery.SetupGet(x => x.Url).Returns("testUrl");
 

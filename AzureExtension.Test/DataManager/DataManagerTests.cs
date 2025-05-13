@@ -81,7 +81,7 @@ public class DataManagerTests
         var mockAccountProvider = new Mock<IAccountProvider>();
         var mockLiveDataProvider = new Mock<IAzureLiveDataProvider>();
         var mockConnectionProvider = new Mock<IConnectionProvider>();
-        var mockQueryRepository = new Mock<ISavedSearchesSource<IQuery>>();
+        var mockQueryRepository = new Mock<ISavedSearchesSource<IQuerySearch>>();
         var queryManager = new AzureDataQueryManager(dataStore, mockAccountProvider.Object, mockLiveDataProvider.Object, mockConnectionProvider.Object, mockQueryRepository.Object);
 
         var mockVssConnection = new Mock<IVssConnection>();
@@ -151,7 +151,7 @@ public class DataManagerTests
                 Value = Array.Empty<byte>(),
             });
 
-        var testQuery = new Mock<IQuery>();
+        var testQuery = new Mock<IQuerySearch>();
         testQuery.SetupGet(q => q.Url).Returns("https://dev.azure.com/organization/project/_queries/query/12345678-1234-1234-1234-1234567890ab");
         testQuery.SetupGet(q => q.Name).Returns("Test Query");
 

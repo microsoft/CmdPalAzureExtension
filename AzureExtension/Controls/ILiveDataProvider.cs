@@ -8,13 +8,9 @@ namespace AzureExtension.Controls;
 
 public interface ILiveDataProvider
 {
-    Task<IEnumerable<IWorkItem>> GetWorkItems(IQuery query);
+    Task<IEnumerable<TContentDataType>> GetContentData<TContentDataType>(IAzureSearch search);
 
-    Task<IEnumerable<IPullRequest>> GetPullRequests(IPullRequestSearch pullRequestSearch);
-
-    Task<IEnumerable<IBuild>> GetBuilds(IPipelineDefinitionSearch definitionSearch);
-
-    Task<IDefinition> GetDefinition(IPipelineDefinitionSearch definitionSearch);
+    Task<TSearchDataType> GetSearchData<TSearchDataType>(IAzureSearch search);
 
     event CacheManagerUpdateEventHandler? OnUpdate;
 }

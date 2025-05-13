@@ -57,14 +57,9 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _savedPipelineSearchesPage = savedPipelineSearchesPage;
         DisplayName = "Azure Extension"; // hard-coded because it's a product title
 
-        _savedSearchesMediator.QuerySaved += OnSearchUpdated;
-        _savedSearchesMediator.QueryRemoved += OnSearchUpdated;
-        _savedSearchesMediator.PullRequestSearchSaved += OnSearchUpdated;
-        _savedSearchesMediator.PullRequestSearchRemoved += OnSearchUpdated;
+        _savedSearchesMediator.SearchUpdated += OnSearchUpdated;
         _authenticationMediator.SignInAction += OnSignInStatusChanged;
         _authenticationMediator.SignOutAction += OnSignInStatusChanged;
-        _savedSearchesMediator.PipelineSearchSaved += OnSearchUpdated;
-        _savedSearchesMediator.PipelineSearchRemoved += OnSearchUpdated;
     }
 
     private void OnSignInStatusChanged(object? sender, SignInStatusChangedEventArgs e)
@@ -72,9 +67,9 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         RaiseItemsChanged();
     }
 
-    private void OnSearchUpdated(object? sender, object? args)
+    private void OnSearchUpdated(object? sender, SearchUpdatedEventArgs args)
     {
-        if (args is IQuery || args is IPullRequestSearch || args is IPipelineDefinitionSearch)
+        if (args.Exception == null)
         {
             RaiseItemsChanged();
         }

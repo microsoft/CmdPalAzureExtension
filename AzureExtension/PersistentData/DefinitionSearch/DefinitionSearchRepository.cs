@@ -20,25 +20,13 @@ public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefini
 
     private readonly IAzureValidator _azureValidator;
     private readonly DataStore _dataStore;
-    private readonly IAzureLiveDataProvider _liveDataProvider;
-    private readonly IConnectionProvider _connectionProvider;
-    private readonly IDataProvider<IPipelineDefinitionSearch, DataModel.Definition, Build> _pipelineProvider;
-    private readonly IAccountProvider _accountProvider;
 
     public DefinitionSearchRepository(
         DataStore dataStore,
-        IAzureValidator azureValidator,
-        IAzureLiveDataProvider liveDataProvider,
-        IConnectionProvider connectionProvider,
-        IDataProvider<IPipelineDefinitionSearch, DataModel.Definition, Build> pipelineProvider,
-        IAccountProvider accountProvider)
+        IAzureValidator azureValidator)
     {
         _azureValidator = azureValidator;
         _dataStore = dataStore;
-        _liveDataProvider = liveDataProvider;
-        _connectionProvider = connectionProvider;
-        _pipelineProvider = pipelineProvider;
-        _accountProvider = accountProvider;
     }
 
     private void ValidateDataStore()
@@ -63,13 +51,13 @@ public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefini
     public bool IsTopLevel(IPipelineDefinitionSearch definitionSearch)
     {
         ValidateDataStore();
-        var dsDefinitionSearch = DefinitionSearch.Get(_dataStore, definitionSearch.InternalId, definitionSearch.ProjectUrl);
+        var dsDefinitionSearch = DefinitionSearch.Get(_dataStore, definitionSearch.InternalId, definitionSearch.Url);
         return dsDefinitionSearch != null && dsDefinitionSearch.IsTopLevel;
     }
 
     public Task ValidateDefinitionSearch(IPipelineDefinitionSearch definitionSearch, IAccount account)
     {
-        return _azureValidator.GetDefinitionInfo(definitionSearch.ProjectUrl, definitionSearch.InternalId, account);
+        return _azureValidator.GetDefinitionInfo(definitionSearch.Url, definitionSearch.InternalId, account);
     }
 
     public Task Validate(IPipelineDefinitionSearch search, IAccount account)
@@ -81,28 +69,28 @@ public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefini
     {
         ValidateDataStore();
         ValidateDefinitionSearch(definitionSearch, account).Wait();
-        DefinitionSearch.AddOrUpdate(_dataStore, definitionSearch.InternalId, definitionSearch.ProjectUrl, isTopLevel);
+        DefinitionSearch.AddOrUpdate(_dataStore, definitionSearch.InternalId, definitionSearch.Url, isTopLevel);
     }
 
     public void RemoveSavedSearch(IPipelineDefinitionSearch dataSearch)
     {
         ValidateDataStore();
         var internalId = dataSearch.InternalId;
-        var projectUrl = dataSearch.ProjectUrl;
+        var url = dataSearch.Url;
 
-        _log.Information($"Removing definition search: {internalId} - {projectUrl}.");
-        if (DefinitionSearch.Get(_dataStore, internalId, projectUrl) == null)
+        _log.Information($"Removing definition search: {internalId} - {url}.");
+        if (DefinitionSearch.Get(_dataStore, internalId, url) == null)
         {
-            throw new InvalidOperationException($"Definition search {internalId} - {projectUrl} not found.");
+            throw new InvalidOperationException($"Definition search {internalId} - {url} not found.");
         }
 
-        DefinitionSearch.Remove(_dataStore, internalId, projectUrl);
+        DefinitionSearch.Remove(_dataStore, internalId, url);
     }
 
     public void AddOrUpdateSearch(IPipelineDefinitionSearch dataSearch, bool isTopLevel)
     {
         ValidateDataStore();
-        DefinitionSearch.AddOrUpdate(_dataStore, dataSearch.InternalId, dataSearch.ProjectUrl, isTopLevel);
+        DefinitionSearch.AddOrUpdate(_dataStore, dataSearch.InternalId, dataSearch.Url, isTopLevel);
     }
 
     public IEnumerable<IPipelineDefinitionSearch> GetSavedSearches()

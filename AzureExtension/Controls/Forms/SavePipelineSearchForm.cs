@@ -2,35 +2,24 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls.DataTransfer;
 using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
-using Serilog;
 
 namespace AzureExtension.Controls.Forms;
 
-public class SavePipelineSearchForm : AzureForm, IAzureForm
+public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
 {
     private readonly IResources _resources;
-    private readonly ISavedSearchesUpdater<IPipelineDefinitionSearch> _definitionRepository;
-    private readonly SavedAzureSearchesMediator _mediator;
-    private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
-    private IPipelineDefinitionSearch? _savedDefinitionSearch;
+    private readonly IAccountProvider _accountProvider;
 
-    public event EventHandler<bool>? LoadingStateChanged;
-
-    public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
-
-    private string IsTopLevelChecked => GetIsTopLevel().ToString().ToLower(CultureInfo.InvariantCulture);
-
-    public Dictionary<string, string> TemplateSubstitutions => new Dictionary<string, string>
+    public override Dictionary<string, string> TemplateSubstitutions => new()
     {
-        { "{{SavePipelineSearchFormTitle}}", !string.IsNullOrEmpty(_savedDefinitionSearch?.ProjectUrl) ? _resources.GetResource("Forms_Edit_PipelineSearch") : _resources.GetResource("Forms_Save_PipelineSearch") },
-        { "{{SavedPipelineSearchString}}", !string.IsNullOrEmpty(_savedDefinitionSearch?.ProjectUrl) ? _savedDefinitionSearch!.ProjectUrl : string.Empty }, // pipeline URL
+        { "{{SavePipelineSearchFormTitle}}", !string.IsNullOrEmpty(SavedSearch?.Url) ? _resources.GetResource("Forms_Edit_PipelineSearch") : _resources.GetResource("Forms_Save_PipelineSearch") },
+        { "{{SavedPipelineSearchString}}", !string.IsNullOrEmpty(SavedSearch?.Url) ? SavedSearch!.Url : string.Empty }, // pipeline URL
         { "{{EnteredPipelineSearchErrorMessage}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchError") },
         { "{{EnteredPipelineSearchLabel}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchLabel") },
         { "{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}", _resources.GetResource("Forms_SavePipelineSearch_URLPlaceholderSuffix") },
@@ -46,61 +35,17 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers)
+        : base(definitionSearch, definitionRepository, mediator, accountProvider)
     {
-        _savedDefinitionSearch = definitionSearch;
         _resources = resources;
-        _definitionRepository = definitionRepository;
-        _mediator = mediator;
-        _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
+        _accountProvider = accountProvider;
         TemplateKey = "SavePipelineSearch";
-    }
-
-    public override string TemplateJson => TemplateHelper.LoadTemplateJsonFromTemplateName(TemplateKey, TemplateSubstitutions);
-
-    public override async Task HandleInputs(string inputs)
-    {
-        LoadingStateChanged?.Invoke(this, true);
-
-        try
-        {
-            var payloadJson = JsonNode.Parse(inputs) ?? throw new InvalidOperationException("No search found");
-
-            var pipelineSearch = CreatePipelineSearchFromJson(payloadJson);
-
-            await _definitionRepository.Validate(pipelineSearch, _accountProvider.GetDefaultAccount());
-
-            // if editing the search, delete the old one
-            // it is safe to do as the new one is already validated
-            if (!string.IsNullOrEmpty(_savedDefinitionSearch?.ProjectUrl))
-            {
-                Log.Information($"Removing outdated search {_savedDefinitionSearch!.InternalId}");
-
-                _definitionRepository.RemoveSavedSearch(_savedDefinitionSearch!);
-            }
-
-            LoadingStateChanged?.Invoke(this, false);
-            _definitionRepository.AddOrUpdateSearch(pipelineSearch, pipelineSearch.IsTopLevel);
-            _mediator.AddPipelineSearch(pipelineSearch);
-
-            if (_savedDefinitionSearch != null)
-            {
-                _savedDefinitionSearch = pipelineSearch;
-            }
-
-            FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
-        }
-        catch (Exception ex)
-        {
-            LoadingStateChanged?.Invoke(this, false);
-            _mediator.AddPipelineSearch(ex);
-            FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
-        }
     }
 
     // Creates a DefinitionSearch based on a URL in the following format
     // https://dev.azure.com/microsoft/project/_build?definitionId=definitionId
-    public DefinitionSearch CreatePipelineSearchFromJson(JsonNode? jsonNode)
+    protected override IPipelineDefinitionSearch CreateSearchFromJson(JsonNode jsonNode)
     {
         var definitionUrl = jsonNode?["EnteredPipelineSearch"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
@@ -111,15 +56,14 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
 
         if (definitionInfo.Result != ResultType.Success)
         {
-            var error = definitionInfo.Error;
             throw new InvalidOperationException($"Failed to get query info {definitionInfo.Error}: {definitionInfo.ErrorMessage}");
         }
 
         var uri = definitionInfo.AzureUri;
-        return new DefinitionSearch
+        return new PipelineDefinitionSearchCandidate
         {
             InternalId = definitionId,
-            ProjectUrl = uri.ToString(),
+            Url = uri.ToString(),
             IsTopLevel = isTopLevel,
         };
     }
@@ -148,15 +92,5 @@ public class SavePipelineSearchForm : AzureForm, IAzureForm
         {
             throw new InvalidOperationException("Failed to parse definitionId from the URL.", ex);
         }
-    }
-
-    public bool GetIsTopLevel()
-    {
-        if (_savedDefinitionSearch == null || string.IsNullOrEmpty(_savedDefinitionSearch.ProjectUrl))
-        {
-            return false;
-        }
-
-        return _definitionRepository.IsTopLevel(_savedDefinitionSearch!);
     }
 }

@@ -5,17 +5,19 @@
 using AzureExtension.Controls.ListItems;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
-using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public class SavedPullRequestSearchesPage : ListPage
+public class SavedPullRequestSearchesPage : SavedSearchesPage
 {
     private readonly IResources _resources;
     private readonly AddPullRequestSearchListItem _addPullRequestSearchListItem;
-    private readonly SavedAzureSearchesMediator _mediator;
     private readonly ISavedSearchesProvider<IPullRequestSearch> _pullRequestSearchRepository;
     private readonly ISearchPageFactory _searchPageFactory;
+
+    protected override SearchUpdatedType SearchUpdatedType => SearchUpdatedType.PullRequest;
+
+    protected override string ExceptionMessage => _resources.GetResource("Pages_SavedPullRequestSearches_Error");
 
     public SavedPullRequestSearchesPage(
         IResources resources,
@@ -23,6 +25,7 @@ public class SavedPullRequestSearchesPage : ListPage
         SavedAzureSearchesMediator mediator,
         ISavedSearchesProvider<IPullRequestSearch> pullRequestSearchRepository,
         ISearchPageFactory searchPageFactory)
+        : base(mediator)
     {
         _resources = resources;
         Title = _resources.GetResource("Pages_SavedPullRequestSearches_Title");
@@ -30,48 +33,7 @@ public class SavedPullRequestSearchesPage : ListPage
         Icon = IconLoader.GetIcon("PullRequest");
         _pullRequestSearchRepository = pullRequestSearchRepository;
         _addPullRequestSearchListItem = addPullRequestSearchListItem;
-        _mediator = mediator;
-        _mediator.PullRequestSearchRemoved += OnPullRequestSearchRemoved;
-        _mediator.PullRequestSearchRemoving += OnPullRequestSearchRemoving;
-        _mediator.PullRequestSearchSaved += OnPullRequestSearchSaved;
         _searchPageFactory = searchPageFactory;
-    }
-
-    private void OnPullRequestSearchRemoved(object? sender, object? args)
-    {
-        IsLoading = false;
-
-        if (args is Exception e)
-        {
-            var toast = new ToastStatusMessage(new StatusMessage()
-            {
-                Message = $"{_resources.GetResource("Pages_SavedPullRequestSearches_Error")} {e.Message}",
-                State = MessageState.Error,
-            });
-
-            toast.Show();
-        }
-        else if (args != null && args is IPullRequestSearch search)
-        {
-            RaiseItemsChanged(0);
-
-            // no toast yet
-        }
-        else if (args is false)
-        {
-            var toast = new ToastStatusMessage(new StatusMessage()
-            {
-                Message = _resources.GetResource("Pages_SavedPullRequestSearches_Failure"),
-                State = MessageState.Error,
-            });
-
-            toast.Show();
-        }
-    }
-
-    private void OnPullRequestSearchRemoving(object? sender, object? e)
-    {
-        IsLoading = true;
     }
 
     public override IListItem[] GetItems()
@@ -90,17 +52,5 @@ public class SavedPullRequestSearchesPage : ListPage
         {
             return [_addPullRequestSearchListItem];
         }
-    }
-
-    public void OnPullRequestSearchSaved(object? sender, object? args)
-    {
-        IsLoading = false;
-
-        if (args != null && args is PullRequestSearch search)
-        {
-            RaiseItemsChanged(0);
-        }
-
-        // errors are handled in SavePullRequestSearchPage
     }
 }
