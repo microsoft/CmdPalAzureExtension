@@ -40,34 +40,31 @@ public class SavedPipelineSearchesPage : ListPage
         _definitionRepository = definitionRepository;
         _addPipelineSearchListItem = addPipelineSearchListItem;
         _mediator = mediator;
-        _mediator.PipelineSearchRemoved += OnPipelineSearchRemoved;
-        _mediator.PipelineSearchRemoving += OnPipelineSearchRemoving;
-        _mediator.PipelineSearchSaved += OnPipelineSearchSaved;
         _accountProvider = accountProvider;
         _searchPageFactory = searchPageFactory;
     }
 
-    private void OnPipelineSearchRemoved(object? sender, object? args)
+    public void OnPipelineSearchRemoved(object? sender, SearchUpdatedEventArgs args)
     {
         IsLoading = false;
 
-        if (args is Exception e)
+        if (args.Exception != null)
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = $"{_resources.GetResource("Pages_SavedPipelineSearches_Error")} {e.Message}",
+                Message = $"{_resources.GetResource("Pages_SavedPipelineSearches_Error")} {args.Exception.Message}",
                 State = MessageState.Error,
             });
 
             toast.Show();
         }
-        else if (args != null && args is IPipelineDefinitionSearch search)
+        else if (args.AzureSearch is IPipelineDefinitionSearch)
         {
             RaiseItemsChanged(0);
 
             // no toast yet
         }
-        else if (args is false)
+        else if (!args.Success)
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
@@ -79,7 +76,7 @@ public class SavedPipelineSearchesPage : ListPage
         }
     }
 
-    private void OnPipelineSearchRemoving(object? sender, object? e)
+    public void OnPipelineSearchRemoving(object? sender, object? e)
     {
         IsLoading = true;
     }

@@ -57,14 +57,11 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _savedPipelineSearchesPage = savedPipelineSearchesPage;
         DisplayName = "Azure Extension"; // hard-coded because it's a product title
 
-        _savedSearchesMediator.QuerySaved += OnSearchUpdated;
-        _savedSearchesMediator.QueryRemoved += OnSearchUpdated;
-        _savedSearchesMediator.PullRequestSearchSaved += OnSearchUpdated;
-        _savedSearchesMediator.PullRequestSearchRemoved += OnSearchUpdated;
+        _savedSearchesMediator.SearchSaved += OnSearchUpdated;
+        _savedSearchesMediator.SearchRemoved += OnSearchUpdated;
+        _savedSearchesMediator.SearchRemoved += OnSearchUpdated;
         _authenticationMediator.SignInAction += OnSignInStatusChanged;
         _authenticationMediator.SignOutAction += OnSignInStatusChanged;
-        _savedSearchesMediator.PipelineSearchSaved += OnSearchUpdated;
-        _savedSearchesMediator.PipelineSearchRemoved += OnSearchUpdated;
     }
 
     private void OnSignInStatusChanged(object? sender, SignInStatusChangedEventArgs e)

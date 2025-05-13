@@ -12,7 +12,7 @@ using Serilog;
 namespace AzureExtension.DataModel;
 
 [Table("Query")]
-public class Query : IQuerySearch
+public class Query : IQuery
 {
     private static readonly Lazy<ILogger> _logger = new(() => Serilog.Log.ForContext("SourceContext", $"DataModel/{nameof(Query)}"));
 

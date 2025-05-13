@@ -36,9 +36,6 @@ public class DefinitionSearch : IPipelineDefinitionSearch
     [Write(false)]
     public string Name => InternalId.ToStringInvariant();
 
-    [Write(false)]
-    public string Url => Url;
-
     public static DefinitionSearch? Get(DataStore dataStore, long internalId, string projectUrl)
     {
         var sql = "SELECT * FROM DefinitionSearch WHERE InternalId = @InternalId AND ProjectUrl = @ProjectUrl";

@@ -31,35 +31,32 @@ public partial class SavedQueriesPage : ListPage
         Name = _resources.GetResource("Pages_SavedQueries"); // Title is for the Page, Name is for the command
         Icon = IconLoader.GetIcon("QueryList");
         _savedQueriesMediator = savedQueriesMediator;
-        _savedQueriesMediator.QueryRemoved += OnQueryRemoved;
-        _savedQueriesMediator.QueryRemoving += OnQueryRemoving;
         _addQueryListItem = addQueryListItem;
-        _savedQueriesMediator.QuerySaved += OnQuerySaved;
         _queryRepository = queryRepository;
         _searchPageFactory = searchPageFactory;
     }
 
-    private void OnQueryRemoved(object? sender, object? args)
+    public void OnQueryRemoved(object? sender, SearchUpdatedEventArgs args)
     {
         IsLoading = false;
 
-        if (args is Exception e)
+        if (args.Exception != null)
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = $"{_resources.GetResource("Pages_SavedQueries_Error")} {e.Message}",
+                Message = $"{_resources.GetResource("Pages_SavedQueries_Error")} {args.Exception.Message}",
                 State = MessageState.Error,
             });
 
             toast.Show();
         }
-        else if (args != null && args is IQuerySearch query)
+        else if (args.AzureSearch is IQuerySearch)
         {
             RaiseItemsChanged(0);
 
             // no toast yet
         }
-        else if (args is false)
+        else if (!args.Success)
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
@@ -71,7 +68,7 @@ public partial class SavedQueriesPage : ListPage
         }
     }
 
-    private void OnQueryRemoving(object? sender, object? e)
+    public void OnQueryRemoving(object? sender, object? e)
     {
         IsLoading = true;
     }

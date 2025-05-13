@@ -31,33 +31,30 @@ public class SavedPullRequestSearchesPage : ListPage
         _pullRequestSearchRepository = pullRequestSearchRepository;
         _addPullRequestSearchListItem = addPullRequestSearchListItem;
         _mediator = mediator;
-        _mediator.PullRequestSearchRemoved += OnPullRequestSearchRemoved;
-        _mediator.PullRequestSearchRemoving += OnPullRequestSearchRemoving;
-        _mediator.PullRequestSearchSaved += OnPullRequestSearchSaved;
         _searchPageFactory = searchPageFactory;
     }
 
-    private void OnPullRequestSearchRemoved(object? sender, object? args)
+    public void OnPullRequestSearchRemoved(object? sender, SearchUpdatedEventArgs args)
     {
         IsLoading = false;
 
-        if (args is Exception e)
+        if (args.Exception != null)
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
-                Message = $"{_resources.GetResource("Pages_SavedPullRequestSearches_Error")} {e.Message}",
+                Message = $"{_resources.GetResource("Pages_SavedPullRequestSearches_Error")} {args.Exception.Message}",
                 State = MessageState.Error,
             });
 
             toast.Show();
         }
-        else if (args != null && args is IPullRequestSearch search)
+        else if (args.AzureSearch is IPullRequestSearch)
         {
             RaiseItemsChanged(0);
 
             // no toast yet
         }
-        else if (args is false)
+        else if (!args.Success)
         {
             var toast = new ToastStatusMessage(new StatusMessage()
             {
@@ -69,7 +66,7 @@ public class SavedPullRequestSearchesPage : ListPage
         }
     }
 
-    private void OnPullRequestSearchRemoving(object? sender, object? e)
+    public void OnPullRequestSearchRemoving(object? sender, SearchUpdatedEventArgs args)
     {
         IsLoading = true;
     }
@@ -92,11 +89,11 @@ public class SavedPullRequestSearchesPage : ListPage
         }
     }
 
-    public void OnPullRequestSearchSaved(object? sender, object? args)
+    public void OnPullRequestSearchSaved(object? sender, SearchUpdatedEventArgs args)
     {
         IsLoading = false;
 
-        if (args != null && args is PullRequestSearchCandidate search)
+        if (args.AzureSearch is PullRequestSearchCandidate)
         {
             RaiseItemsChanged(0);
         }
