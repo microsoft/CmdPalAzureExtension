@@ -96,7 +96,7 @@ public class SavedPullRequestSearchesPage : ListPage
     {
         IsLoading = false;
 
-        if (args != null && args is PullRequestSearch search)
+        if (args != null && args is PullRequestSearchCandidate search)
         {
             RaiseItemsChanged(0);
         }
