@@ -9,13 +9,16 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public class SavedPullRequestSearchesPage : ListPage
+public class SavedPullRequestSearchesPage : SavedSearchesPage
 {
     private readonly IResources _resources;
     private readonly AddPullRequestSearchListItem _addPullRequestSearchListItem;
-    private readonly SavedAzureSearchesMediator _mediator;
     private readonly ISavedSearchesProvider<IPullRequestSearch> _pullRequestSearchRepository;
     private readonly ISearchPageFactory _searchPageFactory;
+
+    protected override SearchUpdatedType SearchUpdatedType => SearchUpdatedType.Pipeline;
+
+    protected override string ExceptionMessage => _resources.GetResource("Pages_SavedPullRequestSearches_Error");
 
     public SavedPullRequestSearchesPage(
         IResources resources,
@@ -23,6 +26,7 @@ public class SavedPullRequestSearchesPage : ListPage
         SavedAzureSearchesMediator mediator,
         ISavedSearchesProvider<IPullRequestSearch> pullRequestSearchRepository,
         ISearchPageFactory searchPageFactory)
+        : base(mediator)
     {
         _resources = resources;
         Title = _resources.GetResource("Pages_SavedPullRequestSearches_Title");
@@ -30,45 +34,7 @@ public class SavedPullRequestSearchesPage : ListPage
         Icon = IconLoader.GetIcon("PullRequest");
         _pullRequestSearchRepository = pullRequestSearchRepository;
         _addPullRequestSearchListItem = addPullRequestSearchListItem;
-        _mediator = mediator;
         _searchPageFactory = searchPageFactory;
-    }
-
-    public void OnPullRequestSearchRemoved(object? sender, SearchUpdatedEventArgs args)
-    {
-        IsLoading = false;
-
-        if (args.Exception != null)
-        {
-            var toast = new ToastStatusMessage(new StatusMessage()
-            {
-                Message = $"{_resources.GetResource("Pages_SavedPullRequestSearches_Error")} {args.Exception.Message}",
-                State = MessageState.Error,
-            });
-
-            toast.Show();
-        }
-        else if (args.AzureSearch is IPullRequestSearch)
-        {
-            RaiseItemsChanged(0);
-
-            // no toast yet
-        }
-        else if (!args.Success)
-        {
-            var toast = new ToastStatusMessage(new StatusMessage()
-            {
-                Message = _resources.GetResource("Pages_SavedPullRequestSearches_Failure"),
-                State = MessageState.Error,
-            });
-
-            toast.Show();
-        }
-    }
-
-    public void OnPullRequestSearchRemoving(object? sender, SearchUpdatedEventArgs args)
-    {
-        IsLoading = true;
     }
 
     public override IListItem[] GetItems()
@@ -87,17 +53,5 @@ public class SavedPullRequestSearchesPage : ListPage
         {
             return [_addPullRequestSearchListItem];
         }
-    }
-
-    public void OnPullRequestSearchSaved(object? sender, SearchUpdatedEventArgs args)
-    {
-        IsLoading = false;
-
-        if (args.AzureSearch is PullRequestSearchCandidate)
-        {
-            RaiseItemsChanged(0);
-        }
-
-        // errors are handled in SavePullRequestSearchPage
     }
 }

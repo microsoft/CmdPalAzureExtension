@@ -10,19 +10,17 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public class SavedPipelineSearchesPage : ListPage
+public class SavedPipelineSearchesPage : SavedSearchesPage
 {
     private readonly IResources _resources;
-
     private readonly AddPipelineSearchListItem _addPipelineSearchListItem;
-
-    private readonly SavedAzureSearchesMediator _mediator;
-
     private readonly ISavedSearchesProvider<IPipelineDefinitionSearch> _definitionRepository;
-
     private readonly IAccountProvider _accountProvider;
-
     private readonly ISearchPageFactory _searchPageFactory;
+
+    protected override SearchUpdatedType SearchUpdatedType => SearchUpdatedType.Pipeline;
+
+    protected override string ExceptionMessage => _resources.GetResource("Pages_SavedPipelineSearches_Error");
 
     public SavedPipelineSearchesPage(
         IResources resources,
@@ -31,6 +29,7 @@ public class SavedPipelineSearchesPage : ListPage
         ISavedSearchesProvider<IPipelineDefinitionSearch> definitionRepository,
         IAccountProvider accountProvider,
         ISearchPageFactory searchPageFactory)
+        : base(mediator)
     {
         _resources = resources;
         Title = _resources.GetResource("Pages_SavedPipelineSearches_Title");
@@ -39,46 +38,8 @@ public class SavedPipelineSearchesPage : ListPage
         ShowDetails = true;
         _definitionRepository = definitionRepository;
         _addPipelineSearchListItem = addPipelineSearchListItem;
-        _mediator = mediator;
         _accountProvider = accountProvider;
         _searchPageFactory = searchPageFactory;
-    }
-
-    public void OnPipelineSearchRemoved(object? sender, SearchUpdatedEventArgs args)
-    {
-        IsLoading = false;
-
-        if (args.Exception != null)
-        {
-            var toast = new ToastStatusMessage(new StatusMessage()
-            {
-                Message = $"{_resources.GetResource("Pages_SavedPipelineSearches_Error")} {args.Exception.Message}",
-                State = MessageState.Error,
-            });
-
-            toast.Show();
-        }
-        else if (args.AzureSearch is IPipelineDefinitionSearch)
-        {
-            RaiseItemsChanged(0);
-
-            // no toast yet
-        }
-        else if (!args.Success)
-        {
-            var toast = new ToastStatusMessage(new StatusMessage()
-            {
-                Message = _resources.GetResource("Pages_SavedPipelineSearches_Failure"),
-                State = MessageState.Error,
-            });
-
-            toast.Show();
-        }
-    }
-
-    public void OnPipelineSearchRemoving(object? sender, object? e)
-    {
-        IsLoading = true;
     }
 
     public override IListItem[] GetItems()
@@ -98,17 +59,5 @@ public class SavedPipelineSearchesPage : ListPage
         {
             return [_addPipelineSearchListItem];
         }
-    }
-
-    public void OnPipelineSearchSaved(object? sender, object? args)
-    {
-        IsLoading = false;
-
-        if (args != null && args is IPipelineDefinitionSearch)
-        {
-            RaiseItemsChanged();
-        }
-
-        // errors are handled in SavePipelineSearchPage
     }
 }
