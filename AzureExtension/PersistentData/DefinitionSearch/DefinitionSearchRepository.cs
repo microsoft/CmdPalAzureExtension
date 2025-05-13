@@ -76,15 +76,15 @@ public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefini
     {
         ValidateDataStore();
         var internalId = dataSearch.InternalId;
-        var projectUrl = dataSearch.Url;
+        var url = dataSearch.Url;
 
-        _log.Information($"Removing definition search: {internalId} - {projectUrl}.");
-        if (DefinitionSearch.Get(_dataStore, internalId, projectUrl) == null)
+        _log.Information($"Removing definition search: {internalId} - {url}.");
+        if (DefinitionSearch.Get(_dataStore, internalId, url) == null)
         {
-            throw new InvalidOperationException($"Definition search {internalId} - {projectUrl} not found.");
+            throw new InvalidOperationException($"Definition search {internalId} - {url} not found.");
         }
 
-        DefinitionSearch.Remove(_dataStore, internalId, projectUrl);
+        DefinitionSearch.Remove(_dataStore, internalId, url);
     }
 
     public void AddOrUpdateSearch(IPipelineDefinitionSearch dataSearch, bool isTopLevel)
