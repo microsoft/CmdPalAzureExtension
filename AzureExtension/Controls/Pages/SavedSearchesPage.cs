@@ -7,12 +7,11 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-#pragma warning disable SA1649 // File name should match first type name
 public abstract class SavedSearchesPage : ListPage
 {
-    protected abstract SearchUpdatedType SearchUpdatedType { get; set; }
+    protected abstract SearchUpdatedType SearchUpdatedType { get; }
 
-    protected abstract string ExceptionMessage { get; set; }
+    protected abstract string ExceptionMessage { get; }
 
     private readonly SavedAzureSearchesMediator _mediator;
 
