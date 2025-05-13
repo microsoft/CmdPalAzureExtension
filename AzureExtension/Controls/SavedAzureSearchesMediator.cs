@@ -6,23 +6,24 @@ namespace AzureExtension.Controls;
 
 public class SavedAzureSearchesMediator
 {
-    public event EventHandler<object?>? QueryRemoving;
+    public event EventHandler<SearchUpdatedEventArgs>? SearchRemoving;
 
-    public event EventHandler<object?>? QueryRemoved;
+    public event EventHandler<SearchUpdatedEventArgs>? SearchRemoved;
 
-    public event EventHandler<object?>? QuerySaved;
+    public event EventHandler<SearchUpdatedEventArgs>? SearchSaved;
 
-    public event EventHandler<object?>? PullRequestSearchSaved;
+    public class SearchUpdatedEventArgs : EventArgs
+    {
+        public IAzureSearch? AzureSearch { get; }
 
-    public event EventHandler<object?>? PullRequestSearchRemoved;
+        public Exception? Exception { get; set; } = null!;
 
-    public event EventHandler<object?>? PullRequestSearchRemoving;
-
-    public event EventHandler<object?>? PipelineSearchSaved;
-
-    public event EventHandler<object?>? PipelineSearchRemoved;
-
-    public event EventHandler<object?>? PipelineSearchRemoving;
+        public SearchUpdatedEventArgs(IAzureSearch? azureSearch, Exception? ex = null)
+        {
+            AzureSearch = azureSearch;
+            Exception = ex;
+        }
+    }
 
     public SavedAzureSearchesMediator()
     {
@@ -30,47 +31,16 @@ public class SavedAzureSearchesMediator
 
     public void Remove(IAzureSearch azureSearch)
     {
-        if (azureSearch is IQuery)
-        {
-            QueryRemoved?.Invoke(this, azureSearch);
-        }
-        else if (azureSearch is IPullRequestSearch)
-        {
-            PullRequestSearchRemoved?.Invoke(this, azureSearch);
-        }
-        else if (azureSearch is IPipelineDefinitionSearch)
-        {
-            PipelineSearchRemoved?.Invoke(this, azureSearch);
-        }
+        SearchRemoved?.Invoke(this, new SearchUpdatedEventArgs(azureSearch));
     }
 
-    public void RemovingQuery(object args)
+    public void RemovingSearch(IAzureSearch? search, Exception? ex = null)
     {
-        QueryRemoving?.Invoke(this, args);
+        SearchRemoving?.Invoke(this, new SearchUpdatedEventArgs(search, ex));
     }
 
-    public void AddQuery(object args)
+    public void AddSearch(IAzureSearch? search, Exception? ex = null)
     {
-        QuerySaved?.Invoke(this, args);
-    }
-
-    public void AddPullRequestSearch(object args)
-    {
-        PullRequestSearchSaved?.Invoke(this, args);
-    }
-
-    public void RemovingPullRequestSearch(object args)
-    {
-        PullRequestSearchRemoving?.Invoke(this, args);
-    }
-
-    public void AddPipelineSearch(object args)
-    {
-        PipelineSearchSaved?.Invoke(this, args);
-    }
-
-    public void RemovingPipelineSearch(object args)
-    {
-        PipelineSearchRemoving?.Invoke(this, args);
+        SearchSaved?.Invoke(this, new SearchUpdatedEventArgs(search, ex));
     }
 }

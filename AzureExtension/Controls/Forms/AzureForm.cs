@@ -77,7 +77,7 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
 
             LoadingStateChanged?.Invoke(this, false);
             _savedSearchesUpdater.AddOrUpdateSearch(search, search.IsTopLevel);
-            _mediator.AddPipelineSearch(search);
+            _mediator.AddSearch(search);
 
             if (SavedSearch != null)
             {
@@ -89,7 +89,7 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
         catch (Exception ex)
         {
             LoadingStateChanged?.Invoke(this, false);
-            _mediator.AddPipelineSearch(ex);
+            _mediator.AddSearch(null, ex);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
         }
     }
