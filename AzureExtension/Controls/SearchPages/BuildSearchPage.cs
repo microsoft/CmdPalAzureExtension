@@ -36,7 +36,7 @@ public partial class BuildSearchPage : SearchPage<IBuild>
         var definition = await _dataProvider.GetSearchData<IDefinition>(search);
         if (definition == null)
         {
-            throw new InvalidOperationException($"Definition not found for search {search.InternalId} - {search.ProjectUrl}");
+            throw new InvalidOperationException($"Definition not found for search {search.InternalId} - {search.Url}");
         }
 
         return definition;

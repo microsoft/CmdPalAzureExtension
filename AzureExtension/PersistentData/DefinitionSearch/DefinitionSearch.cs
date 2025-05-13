@@ -19,7 +19,7 @@ public class DefinitionSearch : IPipelineDefinitionSearch
 
     public long InternalId { get; set; } = DataStore.NoForeignKey;
 
-    public string ProjectUrl { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
 
     public bool IsTopLevel { get; set; }
 
@@ -29,7 +29,7 @@ public class DefinitionSearch : IPipelineDefinitionSearch
     {
         get
         {
-            return new AzureUri(ProjectUrl);
+            return new AzureUri(Url);
         }
     }
 
@@ -37,7 +37,7 @@ public class DefinitionSearch : IPipelineDefinitionSearch
     public string Name => InternalId.ToStringInvariant();
 
     [Write(false)]
-    public string Url => ProjectUrl;
+    public string Url => Url;
 
     public static DefinitionSearch? Get(DataStore dataStore, long internalId, string projectUrl)
     {
@@ -51,7 +51,7 @@ public class DefinitionSearch : IPipelineDefinitionSearch
         var definitionSearch = new DefinitionSearch
         {
             InternalId = internalId,
-            ProjectUrl = projectUrl,
+            Url = projectUrl,
         };
         dataStore.Connection.Insert(definitionSearch);
         return definitionSearch;

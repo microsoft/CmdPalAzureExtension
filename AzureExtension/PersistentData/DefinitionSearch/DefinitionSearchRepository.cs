@@ -51,13 +51,13 @@ public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefini
     public bool IsTopLevel(IPipelineDefinitionSearch definitionSearch)
     {
         ValidateDataStore();
-        var dsDefinitionSearch = DefinitionSearch.Get(_dataStore, definitionSearch.InternalId, definitionSearch.ProjectUrl);
+        var dsDefinitionSearch = DefinitionSearch.Get(_dataStore, definitionSearch.InternalId, definitionSearch.Url);
         return dsDefinitionSearch != null && dsDefinitionSearch.IsTopLevel;
     }
 
     public Task ValidateDefinitionSearch(IPipelineDefinitionSearch definitionSearch, IAccount account)
     {
-        return _azureValidator.GetDefinitionInfo(definitionSearch.ProjectUrl, definitionSearch.InternalId, account);
+        return _azureValidator.GetDefinitionInfo(definitionSearch.Url, definitionSearch.InternalId, account);
     }
 
     public Task Validate(IPipelineDefinitionSearch search, IAccount account)
@@ -69,14 +69,14 @@ public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefini
     {
         ValidateDataStore();
         ValidateDefinitionSearch(definitionSearch, account).Wait();
-        DefinitionSearch.AddOrUpdate(_dataStore, definitionSearch.InternalId, definitionSearch.ProjectUrl, isTopLevel);
+        DefinitionSearch.AddOrUpdate(_dataStore, definitionSearch.InternalId, definitionSearch.Url, isTopLevel);
     }
 
     public void RemoveSavedSearch(IPipelineDefinitionSearch dataSearch)
     {
         ValidateDataStore();
         var internalId = dataSearch.InternalId;
-        var projectUrl = dataSearch.ProjectUrl;
+        var projectUrl = dataSearch.Url;
 
         _log.Information($"Removing definition search: {internalId} - {projectUrl}.");
         if (DefinitionSearch.Get(_dataStore, internalId, projectUrl) == null)
@@ -90,7 +90,7 @@ public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefini
     public void AddOrUpdateSearch(IPipelineDefinitionSearch dataSearch, bool isTopLevel)
     {
         ValidateDataStore();
-        DefinitionSearch.AddOrUpdate(_dataStore, dataSearch.InternalId, dataSearch.ProjectUrl, isTopLevel);
+        DefinitionSearch.AddOrUpdate(_dataStore, dataSearch.InternalId, dataSearch.Url, isTopLevel);
     }
 
     public IEnumerable<IPipelineDefinitionSearch> GetSavedSearches()

@@ -50,7 +50,7 @@ public class AzureDataPipelineUpdater : IDataUpdater
 
     public async Task UpdatePipelineAsync(IPipelineDefinitionSearch definitionSearch, CancellationToken cancellationToken)
     {
-        var azureUri = new AzureUri(definitionSearch.ProjectUrl);
+        var azureUri = new AzureUri(definitionSearch.Url);
         var account = await _accountProvider.GetDefaultAccountAsync();
         var vssConnection = await _connectionProvider.GetVssConnectionAsync(azureUri.Uri, account);
 
