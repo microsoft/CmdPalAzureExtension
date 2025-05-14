@@ -84,9 +84,4 @@ public partial class BuildSearchPage : SearchPage<IBuild>
             },
         };
     }
-
-    protected override Task<IEnumerable<IBuild>> LoadContentData()
-    {
-        return _dataProvider.GetContentData<IBuild>(_search);
-    }
 }

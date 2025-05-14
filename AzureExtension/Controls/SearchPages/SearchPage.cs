@@ -10,20 +10,20 @@ using Serilog;
 
 namespace AzureExtension.Controls.Pages;
 
-public abstract partial class SearchPage<T> : ListPage
+public abstract partial class SearchPage<TContentData> : ListPage
 {
     protected ILogger Logger { get; }
 
-    public IAzureSearch CurrentSearch { get; private set; }
+    protected IAzureSearch CurrentSearch { get; private set; }
 
-    public ILiveDataProvider DataProvider { get; private set; }
+    private readonly ILiveDataProvider _dataProvider;
 
     public SearchPage(IAzureSearch search, ILiveDataProvider dataProvider)
     {
         CurrentSearch = search;
         Name = search.Name;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
-        DataProvider = dataProvider;
+        _dataProvider = dataProvider;
     }
 
     protected void CacheManagerUpdateHandler(object? source, CacheManagerUpdateEventArgs e)
@@ -82,9 +82,9 @@ public abstract partial class SearchPage<T> : ListPage
         }
     }
 
-    private async Task<IEnumerable<T>> GetSearchItemsAsync()
+    private async Task<IEnumerable<TContentData>> GetSearchItemsAsync()
     {
-        DataProvider.OnUpdate += CacheManagerUpdateHandler;
+        _dataProvider.OnUpdate += CacheManagerUpdateHandler;
 
         var items = await LoadContentData();
 
@@ -93,7 +93,10 @@ public abstract partial class SearchPage<T> : ListPage
         return items;
     }
 
-    protected abstract ListItem GetListItem(T item);
+    protected abstract ListItem GetListItem(TContentData item);
 
-    protected abstract Task<IEnumerable<T>> LoadContentData();
+    private Task<IEnumerable<TContentData>> LoadContentData()
+    {
+        return _dataProvider.GetContentData<TContentData>(CurrentSearch);
+    }
 }
