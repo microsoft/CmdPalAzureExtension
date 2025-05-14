@@ -16,9 +16,9 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
     public PullRequestSearchPage(
         IPullRequestSearch search,
         IResources resources,
-        ILiveContentDataProvider<IPullRequest> dataProvider,
+        ILiveContentDataProvider<IPullRequest> contentDataProvider,
         TimeSpanHelper timeSpanHelper)
-        : base(search, dataProvider)
+        : base(search, contentDataProvider)
     {
         _resources = resources;
         _timeSpanHelper = timeSpanHelper;

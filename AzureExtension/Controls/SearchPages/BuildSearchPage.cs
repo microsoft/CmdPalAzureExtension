@@ -20,10 +20,10 @@ public partial class BuildSearchPage : SearchPage<IBuild>
     public BuildSearchPage(
         IPipelineDefinitionSearch search,
         IResources resources,
-        ILiveContentDataProvider<IBuild> dataProvider,
+        ILiveContentDataProvider<IBuild> contentDataProvider,
         ILiveSearchDataProvider<IDefinition> searchDataProvider,
         TimeSpanHelper timeSpanHelper)
-        : base(search, dataProvider)
+        : base(search, contentDataProvider)
     {
         _search = search;
         _resources = resources;

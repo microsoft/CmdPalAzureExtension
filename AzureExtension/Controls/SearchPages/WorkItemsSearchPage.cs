@@ -17,9 +17,9 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
     public WorkItemsSearchPage(
         IQuerySearch query,
         IResources resources,
-        ILiveContentDataProvider<IWorkItem> dataProvider,
+        ILiveContentDataProvider<IWorkItem> contentDataProvider,
         TimeSpanHelper timeSpanHelper)
-        : base(query, dataProvider)
+        : base(query, contentDataProvider)
     {
         _resources = resources;
         _timeSpanHelper = timeSpanHelper;

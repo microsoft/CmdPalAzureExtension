@@ -16,14 +16,14 @@ public abstract partial class SearchPage<TContentData> : ListPage
 
     protected IAzureSearch CurrentSearch { get; private set; }
 
-    private readonly ILiveContentDataProvider<TContentData> _dataProvider;
+    private readonly ILiveContentDataProvider<TContentData> _contentDataProvider;
 
     public SearchPage(IAzureSearch search, ILiveContentDataProvider<TContentData> dataProvider)
     {
         CurrentSearch = search;
         Name = search.Name;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
-        _dataProvider = dataProvider;
+        _contentDataProvider = dataProvider;
     }
 
     protected void CacheManagerUpdateHandler(object? source, CacheManagerUpdateEventArgs e)
@@ -84,7 +84,7 @@ public abstract partial class SearchPage<TContentData> : ListPage
 
     private async Task<IEnumerable<TContentData>> GetSearchItemsAsync()
     {
-        _dataProvider.OnUpdate += CacheManagerUpdateHandler;
+        _contentDataProvider.OnUpdate += CacheManagerUpdateHandler;
 
         var items = await LoadContentData();
 
@@ -97,6 +97,6 @@ public abstract partial class SearchPage<TContentData> : ListPage
 
     private Task<IEnumerable<TContentData>> LoadContentData()
     {
-        return _dataProvider.GetContentData(CurrentSearch);
+        return _contentDataProvider.GetContentData(CurrentSearch);
     }
 }
