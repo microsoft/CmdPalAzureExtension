@@ -14,15 +14,20 @@ public partial class BuildSearchPage : SearchPage<IBuild>
     private readonly IPipelineDefinitionSearch _search;
     private readonly IDefinition _definition;
     private readonly IResources _resources;
-    private readonly ILiveDataProvider _dataProvider;
+    private readonly ILiveSearchDataProvider<IDefinition> _searchDataProvider;
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public BuildSearchPage(IPipelineDefinitionSearch search, IResources resources, ILiveDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
-        : base(search, dataProvider)
+    public BuildSearchPage(
+        IPipelineDefinitionSearch search,
+        IResources resources,
+        ILiveContentDataProvider<IBuild> contentDataProvider,
+        ILiveSearchDataProvider<IDefinition> searchDataProvider,
+        TimeSpanHelper timeSpanHelper)
+        : base(search, contentDataProvider)
     {
         _search = search;
         _resources = resources;
-        _dataProvider = dataProvider;
+        _searchDataProvider = searchDataProvider;
         _timeSpanHelper = timeSpanHelper;
         _definition = GetDefinitionForPage(_search).Result;
         Icon = GetIcon();
@@ -33,7 +38,7 @@ public partial class BuildSearchPage : SearchPage<IBuild>
 
     private async Task<IDefinition> GetDefinitionForPage(IPipelineDefinitionSearch search)
     {
-        var definition = await _dataProvider.GetSearchData<IDefinition>(search);
+        var definition = await _searchDataProvider.GetSearchData(search);
         if (definition == null)
         {
             throw new InvalidOperationException($"Definition not found for search {search.InternalId} - {search.Url}");
@@ -83,10 +88,5 @@ public partial class BuildSearchPage : SearchPage<IBuild>
                 },
             },
         };
-    }
-
-    protected override Task<IEnumerable<IBuild>> LoadContentData()
-    {
-        return _dataProvider.GetContentData<IBuild>(_search);
     }
 }

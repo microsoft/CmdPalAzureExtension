@@ -6,11 +6,10 @@ using AzureExtension.DataManager.Cache;
 
 namespace AzureExtension.Controls;
 
-public interface ILiveDataProvider
+#pragma warning disable SA1649 // File name should match first type name
+public interface ILiveContentDataProvider<TContentDataType>
 {
-    Task<IEnumerable<TContentDataType>> GetContentData<TContentDataType>(IAzureSearch search);
-
-    Task<TSearchDataType> GetSearchData<TSearchDataType>(IAzureSearch search);
+    Task<IEnumerable<TContentDataType>> GetContentData(IAzureSearch search);
 
     event CacheManagerUpdateEventHandler? OnUpdate;
 }

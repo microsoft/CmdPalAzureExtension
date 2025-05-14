@@ -11,17 +11,17 @@ namespace AzureExtension.Controls.Pages;
 
 public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
 {
-    private readonly IQuerySearch _query;
     private readonly IResources _resources;
-    private readonly ILiveDataProvider _dataProvider;
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public WorkItemsSearchPage(IQuerySearch query, IResources resources, ILiveDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
-        : base(query, dataProvider)
+    public WorkItemsSearchPage(
+        IQuerySearch query,
+        IResources resources,
+        ILiveContentDataProvider<IWorkItem> contentDataProvider,
+        TimeSpanHelper timeSpanHelper)
+        : base(query, contentDataProvider)
     {
-        _query = query;
         _resources = resources;
-        _dataProvider = dataProvider;
         _timeSpanHelper = timeSpanHelper;
         Icon = IconLoader.GetIcon("Query");
         Name = query.Name;
@@ -81,11 +81,6 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
                 },
             },
         };
-    }
-
-    protected async override Task<IEnumerable<IWorkItem>> LoadContentData()
-    {
-        return await _dataProvider.GetContentData<IWorkItem>(_query);
     }
 
     protected ITag GetStatusTag(IWorkItem item)
