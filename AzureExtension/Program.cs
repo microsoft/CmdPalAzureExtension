@@ -204,7 +204,19 @@ public sealed class Program
             { typeof(IPipelineDefinitionSearch), new AzureSearchRepositoryAdapter<IPipelineDefinitionSearch>(pipelineDefinitionRepository, pipelineDefinitionRepository) },
         };
 
-        var searchPageFactory = new SearchPageFactory(resources, dataProvider, savedAzureSearchesMediator, accountProvider, azureClientHelpers, azureSearchRepositories, queryRepository, pullRequestSearchRepository, pipelineDefinitionRepository);
+        var searchPageFactory = new SearchPageFactory(
+            resources,
+            savedAzureSearchesMediator,
+            accountProvider,
+            azureClientHelpers,
+            azureSearchRepositories,
+            queryRepository,
+            pullRequestSearchRepository,
+            pipelineDefinitionRepository,
+            new ContentDataProviderAdapter<IWorkItem>(dataProvider),
+            new ContentDataProviderAdapter<IPullRequest>(dataProvider),
+            new ContentDataProviderAdapter<IBuild>(dataProvider),
+            new SearchDataProviderAdapter<IDefinition>(dataProvider));
 
         var addQueryForm = new SaveQueryForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, queryRepository);
         var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources.GetResource("Message_Query_Saved"), resources.GetResource("Message_Query_Saved_Error"), resources.GetResource("ListItems_AddQuery")), resources);

@@ -14,7 +14,11 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
     private readonly IResources _resources;
     private readonly TimeSpanHelper _timeSpanHelper;
 
-    public WorkItemsSearchPage(IQuerySearch query, IResources resources, ILiveDataProvider dataProvider, TimeSpanHelper timeSpanHelper)
+    public WorkItemsSearchPage(
+        IQuerySearch query,
+        IResources resources,
+        ILiveContentDataProvider<IWorkItem> dataProvider,
+        TimeSpanHelper timeSpanHelper)
         : base(query, dataProvider)
     {
         _resources = resources;

@@ -16,9 +16,9 @@ public abstract partial class SearchPage<TContentData> : ListPage
 
     protected IAzureSearch CurrentSearch { get; private set; }
 
-    private readonly ILiveDataProvider _dataProvider;
+    private readonly ILiveContentDataProvider<TContentData> _dataProvider;
 
-    public SearchPage(IAzureSearch search, ILiveDataProvider dataProvider)
+    public SearchPage(IAzureSearch search, ILiveContentDataProvider<TContentData> dataProvider)
     {
         CurrentSearch = search;
         Name = search.Name;
@@ -97,6 +97,6 @@ public abstract partial class SearchPage<TContentData> : ListPage
 
     private Task<IEnumerable<TContentData>> LoadContentData()
     {
-        return _dataProvider.GetContentData<TContentData>(CurrentSearch);
+        return _dataProvider.GetContentData(CurrentSearch);
     }
 }

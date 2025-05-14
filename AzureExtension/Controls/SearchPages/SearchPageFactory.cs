@@ -7,46 +7,41 @@ using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.Forms;
 using AzureExtension.Helpers;
-using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Microsoft.TeamFoundation.TestManagement.WebApi;
 
 namespace AzureExtension.Controls.Pages;
 
 public class SearchPageFactory : ISearchPageFactory
 {
     private readonly IResources _resources;
-
-    private readonly ILiveDataProvider _dataProvider;
-
     private readonly SavedAzureSearchesMediator _mediator;
-
     private readonly IAccountProvider _accountProvider;
-
     private readonly AzureClientHelpers _azureClientHelpers;
-
     private readonly ISavedSearchesUpdater<IQuerySearch> _queryUpdater;
-
     private readonly ISavedSearchesUpdater<IPullRequestSearch> _savedPullRequestSearchUpdater;
-
     private readonly ISavedSearchesUpdater<IPipelineDefinitionSearch> _definitionUpdater;
-
+    private readonly ILiveContentDataProvider<IWorkItem> _workItemProvider;
+    private readonly ILiveContentDataProvider<IPullRequest> _pullRequestProvider;
+    private readonly ILiveContentDataProvider<IBuild> _buildProvider;
+    private readonly ILiveSearchDataProvider<IDefinition> _definitionProvider;
     private readonly IDictionary<Type, IAzureSearchRepository> _azureSearchRepositories;
 
     public SearchPageFactory(
         IResources resources,
-        ILiveDataProvider dataProvider,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
         IDictionary<Type, IAzureSearchRepository> azureSearchRepositories,
         ISavedSearchesUpdater<IQuerySearch> queryUpdater,
         ISavedSearchesUpdater<IPullRequestSearch> savedPullRequestSearchUpdater,
-        ISavedSearchesUpdater<IPipelineDefinitionSearch> definitionUpdater)
+        ISavedSearchesUpdater<IPipelineDefinitionSearch> definitionUpdater,
+        ILiveContentDataProvider<IWorkItem> workItemProvider,
+        ILiveContentDataProvider<IPullRequest> pullRequestProvider,
+        ILiveContentDataProvider<IBuild> buildProvider,
+        ILiveSearchDataProvider<IDefinition> definitionProvider)
     {
         _resources = resources;
-        _dataProvider = dataProvider;
         _mediator = mediator;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
@@ -54,21 +49,25 @@ public class SearchPageFactory : ISearchPageFactory
         _savedPullRequestSearchUpdater = savedPullRequestSearchUpdater;
         _definitionUpdater = definitionUpdater;
         _azureSearchRepositories = azureSearchRepositories;
+        _workItemProvider = workItemProvider;
+        _pullRequestProvider = pullRequestProvider;
+        _buildProvider = buildProvider;
+        _definitionProvider = definitionProvider;
     }
 
     public ListPage CreatePageForSearch(IAzureSearch search)
     {
         if (search is IQuerySearch)
         {
-            return new WorkItemsSearchPage((IQuerySearch)search, _resources, _dataProvider, new TimeSpanHelper(_resources));
+            return new WorkItemsSearchPage((IQuerySearch)search, _resources, _workItemProvider, new TimeSpanHelper(_resources));
         }
         else if (search is IPullRequestSearch)
         {
-            return new PullRequestSearchPage((IPullRequestSearch)search, _resources, _dataProvider, new TimeSpanHelper(_resources));
+            return new PullRequestSearchPage((IPullRequestSearch)search, _resources, _pullRequestProvider, new TimeSpanHelper(_resources));
         }
         else if (search is IPipelineDefinitionSearch)
         {
-            return new BuildSearchPage((IPipelineDefinitionSearch)search, _resources, _dataProvider, new TimeSpanHelper(_resources));
+            return new BuildSearchPage((IPipelineDefinitionSearch)search, _resources, _buildProvider, _definitionProvider, new TimeSpanHelper(_resources));
         }
 
         throw new NotImplementedException($"No page for search type {search.GetType()}");
@@ -143,7 +142,7 @@ public class SearchPageFactory : ISearchPageFactory
 
     public IListItem CreateItemForDefinitionSearch(IPipelineDefinitionSearch search)
     {
-        var definition = _dataProvider.GetSearchData<IDefinition>(search).Result;
+        var definition = _definitionProvider.GetSearchData(search).Result;
         var timeSpanHelper = new TimeSpanHelper(_resources);
 
         var azureSearchRepository = _azureSearchRepositories[typeof(IPipelineDefinitionSearch)];
