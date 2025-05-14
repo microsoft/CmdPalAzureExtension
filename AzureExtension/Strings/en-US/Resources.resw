@@ -138,11 +138,11 @@
     <comment>Description for extension package</comment>
   </data>
   <data name="ExtensionPackageTitle" xml:space="preserve">
-    <value>Azure Extension for Command Palette</value>
+    <value>Command Palette Azure Extension (Preview)</value>
     <comment>Title for the extension package</comment>
   </data>
   <data name="ExtensionTitle" xml:space="preserve">
-    <value>Azure Extension</value>
+    <value>Azure Extension (Preview)</value>
     <comment>Title for the extension</comment>
   </data>
   <data name="Forms_Edit_Query" xml:space="preserve">
