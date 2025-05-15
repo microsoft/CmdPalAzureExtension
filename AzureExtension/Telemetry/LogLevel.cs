@@ -38,4 +38,3 @@ public enum LogLevel
     /// </summary>
     Critical,
 }
-

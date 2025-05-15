@@ -15,6 +15,8 @@ using AzureExtension.DataManager.Cache;
 using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
+using AzureExtension.Telemetry;
+using AzureExtension.Telemetry.Decorators;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Extensions.Configuration;
@@ -117,12 +119,16 @@ public sealed class Program
         await using global::Shmuelie.WinRTServer.ComServer server = new();
         var extensionDisposedEvent = new ManualResetEvent(false);
 
+        var telemetryLogger = new TelemetryLogger();
+
         var authenticationSettings = new AuthenticationSettings();
         authenticationSettings.InitializeSettings();
-        var accountProvider = new AccountProvider(authenticationSettings);
+        var accountProviderInstance = new AccountProvider(authenticationSettings);
 
         // In the case that this is the first launch we will try to automatically connect the default Windows account
-        await accountProvider.EnableSSOForAzureExtensionAsync();
+        await accountProviderInstance.EnableSSOForAzureExtensionAsync();
+
+        var accountProvider = new AccountProviderTelemetryDecorator(accountProviderInstance, telemetryLogger);
 
         var vssConnectionFactory = new VssConnectionFactory();
         using var azureClientProvider = new AzureClientProvider(accountProvider, vssConnectionFactory);
