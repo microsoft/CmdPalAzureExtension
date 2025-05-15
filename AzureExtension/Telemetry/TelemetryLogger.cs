@@ -11,7 +11,7 @@ namespace AzureExtension.Telemetry;
 
 internal sealed class TelemetryLogger : ITelemetryLogger
 {
-    private const string ProviderName = "Microsoft.GitHubExtension";
+    private const string ProviderName = "Microsoft.CmdPal.AzureExtension";
 
     /// <summary>
     /// Time Taken Event Name
