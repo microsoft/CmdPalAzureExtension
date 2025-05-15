@@ -9,7 +9,7 @@ using Microsoft.Diagnostics.Telemetry;
 
 namespace AzureExtension.Telemetry;
 
-internal sealed class Logger : ILogger
+internal sealed class TelemetryLogger : ITelemetryLogger
 {
     private const string ProviderName = "Microsoft.GitHubExtension";
 
@@ -88,10 +88,10 @@ internal sealed class Logger : ILogger
     private readonly List<KeyValuePair<string, string>> _sensitiveStrings = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Logger"/> class.
+    /// Initializes a new instance of the <see cref="TelemetryLogger"/> class.
     /// Prevents a default instance of the Logger class from being created.
     /// </summary>
-    internal Logger()
+    internal TelemetryLogger()
     {
     }
 
@@ -257,16 +257,16 @@ internal sealed class Logger : ILogger
         {
             telemetryOptions = level switch
             {
-                LogLevel.Critical => isError ? Logger._criticalDataErrorOption : Logger._criticalDataOption,
-                LogLevel.Measure => isError ? Logger._measureErrorOption : Logger._measureOption,
-                LogLevel.Info => isError ? Logger._infoErrorOption : Logger._infoOption,
-                _ => isError ? Logger._localErrorOption : Logger._localOption,
+                LogLevel.Critical => isError ? TelemetryLogger._criticalDataErrorOption : TelemetryLogger._criticalDataOption,
+                LogLevel.Measure => isError ? TelemetryLogger._measureErrorOption : TelemetryLogger._measureOption,
+                LogLevel.Info => isError ? TelemetryLogger._infoErrorOption : TelemetryLogger._infoOption,
+                _ => isError ? TelemetryLogger._localErrorOption : TelemetryLogger._localOption,
             };
         }
         else
         {
             // The telemetry is not turned on, downgrade to local telemetry
-            telemetryOptions = isError ? Logger._localErrorOption : Logger._localOption;
+            telemetryOptions = isError ? TelemetryLogger._localErrorOption : TelemetryLogger._localOption;
         }
 
         _telemetryEventSourceInstance.Write(eventName, ref telemetryOptions, ref _activityId, ref relatedActivityId, ref data);

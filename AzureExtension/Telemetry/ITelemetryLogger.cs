@@ -6,10 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AzureExtension.Telemetry;
 
-/// <summary>
-/// To create an instance call LoggerFactory.Get<ILogger>()
-/// </summary>
-public interface ILogger
+public interface ITelemetryLogger
 {
     /// <summary>
     /// Add a string that we should try stripping out of some of our telemetry for sensitivity reasons (ex. VM name, etc.).
@@ -65,4 +62,3 @@ public interface ILogger
     /// <typeparam name="T">Anonymous type.</typeparam>
     public void LogError<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(string eventName, LogLevel level, T data, Guid? relatedActivityId = null);
 }
-
