@@ -127,7 +127,7 @@ internal sealed class Logger : ILogger
     /// <param name="relatedActivityId">Optional relatedActivityId which will allow to correlate this telemetry with other telemetry in the same action/activity or thread and corelate them</param>
     public void LogException(string action, Exception e, Guid? relatedActivityId = null)
     {
-        var innerMessage = ReplaceSensitiveStrings(e.InnerException?.Message);
+        var innerMessage = ReplaceSensitiveStrings(e.InnerException?.Message ?? string.Empty);
         var innerStackTrace = new StringBuilder();
         var innerException = e.InnerException;
         while (innerException != null)
@@ -208,33 +208,30 @@ internal sealed class Logger : ILogger
     /// <returns>After, stripped string</returns>
     private string ReplaceSensitiveStrings(string message)
     {
-        if (message != null)
+        foreach (var pair in _sensitiveStrings)
         {
-            foreach (var pair in _sensitiveStrings)
+            // There's no String.Replace() with case insensitivity.
+            // We could use Regular Expressions here for searching for case-insensitive string matches,
+            // but it's not easy to specify the RegEx timeout value for .net 4.0.  And we were worried
+            // about rare cases where the user could accidentally lock us up with RegEx, since we're using strings
+            // provided by the user, so just use a simple non-RegEx replacement algorithm instead.
+            var sb = new StringBuilder();
+            var i = 0;
+            while (true)
             {
-                // There's no String.Replace() with case insensitivity.
-                // We could use Regular Expressions here for searching for case-insensitive string matches,
-                // but it's not easy to specify the RegEx timeout value for .net 4.0.  And we were worried
-                // about rare cases where the user could accidentally lock us up with RegEx, since we're using strings
-                // provided by the user, so just use a simple non-RegEx replacement algorithm instead.
-                var sb = new StringBuilder();
-                var i = 0;
-                while (true)
+                // Find the string to strip out.
+                var foundPosition = message.IndexOf(pair.Key, i, StringComparison.OrdinalIgnoreCase);
+                if (foundPosition < 0)
                 {
-                    // Find the string to strip out.
-                    var foundPosition = message.IndexOf(pair.Key, i, StringComparison.OrdinalIgnoreCase);
-                    if (foundPosition < 0)
-                    {
-                        sb.Append(message, i, message.Length - i);
-                        message = sb.ToString();
-                        break;
-                    }
-
-                    // Replace the string.
-                    sb.Append(message, i, foundPosition - i);
-                    sb.Append(pair.Value);
-                    i = foundPosition + pair.Key.Length;
+                    sb.Append(message, i, message.Length - i);
+                    message = sb.ToString();
+                    break;
                 }
+
+                // Replace the string.
+                sb.Append(message, i, foundPosition - i);
+                sb.Append(pair.Value);
+                i = foundPosition + pair.Key.Length;
             }
         }
 
@@ -280,8 +277,8 @@ internal sealed class Logger : ILogger
         try
         {
             // This should convert "c:\users\johndoe" to "<SpecialFolder>".
-            var userDirectory = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)).FullName;
-            AddSensitiveString(Directory.GetParent(userDirectory).ToString(), "<SpecialFolder>");
+            var userDirectory = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData))!.FullName;
+            AddSensitiveString(Directory.GetParent(userDirectory)!.ToString(), "<SpecialFolder>");
 
             // Include both these names, since they should cover the logged on user, and the user who is running the tools built on top of these API's
             // These names should almost always be the same, but technically could be different.
@@ -295,3 +292,4 @@ internal sealed class Logger : ILogger
             LogException("AddSensitiveStrings", e);
         }
     }
+}
