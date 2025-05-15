@@ -19,6 +19,7 @@ using AzureExtension.Telemetry;
 using AzureExtension.Telemetry.Decorators;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Microsoft.Diagnostics.Telemetry.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Microsoft.Windows.AppLifecycle;
@@ -120,6 +121,8 @@ public sealed class Program
         var extensionDisposedEvent = new ManualResetEvent(false);
 
         var telemetryLogger = new TelemetryLogger();
+
+        telemetryLogger.Log("HandShake", LogLevel.Critical, new { PartA_PrivTags = PartA_PrivTags.ProductAndServiceUsage });
 
         var authenticationSettings = new AuthenticationSettings();
         authenticationSettings.InitializeSettings();

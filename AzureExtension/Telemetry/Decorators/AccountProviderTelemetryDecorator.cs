@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.Account;
+using Microsoft.Diagnostics.Telemetry.Internal;
 using Microsoft.Identity.Client;
 using Microsoft.VisualStudio.Services.Common;
 
@@ -52,7 +53,7 @@ public class AccountProviderTelemetryDecorator : IAccountProvider
     public async Task<bool> LogoutAccount(string username)
     {
         var res = await _accountProvider.LogoutAccount(username);
-        _logger.Log("LogoutAccount", LogLevel.Info, new { username }, null);
+        _logger.Log("LogoutAccount", LogLevel.Info, new { PartA_PrivTags = PartA_PrivTags.ProductAndServiceUsage });
         return res;
     }
 
@@ -60,7 +61,7 @@ public class AccountProviderTelemetryDecorator : IAccountProvider
     {
         _logger.Log("ShowLogonSession", LogLevel.Info, new { }, null);
         var account = await _accountProvider.ShowLogonSession();
-        _logger.Log("ShowLogonSessionCompleted", LogLevel.Info, new { account }, null);
+        _logger.Log("ShowLogonSessionCompleted", LogLevel.Info, new { PartA_PrivTags = PartA_PrivTags.ProductAndServiceUsage });
         return account;
     }
 }
