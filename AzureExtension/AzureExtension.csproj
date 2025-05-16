@@ -64,7 +64,6 @@
         <Content Include="Controls\Templates\*">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
-        <Compile Remove="D:\azext\\codeAnalysis\GlobalSuppressions.cs" />
         <None Update="appsettings.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
