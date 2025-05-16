@@ -531,9 +531,11 @@
   </data>
   <data name="Pages_SavePipelineSearch_SuccessMessage" xml:space="preserve">
     <value>Pipeline saved successfully!</value>
+    <comment>Message shown when a pipeline search saves correctly</comment>
   </data>
   <data name="Pages_SavePipelineSearch_FailureMessage" xml:space="preserve">
     <value>Saving pipeline failed: </value>
+    <comment>Message shown when a pipeline search fails to save</comment>
   </data>
   <data name="Pages_SavedPipelineSearches_Title" xml:space="preserve">
     <value>Saved Azure DevOps Pipelines</value>
@@ -601,5 +603,14 @@
   </data>
   <data name="Pages_SaveQuery_Title" xml:space="preserve">
     <value>Save Query</value>
+    <comment>The title for the SaveQueryPage</comment>
+  </data>
+  <data name="Pages_Search_ErrorMessage" xml:space="preserve">
+    <value>An error occurred</value>
+    <comment>The message displayed if one of the search pages fails to return items</comment>
+  </data>
+  <data name="Pages_Search_NoItemsFound" xml:space="preserve">
+    <value>No items found</value>
+    <comment>Displayed if no items are returned</comment>
   </data>
 </root>

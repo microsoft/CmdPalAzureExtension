@@ -19,7 +19,7 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         IResources resources,
         ILiveContentDataProvider<IWorkItem> contentDataProvider,
         TimeSpanHelper timeSpanHelper)
-        : base(query, contentDataProvider)
+        : base(query, contentDataProvider, resources)
     {
         _resources = resources;
         _timeSpanHelper = timeSpanHelper;
