@@ -18,7 +18,6 @@
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<GenerateAppxPackageOnBuild>True</GenerateAppxPackageOnBuild>
-        <ExcludeFromStyleCop>Telemetry\TelemetryEventSource.cs</ExcludeFromStyleCop>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -99,6 +98,9 @@
 	  <Compile Remove="DataManager\Data\**" />
 	  <EmbeddedResource Remove="Contracts\**" />
 	  <EmbeddedResource Remove="DataManager\Data\**" />
+      <Compile Update="Telemetry\TelemetryEventSource.cs">
+        <ExcludeFromStyleCop>true</ExcludeFromStyleCop>
+      </Compile>
 	  <None Remove="Contracts\**" />
 	  <None Remove="DataManager\Data\**" />
 	  <Page Remove="Contracts\**" />
