@@ -6,8 +6,6 @@ using AzureExtension.Controls.Forms;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Microsoft.VisualStudio.Services.Commerce;
-using static Microsoft.Azure.Pipelines.WebApi.PipelinesResources;
 
 namespace AzureExtension.Controls.Pages;
 
