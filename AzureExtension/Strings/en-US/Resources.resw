@@ -146,11 +146,11 @@
     <comment>Title for the extension</comment>
   </data>
   <data name="Forms_Edit_Query" xml:space="preserve">
-    <value>Edit Query</value>
+    <value>Edit query</value>
     <comment>Shown in form button to edit a query</comment>
   </data>
   <data name="Forms_Save_Query" xml:space="preserve">
-    <value>Save Query</value>
+    <value>Save query</value>
     <comment>Shown in form button to save a query</comment>
   </data>
   <data name="Forms_SaveQuery_TemplateEnteredQueryError" xml:space="preserve">
@@ -182,7 +182,7 @@
     <comment>The title for the button that submits the form and saves the query</comment>
   </data>
   <data name="Forms_SignIn" xml:space="preserve">
-    <value>Sign In</value>
+    <value>Sign in</value>
     <comment>Shown in sign in form as title and button title</comment>
   </data>
   <data name="Forms_SignIn_Tooltip" xml:space="preserve">
@@ -286,7 +286,7 @@
     <comment>Shown in command to copy title of pull request on a page</comment>
   </data>
   <data name="Pages_SavedQueries" xml:space="preserve">
-    <value>Saved Azure DevOps Queries</value>
+    <value>Saved Azure DevOps queries</value>
     <comment>Name of page that shows list of saved github queries</comment>
   </data>
   <data name="Pages_SavedQueries_Error" xml:space="preserve">
@@ -394,11 +394,11 @@
     <comment>Title for the AddSavedPullRequestSearch list item</comment>
   </data>
   <data name="Pages_SavedPullRequestSearches_Title" xml:space="preserve">
-    <value>Saved Azure DevOps Pull Request Searches</value>
+    <value>Saved Azure DevOps pull request Searches</value>
     <comment>Name of the page that shows user-saved pull request searches</comment>
   </data>
   <data name="Pages_SignIn_Title" xml:space="preserve">
-    <value>Sign In</value>
+    <value>Sign in</value>
     <comment>The title for that page that signs in users</comment>
   </data>
   <data name="Pages_SavedPullRequestSearches_Error" xml:space="preserve">
@@ -410,7 +410,7 @@
     <comment>Shown when failed to remove a search from saved queries page</comment>
   </data>
   <data name="Pages_SavePullRequestSearch_Title" xml:space="preserve">
-    <value>Save Pull Request Search</value>
+    <value>Save pull request search</value>
     <comment>The title for the page that saves pull request searches</comment>
   </data>
   <data name="Pages_SavePullRequestSearch_SuccessMessage" xml:space="preserve">
@@ -426,7 +426,7 @@
     <comment>The option to select all pull requests in a repository that are created by the authenticated user</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplateViewAssignedToMeTitle" xml:space="preserve">
-    <value>Assigned to Me</value>
+    <value>Assigned to me</value>
     <comment>The option to select all pull requests in a repository that are assigned to the authenticated user</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplateViewAllTitle" xml:space="preserve">
@@ -438,11 +438,11 @@
     <comment>Title for command to remove a query or pull request search</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_CopyWorkItemId" xml:space="preserve">
-    <value>Copy Work Item ID</value>
+    <value>Copy work item ID</value>
     <comment>The label for the command to copy the work item ID</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_CopyURLCommand" xml:space="preserve">
-    <value>Copy Work Item URL</value>
+    <value>Copy work item URL</value>
     <comment>The label for the command to copy a work item URL</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_Reason" xml:space="preserve">
@@ -450,7 +450,7 @@
     <comment>The label for the work item's "Reason" detail</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_AssignedTo" xml:space="preserve">
-    <value>Assigned To</value>
+    <value>Assigned to</value>
     <comment>The label for the work item's "Assigned To" detail</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_Unassigned" xml:space="preserve">
@@ -458,7 +458,7 @@
     <comment>The label for the work item's "Unassigned" detail</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_LastChanged" xml:space="preserve">
-    <value>Last Changed</value>
+    <value>Last changed</value>
     <comment>The label for the work item's "Last Changed" detail</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_CreatedDate" xml:space="preserve">
@@ -466,11 +466,11 @@
     <comment>The label for the work item's "Created Date" detail</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_CopyIdCommand" xml:space="preserve">
-    <value>Copy Pull Request ID</value>
+    <value>Copy pull request ID</value>
     <comment>The label for the command to copy a pull request's ID</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_CopyURLCommand" xml:space="preserve">
-    <value>Copy Pull Request URL</value>
+    <value>Copy pull request URL</value>
     <comment>The label for the command to copy the pull request URL</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_Author" xml:space="preserve">
@@ -482,15 +482,15 @@
     <comment>Label for the pull request's "Updated At" detail</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_TargetBranch" xml:space="preserve">
-    <value>Target Branch</value>
+    <value>Target branch</value>
     <comment>Label for the pull request's "Target Branch" detail</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_PolicyStatus" xml:space="preserve">
-    <value>Policy Status</value>
+    <value>Policy status</value>
     <comment>Label for the pull request's "Policy Status" detail</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_PolicyStatusReason" xml:space="preserve">
-    <value>Policy Status Reason</value>
+    <value>Policy status reason</value>
     <comment>Label for the pull request's "Policy Status Reason" detail</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_InternalId" xml:space="preserve">
@@ -506,11 +506,11 @@
     <comment>This replaces the pull request's "Policy Status Reason" detail value when none was provided from ADO</comment>
   </data>
   <data name="Forms_Save_PipelineSearch" xml:space="preserve">
-    <value>Save Pipeline Search</value>
+    <value>Save pipeline search</value>
     <comment>The title for the form to save a pipeline search</comment>
   </data>
   <data name="Forms_Edit_PipelineSearch" xml:space="preserve">
-    <value>Edit Pipeline Search</value>
+    <value>Edit pipeline search</value>
     <comment>The title for the form to edit a pipeline search</comment>
   </data>
   <data name="Forms_SavePipelineSearch_TemplateEnteredPipelineSearchError" xml:space="preserve">
@@ -525,18 +525,16 @@
     <value>Add a pipeline by URL</value>
     <comment>Title for the AddPipelineSearchListItem</comment>
   </data>
-  <data name="Pages_SavePipelineSearch_Title" xml:space="preserve">
-    <value>Save Pipeline By URL</value>
-    <comment>Title for the SavePipelineSearchPage</comment>
-  </data>
   <data name="Pages_SavePipelineSearch_SuccessMessage" xml:space="preserve">
     <value>Pipeline saved successfully!</value>
+    <comment>Shown if the pipeline search saves successfully</comment>
   </data>
   <data name="Pages_SavePipelineSearch_FailureMessage" xml:space="preserve">
     <value>Saving pipeline failed: </value>
+    <comment>Shown if there's an error in saving a pipeline search</comment>
   </data>
   <data name="Pages_SavedPipelineSearches_Title" xml:space="preserve">
-    <value>Saved Azure DevOps Pipelines</value>
+    <value>Saved Azure DevOps pipelines</value>
     <comment>The title for the SavedPipelinesPage</comment>
   </data>
   <data name="Pages_EditPipelineSearch_SuccessMessage" xml:space="preserve">
@@ -552,7 +550,7 @@
     <comment>The user or account that started the pipeline run</comment>
   </data>
   <data name="PipelineBuild_SourceBranch" xml:space="preserve">
-    <value>Source Branch</value>
+    <value>Source branch</value>
     <comment>The code branch the pipeline was run on</comment>
   </data>
   <data name="Pages_BuildSearch_ErrorMessage" xml:space="preserve">
@@ -582,5 +580,13 @@
   <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchTitlePlaceholder" xml:space="preserve">
     <value>My team's pull requests</value>
     <comment>A sample title for a pull request search</comment>
+  </data>
+  <data name="Pages_Search_NoItemsFound" xml:space="preserve">
+    <value>No items found</value>
+    <comment>Message displayed when there are no items on a search page</comment>
+  </data>
+  <data name="Pages_Search_ErrorMessage" xml:space="preserve">
+    <value>An error occurred in search</value>
+    <comment>Message displayed on search page when fetching search items fails</comment>
   </data>
 </root>
