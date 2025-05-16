@@ -50,6 +50,13 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "System.Windows.Documents.InlineCollection.Add(System.String)", Scope = "member", Target = "Microsoft.Templates.UI.Extensions.TextBlockExtensions.#OnSequentialFlowStepChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)", Justification = "No text here")]
 [assembly: SuppressMessage("Globalization", "CA1309:Use ordinal string comparison", Justification = "The user's search term should be compared with culture based rules.", Scope = "type", Target = "~T:Microsoft.PowerToys.Run.Plugin.TimeDate.Components.SearchController")]
 
+// Telemetry related suppressions
+[assembly: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1633:File must have header", Justification = "File comes from a template with a different codestyle.", Scope = "file", Target = "Telemetry/TelemetryEventSource.cs")]
+[assembly: SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1518:File must not contain blank lines at the start", Justification = "File comes from a template with a different codestyle.", Scope = "file", Target = "Telemetry/TelemetryEventSource.cs")]
+[assembly: SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:File may only contain a single type", Justification = "Multiple types in this file are intentional.", Scope = "file", Target = "Telemetry/TelemetryEventSource.cs")]
+[assembly: SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1413:Use trailing comma in multi-line initializers", Justification = "File comes from a template with a different codestyle.", Scope = "file", Target = "Telemetry/TelemetryEventSource.cs")]
+[assembly: SuppressMessage("Performance", "CA1852:Seal internal types", Justification = "File comes from a template with a different codestyle.", Scope = "file", Target = "Telemetry/TelemetryEventSource.cs")]
+
 // Uninstantiated TestFixture classes
 [assembly: SuppressMessage("Microsoft.Performance", "CA1812: Avoid uninstantiated internal classes", Scope = "module", Justification = "CA1812 will be thrown for every file in the test project. This is mentioned here: dotnet/roslyn-analyzers#1830")]
 
