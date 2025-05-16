@@ -131,6 +131,11 @@ extends:
                     destination: '$(System.DefaultWorkingDirectory)\AzureExtension\Telemetry\'
 
                 - task: PowerShell@2
+                  displayName: Adding header to TelemetryEventSource.cs
+                  inputs:
+                    filePath: './build/scripts/AddHeaderToTelemetryFile.ps1'
+
+                - task: PowerShell@2
                   displayName: Building MSIX
                   inputs:
                     filePath: './build/scripts/Build.ps1'
