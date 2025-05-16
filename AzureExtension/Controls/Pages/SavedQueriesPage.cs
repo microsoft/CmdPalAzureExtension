@@ -6,7 +6,6 @@ using AzureExtension.Controls;
 using AzureExtension.Controls.Pages;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
-using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension;
 
