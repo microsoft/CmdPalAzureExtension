@@ -6,6 +6,8 @@ using AzureExtension.Controls.Forms;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Microsoft.VisualStudio.Services.Commerce;
+using static Microsoft.Azure.Pipelines.WebApi.PipelinesResources;
 
 namespace AzureExtension.Controls.Pages;
 
@@ -15,20 +17,20 @@ public sealed partial class SaveQueryPage : ContentPage
     private readonly StatusMessage _statusMessage;
     private readonly string _successMessage;
     private readonly string _errorMessage;
+    private readonly IResources _resources;
 
-    public SaveQueryPage(SaveQueryForm saveQueryForm, StatusMessage statusMessage, string successMessage, string errorMessage, string saveQueryPageTitle)
+    public SaveQueryPage(SaveQueryForm saveQueryForm, StatusMessage statusMessage, IResources resources)
     {
         _saveQueryForm = saveQueryForm;
         _statusMessage = statusMessage;
-        _successMessage = successMessage;
-        _errorMessage = errorMessage;
+        _resources = resources;
+        _successMessage = _resources.GetResource("Message_Query_Saved");
+        _errorMessage = _resources.GetResource("Message_Query_Saved_Error");
         Icon = IconLoader.GetIcon("Add");
-        Title = saveQueryPageTitle;
+        Title = _resources.GetResource("Pages_SaveQuery_Title");
 
-        // Wire up events using the helper
         FormEventHelper.WireFormEvents(_saveQueryForm, this, _statusMessage, _successMessage, _errorMessage);
 
-        // Hide status message initially
         ExtensionHost.HideStatus(_statusMessage);
     }
 
