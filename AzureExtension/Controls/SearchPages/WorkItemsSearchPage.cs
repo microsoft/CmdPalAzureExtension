@@ -24,7 +24,8 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         _resources = resources;
         _timeSpanHelper = timeSpanHelper;
         Icon = IconLoader.GetIcon("Query");
-        Name = query.Name;
+        Title = query.Name;
+        Name = Title; // Name is for the command, title is for the page
         ShowDetails = true;
     }
 

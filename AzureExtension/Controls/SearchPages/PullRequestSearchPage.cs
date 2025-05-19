@@ -23,7 +23,8 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
         _resources = resources;
         _timeSpanHelper = timeSpanHelper;
         Icon = IconLoader.GetIcon("PullRequest");
-        Name = search.Name;
+        Title = search.Name;
+        Name = Title; // Name is for the command, title is for the page
         ShowDetails = true;
     }
 

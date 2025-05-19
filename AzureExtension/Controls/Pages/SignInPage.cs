@@ -21,7 +21,7 @@ public partial class SignInPage : ContentPage
     {
         _resources = resources;
         Icon = IconLoader.GetIcon("Logo");
-        Title = _resources.GetResource("Forms_SignIn_PageTitle");
+        Title = _resources.GetResource("Pages_SignIn_Title");
         Name = Title; // Title is for the Page, Name is for the command
         _signInForm = signInForm;
         _signInCommand = signInCommand;

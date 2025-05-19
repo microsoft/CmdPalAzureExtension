@@ -17,13 +17,13 @@ internal sealed partial class EditPullRequestSearchPage : ContentPage
     private readonly string _successMessage;
     private readonly string _errorMessage;
 
-    public EditPullRequestSearchPage(IResources resources, SavePullRequestSearchForm savePullRequestSearchForm, StatusMessage statusMessage, string successMessage, string errorMessage)
+    public EditPullRequestSearchPage(IResources resources, SavePullRequestSearchForm savePullRequestSearchForm, StatusMessage statusMessage)
     {
         _resources = resources;
         _savePullRequestSearchForm = savePullRequestSearchForm;
         _statusMessage = statusMessage;
-        _successMessage = successMessage;
-        _errorMessage = errorMessage;
+        _successMessage = _resources.GetResource("Pages_EditPullRequestSearch_SuccessMessage");
+        _errorMessage = _resources.GetResource("Pages_EditPullRequestSearch_FailureMessage");
 
         // Wire up events using the helper
         FormEventHelper.WireFormEvents(_savePullRequestSearchForm, this, _statusMessage, _successMessage, _errorMessage);
@@ -33,7 +33,7 @@ internal sealed partial class EditPullRequestSearchPage : ContentPage
 
         // Set page properties
         Title = _resources.GetResource("Pages_Edit");
-        Name = _resources.GetResource("Pages_Edit"); // Title is for the Page, Name is for the Command
+        Name = Title; // Title is for the Page, Name is for the Command
         Icon = IconLoader.GetIcon("Edit");
     }
 
