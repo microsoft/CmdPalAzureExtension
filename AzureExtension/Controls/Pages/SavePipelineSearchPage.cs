@@ -23,6 +23,7 @@ public class SavePipelineSearchPage : ContentPage
         _savePipelineSearchForm = savePipelineSearchForm;
         _statusMessage = statusMessage;
         Title = _resources.GetResource("Pages_SavePipelineSearch_Title");
+        Icon = IconLoader.GetIcon("Add");
 
         FormEventHelper.WireFormEvents(
             _savePipelineSearchForm,

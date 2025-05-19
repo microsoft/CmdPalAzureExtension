@@ -24,6 +24,7 @@ public class IconLoader
             { "Deliverable", (@"Assets\Deliverable.svg", @"Assets\Deliverable.svg") },
             { "Epic", (@"Assets\Epic.png", @"Assets\Epic.png") },
             { "Feature", (@"Assets\Feature.png", @"Assets\Feature.png") },
+            { "Failure", (@"Assets\Failure.png", @"Assets\Failure.png") },
             { "Impediment", (@"Assets\Impediment.png", @"Assets\Impediment.png") },
             { "Issue", (@"Assets\Issue.png", @"Assets\Issue.png") },
             { "Pipeline", (@"Assets\Pipeline.png", @"Assets\Pipeline.png") },

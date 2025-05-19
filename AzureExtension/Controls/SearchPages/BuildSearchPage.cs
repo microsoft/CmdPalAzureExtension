@@ -23,7 +23,7 @@ public partial class BuildSearchPage : SearchPage<IBuild>
         ILiveContentDataProvider<IBuild> contentDataProvider,
         ILiveSearchDataProvider<IDefinition> searchDataProvider,
         TimeSpanHelper timeSpanHelper)
-        : base(search, contentDataProvider)
+        : base(search, contentDataProvider, resources)
     {
         _search = search;
         _resources = resources;

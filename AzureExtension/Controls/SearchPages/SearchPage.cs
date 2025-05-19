@@ -17,13 +17,15 @@ public abstract partial class SearchPage<TContentData> : ListPage
     protected IAzureSearch CurrentSearch { get; private set; }
 
     private readonly ILiveContentDataProvider<TContentData> _contentDataProvider;
+    private readonly IResources _resources;
 
-    public SearchPage(IAzureSearch search, ILiveContentDataProvider<TContentData> dataProvider)
+    public SearchPage(IAzureSearch search, ILiveContentDataProvider<TContentData> dataProvider, IResources resources)
     {
         CurrentSearch = search;
         Name = search.Name;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         _contentDataProvider = dataProvider;
+        _resources = resources;
     }
 
     protected void CacheManagerUpdateHandler(object? source, CacheManagerUpdateEventArgs e)
@@ -59,8 +61,8 @@ public abstract partial class SearchPage<TContentData> : ListPage
                 {
                     new ListItem(new NoOpCommand())
                     {
-                        Title = "No items found",
-                        Icon = IconLoader.GetIcon("Logo"),
+                        Title = _resources.GetResource("Pages_Search_NoItemsFound"),
+                        Icon = GetIconForSearch(CurrentSearch),
                     },
                 };
             }
@@ -71,12 +73,12 @@ public abstract partial class SearchPage<TContentData> : ListPage
             {
                 new(new NoOpCommand())
                 {
-                    Title = "An error occurred with search",
+                    Title = _resources.GetResource("Pages_Search_ErrorMessage"),
                     Details = new Details()
                     {
                         Body = ex.Message,
                     },
-                    Icon = new IconInfo(string.Empty),
+                    Icon = IconLoader.GetIcon("Failure"),
                 },
             };
         }
@@ -98,5 +100,25 @@ public abstract partial class SearchPage<TContentData> : ListPage
     private Task<IEnumerable<TContentData>> LoadContentData()
     {
         return _contentDataProvider.GetContentData(CurrentSearch);
+    }
+
+    private IconInfo GetIconForSearch(IAzureSearch search)
+    {
+        if (search is IQuerySearch)
+        {
+            return IconLoader.GetIcon("Query");
+        }
+        else if (search is IPullRequestSearch)
+        {
+            return IconLoader.GetIcon("PullRequest");
+        }
+        else if (search is IPipelineDefinitionSearch)
+        {
+            return IconLoader.GetIcon("Pipeline");
+        }
+        else
+        {
+            return IconLoader.GetIcon("Logo");
+        }
     }
 }
