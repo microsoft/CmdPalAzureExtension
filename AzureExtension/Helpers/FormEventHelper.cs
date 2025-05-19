@@ -29,7 +29,7 @@ public static class FormEventHelper
     {
         if (args?.Exception != null)
         {
-            var message = $"{errorMessage}: {args.Exception.Message}";
+            var message = $"{errorMessage} {args.Exception.Message}";
 
             ExtensionHost.LogMessage(new LogMessage() { Message = args.Exception.Message });
             SetStatusMessage(statusMessage, message, MessageState.Error);

@@ -290,7 +290,7 @@
     <comment>Name of page that shows list of saved github queries</comment>
   </data>
   <data name="Pages_SavedQueries_Error" xml:space="preserve">
-    <value>Error fetching saved queries: </value>
+    <value>Error fetching saved queries:</value>
     <comment>Shown in a toast when error happens when saving a query</comment>
   </data>
   <data name="Pages_SavedQueries_Failure" xml:space="preserve">
@@ -414,7 +414,7 @@
     <comment>Success message when a pull request search has saved successfully</comment>
   </data>
   <data name="Pages_SavePullRequestSearch_FailureMessage" xml:space="preserve">
-    <value>Saving pull request search failed: </value>
+    <value>Saving pull request search failed:</value>
     <comment>Message shown when the extension fails to save a pull request search that is not due to a thrown error</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplateViewMineTitle" xml:space="preserve">
@@ -526,7 +526,7 @@
     <comment>Message shown when a pipeline search saves correctly</comment>
   </data>
   <data name="Pages_SavePipelineSearch_FailureMessage" xml:space="preserve">
-    <value>Saving pipeline failed: </value>
+    <value>Saving pipeline failed:</value>
     <comment>Message shown when a pipeline search fails to save</comment>
   </data>
   <data name="Pages_SavedPipelineSearches_Title" xml:space="preserve">
@@ -538,7 +538,7 @@
     <comment>The success message when a pipeline search is saved</comment>
   </data>
   <data name="Pages_EditPipelineSearch_FailureMessage" xml:space="preserve">
-    <value>Editing pipeline search failed: </value>
+    <value>Editing pipeline search failed:</value>
     <comment>The message shown when editing a pipeline search fails</comment>
   </data>
   <data name="PipelineBuild_Requester" xml:space="preserve">
@@ -586,7 +586,7 @@
     <comment>The name of the sign out command</comment>
   </data>
   <data name="Pages_SavedPipelineSearches_Error" xml:space="preserve">
-    <value>Error fetching saved pipeline searches: </value>
+    <value>Error fetching saved pipeline searches:</value>
     <comment>An error message shown if the saved pipeline searches cannot be accessed</comment>
   </data>
   <data name="Pages_SavePipelineSearch_Title" xml:space="preserve">
@@ -602,7 +602,7 @@
     <comment>Success message that displays when a user edits a pull request search.</comment>
   </data>
   <data name="Pages_EditPullRequestSearch_FailureMessage" xml:space="preserve">
-    <value>Editing pull request search failed: </value>
+    <value>Editing pull request search failed:</value>
     <comment>Message displayed if there's an error in editing a pull request search.</comment>
   </data>
   <data name="Pages_EditQuery_SuccessMessage" xml:space="preserve">
@@ -610,7 +610,7 @@
     <comment>Message displayed when a query has been successfully edited.</comment>
   </data>
   <data name="Pages_EditQuery_FailureMessage" xml:space="preserve">
-    <value>Editing query failed: </value>
+    <value>Editing query failed:</value>
     <comment>Message displayed there's a failure in query editing.</comment>
   </data>
   <data name="Pages_Search_ErrorMessage" xml:space="preserve">
