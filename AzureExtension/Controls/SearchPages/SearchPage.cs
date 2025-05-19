@@ -62,7 +62,7 @@ public abstract partial class SearchPage<TContentData> : ListPage
                     new ListItem(new NoOpCommand())
                     {
                         Title = _resources.GetResource("Pages_Search_NoItemsFound"),
-                        Icon = IconLoader.GetIcon("Logo"),
+                        Icon = GetIconForSearch(CurrentSearch),
                     },
                 };
             }
@@ -78,7 +78,7 @@ public abstract partial class SearchPage<TContentData> : ListPage
                     {
                         Body = ex.Message,
                     },
-                    Icon = new IconInfo(string.Empty),
+                    Icon = IconLoader.GetIcon("Failure"),
                 },
             };
         }
@@ -100,5 +100,25 @@ public abstract partial class SearchPage<TContentData> : ListPage
     private Task<IEnumerable<TContentData>> LoadContentData()
     {
         return _contentDataProvider.GetContentData(CurrentSearch);
+    }
+
+    private IconInfo GetIconForSearch(IAzureSearch search)
+    {
+        if (search is IQuerySearch)
+        {
+            return IconLoader.GetIcon("Query");
+        }
+        else if (search is IPullRequestSearch)
+        {
+            return IconLoader.GetIcon("PullRequest");
+        }
+        else if (search is IPipelineDefinitionSearch)
+        {
+            return IconLoader.GetIcon("Pipeline");
+        }
+        else
+        {
+            return IconLoader.GetIcon("Logo");
+        }
     }
 }

@@ -25,13 +25,10 @@ internal sealed partial class EditPullRequestSearchPage : ContentPage
         _successMessage = _resources.GetResource("Pages_EditPullRequestSearch_SuccessMessage");
         _errorMessage = _resources.GetResource("Pages_EditPullRequestSearch_FailureMessage");
 
-        // Wire up events using the helper
         FormEventHelper.WireFormEvents(_savePullRequestSearchForm, this, _statusMessage, _successMessage, _errorMessage);
 
-        // Hide status message initially
         ExtensionHost.HideStatus(_statusMessage);
 
-        // Set page properties
         Title = _resources.GetResource("Pages_Edit");
         Name = Title; // Title is for the Page, Name is for the Command
         Icon = IconLoader.GetIcon("Edit");

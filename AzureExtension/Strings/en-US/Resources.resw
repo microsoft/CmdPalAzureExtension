@@ -523,11 +523,11 @@
   </data>
   <data name="Pages_SavePipelineSearch_SuccessMessage" xml:space="preserve">
     <value>Pipeline saved successfully!</value>
-    <comment>Shown if the pipeline search saves successfully</comment>
+    <comment>Message shown when a pipeline search saves correctly</comment>
   </data>
   <data name="Pages_SavePipelineSearch_FailureMessage" xml:space="preserve">
     <value>Saving pipeline failed: </value>
-    <comment>Shown if there's an error in saving a pipeline search</comment>
+    <comment>Message shown when a pipeline search fails to save</comment>
   </data>
   <data name="Pages_SavedPipelineSearches_Title" xml:space="preserve">
     <value>Saved Azure DevOps pipelines</value>
@@ -577,14 +577,6 @@
     <value>My team's pull requests</value>
     <comment>A sample title for a pull request search</comment>
   </data>
-  <data name="Pages_Search_NoItemsFound" xml:space="preserve">
-    <value>No items found</value>
-    <comment>Message displayed when there are no items on a search page</comment>
-  </data>
-  <data name="Pages_Search_ErrorMessage" xml:space="preserve">
-    <value>An error occurred in search:</value>
-    <comment>Message displayed on search page when fetching search items fails</comment>
-  </data>
   <data name="Commands_SignIn" xml:space="preserve">
     <value>Sign in</value>
     <comment>The name of the sign in command</comment>
@@ -592,22 +584,6 @@
   <data name="Commands_SignOut" xml:space="preserve">
     <value>Sign out</value>
     <comment>The name of the sign out command</comment>
-  </data>
-  <data name="Pages_EditPullRequestSearch_FailureMessage" xml:space="preserve">
-    <value>Editing pull request search failed: </value>
-    <comment>The message shown when editing a pull request search fails</comment>
-  </data>
-  <data name="Pages_EditPullRequestSearch_SuccessMessage" xml:space="preserve">
-    <value>Pull request search edited successfully!</value>
-    <comment>Message shown when a user successfully saves a pull request search</comment>
-  </data>
-  <data name="Pages_EditQuery_FailureMessage" xml:space="preserve">
-    <value>Editing query failed: </value>
-    <comment>Message shown when editing a query fails</comment>
-  </data>
-  <data name="Pages_EditQuery_SuccessMessage" xml:space="preserve">
-    <value>Query edited successfully!</value>
-    <comment>Message shown when a query is edited successfully</comment>
   </data>
   <data name="Pages_SavedPipelineSearches_Error" xml:space="preserve">
     <value>Error fetching saved pipeline searches: </value>
@@ -620,5 +596,29 @@
   <data name="Pages_SaveQuery_Title" xml:space="preserve">
     <value>Save query</value>
     <comment>The title for the SaveQueryPage</comment>
+  </data>
+  <data name="Pages_EditPullRequestSearch_SuccessMessage" xml:space="preserve">
+    <value>Pull request search edited successfully!</value>
+    <comment>Success message that displays when a user edits a pull request search.</comment>
+  </data>
+  <data name="Pages_EditPullRequestSearch_FailureMessage" xml:space="preserve">
+    <value>Editing pull request search failed: </value>
+    <comment>Message displayed if there's an error in editing a pull request search.</comment>
+  </data>
+  <data name="Pages_EditQuery_SuccessMessage" xml:space="preserve">
+    <value>Query edited successfully!</value>
+    <comment>Message displayed when a query has been successfully edited.</comment>
+  </data>
+  <data name="Pages_EditQuery_FailureMessage" xml:space="preserve">
+    <value>Editing query failed: </value>
+    <comment>Message displayed there's a failure in query editing.</comment>
+  </data>
+  <data name="Pages_Search_ErrorMessage" xml:space="preserve">
+    <value>An error occurred</value>
+    <comment>The message displayed if one of the search pages fails to return items</comment>
+  </data>
+  <data name="Pages_Search_NoItemsFound" xml:space="preserve">
+    <value>No items found</value>
+    <comment>Displayed if no items are returned</comment>
   </data>
 </root>

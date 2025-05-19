@@ -24,6 +24,7 @@ public class SavePipelineSearchPage : ContentPage
         _statusMessage = statusMessage;
         Title = _resources.GetResource("Pages_SavePipelineSearch_Title");
         Name = Title; // Name is for commands, title is for the page
+        Icon = IconLoader.GetIcon("Add");
 
         FormEventHelper.WireFormEvents(
             _savePipelineSearchForm,
