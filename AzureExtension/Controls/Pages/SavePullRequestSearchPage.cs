@@ -17,7 +17,7 @@ public class SavePullRequestSearchPage : ContentPage
 
     private readonly IResources _resources;
 
-    public SavePullRequestSearchPage(SavePullRequestSearchForm savePullRequestSearchForm, StatusMessage statusMessage, IResources resources )
+    public SavePullRequestSearchPage(SavePullRequestSearchForm savePullRequestSearchForm, StatusMessage statusMessage, IResources resources)
     {
         _resources = resources;
         Title = _resources.GetResource("Pages_SavePullRequestSearch_Title");
@@ -25,10 +25,8 @@ public class SavePullRequestSearchPage : ContentPage
         _savePullRequestSearchForm = savePullRequestSearchForm;
         _statusMessage = statusMessage;
 
-        // Wire up events using the helper
         FormEventHelper.WireFormEvents(_savePullRequestSearchForm, this, _statusMessage, _resources.GetResource("Pages_SavePullRequestSearch_SuccessMessage"), _resources.GetResource("Pages_SavePullRequestSearch_FailureMessage"));
 
-        // Hide status message initially
         ExtensionHost.HideStatus(_statusMessage);
     }
 

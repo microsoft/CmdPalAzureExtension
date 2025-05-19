@@ -30,6 +30,7 @@ public sealed partial class SaveQueryPage : ContentPage
         FormEventHelper.WireFormEvents(_saveQueryForm, this, _statusMessage, _successMessage, _errorMessage);
 
         ExtensionHost.HideStatus(_statusMessage);
+        _resources = resources;
     }
 
     public override IContent[] GetContent()

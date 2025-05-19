@@ -55,7 +55,7 @@ public partial class BuildSearchPage : SearchPage<IBuild>
             return IconLoader.GetIconForPipelineStatusAndResult(lastBuild.Status, lastBuild.Result);
         }
 
-        return IconLoader.GetIcon("Logo");
+        return IconLoader.GetIcon("Pipeline");
     }
 
     protected override ListItem GetListItem(IBuild item)

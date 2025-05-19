@@ -146,11 +146,11 @@
     <comment>Title for the extension</comment>
   </data>
   <data name="Forms_Edit_Query" xml:space="preserve">
-    <value>Edit Query</value>
+    <value>Edit query</value>
     <comment>Shown in form button to edit a query</comment>
   </data>
   <data name="Forms_Save_Query" xml:space="preserve">
-    <value>Save Query</value>
+    <value>Save query</value>
     <comment>Shown in form button to save a query</comment>
   </data>
   <data name="Forms_SaveQuery_TemplateEnteredQueryError" xml:space="preserve">
@@ -162,7 +162,7 @@
     <comment>Shown if the user submits the form without entering a query</comment>
   </data>
   <data name="Forms_SaveQuery_TemplateEnteredQueryLabel" xml:space="preserve">
-    <value>Query string or URL:</value>
+    <value>Query URL</value>
     <comment>Shown as the label for the input text box for the Azure query</comment>
   </data>
   <data name="Forms_SavePipelineSearch_TemplateEnteredPipelineSearchLabel" xml:space="preserve">
@@ -182,11 +182,11 @@
     <comment>The title for the button that submits the form and saves the query</comment>
   </data>
   <data name="Forms_SignIn" xml:space="preserve">
-    <value>Sign In</value>
+    <value>Sign in</value>
     <comment>Shown in sign in form as title and button title</comment>
   </data>
   <data name="Forms_SignIn_Tooltip" xml:space="preserve">
-    <value>Sign in to Azure Dev Ops</value>
+    <value>Sign in to Azure DevOps</value>
     <comment>Shown in form's sign in button tooltip</comment>
   </data>
   <data name="Forms_SignOut_TemplateAuthButtonTitle" xml:space="preserve">
@@ -210,11 +210,11 @@
     <comment>Shown in a toast when query is saved</comment>
   </data>
   <data name="Message_Query_Saved_Error" xml:space="preserve">
-    <value>Error in saving query</value>
+    <value>Error in saving query:</value>
     <comment>Shown in a toast when there is an error saving a query</comment>
   </data>
   <data name="Message_Sign_In_Fail" xml:space="preserve">
-    <value>Sign in failed</value>
+    <value>Sign in failed:</value>
     <comment>Message shown in a toast when sign in proccess fails</comment>
   </data>
   <data name="Message_Sign_In_Success" xml:space="preserve">
@@ -222,7 +222,7 @@
     <comment>Shown in a toast when sign in proccess succeeded</comment>
   </data>
   <data name="Message_Sign_Out_Fail" xml:space="preserve">
-    <value>Sign out failed</value>
+    <value>Sign out failed:</value>
     <comment>Shown in a toast when sign out process fails</comment>
   </data>
   <data name="Message_Sign_Out_Success" xml:space="preserve">
@@ -286,11 +286,11 @@
     <comment>Shown in command to copy title of pull request on a page</comment>
   </data>
   <data name="Pages_SavedQueries" xml:space="preserve">
-    <value>Saved Azure DevOps Queries</value>
+    <value>Saved Azure DevOps queries</value>
     <comment>Name of page that shows list of saved github queries</comment>
   </data>
   <data name="Pages_SavedQueries_Error" xml:space="preserve">
-    <value>Error in removing query: </value>
+    <value>Error fetching saved queries:</value>
     <comment>Shown in a toast when error happens when saving a query</comment>
   </data>
   <data name="Pages_SavedQueries_Failure" xml:space="preserve">
@@ -334,18 +334,18 @@
     <comment>Indicates when something was updated</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplateRepositoryUrlLabel" xml:space="preserve">
-    <value>Enter Repository URL</value>
+    <value>Enter repository URL</value>
     <comment>The label for a text input where users enter the URL of the repository they want to view pull requests from</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplateRepositoryUrlPlaceholder" xml:space="preserve">
-    <value>Enter Repository URL</value>
+    <value>Enter repository URL</value>
     <comment>A placeholder for a text input where users enter the repository URL for a pull request search</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplateRepositoryUrlError" xml:space="preserve">
     <value>Must enter repository URL</value>
     <comment>The error that appears if a user does not enter a repository URL when saving a pull request search</comment>
   </data>
-  <data name="Forms_SavePullRequestSearch_TemplateDefaultView" xml:space="preserve">
+  <data name="Forms_SavePullRequestSearch_TemplateViewDefault" xml:space="preserve">
     <value>Mine</value>
     <comment>The default option for the pull request search view</comment>
   </data>
@@ -366,7 +366,7 @@
     <comment>The label for the checkbox that adds a query to the top-level commands</comment>
   </data>
   <data name="Forms_SignIn_TemplateAuthTitle" xml:space="preserve">
-    <value>Sign into your Azure Dev Ops account</value>
+    <value>Sign into your Azure DevOps account</value>
     <comment>The title for the form displayed in the SignInPage</comment>
   </data>
   <data name="Forms_SignIn_TemplateAuthButtonTitle" xml:space="preserve">
@@ -374,16 +374,12 @@
     <comment>The title for the SignIn template</comment>
   </data>
   <data name="Forms_SignIn_TemplateAuthButtonTooltip" xml:space="preserve">
-    <value>Sign into your Azure Dev Ops account</value>
+    <value>Sign into your Azure DevOps account</value>
     <comment>The tooltip for the "Sign In" button in the SignInPage</comment>
   </data>
   <data name="Forms_SignOut_PageTitle" xml:space="preserve">
     <value>Sign out</value>
     <comment>The title for the SignOutPage.</comment>
-  </data>
-  <data name="Forms_SignIn_PageTitle" xml:space="preserve">
-    <value>Sign in</value>
-    <comment>The page title for the SignInPage</comment>
   </data>
   <data name="Forms_SignIn_PageSubtitle" xml:space="preserve">
     <value>Sign into your Azure DevOps account</value>
@@ -394,15 +390,15 @@
     <comment>Title for the AddSavedPullRequestSearch list item</comment>
   </data>
   <data name="Pages_SavedPullRequestSearches_Title" xml:space="preserve">
-    <value>Saved Azure DevOps Pull Request Searches</value>
+    <value>Saved Azure DevOps pull request searches</value>
     <comment>Name of the page that shows user-saved pull request searches</comment>
   </data>
   <data name="Pages_SignIn_Title" xml:space="preserve">
-    <value>Sign In</value>
+    <value>Sign in</value>
     <comment>The title for that page that signs in users</comment>
   </data>
   <data name="Pages_SavedPullRequestSearches_Error" xml:space="preserve">
-    <value>Error in removing pull request search:</value>
+    <value>Error in fetching pull request searches:</value>
     <comment>Shown in a toast when error happens when saving a query</comment>
   </data>
   <data name="Pages_SavedPullRequestSearches_Failure" xml:space="preserve">
@@ -410,7 +406,7 @@
     <comment>Shown when failed to remove a search from saved queries page</comment>
   </data>
   <data name="Pages_SavePullRequestSearch_Title" xml:space="preserve">
-    <value>Save Pull Request Search</value>
+    <value>Save pull request search</value>
     <comment>The title for the page that saves pull request searches</comment>
   </data>
   <data name="Pages_SavePullRequestSearch_SuccessMessage" xml:space="preserve">
@@ -418,7 +414,7 @@
     <comment>Success message when a pull request search has saved successfully</comment>
   </data>
   <data name="Pages_SavePullRequestSearch_FailureMessage" xml:space="preserve">
-    <value>Saving pull request search failed: </value>
+    <value>Saving pull request search failed:</value>
     <comment>Message shown when the extension fails to save a pull request search that is not due to a thrown error</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplateViewMineTitle" xml:space="preserve">
@@ -426,7 +422,7 @@
     <comment>The option to select all pull requests in a repository that are created by the authenticated user</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplateViewAssignedToMeTitle" xml:space="preserve">
-    <value>Assigned to Me</value>
+    <value>Assigned to me</value>
     <comment>The option to select all pull requests in a repository that are assigned to the authenticated user</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplateViewAllTitle" xml:space="preserve">
@@ -438,11 +434,11 @@
     <comment>Title for command to remove a query or pull request search</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_CopyWorkItemId" xml:space="preserve">
-    <value>Copy Work Item ID</value>
+    <value>Copy work item ID</value>
     <comment>The label for the command to copy the work item ID</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_CopyURLCommand" xml:space="preserve">
-    <value>Copy Work Item URL</value>
+    <value>Copy work item URL</value>
     <comment>The label for the command to copy a work item URL</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_Reason" xml:space="preserve">
@@ -450,7 +446,7 @@
     <comment>The label for the work item's "Reason" detail</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_AssignedTo" xml:space="preserve">
-    <value>Assigned To</value>
+    <value>Assigned to</value>
     <comment>The label for the work item's "Assigned To" detail</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_Unassigned" xml:space="preserve">
@@ -458,7 +454,7 @@
     <comment>The label for the work item's "Unassigned" detail</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_LastChanged" xml:space="preserve">
-    <value>Last Changed</value>
+    <value>Last changed</value>
     <comment>The label for the work item's "Last Changed" detail</comment>
   </data>
   <data name="Pages_WorkItemsSearchPage_CreatedDate" xml:space="preserve">
@@ -466,11 +462,11 @@
     <comment>The label for the work item's "Created Date" detail</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_CopyIdCommand" xml:space="preserve">
-    <value>Copy Pull Request ID</value>
+    <value>Copy pull request ID</value>
     <comment>The label for the command to copy a pull request's ID</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_CopyURLCommand" xml:space="preserve">
-    <value>Copy Pull Request URL</value>
+    <value>Copy pull request URL</value>
     <comment>The label for the command to copy the pull request URL</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_Author" xml:space="preserve">
@@ -482,15 +478,15 @@
     <comment>Label for the pull request's "Updated At" detail</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_TargetBranch" xml:space="preserve">
-    <value>Target Branch</value>
+    <value>Target branch</value>
     <comment>Label for the pull request's "Target Branch" detail</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_PolicyStatus" xml:space="preserve">
-    <value>Policy Status</value>
+    <value>Policy status</value>
     <comment>Label for the pull request's "Policy Status" detail</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_PolicyStatusReason" xml:space="preserve">
-    <value>Policy Status Reason</value>
+    <value>Policy status reason</value>
     <comment>Label for the pull request's "Policy Status Reason" detail</comment>
   </data>
   <data name="Pages_PullRequestSearchPage_InternalId" xml:space="preserve">
@@ -506,11 +502,11 @@
     <comment>This replaces the pull request's "Policy Status Reason" detail value when none was provided from ADO</comment>
   </data>
   <data name="Forms_Save_PipelineSearch" xml:space="preserve">
-    <value>Save Pipeline Search</value>
+    <value>Save pipeline search</value>
     <comment>The title for the form to save a pipeline search</comment>
   </data>
   <data name="Forms_Edit_PipelineSearch" xml:space="preserve">
-    <value>Edit Pipeline Search</value>
+    <value>Edit pipeline search</value>
     <comment>The title for the form to edit a pipeline search</comment>
   </data>
   <data name="Forms_SavePipelineSearch_TemplateEnteredPipelineSearchError" xml:space="preserve">
@@ -519,26 +515,22 @@
   </data>
   <data name="Forms_SavePipelineSearch_URLPlaceholderSuffix" xml:space="preserve">
     <value>organization/project/_build?definitionId=######</value>
-    <comment>The suffix for the pipeline search URL placeholder</comment>
+    <comment>The suffix for the pipeline search URL placeholder. The full URL is "https://dev.azure.com/{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}".</comment>
   </data>
   <data name="ListItems_AddPipelineSearch" xml:space="preserve">
-    <value>Add a pipeline by URL</value>
+    <value>Add a pipeline</value>
     <comment>Title for the AddPipelineSearchListItem</comment>
-  </data>
-  <data name="Pages_SavePipelineSearch_Title" xml:space="preserve">
-    <value>Save Pipeline By URL</value>
-    <comment>Title for the SavePipelineSearchPage</comment>
   </data>
   <data name="Pages_SavePipelineSearch_SuccessMessage" xml:space="preserve">
     <value>Pipeline saved successfully!</value>
     <comment>Message shown when a pipeline search saves correctly</comment>
   </data>
   <data name="Pages_SavePipelineSearch_FailureMessage" xml:space="preserve">
-    <value>Saving pipeline failed: </value>
+    <value>Saving pipeline failed:</value>
     <comment>Message shown when a pipeline search fails to save</comment>
   </data>
   <data name="Pages_SavedPipelineSearches_Title" xml:space="preserve">
-    <value>Saved Azure DevOps Pipelines</value>
+    <value>Saved Azure DevOps pipelines</value>
     <comment>The title for the SavedPipelinesPage</comment>
   </data>
   <data name="Pages_EditPipelineSearch_SuccessMessage" xml:space="preserve">
@@ -546,7 +538,7 @@
     <comment>The success message when a pipeline search is saved</comment>
   </data>
   <data name="Pages_EditPipelineSearch_FailureMessage" xml:space="preserve">
-    <value>Editing pipeline search failed: </value>
+    <value>Editing pipeline search failed:</value>
     <comment>The message shown when editing a pipeline search fails</comment>
   </data>
   <data name="PipelineBuild_Requester" xml:space="preserve">
@@ -554,11 +546,11 @@
     <comment>The user or account that started the pipeline run</comment>
   </data>
   <data name="PipelineBuild_SourceBranch" xml:space="preserve">
-    <value>Source Branch</value>
+    <value>Source branch</value>
     <comment>The code branch the pipeline was run on</comment>
   </data>
   <data name="Pages_BuildSearch_ErrorMessage" xml:space="preserve">
-    <value>An error occurred with search</value>
+    <value>An error occurred with search:</value>
     <comment>A message displayed when an error occurs in page loading</comment>
   </data>
   <data name="Pages_BuildSearch_NoItemsMessage" xml:space="preserve">
@@ -578,19 +570,39 @@
     <comment>Shown if the user submits the SaveSearchForm without a name</comment>
   </data>
   <data name="Forms_SaveQuery_TemplateNameLabel" xml:space="preserve">
-    <value>Name:</value>
+    <value>Name</value>
     <comment>Shown as the name for the saved query</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchTitlePlaceholder" xml:space="preserve">
     <value>My team's pull requests</value>
     <comment>A sample title for a pull request search</comment>
   </data>
+  <data name="Commands_SignIn" xml:space="preserve">
+    <value>Sign in</value>
+    <comment>The name of the sign in command</comment>
+  </data>
+  <data name="Commands_SignOut" xml:space="preserve">
+    <value>Sign out</value>
+    <comment>The name of the sign out command</comment>
+  </data>
+  <data name="Pages_SavedPipelineSearches_Error" xml:space="preserve">
+    <value>Error fetching saved pipeline searches:</value>
+    <comment>An error message shown if the saved pipeline searches cannot be accessed</comment>
+  </data>
+  <data name="Pages_SavePipelineSearch_Title" xml:space="preserve">
+    <value>Save pipeline search</value>
+    <comment>Title for the SavePipelineSearchPage</comment>
+  </data>
+  <data name="Pages_SaveQuery_Title" xml:space="preserve">
+    <value>Save query</value>
+    <comment>The title for the SaveQueryPage</comment>
+  </data>
   <data name="Pages_EditPullRequestSearch_SuccessMessage" xml:space="preserve">
     <value>Pull request search edited successfully!</value>
     <comment>Success message that displays when a user edits a pull request search.</comment>
   </data>
   <data name="Pages_EditPullRequestSearch_FailureMessage" xml:space="preserve">
-    <value>Editing pull request search failed: </value>
+    <value>Editing pull request search failed:</value>
     <comment>Message displayed if there's an error in editing a pull request search.</comment>
   </data>
   <data name="Pages_EditQuery_SuccessMessage" xml:space="preserve">
@@ -598,12 +610,8 @@
     <comment>Message displayed when a query has been successfully edited.</comment>
   </data>
   <data name="Pages_EditQuery_FailureMessage" xml:space="preserve">
-    <value>Editing query failed: </value>
+    <value>Editing query failed:</value>
     <comment>Message displayed there's a failure in query editing.</comment>
-  </data>
-  <data name="Pages_SaveQuery_Title" xml:space="preserve">
-    <value>Save Query</value>
-    <comment>The title for the SaveQueryPage</comment>
   </data>
   <data name="Pages_Search_ErrorMessage" xml:space="preserve">
     <value>An error occurred</value>

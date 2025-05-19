@@ -45,10 +45,10 @@ public abstract class SavedSearchesPage : ListPage
         switch (args.EventType)
         {
             case SearchUpdatedEventType.SearchAdded:
-                RaiseItemsChanged(0);
+                RaiseItemsChanged();
                 break;
             case SearchUpdatedEventType.SearchRemoved:
-                RaiseItemsChanged(0);
+                RaiseItemsChanged();
                 break;
             case SearchUpdatedEventType.SearchRemoving:
                 IsLoading = true;

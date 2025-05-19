@@ -23,7 +23,7 @@ public class SignOutCommand : InvokableCommand
         _authenticationMediator = authenticationMediator;
         _authenticationMediator.SignInAction += ResetCommand;
         _authenticationMediator.SignOutAction += ResetCommand;
-        Name = _resources.GetResource("Forms_SignOut_PageTitle");
+        Name = _resources.GetResource("Commands_SignOut");
         Icon = IconLoader.GetIcon("Logo");
     }
 
