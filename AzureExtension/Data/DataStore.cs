@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
-using System.Reflection;
 using System.Text;
 using AzureExtension.Helpers;
 using Microsoft.Data.Sqlite;
@@ -293,6 +292,11 @@ public class DataStore : IDisposable
             Connection = null;
             SqliteConnection.ClearAllPools();
         }
+    }
+
+    public void Reset()
+    {
+        Create(true);
     }
 
     private bool _disposed; // To detect redundant calls.

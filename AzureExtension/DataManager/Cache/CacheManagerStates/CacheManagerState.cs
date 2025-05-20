@@ -30,4 +30,10 @@ public abstract class CacheManagerState
     {
         return;
     }
+
+    public virtual void ClearCache()
+    {
+        CacheManager.State = CacheManager.PendingClearCacheState;
+        CacheManager.CancelUpdateInProgress();
+    }
 }
