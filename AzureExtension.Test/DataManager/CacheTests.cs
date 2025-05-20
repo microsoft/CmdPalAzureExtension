@@ -5,6 +5,7 @@
 using AzureExtension.Controls;
 using AzureExtension.DataManager;
 using AzureExtension.DataManager.Cache;
+using AzureExtension.Helpers;
 using Moq;
 
 namespace AzureExtension.Test.DataManager;
@@ -223,4 +224,41 @@ public class CacheTests
         Assert.IsNotNull(cacheManager.CurrentUpdateParameters);
         Assert.AreEqual(stubQuery.Object, cacheManager.CurrentUpdateParameters.UpdateObject);
    }
+
+    [TestMethod]
+    public void ClearingCacheWhileIdle()
+    {
+        var dataUpdateService = new Mock<IDataUpdateService>();
+        var authenticationMediator = new AuthenticationMediator();
+        using var cacheManager = new CacheManager(dataUpdateService.Object, authenticationMediator);
+
+        Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
+
+        authenticationMediator.SignOut(new SignInStatusChangedEventArgs(false));
+
+        dataUpdateService.Verify(x => x.PurgeAllData());
+    }
+
+    [TestMethod]
+    public async Task ClearingCacheWhileUpdating()
+    {
+        var dataUpdateService = new Mock<IDataUpdateService>();
+        var authenticationMediator = new AuthenticationMediator();
+        using var cacheManager = new CacheManager(dataUpdateService.Object, authenticationMediator);
+
+        await cacheManager.PeriodicUpdate();
+
+        Assert.AreEqual(cacheManager.PeriodicUpdatingState, cacheManager.State);
+
+        authenticationMediator.SignOut(new SignInStatusChangedEventArgs(false));
+
+        Assert.AreEqual(cacheManager.PendingClearCacheState, cacheManager.State);
+
+        dataUpdateService.Raise(x => x.OnUpdate += null, new DataManagerUpdateEventArgs(
+            DataManagerUpdateKind.Cancel,
+            new DataUpdateParameters() { UpdateType = DataUpdateType.Query }));
+
+        Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
+        dataUpdateService.Verify(x => x.PurgeAllData());
+    }
 }
