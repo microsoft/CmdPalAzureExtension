@@ -16,7 +16,8 @@ public class CacheTests
     public void TestCacheManagerInitialization()
     {
         var dataUpdateService = new Mock<IDataUpdateService>();
-        using var cacheManager = new CacheManager(dataUpdateService.Object);
+        var authenticationMediator = new AuthenticationMediator();
+        using var cacheManager = new CacheManager(dataUpdateService.Object, authenticationMediator);
 
         var state = cacheManager.State;
 
@@ -28,7 +29,8 @@ public class CacheTests
     public async Task TestCacheManagerPeriodicUpdate()
     {
         var dataUpdateService = new Mock<IDataUpdateService>();
-        using var cacheManager = new CacheManager(dataUpdateService.Object);
+        var authenticationMediator = new AuthenticationMediator();
+        using var cacheManager = new CacheManager(dataUpdateService.Object, authenticationMediator);
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 
@@ -48,7 +50,8 @@ public class CacheTests
     public async Task TestCacheManagerRefresh()
     {
         var dataUpdateService = new Mock<IDataUpdateService>();
-        using var cacheManager = new CacheManager(dataUpdateService.Object);
+        var authenticationMediator = new AuthenticationMediator();
+        using var cacheManager = new CacheManager(dataUpdateService.Object, authenticationMediator);
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 
@@ -69,7 +72,8 @@ public class CacheTests
     public async Task TestCacheManagerRefreshWithError()
     {
         var dataUpdateService = new Mock<IDataUpdateService>();
-        using var cacheManager = new CacheManager(dataUpdateService.Object);
+        var authenticationMediator = new AuthenticationMediator();
+        using var cacheManager = new CacheManager(dataUpdateService.Object, authenticationMediator);
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 
@@ -90,7 +94,8 @@ public class CacheTests
     public async Task TestCacheManagerRefreshWhileRefreshingSameQuery()
     {
         var dataUpdateService = new Mock<IDataUpdateService>();
-        using var cacheManager = new CacheManager(dataUpdateService.Object);
+        var authenticationMediator = new AuthenticationMediator();
+        using var cacheManager = new CacheManager(dataUpdateService.Object, authenticationMediator);
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 
@@ -116,7 +121,8 @@ public class CacheTests
     public async Task TestCacheManagerRefreshWhileRefreshingDifferentQuery()
     {
         var dataUpdateService = new Mock<IDataUpdateService>();
-        using var cacheManager = new CacheManager(dataUpdateService.Object);
+        var authenticationMediator = new AuthenticationMediator();
+        using var cacheManager = new CacheManager(dataUpdateService.Object, authenticationMediator);
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 
@@ -157,7 +163,8 @@ public class CacheTests
     public async Task TestCacheManagerRefreshWhilePeriodicUpdating()
     {
         var dataUpdateService = new Mock<IDataUpdateService>();
-        using var cacheManager = new CacheManager(dataUpdateService.Object);
+        var authenticationMediator = new AuthenticationMediator();
+        using var cacheManager = new CacheManager(dataUpdateService.Object, authenticationMediator);
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 
@@ -194,7 +201,8 @@ public class CacheTests
     public async Task TestCacheManagerPeriodicUpdateWhileRefreshing()
     {
         var dataUpdateService = new Mock<IDataUpdateService>();
-        using var cacheManager = new CacheManager(dataUpdateService.Object);
+        var authenticationMediator = new AuthenticationMediator();
+        using var cacheManager = new CacheManager(dataUpdateService.Object, authenticationMediator);
 
         Assert.AreEqual(cacheManager.IdleState, cacheManager.State);
 

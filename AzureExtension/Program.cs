@@ -163,7 +163,8 @@ public sealed class Program
         };
 
         var azureDataManager = new AzureDataManager(cacheDataStore, updatersDictionary);
-        using var cacheManager = new CacheManager(azureDataManager);
+        var authenticationMediator = new AuthenticationMediator();
+        using var cacheManager = new CacheManager(azureDataManager, authenticationMediator);
 
         var contentProvidersDictionary = new Dictionary<Type, IContentDataProvider>
         {
@@ -186,7 +187,6 @@ public sealed class Program
         var resources = new Resources(resourceLoader);
 
         var timeSpanHelper = new TimeSpanHelper(resources);
-        var authenticationMediator = new AuthenticationMediator();
 
         var signInCommand = new SignInCommand(resources, accountProvider, authenticationMediator);
         var signInForm = new SignInForm(authenticationMediator, resources, signInCommand);

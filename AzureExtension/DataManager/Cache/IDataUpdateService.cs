@@ -13,4 +13,6 @@ public interface IDataUpdateService
     bool IsNewOrStaleData(DataUpdateParameters parameters, TimeSpan refreshCooldown);
 
     Task UpdateData(DataUpdateParameters parameters);
+
+    void PurgeAllData();
 }
