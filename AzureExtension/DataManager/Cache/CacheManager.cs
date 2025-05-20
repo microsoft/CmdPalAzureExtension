@@ -165,12 +165,12 @@ public sealed class CacheManager : IDisposable, ICacheManager
         return Task.CompletedTask;
     }
 
-    public void SendUpdateEvent(object? source, CacheManagerUpdateKind kind, Exception? ex = null)
+    private void SendUpdateEvent(object? source, CacheManagerUpdateKind kind, DataUpdateParameters dataUpdateParameters, Exception? ex = null)
     {
         if (OnUpdate != null)
         {
             _logger.Debug($"Sending update event. Kind: {kind}.");
-            OnUpdate.Invoke(source, new CacheManagerUpdateEventArgs(kind, ex));
+            OnUpdate.Invoke(source, new CacheManagerUpdateEventArgs(kind, dataUpdateParameters, ex));
         }
     }
 
@@ -186,14 +186,14 @@ public sealed class CacheManager : IDisposable, ICacheManager
         switch (e.Kind)
         {
             case DataManagerUpdateKind.Success:
-                SendUpdateEvent(this, CacheManagerUpdateKind.Updated);
+                SendUpdateEvent(this, CacheManagerUpdateKind.Updated, e.Parameters);
                 LastUpdated = DateTime.UtcNow;
                 break;
             case DataManagerUpdateKind.Cancel:
-                SendUpdateEvent(this, CacheManagerUpdateKind.Cancel);
+                SendUpdateEvent(this, CacheManagerUpdateKind.Cancel, e.Parameters);
                 break;
             case DataManagerUpdateKind.Error:
-                SendUpdateEvent(this, CacheManagerUpdateKind.Error, e.Exception);
+                SendUpdateEvent(this, CacheManagerUpdateKind.Error, e.Parameters, e.Exception);
                 break;
         }
     }
