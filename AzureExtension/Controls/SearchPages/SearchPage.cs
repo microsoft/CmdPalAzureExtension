@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.DataManager;
 using AzureExtension.DataManager.Cache;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -34,7 +35,7 @@ public abstract partial class SearchPage<TContentData> : ListPage
         if (e.Kind == CacheManagerUpdateKind.Updated && e.DataUpdateParameters != null)
         {
             // This should check if this is the search that originated the update.
-            if (e.DataUpdateParameters.UpdateObject == CurrentSearch)
+            if (e.DataUpdateParameters.UpdateType == DataUpdateType.All || e.DataUpdateParameters.UpdateObject == CurrentSearch)
             {
                 Logger.Information($"Received cache manager update event.");
                 RaiseItemsChanged(0);
