@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 using AzureExtension.Helpers;
 using Microsoft.Data.Sqlite;
