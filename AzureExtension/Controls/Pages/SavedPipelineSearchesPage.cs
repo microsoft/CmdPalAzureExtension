@@ -4,6 +4,8 @@
 
 using AzureExtension.Account;
 using AzureExtension.Controls.ListItems;
+using AzureExtension.DataManager;
+using AzureExtension.DataManager.Cache;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 
@@ -16,6 +18,7 @@ public class SavedPipelineSearchesPage : SavedSearchesPage
     private readonly ISavedSearchesProvider<IPipelineDefinitionSearch> _definitionRepository;
     private readonly IAccountProvider _accountProvider;
     private readonly ISearchPageFactory _searchPageFactory;
+    private readonly ILiveContentDataProvider<IBuild> _buildProvider;
 
     protected override SearchUpdatedType SearchUpdatedType => SearchUpdatedType.Pipeline;
 
@@ -27,6 +30,7 @@ public class SavedPipelineSearchesPage : SavedSearchesPage
         SavedAzureSearchesMediator mediator,
         ISavedSearchesProvider<IPipelineDefinitionSearch> definitionRepository,
         IAccountProvider accountProvider,
+        ILiveContentDataProvider<IBuild> buildProvider,
         ISearchPageFactory searchPageFactory)
         : base(mediator)
     {
@@ -39,6 +43,19 @@ public class SavedPipelineSearchesPage : SavedSearchesPage
         _addPipelineSearchListItem = addPipelineSearchListItem;
         _accountProvider = accountProvider;
         _searchPageFactory = searchPageFactory;
+        _buildProvider = buildProvider;
+        _buildProvider.OnUpdate += OnUpdate;
+    }
+
+    private void OnUpdate(object? source, CacheManagerUpdateEventArgs e)
+    {
+        if (e.Kind == CacheManagerUpdateKind.Updated && e.DataUpdateParameters != null)
+        {
+            if (e.DataUpdateParameters.UpdateType == DataUpdateType.All)
+            {
+                RaiseItemsChanged(0);
+            }
+        }
     }
 
     public override IListItem[] GetItems()
