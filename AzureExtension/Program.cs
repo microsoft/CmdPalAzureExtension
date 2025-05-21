@@ -232,7 +232,7 @@ public sealed class Program
         var addPipelineSearchListItem = new AddPipelineSearchListItem(savePipelineSearchPage, resources);
         var savedPipelineSearchesPage = new SavedPipelineSearchesPage(resources, addPipelineSearchListItem, savedAzureSearchesMediator, pipelineDefinitionRepository, accountProvider, new ContentDataProviderAdapter<IBuild>(dataProvider), searchPageFactory);
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator, savedPipelineSearchesPage);
+        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator, savedPipelineSearchesPage, dataProvider);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 
