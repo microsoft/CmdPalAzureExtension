@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using AzureExtension.DataManager.Cache;
+using AzureExtension.Helpers;
 
 namespace AzureExtension.Controls;
 
@@ -11,5 +12,5 @@ public interface ILiveContentDataProvider<TContentDataType>
 {
     Task<IEnumerable<TContentDataType>> GetContentData(IAzureSearch search);
 
-    event CacheManagerUpdateEventHandler? OnUpdate;
+    WeakEvent<CacheManagerUpdateEventArgs> OnUpdate { get; }
 }

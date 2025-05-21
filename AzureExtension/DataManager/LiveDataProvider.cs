@@ -4,6 +4,7 @@
 
 using AzureExtension.Controls;
 using AzureExtension.DataManager.Cache;
+using AzureExtension.Helpers;
 using Serilog;
 
 namespace AzureExtension.DataManager;
@@ -20,38 +21,7 @@ public class LiveDataProvider : ILiveDataProvider
 
     private readonly List<WeakReference<CacheManagerUpdateEventHandler>> _weakOnUpdateHandlers = new();
 
-    public event CacheManagerUpdateEventHandler? OnUpdate
-    {
-        add
-        {
-            if (value != null)
-            {
-                lock (_weakReferencesLock)
-                {
-                    _weakOnUpdateHandlers.Add(new WeakReference<CacheManagerUpdateEventHandler>(value));
-                }
-            }
-        }
-
-        remove
-        {
-            if (value != null)
-            {
-                lock (_weakReferencesLock)
-                {
-                    _weakOnUpdateHandlers.RemoveAll(wr =>
-                    {
-                        if (wr.TryGetTarget(out var target))
-                        {
-                            return target == value;
-                        }
-
-                        return true;
-                    });
-                }
-            }
-        }
-    }
+    public WeakEvent<CacheManagerUpdateEventArgs> OnUpdate { get; } = new();
 
     public LiveDataProvider(ICacheManager cacheManager, IDictionary<Type, IContentDataProvider> providersDictionary, IDictionary<Type, ISearchDataProvider> searchDataProvidersDictionary)
     {
@@ -65,19 +35,7 @@ public class LiveDataProvider : ILiveDataProvider
 
     public void OnCacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
     {
-        lock (_weakReferencesLock)
-        {
-            _weakOnUpdateHandlers.RemoveAll(wr =>
-            {
-                if (wr.TryGetTarget(out var handler))
-                {
-                    handler.Invoke(source, e);
-                    return false;
-                }
-
-                return true;
-            });
-        }
+        OnUpdate.Raise(source, e);
     }
 
     private async Task WaitForCacheUpdateAsync(DataUpdateParameters parameters)

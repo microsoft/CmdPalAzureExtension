@@ -51,7 +51,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _authenticationMediator = authenticationMediator;
         _savedPipelineSearchesPage = savedPipelineSearchesPage;
         _liveDataProvider = liveDataProvider;
-        _liveDataProvider.OnUpdate += OnLiveDataUpdate;
+        _liveDataProvider.OnUpdate.AddListener(OnLiveDataUpdate);
         DisplayName = "Azure Extension"; // hard-coded because it's a product title
 
         _savedSearchesMediator.SearchUpdated += OnSearchUpdated;

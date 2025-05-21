@@ -26,7 +26,7 @@ public abstract partial class SearchPage<TContentData> : ListPage
         Name = search.Name;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         _contentDataProvider = dataProvider;
-        _contentDataProvider.OnUpdate += CacheManagerUpdateHandler;
+        _contentDataProvider.OnUpdate.AddListener(CacheManagerUpdateHandler);
         _resources = resources;
     }
 

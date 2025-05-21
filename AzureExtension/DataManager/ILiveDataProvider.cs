@@ -4,6 +4,7 @@
 
 using AzureExtension.Controls;
 using AzureExtension.DataManager.Cache;
+using AzureExtension.Helpers;
 
 namespace AzureExtension.DataManager;
 
@@ -13,5 +14,5 @@ public interface ILiveDataProvider
 
     Task<TSearchDataType> GetSearchData<TSearchDataType>(IAzureSearch search);
 
-    event CacheManagerUpdateEventHandler? OnUpdate;
+    WeakEvent<CacheManagerUpdateEventArgs> OnUpdate { get; }
 }

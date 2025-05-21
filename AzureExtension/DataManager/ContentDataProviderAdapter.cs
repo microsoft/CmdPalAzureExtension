@@ -4,6 +4,7 @@
 
 using AzureExtension.Controls;
 using AzureExtension.DataManager.Cache;
+using AzureExtension.Helpers;
 
 namespace AzureExtension.DataManager;
 
@@ -17,11 +18,7 @@ public class ContentDataProviderAdapter<TContentData> : ILiveContentDataProvider
         _liveDataProvider = liveDataProvider;
     }
 
-    public event CacheManagerUpdateEventHandler? OnUpdate
-    {
-        add => _liveDataProvider.OnUpdate += value;
-        remove => _liveDataProvider.OnUpdate -= value;
-    }
+    public WeakEvent<CacheManagerUpdateEventArgs> OnUpdate => _liveDataProvider.OnUpdate;
 
     public Task<IEnumerable<TContentData>> GetContentData(IAzureSearch search)
     {
