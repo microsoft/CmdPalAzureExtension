@@ -54,16 +54,4 @@ public partial class SavedQueriesPage : SavedSearchesPage
             return [_addQueryListItem];
         }
     }
-
-    public void OnQuerySaved(object? sender, object? args)
-    {
-        IsLoading = false;
-
-        if (args != null && args is IQuerySearch)
-        {
-            RaiseItemsChanged(0);
-        }
-
-        // errors are handled in SaveQueryPage
-    }
 }

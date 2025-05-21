@@ -25,6 +25,7 @@ public abstract partial class SearchPage<TContentData> : ListPage
         Name = search.Name;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         _contentDataProvider = dataProvider;
+        _contentDataProvider.OnUpdate += CacheManagerUpdateHandler;
         _resources = resources;
     }
 
@@ -90,8 +91,6 @@ public abstract partial class SearchPage<TContentData> : ListPage
 
     private async Task<IEnumerable<TContentData>> GetSearchItemsAsync()
     {
-        _contentDataProvider.OnUpdate += CacheManagerUpdateHandler;
-
         var items = await LoadContentData();
 
         Logger.Information($"Found {items.Count()} items matching search query \"{CurrentSearch.Name}\"");

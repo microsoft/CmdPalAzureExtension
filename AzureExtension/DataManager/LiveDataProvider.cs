@@ -16,12 +16,33 @@ public class LiveDataProvider : ILiveDataProvider
     private readonly IDictionary<Type, IContentDataProvider> _contentProvidersDictionary;
     private readonly IDictionary<Type, ISearchDataProvider> _searchDataProvidersDictionary;
 
-    private CacheManagerUpdateEventHandler? _onUpdate;
+    private readonly List<WeakReference<CacheManagerUpdateEventHandler>> _weakOnUpdateHandlers = new();
 
     public event CacheManagerUpdateEventHandler? OnUpdate
     {
-        add => _onUpdate = value;
-        remove => _onUpdate -= value;
+        add
+        {
+            if (value != null)
+            {
+                _weakOnUpdateHandlers.Add(new WeakReference<CacheManagerUpdateEventHandler>(value));
+            }
+        }
+
+        remove
+        {
+            if (value != null)
+            {
+                _weakOnUpdateHandlers.RemoveAll(wr =>
+                {
+                    if (wr.TryGetTarget(out var target))
+                    {
+                        return target == value;
+                    }
+
+                    return true;
+                });
+            }
+        }
     }
 
     public LiveDataProvider(ICacheManager cacheManager, IDictionary<Type, IContentDataProvider> providersDictionary, IDictionary<Type, ISearchDataProvider> searchDataProvidersDictionary)
@@ -36,7 +57,16 @@ public class LiveDataProvider : ILiveDataProvider
 
     public void OnCacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
     {
-        _onUpdate?.Invoke(source, e);
+        _weakOnUpdateHandlers.RemoveAll(wr =>
+        {
+            if (wr.TryGetTarget(out var handler))
+            {
+                handler.Invoke(source, e);
+                return false;
+            }
+
+            return true;
+        });
     }
 
     private async Task WaitForCacheUpdateAsync(DataUpdateParameters parameters)
