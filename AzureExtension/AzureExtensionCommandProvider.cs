@@ -14,23 +14,14 @@ namespace AzureExtension;
 public partial class AzureExtensionCommandProvider : CommandProvider
 {
     private readonly SignInPage _signInPage;
-
     private readonly SignOutPage _signOutPage;
-
     private readonly SavedQueriesPage _savedQueriesPage;
-
     private readonly IAccountProvider _accountProvider;
-
     private readonly IResources _resources;
-
     private readonly SavedPullRequestSearchesPage _savedPullRequestSearchesPage;
-
     private readonly ISearchPageFactory _searchPageFactory;
-
     private readonly SavedAzureSearchesMediator _savedSearchesMediator;
-
     private readonly AuthenticationMediator _authenticationMediator;
-
     private readonly SavedPipelineSearchesPage _savedPipelineSearchesPage;
 
     public AzureExtensionCommandProvider(

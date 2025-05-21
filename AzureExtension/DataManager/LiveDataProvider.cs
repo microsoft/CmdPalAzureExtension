@@ -16,6 +16,8 @@ public class LiveDataProvider : ILiveDataProvider
     private readonly IDictionary<Type, IContentDataProvider> _contentProvidersDictionary;
     private readonly IDictionary<Type, ISearchDataProvider> _searchDataProvidersDictionary;
 
+    private readonly object _weakReferencesLock = new();
+
     private readonly List<WeakReference<CacheManagerUpdateEventHandler>> _weakOnUpdateHandlers = new();
 
     public event CacheManagerUpdateEventHandler? OnUpdate
@@ -24,7 +26,10 @@ public class LiveDataProvider : ILiveDataProvider
         {
             if (value != null)
             {
-                _weakOnUpdateHandlers.Add(new WeakReference<CacheManagerUpdateEventHandler>(value));
+                lock (_weakReferencesLock)
+                {
+                    _weakOnUpdateHandlers.Add(new WeakReference<CacheManagerUpdateEventHandler>(value));
+                }
             }
         }
 
@@ -32,15 +37,18 @@ public class LiveDataProvider : ILiveDataProvider
         {
             if (value != null)
             {
-                _weakOnUpdateHandlers.RemoveAll(wr =>
+                lock (_weakReferencesLock)
                 {
-                    if (wr.TryGetTarget(out var target))
+                    _weakOnUpdateHandlers.RemoveAll(wr =>
                     {
-                        return target == value;
-                    }
+                        if (wr.TryGetTarget(out var target))
+                        {
+                            return target == value;
+                        }
 
-                    return true;
-                });
+                        return true;
+                    });
+                }
             }
         }
     }
@@ -57,16 +65,19 @@ public class LiveDataProvider : ILiveDataProvider
 
     public void OnCacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
     {
-        _weakOnUpdateHandlers.RemoveAll(wr =>
+        lock (_weakReferencesLock)
         {
-            if (wr.TryGetTarget(out var handler))
+            _weakOnUpdateHandlers.RemoveAll(wr =>
             {
-                handler.Invoke(source, e);
-                return false;
-            }
+                if (wr.TryGetTarget(out var handler))
+                {
+                    handler.Invoke(source, e);
+                    return false;
+                }
 
-            return true;
-        });
+                return true;
+            });
+        }
     }
 
     private async Task WaitForCacheUpdateAsync(DataUpdateParameters parameters)
