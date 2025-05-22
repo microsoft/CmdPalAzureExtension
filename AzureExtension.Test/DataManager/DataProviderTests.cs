@@ -174,12 +174,4 @@ public class DataProviderTests
         mockPipelineProvider.Verify(m => m.GetDataForSearch(It.IsAny<IPipelineDefinitionSearch>()), Times.Exactly(2));
         Assert.IsNotNull(getDefinitionTask.Result);
     }
-
-    private sealed class ThrowinHandler
-    {
-        public void Handle(object? sender, CacheManagerUpdateEventArgs args)
-        {
-            throw new InvalidOperationException("Test exception");
-        }
-    }
 }

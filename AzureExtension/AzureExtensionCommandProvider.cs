@@ -143,7 +143,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider, IDisposabl
         _disposed = true;
     }
 
-    public new void Dispose()
+    void IDisposable.Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);

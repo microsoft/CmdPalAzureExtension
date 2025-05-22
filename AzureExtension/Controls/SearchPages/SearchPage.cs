@@ -35,7 +35,7 @@ public abstract partial class SearchPage<TContentData> : ListPage
     {
         if (e.Kind == CacheManagerUpdateKind.Updated && e.DataUpdateParameters != null)
         {
-            // This should check if this is the search that originated the update.
+            // Check if this is the search that originated the update.
             if (e.DataUpdateParameters.UpdateType == DataUpdateType.All || e.DataUpdateParameters.UpdateObject == CurrentSearch)
             {
                 Logger.Information($"Received cache manager update event.");
