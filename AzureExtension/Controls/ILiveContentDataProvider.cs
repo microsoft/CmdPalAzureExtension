@@ -12,7 +12,7 @@ public interface ILiveContentDataProvider<TContentDataType>
 {
     Task<IEnumerable<TContentDataType>> GetContentData(IAzureSearch search);
 
-    WeakEventSource<CacheManagerUpdateEventArgs> WeakOnUpdate { get; }
+    event EventHandler<CacheManagerUpdateEventArgs> WeakOnUpdate;
 
-    event CacheManagerUpdateEventHandler? OnUpdate;
+    event EventHandler<CacheManagerUpdateEventArgs> OnUpdate;
 }

@@ -17,9 +17,15 @@ public class LiveDataProvider : ILiveDataProvider
     private readonly IDictionary<Type, IContentDataProvider> _contentProvidersDictionary;
     private readonly IDictionary<Type, ISearchDataProvider> _searchDataProvidersDictionary;
 
-    public WeakEventSource<CacheManagerUpdateEventArgs> WeakOnUpdate { get; } = new();
+    private readonly WeakEventSource<CacheManagerUpdateEventArgs> _weakOnUpdate;
 
-    public event CacheManagerUpdateEventHandler? OnUpdate;
+    public event EventHandler<CacheManagerUpdateEventArgs>? WeakOnUpdate
+    {
+        add => _weakOnUpdate.Subscribe(value);
+        remove => _weakOnUpdate.Unsubscribe(value);
+    }
+
+    public event EventHandler<CacheManagerUpdateEventArgs>? OnUpdate;
 
     public LiveDataProvider(ICacheManager cacheManager, IDictionary<Type, IContentDataProvider> providersDictionary, IDictionary<Type, ISearchDataProvider> searchDataProvidersDictionary)
     {
@@ -27,13 +33,13 @@ public class LiveDataProvider : ILiveDataProvider
         _cacheManager = cacheManager;
         _contentProvidersDictionary = providersDictionary;
         _searchDataProvidersDictionary = searchDataProvidersDictionary;
-
+        _weakOnUpdate = new WeakEventSource<CacheManagerUpdateEventArgs>();
         _cacheManager.OnUpdate += OnCacheManagerUpdate;
     }
 
     public void OnCacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
     {
-        WeakOnUpdate.Raise(source, e);
+        _weakOnUpdate.Raise(source, e);
         OnUpdate?.Invoke(source, e);
     }
 

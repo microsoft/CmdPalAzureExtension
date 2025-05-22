@@ -115,13 +115,23 @@ public class WeakEventSource<TEventArgs>
         });
     }
 
-    public void Subscribe(EventHandler<TEventArgs> handler)
+    public void Subscribe(EventHandler<TEventArgs>? handler)
     {
+        if (handler == null)
+        {
+            return;
+        }
+
         _delegates.Add(new WeakDelegate(handler, CreateOpenHandler(handler.GetMethodInfo())));
     }
 
-    public void Unsubscribe(EventHandler<TEventArgs> handler)
+    public void Unsubscribe(EventHandler<TEventArgs>? handler)
     {
+        if (handler == null)
+        {
+            return;
+        }
+
         _delegates.RemoveAll(d =>
         {
             if (d.IsMatch(handler))

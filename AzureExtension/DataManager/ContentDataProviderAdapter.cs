@@ -18,9 +18,13 @@ public class ContentDataProviderAdapter<TContentData> : ILiveContentDataProvider
         _liveDataProvider = liveDataProvider;
     }
 
-    public WeakEventSource<CacheManagerUpdateEventArgs> WeakOnUpdate => _liveDataProvider.WeakOnUpdate;
+    public event EventHandler<CacheManagerUpdateEventArgs> WeakOnUpdate
+    {
+        add => _liveDataProvider.WeakOnUpdate += value;
+        remove => _liveDataProvider.WeakOnUpdate -= value;
+    }
 
-    public event CacheManagerUpdateEventHandler? OnUpdate
+    public event EventHandler<CacheManagerUpdateEventArgs>? OnUpdate
     {
         add => _liveDataProvider.OnUpdate += value;
         remove => _liveDataProvider.OnUpdate -= value;

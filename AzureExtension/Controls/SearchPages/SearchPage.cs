@@ -27,14 +27,12 @@ public abstract partial class SearchPage<TContentData> : ListPage
         Name = search.Name;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         _contentDataProvider = dataProvider;
-        _contentDataProvider.WeakOnUpdate.Subscribe(OnEvent);
+        _contentDataProvider.WeakOnUpdate += OnCacheManagerUpdateHandler;
         _resources = resources;
     }
 
-    public void OnEvent(object? sender, CacheManagerUpdateEventArgs args)
+    public void OnCacheManagerUpdateHandler(object? source, CacheManagerUpdateEventArgs e)
     {
-        var e = args;
-
         if (e.Kind == CacheManagerUpdateKind.Updated && e.DataUpdateParameters != null)
         {
             // This should check if this is the search that originated the update.
