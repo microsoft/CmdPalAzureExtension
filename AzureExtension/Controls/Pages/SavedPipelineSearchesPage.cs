@@ -44,7 +44,7 @@ public class SavedPipelineSearchesPage : SavedSearchesPage
         _accountProvider = accountProvider;
         _searchPageFactory = searchPageFactory;
         _buildProvider = buildProvider;
-        _buildProvider.OnUpdate.AddListener(OnUpdate);
+        _buildProvider.OnUpdate += OnUpdate;
     }
 
     private void OnUpdate(object? source, CacheManagerUpdateEventArgs e)

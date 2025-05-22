@@ -13,7 +13,7 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension;
 
-public partial class AzureExtensionCommandProvider : CommandProvider
+public partial class AzureExtensionCommandProvider : CommandProvider, IDisposable
 {
     private readonly SignInPage _signInPage;
     private readonly SignOutPage _signOutPage;
@@ -51,7 +51,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider
         _authenticationMediator = authenticationMediator;
         _savedPipelineSearchesPage = savedPipelineSearchesPage;
         _liveDataProvider = liveDataProvider;
-        _liveDataProvider.OnUpdate.AddListener(OnLiveDataUpdate);
+        _liveDataProvider.OnUpdate += OnLiveDataUpdate;
         DisplayName = "Azure Extension"; // hard-coded because it's a product title
 
         _savedSearchesMediator.SearchUpdated += OnSearchUpdated;
@@ -118,5 +118,34 @@ public partial class AzureExtensionCommandProvider : CommandProvider
     private async Task<List<IListItem>> GetTopLevelSearches()
     {
         return await _searchPageFactory.CreateCommandsForTopLevelSearches();
+    }
+
+    // disposing area
+    private bool _disposed;
+
+    private void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (!disposing)
+        {
+            return;
+        }
+
+        _savedSearchesMediator.SearchUpdated -= OnSearchUpdated;
+        _authenticationMediator.SignInAction -= OnSignInStatusChanged;
+        _authenticationMediator.SignOutAction -= OnSignInStatusChanged;
+        _liveDataProvider.OnUpdate -= OnLiveDataUpdate;
+
+        _disposed = true;
+    }
+
+    public new void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

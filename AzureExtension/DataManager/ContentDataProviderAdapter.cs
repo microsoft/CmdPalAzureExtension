@@ -18,7 +18,13 @@ public class ContentDataProviderAdapter<TContentData> : ILiveContentDataProvider
         _liveDataProvider = liveDataProvider;
     }
 
-    public WeakEvent<CacheManagerUpdateEventArgs> OnUpdate => _liveDataProvider.OnUpdate;
+    public WeakEvent<CacheManagerUpdateEventArgs> WeakOnUpdate => _liveDataProvider.WeakOnUpdate;
+
+    public event CacheManagerUpdateEventHandler? OnUpdate
+    {
+        add => _liveDataProvider.OnUpdate += value;
+        remove => _liveDataProvider.OnUpdate -= value;
+    }
 
     public Task<IEnumerable<TContentData>> GetContentData(IAzureSearch search)
     {

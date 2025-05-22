@@ -14,5 +14,7 @@ public interface ILiveDataProvider
 
     Task<TSearchDataType> GetSearchData<TSearchDataType>(IAzureSearch search);
 
-    WeakEvent<CacheManagerUpdateEventArgs> OnUpdate { get; }
+    WeakEvent<CacheManagerUpdateEventArgs> WeakOnUpdate { get; }
+
+    event CacheManagerUpdateEventHandler? OnUpdate;
 }

@@ -182,37 +182,4 @@ public class DataProviderTests
             throw new InvalidOperationException("Test exception");
         }
     }
-
-    [TestMethod]
-    public void TestLiveDataProviderWeakEvent()
-    {
-        var mockCacheManager = new Mock<ICacheManager>();
-        var mockQueryProvider = new Mock<ISearchDataProvider>();
-        var mockQueryContentProvider = new Mock<IContentDataProvider>();
-        var stubContentDataDictionary = new Dictionary<Type, IContentDataProvider>();
-        var stubSearchDataDictionary = new Dictionary<Type, ISearchDataProvider>();
-
-        var dataProvider = new LiveDataProvider(
-            mockCacheManager.Object,
-            stubContentDataDictionary,
-            stubSearchDataDictionary);
-
-        dataProvider.OnUpdate.AddListener((sender, args) =>
-        {
-            Assert.IsNotNull(sender);
-            Assert.IsNotNull(args);
-        });
-        {
-            var handler = new ThrowinHandler();
-            dataProvider.OnUpdate.AddListener(handler.Handle);
-            handler = null;
-        }
-
-        GC.Collect();
-        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
-        GC.WaitForPendingFinalizers();
-        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
-
-        dataProvider.OnUpdate.Raise(this, new CacheManagerUpdateEventArgs(CacheManagerUpdateKind.Updated));
-    }
 }

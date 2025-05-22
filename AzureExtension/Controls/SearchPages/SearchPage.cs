@@ -11,7 +11,8 @@ using Serilog;
 
 namespace AzureExtension.Controls.Pages;
 
-public abstract partial class SearchPage<TContentData> : ListPage
+public abstract partial class SearchPage<TContentData> : ListPage, IWeakListener<CacheManagerUpdateEventArgs>
+    where TContentData : class
 {
     protected ILogger Logger { get; }
 
@@ -26,12 +27,14 @@ public abstract partial class SearchPage<TContentData> : ListPage
         Name = search.Name;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         _contentDataProvider = dataProvider;
-        _contentDataProvider.OnUpdate.AddListener(CacheManagerUpdateHandler);
+        _contentDataProvider.WeakOnUpdate.AddListener(this);
         _resources = resources;
     }
 
-    private void CacheManagerUpdateHandler(object? source, CacheManagerUpdateEventArgs e)
+    public void OnEvent(object? sender, CacheManagerUpdateEventArgs args)
     {
+        var e = args;
+
         if (e.Kind == CacheManagerUpdateKind.Updated && e.DataUpdateParameters != null)
         {
             // This should check if this is the search that originated the update.
