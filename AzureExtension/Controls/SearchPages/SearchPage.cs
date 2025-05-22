@@ -27,11 +27,11 @@ public abstract partial class SearchPage<TContentData> : ListPage
         Name = search.Name;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         _contentDataProvider = dataProvider;
-        _contentDataProvider.WeakOnUpdate += OnCacheManagerUpdateHandler;
+        _contentDataProvider.WeakOnUpdate += CacheManagerUpdateHandler;
         _resources = resources;
     }
 
-    public void OnCacheManagerUpdateHandler(object? source, CacheManagerUpdateEventArgs e)
+    private void CacheManagerUpdateHandler(object? source, CacheManagerUpdateEventArgs e)
     {
         if (e.Kind == CacheManagerUpdateKind.Updated && e.DataUpdateParameters != null)
         {
