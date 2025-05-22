@@ -5,6 +5,7 @@
 using System.Collections;
 using System.Reflection;
 using AzureExtension.Helpers;
+using Microsoft.UI.Xaml.Controls;
 
 namespace AzureExtension.Test.Helpers;
 
@@ -211,6 +212,13 @@ public class WeakEventTests
         Assert.AreEqual(100, lastValue, "Permanent handler should receive correct value");
     }
 
+    // Helper for testing static handlers
+    // Should be only used in one test.
+    private static class StaticHandlerCounter
+    {
+        public static int Count { get; set; }
+    }
+
     [TestMethod]
     public void WeakEventSource_ShouldSupportStaticHandlers()
     {
@@ -350,11 +358,5 @@ public class WeakEventTests
 
         // Act & Assert - should not throw
         weakEvent.Raise(this, new TestEventArgs { Value = 42 });
-    }
-
-    // Helper for testing static handlers
-    private static class StaticHandlerCounter
-    {
-        public static int Count { get; set; }
     }
 }
