@@ -120,6 +120,8 @@ public class WeakEventTests
             return new WeakReference(obj);
         })();
 
+        Assert.IsTrue(weakRef.IsAlive, "Weak reference should be alive after creation");
+
         // Force garbage collection
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
         GC.WaitForPendingFinalizers();
