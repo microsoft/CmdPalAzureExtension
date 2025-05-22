@@ -2,58 +2,134 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AzureExtension.Helpers;
 
 #pragma warning disable SA1649 // File name should match first type name
-public class WeakEvent<TEventArgs>
-    where TEventArgs : EventArgs
+public class WeakEventSource<TEventArgs>
+        where TEventArgs : EventArgs
 {
-    private readonly List<WeakReference<IWeakListener<TEventArgs>>> _handlers = new();
+    private delegate void OpenEventHandler(object? target, object? sender, TEventArgs e);
 
-    public void AddListener(IWeakListener<TEventArgs> handler)
+    private struct StrongHandler
     {
-        lock (_handlers)
+        private readonly object? _target;
+        private readonly OpenEventHandler _openHandler;
+
+        public StrongHandler(object? target, OpenEventHandler openHandler)
         {
-            _handlers.Add(new WeakReference<IWeakListener<TEventArgs>>(handler));
+            _target = target;
+            _openHandler = openHandler;
+        }
+
+        public void Invoke(object? sender, TEventArgs e)
+        {
+            _openHandler(_target, sender, e);
         }
     }
 
-    public void RemoveListener(IWeakListener<TEventArgs> handler)
+    private sealed class WeakDelegate
     {
-        lock (_handlers)
-        {
-            _handlers.RemoveAll(h =>
-            {
-                if (h.TryGetTarget(out var target))
-                {
-                    return target == handler;
-                }
+        private readonly WeakReference? _weakTarget;
+        private readonly MethodInfo _method;
+        private readonly OpenEventHandler _openHandler;
 
-                return true;
-            });
+        public WeakDelegate(
+            Delegate handler,
+            OpenEventHandler openHandler)
+        {
+            _weakTarget = handler.Target != null ? new WeakReference(handler.Target) : null;
+            _method = handler.GetMethodInfo();
+            _openHandler = openHandler;
+        }
+
+        public bool IsAlive => _weakTarget?.IsAlive ?? true;
+
+        public StrongHandler? TryGetStrongHandler()
+        {
+            object? target = null;
+            if (_weakTarget is { })
+            {
+                target = _weakTarget.Target;
+                if (target is null)
+                {
+                    return null;
+                }
+            }
+
+            return new StrongHandler(target, _openHandler);
+        }
+
+        public bool IsMatch(Delegate handler)
+        {
+            return ReferenceEquals(handler.Target, _weakTarget?.Target)
+                    && handler.GetMethodInfo().Equals(_method);
+        }
+    }
+
+    private readonly List<WeakDelegate> _delegates = new();
+
+    private static readonly Type EventArgsType = typeof(OpenEventHandler)
+            .GetRuntimeMethods()
+            .Single(m => m.Name == "Invoke")
+            .GetParameters()
+            .Last()
+            .ParameterType;
+
+    private static OpenEventHandler CreateOpenHandler(MethodInfo method)
+    {
+        var target = Expression.Parameter(typeof(object), "target");
+        var sender = Expression.Parameter(typeof(object), "sender");
+        var e = Expression.Parameter(EventArgsType, "e");
+
+        if (method.IsStatic)
+        {
+            var expr = Expression.Lambda<OpenEventHandler>(Expression.Call(method, sender, e), target, sender, e);
+            return expr.Compile();
+        }
+        else
+        {
+            var expr = Expression.Lambda<OpenEventHandler>(Expression.Call(Expression.Convert(target, method.DeclaringType!), method, sender, e), target, sender, e);
+            return expr.Compile();
         }
     }
 
     public void Raise(object? sender, TEventArgs args)
     {
-        lock (_handlers)
+        _delegates.RemoveAll(d =>
         {
-            _handlers.RemoveAll(h =>
+            if (d.IsAlive)
             {
-                if (h.TryGetTarget(out var target))
+                var strongHandler = d.TryGetStrongHandler();
+                if (strongHandler != null)
                 {
-                    target.OnEvent(sender, args);
-                    return false;
+                    strongHandler.Value.Invoke(sender, args);
                 }
 
-                return true;
-            });
-        }
-    }
-}
+                return false;
+            }
 
-public interface IWeakListener<TEventArgs>
-    where TEventArgs : EventArgs
-{
-    void OnEvent(object? sender, TEventArgs args);
+            return true;
+        });
+    }
+
+    public void Subscribe(EventHandler<TEventArgs> handler)
+    {
+        _delegates.Add(new WeakDelegate(handler, CreateOpenHandler(handler.GetMethodInfo())));
+    }
+
+    public void Unsubscribe(EventHandler<TEventArgs> handler)
+    {
+        _delegates.RemoveAll(d =>
+        {
+            if (d.IsMatch(handler))
+            {
+                return true;
+            }
+
+            return !d.IsAlive;
+        });
+    }
 }

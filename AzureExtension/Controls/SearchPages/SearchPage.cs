@@ -11,7 +11,7 @@ using Serilog;
 
 namespace AzureExtension.Controls.Pages;
 
-public abstract partial class SearchPage<TContentData> : ListPage, IWeakListener<CacheManagerUpdateEventArgs>
+public abstract partial class SearchPage<TContentData> : ListPage
     where TContentData : class
 {
     protected ILogger Logger { get; }
@@ -27,7 +27,7 @@ public abstract partial class SearchPage<TContentData> : ListPage, IWeakListener
         Name = search.Name;
         Logger = Log.ForContext("SourceContext", $"Pages/{GetType().Name}");
         _contentDataProvider = dataProvider;
-        _contentDataProvider.WeakOnUpdate.AddListener(this);
+        _contentDataProvider.WeakOnUpdate.Subscribe(OnEvent);
         _resources = resources;
     }
 

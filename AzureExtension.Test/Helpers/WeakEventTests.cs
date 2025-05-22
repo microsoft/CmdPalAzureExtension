@@ -2,11 +2,9 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Threading;
+using System.Collections;
+using System.Reflection;
 using AzureExtension.Helpers;
-using Microsoft.VisualStudio.Services.Common;
-using Moq;
 
 namespace AzureExtension.Test.Helpers;
 
@@ -18,53 +16,17 @@ public class WeakEventTests
         public int Value { get; set; }
     }
 
-    private sealed class EventListener : IWeakListener<TestEventArgs>
-    {
-        public int CallCount { get; set; }
-
-        public int LastValue { get; private set; }
-
-        public void OnEvent(object? sender, TestEventArgs args)
-        {
-            CallCount++;
-            LastValue = args.Value;
-        }
-    }
-
-    private sealed class AnonymousEventListener : IWeakListener<TestEventArgs>
-    {
-        private readonly Action<object?, TestEventArgs> _handler;
-
-        public AnonymousEventListener(Action<object?, TestEventArgs> handler)
-        {
-            _handler = handler;
-        }
-
-        public void OnEvent(object? sender, TestEventArgs args)
-        {
-            _handler(sender, args);
-        }
-    }
-
-    private sealed class StaticEventListener : IWeakListener<TestEventArgs>
-    {
-        public void OnEvent(object? sender, TestEventArgs args)
-        {
-            StaticHandlerCounter.Count++;
-        }
-    }
-
     [TestMethod]
-    public void AddListener_ShouldRegisterHandler()
+    public void Subscribe_ShouldRegisterHandler()
     {
         // Arrange
-        var weakEvent = new WeakEvent<TestEventArgs>();
+        var weakEvent = new WeakEventSource<TestEventArgs>();
         int invocationCount = 0;
-        var listener = new AnonymousEventListener((sender, e) => invocationCount++);
+        EventHandler<TestEventArgs> handler = (sender, e) => invocationCount++;
         var args = new TestEventArgs { Value = 42 };
 
         // Act
-        weakEvent.AddListener(listener);
+        weakEvent.Subscribe(handler);
         weakEvent.Raise(this, args);
 
         // Assert
@@ -72,101 +34,161 @@ public class WeakEventTests
     }
 
     [TestMethod]
-    public void RemoveListener_ShouldUnregisterHandler()
+    public void Unsubscribe_ShouldUnregisterHandler()
     {
         // Arrange
-        var weakEvent = new WeakEvent<TestEventArgs>();
-        var listener = new EventListener();
+        var weakEvent = new WeakEventSource<TestEventArgs>();
+        int callCount = 0;
+        EventHandler<TestEventArgs> handler = (sender, e) => callCount++;
 
         // Act
-        weakEvent.AddListener(listener);
-        weakEvent.RemoveListener(listener);
+        weakEvent.Subscribe(handler);
+        weakEvent.Unsubscribe(handler);
         weakEvent.Raise(this, new TestEventArgs { Value = 42 });
 
         // Assert
-        Assert.AreEqual(0, listener.CallCount, "Handler should not be called after removal");
+        Assert.AreEqual(0, callCount, "Handler should not be called after removal");
     }
 
     [TestMethod]
     public void Raise_ShouldInvokeAllHandlers()
     {
         // Arrange
-        var weakEvent = new WeakEvent<TestEventArgs>();
-        var listener1 = new EventListener();
-        var listener2 = new EventListener();
+        var weakEvent = new WeakEventSource<TestEventArgs>();
+        int callCount1 = 0, callCount2 = 0;
+        int lastValue1 = 0, lastValue2 = 0;
+
+        EventHandler<TestEventArgs> handler1 = (sender, e) =>
+        {
+            callCount1++;
+            lastValue1 = e.Value;
+        };
+
+        EventHandler<TestEventArgs> handler2 = (sender, e) =>
+        {
+            callCount2++;
+            lastValue2 = e.Value;
+        };
+
         var args = new TestEventArgs { Value = 42 };
 
         // Act
-        weakEvent.AddListener(listener1);
-        weakEvent.AddListener(listener2);
+        weakEvent.Subscribe(handler1);
+        weakEvent.Subscribe(handler2);
         weakEvent.Raise(this, args);
 
         // Assert
-        Assert.AreEqual(1, listener1.CallCount, "First listener should be called once");
-        Assert.AreEqual(1, listener2.CallCount, "Second listener should be called once");
-        Assert.AreEqual(42, listener1.LastValue, "First listener should receive correct value");
-        Assert.AreEqual(42, listener2.LastValue, "Second listener should receive correct value");
+        Assert.AreEqual(1, callCount1, "First handler should be called once");
+        Assert.AreEqual(1, callCount2, "Second handler should be called once");
+        Assert.AreEqual(42, lastValue1, "First handler should receive correct value");
+        Assert.AreEqual(42, lastValue2, "Second handler should receive correct value");
     }
 
     [TestMethod]
-    public void WeakEvent_ShouldAddListener()
+    public void WeakEventSource_ShouldAddHandler()
     {
-        // Test that listeners are added correctly
-        var weakEvent = new WeakEvent<TestEventArgs>();
-        var listener = new EventListener();
+        // Test that handlers are added correctly
+        var weakEvent = new WeakEventSource<TestEventArgs>();
+        EventHandler<TestEventArgs> handler = (sender, e) => { };
 
-        weakEvent.AddListener(listener);
+        weakEvent.Subscribe(handler);
 
-        var fieldInfo = typeof(WeakEvent<TestEventArgs>).GetField("_handlers", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var handlers = (List<WeakReference<IWeakListener<TestEventArgs>>>)fieldInfo!.GetValue(weakEvent)!;
+        var fieldInfo = typeof(WeakEventSource<TestEventArgs>).GetField("_delegates", BindingFlags.NonPublic | BindingFlags.Instance);
+        var delegates = (IList)fieldInfo!.GetValue(weakEvent)!;
 
-        Assert.AreEqual(1, handlers.Count, "Handler should be added");
+        Assert.AreEqual(1, delegates.Count, "Handler should be added");
+    }
 
-        bool targetResolved = handlers[0].TryGetTarget(out var target);
-        Assert.IsTrue(targetResolved, "Should resolve target");
-        Assert.AreSame(listener, target, "Should resolve to the correct listener");
+    private sealed class InstanceSubscriber
+    {
+        public int CallCount { get; private set; }
+
+        public void Handler(object? sender, TestEventArgs e)
+        {
+            CallCount++;
+        }
     }
 
     [TestMethod]
-    public void WeakEvent_ShouldRemoveDeadReferences()
+    public void WeakReferenceSanityCheck()
     {
-        // Test specifically the cleanup logic
-        var weakEvent = new WeakEvent<TestEventArgs>();
+        WeakReference weakRef;
+        {
+            var instance = new InstanceSubscriber();
+            weakRef = new WeakReference(instance);
+            instance = null;
+        }
 
-        // Use reflection to directly access the handlers list
-        var fieldInfo = typeof(WeakEvent<TestEventArgs>).GetField("_handlers", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var handlers = (List<WeakReference<IWeakListener<TestEventArgs>>>)fieldInfo!.GetValue(weakEvent)!;
+        // Force garbage collection
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
+        GC.WaitForPendingFinalizers();
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
 
-        // Add a known dead weak reference
-        handlers.Add(new WeakReference<IWeakListener<TestEventArgs>>(null!));
+        Assert.IsFalse(weakRef.IsAlive, "Weak reference should not be alive after GC");
+    }
+
+    [TestMethod]
+    public void WeakEventSource_ShouldRemoveDeadReferences()
+    {
+        // Arrange
+        var weakEvent = new WeakEventSource<TestEventArgs>();
+        {
+            var instanceSubscriber = new InstanceSubscriber();
+            weakEvent.Subscribe(instanceSubscriber.Handler);
+            instanceSubscriber = null;
+        }
+
+        // Verify initial state with reflection
+        var fieldInfo = typeof(WeakEventSource<TestEventArgs>).GetField("_delegates", BindingFlags.NonPublic | BindingFlags.Instance);
+        var delegates = (IList)fieldInfo!.GetValue(weakEvent)!;
+        Assert.AreEqual(1, delegates.Count, "Should have 1 delegate before GC");
+
+        // Force garbage collection
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
+        GC.WaitForPendingFinalizers();
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
 
         // Trigger cleanup by raising the event
         weakEvent.Raise(this, new TestEventArgs());
 
-        // Verify the dead reference was removed
-        Assert.AreEqual(0, handlers.Count, "Dead reference should be removed");
+        // Get updated delegates list
+        delegates = (IList)fieldInfo!.GetValue(weakEvent)!;
+
+        // Dead references should be removed during Raise
+        Assert.AreEqual(0, delegates.Count, "Dead reference should be removed");
     }
 
     [TestMethod]
-    public void WeakEvent_ShouldInvokeRemainingHandlersAfterGarbageCollection()
+    public void WeakEventSource_ShouldInvokeRemainingHandlersAfterGarbageCollection()
     {
         // Arrange
-        var weakEvent = new WeakEvent<TestEventArgs>();
-        var permanentListener = new EventListener();
+        var weakEvent = new WeakEventSource<TestEventArgs>();
+        int permanentCallCount = 0;
+        int lastValue = 0;
 
-        // Act - add a permanent listener and a temporary one
-        weakEvent.AddListener(permanentListener);
+        // Permanent handler that we'll keep a reference to
+        EventHandler<TestEventArgs> permanentHandler = (sender, e) =>
         {
-            var temporaryListener = new EventListener();
-            weakEvent.AddListener(temporaryListener);
+            permanentCallCount++;
+            lastValue = e.Value;
+        };
+
+        // Act - add permanent handler and a temporary one
+        weakEvent.Subscribe(permanentHandler);
+
+        // Create a scope for the temporary handler
+        {
+            int tempCallCount = 0;
+            EventHandler<TestEventArgs>? temporaryHandler = (sender, e) => tempCallCount++;
+            weakEvent.Subscribe(temporaryHandler);
 
             // Verify both work initially
             weakEvent.Raise(this, new TestEventArgs { Value = 42 });
-            Assert.AreEqual(1, permanentListener.CallCount, "Permanent listener should be called");
-            Assert.AreEqual(1, temporaryListener.CallCount, "Temporary listener should be called");
+            Assert.AreEqual(1, permanentCallCount, "Permanent handler should be called");
+            Assert.AreEqual(1, tempCallCount, "Temporary handler should be called");
 
-            // Clear reference to temporary listener
-            temporaryListener = null;
+            // Clear reference to temporary handler
+            temporaryHandler = null;
         }
 
         // Force garbage collection
@@ -175,89 +197,37 @@ public class WeakEventTests
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
 
         // Reset counter
-        permanentListener.CallCount = 0;
+        permanentCallCount = 0;
 
         // Raise event again
         weakEvent.Raise(this, new TestEventArgs { Value = 100 });
 
         // Assert
-        Assert.AreEqual(1, permanentListener.CallCount, "Permanent listener should still be called after GC");
-        Assert.AreEqual(100, permanentListener.LastValue, "Permanent listener should receive correct value");
+        Assert.AreEqual(1, permanentCallCount, "Permanent handler should still be called after GC");
+        Assert.AreEqual(100, lastValue, "Permanent handler should receive correct value");
     }
 
     [TestMethod]
-    public void WeakEvent_ShouldRemoveHandlersWhenTargetCannotBeResolved()
+    public void WeakEventSource_ShouldSupportStaticHandlers()
     {
         // Arrange
-        var weakEvent = new WeakEvent<TestEventArgs>();
-
-        // Get access to the handlers list through reflection
-        var fieldInfo = typeof(WeakEvent<TestEventArgs>).GetField("_handlers", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var handlers = (List<WeakReference<IWeakListener<TestEventArgs>>>)fieldInfo!.GetValue(weakEvent)!;
-
-        // Create a mock listener
-        var mockListener = new Mock<IWeakListener<TestEventArgs>>();
-
-        // Add a real weak reference to the list
-        var weakRef = new WeakReference<IWeakListener<TestEventArgs>>(mockListener.Object);
-        handlers.Add(weakRef);
-
-        // Verify we have one handler
-        Assert.AreEqual(1, handlers.Count, "Should have 1 handler before test");
-
-        // Now create a new list with our own "dead" weak reference implementation
-        var newHandlersList = new List<WeakReference<IWeakListener<TestEventArgs>>>();
-
-        // Create a proxy for handling TryGetTarget calls - to track and control behavior
-        bool tryGetTargetCalled = false;
-        handlers[0] = new WeakReference<IWeakListener<TestEventArgs>>(mockListener.Object);
-
-        // Use reflection to replace the handlers field with our controlled list
-        // First, we need to create a mock of the handlers list
-        var mockHandlersList = new Mock<List<WeakReference<IWeakListener<TestEventArgs>>>>();
-
-        // Set up the RemoveAll method to simulate removing dead references
-        mockHandlersList.Setup(l => l.RemoveAll(It.IsAny<Predicate<WeakReference<IWeakListener<TestEventArgs>>>>()))
-                       .Callback<Predicate<WeakReference<IWeakListener<TestEventArgs>>>>(predicate =>
-                       {
-                           // Simulate the RemoveAll by calling the predicate with our weak reference
-                           // If the predicate returns true, it means the item would be removed
-                           tryGetTargetCalled = true;
-
-                           // The cleanup should try to remove the item since TryGetTarget will return false
-                           Assert.IsTrue(predicate(weakRef), "Predicate should return true for dead references");
-                       })
-                       .Returns(1); // Simulate that 1 item was removed
-
-        mockHandlersList.Setup(l => l.Count).Returns(0); // After removal, count should be 0
-
-        // Replace the real handlers list with our mock
-        fieldInfo.SetValue(weakEvent, mockHandlersList.Object);
-
-        // Act: Raise the event which should clean up dead references
-        weakEvent.Raise(this, new TestEventArgs { Value = 42 });
-
-        // Assert: Verify the RemoveAll was called
-        Assert.IsTrue(tryGetTargetCalled, "RemoveAll should have been called");
-        mockHandlersList.Verify(l => l.RemoveAll(It.IsAny<Predicate<WeakReference<IWeakListener<TestEventArgs>>>>()), Times.Once);
-    }
-
-    [TestMethod]
-    public void WeakEvent_ShouldSupportStaticHandlers()
-    {
-        // Arrange
-        var weakEvent = new WeakEvent<TestEventArgs>();
-        var staticListener = new StaticEventListener();
+        var weakEvent = new WeakEventSource<TestEventArgs>();
         StaticHandlerCounter.Count = 0;
 
+        // Static handler
+        static void StaticHandler(object? sender, TestEventArgs args)
+        {
+            StaticHandlerCounter.Count++;
+        }
+
         // Act
-        weakEvent.AddListener(staticListener);
+        weakEvent.Subscribe(StaticHandler);
         weakEvent.Raise(this, new TestEventArgs { Value = 42 });
 
         // Assert
         Assert.AreEqual(1, StaticHandlerCounter.Count, "Static handler should be called");
 
-        // Force garbage collection (shouldn't affect static methods since we hold a reference)
+        // Force garbage collection (shouldn't affect static methods)
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
         GC.WaitForPendingFinalizers();
 
@@ -272,14 +242,21 @@ public class WeakEventTests
     }
 
     [TestMethod]
-    public void WeakEvent_ShouldHandleMultipleRaises()
+    public void WeakEventSource_ShouldHandleMultipleRaises()
     {
         // Arrange
-        var weakEvent = new WeakEvent<TestEventArgs>();
-        var listener = new EventListener();
+        var weakEvent = new WeakEventSource<TestEventArgs>();
+        int callCount = 0;
+        int lastValue = 0;
+
+        EventHandler<TestEventArgs> handler = (sender, e) =>
+        {
+            callCount++;
+            lastValue = e.Value;
+        };
 
         // Act
-        weakEvent.AddListener(listener);
+        weakEvent.Subscribe(handler);
 
         // Raise multiple times
         for (int i = 0; i < 5; i++)
@@ -288,55 +265,73 @@ public class WeakEventTests
         }
 
         // Assert
-        Assert.AreEqual(5, listener.CallCount, "Listener should be called five times");
-        Assert.AreEqual(4, listener.LastValue, "Last value should be 4");
+        Assert.AreEqual(5, callCount, "Handler should be called five times");
+        Assert.AreEqual(4, lastValue, "Last value should be 4");
     }
 
     [TestMethod]
-    public void WeakEvent_ShouldSupportDynamicallyAddingAndRemovingHandlers()
+    public void WeakEventSource_ShouldSupportDynamicallyAddingAndRemovingHandlers()
     {
         // Arrange
-        var weakEvent = new WeakEvent<TestEventArgs>();
-        var listener1 = new EventListener();
-        var listener2 = new EventListener();
-        var listener3 = new EventListener();
+        var weakEvent = new WeakEventSource<TestEventArgs>();
+        int callCount1 = 0, callCount2 = 0, callCount3 = 0;
+        int lastValue1 = 0, lastValue2 = 0, lastValue3 = 0;
 
-        // Act - add first listener
-        weakEvent.AddListener(listener1);
+        EventHandler<TestEventArgs> handler1 = (sender, e) =>
+        {
+            callCount1++;
+            lastValue1 = e.Value;
+        };
+
+        EventHandler<TestEventArgs> handler2 = (sender, e) =>
+        {
+            callCount2++;
+            lastValue2 = e.Value;
+        };
+
+        EventHandler<TestEventArgs> handler3 = (sender, e) =>
+        {
+            callCount3++;
+            lastValue3 = e.Value;
+        };
+
+        // Act - add first handler
+        weakEvent.Subscribe(handler1);
         weakEvent.Raise(this, new TestEventArgs { Value = 1 });
 
-        // Add second listener
-        weakEvent.AddListener(listener2);
+        // Add second handler
+        weakEvent.Subscribe(handler2);
         weakEvent.Raise(this, new TestEventArgs { Value = 2 });
 
-        // Remove first listener
-        weakEvent.RemoveListener(listener1);
+        // Remove first handler
+        weakEvent.Unsubscribe(handler1);
         weakEvent.Raise(this, new TestEventArgs { Value = 3 });
 
-        // Add third listener
-        weakEvent.AddListener(listener3);
+        // Add third handler
+        weakEvent.Subscribe(handler3);
         weakEvent.Raise(this, new TestEventArgs { Value = 4 });
 
         // Assert
-        Assert.AreEqual(2, listener1.CallCount, "First listener should be called twice");
-        Assert.AreEqual(3, listener2.CallCount, "Second listener should be called three times");
-        Assert.AreEqual(1, listener3.CallCount, "Third listener should be called once");
+        Assert.AreEqual(2, callCount1, "First handler should be called twice");
+        Assert.AreEqual(3, callCount2, "Second handler should be called three times");
+        Assert.AreEqual(1, callCount3, "Third handler should be called once");
 
-        Assert.AreEqual(2, listener1.LastValue, "First listener should have last value 2");
-        Assert.AreEqual(4, listener2.LastValue, "Second listener should have last value 4");
-        Assert.AreEqual(4, listener3.LastValue, "Third listener should have last value 4");
+        Assert.AreEqual(2, lastValue1, "First handler should have last value 2");
+        Assert.AreEqual(4, lastValue2, "Second handler should have last value 4");
+        Assert.AreEqual(4, lastValue3, "Third handler should have last value 4");
     }
 
     [TestMethod]
-    public void WeakEvent_ShouldWorkWithAnonymousHandlers()
+    public void WeakEventSource_ShouldWorkWithAnonymousHandlers()
     {
         // Arrange
-        var weakEvent = new WeakEvent<TestEventArgs>();
+        var weakEvent = new WeakEventSource<TestEventArgs>();
         int capturedValue = 0;
-        var anonymousListener = new AnonymousEventListener((sender, args) => capturedValue = args.Value);
+
+        EventHandler<TestEventArgs> handler = (sender, args) => capturedValue = args.Value;
 
         // Act
-        weakEvent.AddListener(anonymousListener);
+        weakEvent.Subscribe(handler);
         weakEvent.Raise(this, new TestEventArgs { Value = 42 });
 
         // Assert
@@ -344,10 +339,10 @@ public class WeakEventTests
     }
 
     [TestMethod]
-    public void WeakEvent_ShouldHandleRaisingWhenNoHandlersRegistered()
+    public void WeakEventSource_ShouldHandleRaisingWhenNoHandlersRegistered()
     {
         // Arrange
-        var weakEvent = new WeakEvent<TestEventArgs>();
+        var weakEvent = new WeakEventSource<TestEventArgs>();
 
         // Act & Assert - should not throw
         weakEvent.Raise(this, new TestEventArgs { Value = 42 });

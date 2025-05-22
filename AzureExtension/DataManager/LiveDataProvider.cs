@@ -17,7 +17,7 @@ public class LiveDataProvider : ILiveDataProvider
     private readonly IDictionary<Type, IContentDataProvider> _contentProvidersDictionary;
     private readonly IDictionary<Type, ISearchDataProvider> _searchDataProvidersDictionary;
 
-    public WeakEvent<CacheManagerUpdateEventArgs> WeakOnUpdate { get; } = new();
+    public WeakEventSource<CacheManagerUpdateEventArgs> WeakOnUpdate { get; } = new();
 
     public event CacheManagerUpdateEventHandler? OnUpdate;
 
