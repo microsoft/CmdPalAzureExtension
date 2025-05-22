@@ -113,11 +113,12 @@ public class WeakEventTests
     public void WeakReferenceSanityCheck()
     {
         WeakReference weakRef;
+
+        weakRef = new Func<WeakReference>(() =>
         {
-            var instance = new InstanceSubscriber();
-            weakRef = new WeakReference(instance);
-            instance = null;
-        }
+            var obj = new object();
+            return new WeakReference(obj);
+        })();
 
         // Force garbage collection
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
@@ -131,12 +132,13 @@ public class WeakEventTests
     public void WeakEventSource_ShouldRemoveDeadReferences()
     {
         // Arrange
-        var weakEvent = new WeakEventSource<TestEventArgs>();
+        var weakEvent = new Func<WeakEventSource<TestEventArgs>>(() =>
         {
-            var instanceSubscriber = new InstanceSubscriber();
-            weakEvent.Subscribe(instanceSubscriber.Handler);
-            instanceSubscriber = null;
-        }
+            var weakEventSource = new WeakEventSource<TestEventArgs>();
+            var subscriber = new InstanceSubscriber();
+            weakEventSource.Subscribe(subscriber.Handler);
+            return weakEventSource;
+        })();
 
         // Verify initial state with reflection
         var fieldInfo = typeof(WeakEventSource<TestEventArgs>).GetField("_delegates", BindingFlags.NonPublic | BindingFlags.Instance);
