@@ -71,18 +71,11 @@ public class WeakEventSource<TEventArgs>
 
     private readonly List<WeakDelegate> _delegates = new();
 
-    private static readonly Type EventArgsType = typeof(OpenEventHandler)
-            .GetRuntimeMethods()
-            .Single(m => m.Name == "Invoke")
-            .GetParameters()
-            .Last()
-            .ParameterType;
-
     private static OpenEventHandler CreateOpenHandler(MethodInfo method)
     {
         var target = Expression.Parameter(typeof(object), "target");
         var sender = Expression.Parameter(typeof(object), "sender");
-        var e = Expression.Parameter(EventArgsType, "e");
+        var e = Expression.Parameter(typeof(TEventArgs), "e");
 
         if (method.IsStatic)
         {
