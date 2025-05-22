@@ -11,7 +11,7 @@ using Microsoft.CommandPalette.Extensions;
 
 namespace AzureExtension.Controls.Pages;
 
-public class SavedPipelineSearchesPage : SavedSearchesPage
+public class SavedPipelineSearchesPage : SavedSearchesPage, IDisposable
 {
     private readonly IResources _resources;
     private readonly AddPipelineSearchListItem _addPipelineSearchListItem;
@@ -44,10 +44,10 @@ public class SavedPipelineSearchesPage : SavedSearchesPage
         _accountProvider = accountProvider;
         _searchPageFactory = searchPageFactory;
         _buildProvider = buildProvider;
-        _buildProvider.OnUpdate += OnUpdate;
+        _buildProvider.OnUpdate += CacheManagerUpdate;
     }
 
-    private void OnUpdate(object? source, CacheManagerUpdateEventArgs e)
+    private void CacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
     {
         if (e.Kind == CacheManagerUpdateKind.Updated && e.DataUpdateParameters != null)
         {
@@ -75,5 +75,27 @@ public class SavedPipelineSearchesPage : SavedSearchesPage
         {
             return [_addPipelineSearchListItem];
         }
+    }
+
+    // Disposing area
+    private bool _disposed;
+
+    private void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _buildProvider.OnUpdate -= CacheManagerUpdate;
+            }
+
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }
