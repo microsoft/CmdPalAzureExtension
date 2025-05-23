@@ -20,6 +20,7 @@ public class CacheManagerUpdateEventArgs : EventArgs
 {
     private readonly CacheManagerUpdateKind _kind;
     private readonly Exception? _exception;
+    private readonly DataUpdateParameters? _dataUpdateParameters;
 
     public CacheManagerUpdateEventArgs(CacheManagerUpdateKind updateKind, Exception? exception = null)
     {
@@ -27,7 +28,16 @@ public class CacheManagerUpdateEventArgs : EventArgs
         _exception = exception;
     }
 
+    public CacheManagerUpdateEventArgs(CacheManagerUpdateKind updateKind, DataUpdateParameters dataUpdateParameters, Exception? exception = null)
+    {
+        _kind = updateKind;
+        _exception = exception;
+        _dataUpdateParameters = dataUpdateParameters;
+    }
+
     public CacheManagerUpdateKind Kind => _kind;
 
     public Exception? Exception => _exception;
+
+    public DataUpdateParameters? DataUpdateParameters => _dataUpdateParameters;
 }
