@@ -50,10 +50,10 @@ public class WeakEventSource<TEventArgs>
         public StrongHandler? TryGetStrongHandler()
         {
             object? target = null;
-            if (_weakTarget is { })
+            if (_weakTarget != null)
             {
                 target = _weakTarget.Target;
-                if (target is null)
+                if (target == null)
                 {
                     return null;
                 }
@@ -69,6 +69,7 @@ public class WeakEventSource<TEventArgs>
         }
     }
 
+    private readonly object _delegatesLock = new object();
     private readonly List<WeakDelegate> _delegates = new();
 
     private static OpenEventHandler CreateOpenHandler(MethodInfo method)
@@ -91,21 +92,29 @@ public class WeakEventSource<TEventArgs>
 
     public void Raise(object? sender, TEventArgs args)
     {
-        _delegates.RemoveAll(d =>
+        var validDelegates = new List<WeakDelegate>();
+        lock (_delegatesLock)
         {
-            if (d.IsAlive)
+            _delegates.RemoveAll(d =>
             {
-                var strongHandler = d.TryGetStrongHandler();
-                if (strongHandler != null)
+                if (d.IsAlive)
                 {
-                    strongHandler.Value.Invoke(sender, args);
+                    validDelegates.Add(d);
+                    return false;
                 }
 
-                return false;
-            }
+                return true;
+            });
+        }
 
-            return true;
-        });
+        foreach (var d in validDelegates)
+        {
+            var strongHandler = d.TryGetStrongHandler();
+            if (strongHandler != null)
+            {
+                strongHandler.Value.Invoke(sender, args);
+            }
+        }
     }
 
     public void Subscribe(EventHandler<TEventArgs>? handler)
@@ -115,7 +124,10 @@ public class WeakEventSource<TEventArgs>
             return;
         }
 
-        _delegates.Add(new WeakDelegate(handler, CreateOpenHandler(handler.GetMethodInfo())));
+        lock (_delegatesLock)
+        {
+            _delegates.Add(new WeakDelegate(handler, CreateOpenHandler(handler.GetMethodInfo())));
+        }
     }
 
     public void Unsubscribe(EventHandler<TEventArgs>? handler)
@@ -125,14 +137,17 @@ public class WeakEventSource<TEventArgs>
             return;
         }
 
-        _delegates.RemoveAll(d =>
+        lock (_delegatesLock)
         {
-            if (d.IsMatch(handler))
+            _delegates.RemoveAll(d =>
             {
-                return true;
-            }
+                if (d.IsMatch(handler))
+                {
+                    return true;
+                }
 
-            return !d.IsAlive;
-        });
+                return !d.IsAlive;
+            });
+        }
     }
 }
