@@ -64,7 +64,7 @@ extends:
                     outputDirectoryRoot: LocOutput
                     localizationTarget: true
                     appendRelativeDir: true
-                    teamId: '123893'
+                    teamId: '132258'
                     authType: 'FederatedIdentityTDBuild'
                     FederatedIdentityTDBuildServiceConnection: 'CmdPalExtensionsTdBuildConnection'
                     pseudoSetting: 'Included'
@@ -76,7 +76,7 @@ extends:
                   inputs:
                     resourceFilePath: |
                       **\en-US\*.resw
-                    teamId: '123893'
+                    teamId: '132258'
                     authType: 'FederatedIdentityTDBuild'
                     FederatedIdentityTDBuildServiceConnection: 'CmdPalExtensionsTdBuildConnection'
                     appendRelativeDir: true
