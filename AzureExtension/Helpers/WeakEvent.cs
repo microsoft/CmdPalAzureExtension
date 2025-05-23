@@ -69,6 +69,7 @@ public class WeakEventSource<TEventArgs>
         }
     }
 
+    private readonly object _delegatesLock = new object();
     private readonly List<WeakDelegate> _delegates = new();
 
     private static OpenEventHandler CreateOpenHandler(MethodInfo method)
@@ -91,7 +92,7 @@ public class WeakEventSource<TEventArgs>
 
     public void Raise(object? sender, TEventArgs args)
     {
-        lock (_delegates)
+        lock (_delegatesLock)
         {
             _delegates.RemoveAll(d =>
             {
@@ -118,7 +119,7 @@ public class WeakEventSource<TEventArgs>
             return;
         }
 
-        lock (_delegates)
+        lock (_delegatesLock)
         {
             _delegates.Add(new WeakDelegate(handler, CreateOpenHandler(handler.GetMethodInfo())));
         }
@@ -131,7 +132,7 @@ public class WeakEventSource<TEventArgs>
             return;
         }
 
-        lock (_delegates)
+        lock (_delegatesLock)
         {
             _delegates.RemoveAll(d =>
             {
