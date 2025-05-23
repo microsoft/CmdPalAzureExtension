@@ -50,10 +50,10 @@ public class WeakEventSource<TEventArgs>
         public StrongHandler? TryGetStrongHandler()
         {
             object? target = null;
-            if (_weakTarget is { })
+            if (_weakTarget != null)
             {
                 target = _weakTarget.Target;
-                if (target is null)
+                if (target == null)
                 {
                     return null;
                 }
@@ -91,21 +91,24 @@ public class WeakEventSource<TEventArgs>
 
     public void Raise(object? sender, TEventArgs args)
     {
-        _delegates.RemoveAll(d =>
+        lock (_delegates)
         {
-            if (d.IsAlive)
+            _delegates.RemoveAll(d =>
             {
-                var strongHandler = d.TryGetStrongHandler();
-                if (strongHandler != null)
+                if (d.IsAlive)
                 {
-                    strongHandler.Value.Invoke(sender, args);
+                    var strongHandler = d.TryGetStrongHandler();
+                    if (strongHandler != null)
+                    {
+                        strongHandler.Value.Invoke(sender, args);
+                    }
+
+                    return false;
                 }
 
-                return false;
-            }
-
-            return true;
-        });
+                return true;
+            });
+        }
     }
 
     public void Subscribe(EventHandler<TEventArgs>? handler)
@@ -115,7 +118,10 @@ public class WeakEventSource<TEventArgs>
             return;
         }
 
-        _delegates.Add(new WeakDelegate(handler, CreateOpenHandler(handler.GetMethodInfo())));
+        lock (_delegates)
+        {
+            _delegates.Add(new WeakDelegate(handler, CreateOpenHandler(handler.GetMethodInfo())));
+        }
     }
 
     public void Unsubscribe(EventHandler<TEventArgs>? handler)
@@ -125,14 +131,17 @@ public class WeakEventSource<TEventArgs>
             return;
         }
 
-        _delegates.RemoveAll(d =>
+        lock (_delegates)
         {
-            if (d.IsMatch(handler))
+            _delegates.RemoveAll(d =>
             {
-                return true;
-            }
+                if (d.IsMatch(handler))
+                {
+                    return true;
+                }
 
-            return !d.IsAlive;
-        });
+                return !d.IsAlive;
+            });
+        }
     }
 }
