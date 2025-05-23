@@ -92,23 +92,28 @@ public class WeakEventSource<TEventArgs>
 
     public void Raise(object? sender, TEventArgs args)
     {
+        var validDelegates = new List<WeakDelegate>();
         lock (_delegatesLock)
         {
             _delegates.RemoveAll(d =>
             {
                 if (d.IsAlive)
                 {
-                    var strongHandler = d.TryGetStrongHandler();
-                    if (strongHandler != null)
-                    {
-                        strongHandler.Value.Invoke(sender, args);
-                    }
-
+                    validDelegates.Add(d);
                     return false;
                 }
 
                 return true;
             });
+        }
+
+        foreach (var d in validDelegates)
+        {
+            var strongHandler = d.TryGetStrongHandler();
+            if (strongHandler != null)
+            {
+                strongHandler.Value.Invoke(sender, args);
+            }
         }
     }
 
