@@ -6,15 +6,14 @@ using AzureExtension.Controls.Pages;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
-namespace AzureExtension.Controls.ListItems
+namespace AzureExtension.Controls.ListItems;
+
+public partial class AddPipelineSearchListItem : ListItem
 {
-    public partial class AddPipelineSearchListItem : ListItem
+    public AddPipelineSearchListItem(SavePipelineSearchPage page, IResources resources)
+    : base(page)
     {
-        public AddPipelineSearchListItem(SavePipelineSearchPage page, IResources resources)
-        : base(page)
-        {
-            Title = resources.GetResource("ListItems_AddPipelineSearch");
-            Icon = IconLoader.GetIcon("Add");
-        }
+        Title = resources.GetResource("ListItems_AddPipelineSearch");
+        Icon = IconLoader.GetIcon("Add");
     }
 }
