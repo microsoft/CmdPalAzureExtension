@@ -39,4 +39,10 @@ public class IdleState : CacheManagerState
         Logger.Information("Starting periodic update.");
         await CacheManager.Update(parameters);
     }
+
+    public override void ClearCache()
+    {
+        Logger.Information("Clearing cache.");
+        CacheManager.PurgeAllData();
+    }
 }

@@ -4,6 +4,7 @@
 
 using AzureExtension.Controls;
 using AzureExtension.DataManager.Cache;
+using AzureExtension.Helpers;
 
 namespace AzureExtension.DataManager;
 
@@ -17,7 +18,13 @@ public class ContentDataProviderAdapter<TContentData> : ILiveContentDataProvider
         _liveDataProvider = liveDataProvider;
     }
 
-    public event CacheManagerUpdateEventHandler? OnUpdate
+    public event EventHandler<CacheManagerUpdateEventArgs> WeakOnUpdate
+    {
+        add => _liveDataProvider.WeakOnUpdate += value;
+        remove => _liveDataProvider.WeakOnUpdate -= value;
+    }
+
+    public event EventHandler<CacheManagerUpdateEventArgs>? OnUpdate
     {
         add => _liveDataProvider.OnUpdate += value;
         remove => _liveDataProvider.OnUpdate -= value;

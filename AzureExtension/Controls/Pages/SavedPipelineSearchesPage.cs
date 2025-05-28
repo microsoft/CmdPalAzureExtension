@@ -4,19 +4,21 @@
 
 using AzureExtension.Account;
 using AzureExtension.Controls.ListItems;
+using AzureExtension.DataManager;
+using AzureExtension.DataManager.Cache;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
-using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public class SavedPipelineSearchesPage : SavedSearchesPage
+public class SavedPipelineSearchesPage : SavedSearchesPage, IDisposable
 {
     private readonly IResources _resources;
     private readonly AddPipelineSearchListItem _addPipelineSearchListItem;
     private readonly ISavedSearchesProvider<IPipelineDefinitionSearch> _definitionRepository;
     private readonly IAccountProvider _accountProvider;
     private readonly ISearchPageFactory _searchPageFactory;
+    private readonly ILiveContentDataProvider<IBuild> _buildProvider;
 
     protected override SearchUpdatedType SearchUpdatedType => SearchUpdatedType.Pipeline;
 
@@ -28,6 +30,7 @@ public class SavedPipelineSearchesPage : SavedSearchesPage
         SavedAzureSearchesMediator mediator,
         ISavedSearchesProvider<IPipelineDefinitionSearch> definitionRepository,
         IAccountProvider accountProvider,
+        ILiveContentDataProvider<IBuild> buildProvider,
         ISearchPageFactory searchPageFactory)
         : base(mediator)
     {
@@ -40,6 +43,19 @@ public class SavedPipelineSearchesPage : SavedSearchesPage
         _addPipelineSearchListItem = addPipelineSearchListItem;
         _accountProvider = accountProvider;
         _searchPageFactory = searchPageFactory;
+        _buildProvider = buildProvider;
+        _buildProvider.OnUpdate += CacheManagerUpdate;
+    }
+
+    private void CacheManagerUpdate(object? source, CacheManagerUpdateEventArgs e)
+    {
+        if (e.Kind == CacheManagerUpdateKind.Updated && e.DataUpdateParameters != null)
+        {
+            if (e.DataUpdateParameters.UpdateType == DataUpdateType.All)
+            {
+                RaiseItemsChanged(0);
+            }
+        }
     }
 
     public override IListItem[] GetItems()
@@ -59,5 +75,27 @@ public class SavedPipelineSearchesPage : SavedSearchesPage
         {
             return [_addPipelineSearchListItem];
         }
+    }
+
+    // Disposing area
+    private bool _disposed;
+
+    private void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _buildProvider.OnUpdate -= CacheManagerUpdate;
+            }
+
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

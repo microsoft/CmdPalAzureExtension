@@ -23,7 +23,7 @@ public partial class BuildSearchPage : SearchPage<IBuild>
         ILiveContentDataProvider<IBuild> contentDataProvider,
         ILiveSearchDataProvider<IDefinition> searchDataProvider,
         TimeSpanHelper timeSpanHelper)
-        : base(search, contentDataProvider)
+        : base(search, contentDataProvider, resources)
     {
         _search = search;
         _resources = resources;
@@ -55,7 +55,7 @@ public partial class BuildSearchPage : SearchPage<IBuild>
             return IconLoader.GetIconForPipelineStatusAndResult(lastBuild.Status, lastBuild.Result);
         }
 
-        return IconLoader.GetIcon("Logo");
+        return IconLoader.GetIcon("Pipeline");
     }
 
     protected override ListItem GetListItem(IBuild item)

@@ -295,6 +295,11 @@ public class DataStore : IDisposable
         }
     }
 
+    public void Reset()
+    {
+        Create(true);
+    }
+
     private bool _disposed; // To detect redundant calls.
 
     protected virtual void Dispose(bool disposing)

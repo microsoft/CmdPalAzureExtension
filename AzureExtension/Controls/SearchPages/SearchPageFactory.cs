@@ -79,13 +79,13 @@ public class SearchPageFactory : ISearchPageFactory
         {
             var saveQueryForm = new SaveQueryForm((IQuerySearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _queryUpdater);
             var statusMessage = new StatusMessage();
-            return new EditQueryPage(_resources, saveQueryForm, statusMessage, "Query edited successfully", "Error in editing query");
+            return new EditQueryPage(_resources, saveQueryForm, statusMessage);
         }
         else if (search is IPullRequestSearch)
         {
             var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _savedPullRequestSearchUpdater);
             var statusMessage = new StatusMessage();
-            return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage, "Pull request search edited successfully", "error in editing pull request search");
+            return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage);
         }
         else if (search is IPipelineDefinitionSearch)
         {

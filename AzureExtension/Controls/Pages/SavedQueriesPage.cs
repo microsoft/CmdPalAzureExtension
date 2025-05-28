@@ -6,7 +6,6 @@ using AzureExtension.Controls;
 using AzureExtension.Controls.Pages;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
-using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension;
 
@@ -31,7 +30,7 @@ public partial class SavedQueriesPage : SavedSearchesPage
     {
         _resources = resources;
         Title = _resources.GetResource("Pages_SavedQueries");
-        Name = _resources.GetResource("Pages_SavedQueries"); // Title is for the Page, Name is for the command
+        Name = Title; // Title is for the Page, Name is for the command
         Icon = IconLoader.GetIcon("QueryList");
         _addQueryListItem = addQueryListItem;
         _queryRepository = queryRepository;
@@ -54,17 +53,5 @@ public partial class SavedQueriesPage : SavedSearchesPage
         {
             return [_addQueryListItem];
         }
-    }
-
-    public void OnQuerySaved(object? sender, object? args)
-    {
-        IsLoading = false;
-
-        if (args != null && args is IQuerySearch)
-        {
-            RaiseItemsChanged(0);
-        }
-
-        // errors are handled in SaveQueryPage
     }
 }

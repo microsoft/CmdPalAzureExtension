@@ -12,7 +12,6 @@ namespace AzureExtension.Controls.Forms;
 public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
 {
     private readonly IResources _resources;
-    private readonly IAccountProvider _accountProvider;
 
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
@@ -23,7 +22,7 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
         { "{{PullRequestSearchViewMineTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewMineTitle") },
         { "{{PullRequestSearchViewAssignedToMeTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAssignedToMeTitle") },
         { "{{PullRequestSearchViewAllTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAllTitle") },
-        { "{{PullRequestSearchSelectedView}}", string.IsNullOrEmpty(SavedSearch?.View) ? _resources.GetResource("Forms_SavePullRequestSearch_TemplateDefaultView") : SavedSearch.View },
+        { "{{PullRequestSearchSelectedView}}", string.IsNullOrEmpty(SavedSearch?.View) ? _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewDefault") : SavedSearch.View },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateIsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SavePullRequestSearchActionTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateSavePullRequestSearchActionTitle") },
@@ -38,7 +37,6 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
         : base(null, pullRequestSearchRepository, mediator, accountProvider)
     {
         _resources = resources;
-        _accountProvider = accountProvider;
         TemplateKey = "SavePullRequestSearch";
     }
 
@@ -52,7 +50,6 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
         : base(savedPullRequestSearch, pullRequestSearchRepository, mediator, accountProvider)
     {
         _resources = resources;
-        _accountProvider = accountProvider;
         TemplateKey = "SavePullRequestSearch";
     }
 

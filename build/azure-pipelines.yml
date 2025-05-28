@@ -38,6 +38,7 @@ extends:
         break: false
         scanOutputDirectoryOnly: true
       policheck:
+        enabled: true
         severity: Note
         break: false
     pool:
@@ -63,7 +64,7 @@ extends:
                     outputDirectoryRoot: LocOutput
                     localizationTarget: true
                     appendRelativeDir: true
-                    teamId: '123893'
+                    teamId: '132258'
                     authType: 'FederatedIdentityTDBuild'
                     FederatedIdentityTDBuildServiceConnection: 'CmdPalExtensionsTdBuildConnection'
                     pseudoSetting: 'Included'
@@ -75,7 +76,7 @@ extends:
                   inputs:
                     resourceFilePath: |
                       **\en-US\*.resw
-                    teamId: '123893'
+                    teamId: '132258'
                     authType: 'FederatedIdentityTDBuild'
                     FederatedIdentityTDBuildServiceConnection: 'CmdPalExtensionsTdBuildConnection'
                     appendRelativeDir: true

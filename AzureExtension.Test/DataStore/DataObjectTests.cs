@@ -372,4 +372,30 @@ public partial class DataStoreTests
         Assert.AreEqual(PullRequestView.Mine, findPull.View);
         Assert.AreEqual("project", findPull.Project.Name);
     }
+
+    [TestMethod]
+    [TestCategory("Unit")]
+    public void ResetDataStore()
+    {
+        using var dataStore = new DataStore("TestStore", TestHelpers.GetDataStoreFilePath(TestOptions), TestOptions.DataStoreOptions.DataStoreSchema!);
+        Assert.IsNotNull(dataStore);
+        dataStore.Create();
+        using var tx = dataStore.Connection!.BeginTransaction();
+
+        var org = Organization.GetOrCreate(dataStore, new Uri("https://dev.azure.com/organization/"));
+        Assert.IsNotNull(org);
+        dataStore.Connection.Insert(new Project { Name = "project", InternalId = "11", OrganizationId = org.Id });
+        dataStore.Connection.Insert(new Repository { Name = "repository1", InternalId = "21", CloneUrl = "https://organization/project/_git/repository1/", ProjectId = 1 });
+        dataStore.Connection.Insert(new Repository { Name = "repository2", InternalId = "22", CloneUrl = "https://organization/project/_git/repository2/", ProjectId = 1 });
+
+        tx.Commit();
+
+        var dataStoreProjects = dataStore.Connection.GetAll<Repository>().ToList();
+        Assert.AreEqual(2, dataStoreProjects.Count);
+
+        dataStore.Reset();
+
+        var dataStoreProjects2 = dataStore.Connection.GetAll<Repository>().ToList();
+        Assert.AreEqual(0, dataStoreProjects2.Count);
+    }
 }

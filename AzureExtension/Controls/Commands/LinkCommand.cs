@@ -22,6 +22,6 @@ internal sealed partial class LinkCommand : InvokableCommand
     public override CommandResult Invoke()
     {
         Process.Start(new ProcessStartInfo(_url) { UseShellExecute = true });
-        return CommandResult.KeepOpen();
+        return CommandResult.Dismiss();
     }
 }

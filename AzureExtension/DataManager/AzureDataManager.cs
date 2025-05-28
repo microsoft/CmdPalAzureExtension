@@ -133,4 +133,9 @@ public class AzureDataManager : IDataUpdateService
 
         throw new NotImplementedException($"Update type {parameters.UpdateType} not implemented.");
     }
+
+    public void PurgeAllData()
+    {
+        _dataStore.Reset();
+    }
 }

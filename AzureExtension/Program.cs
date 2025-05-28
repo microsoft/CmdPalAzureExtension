@@ -172,7 +172,8 @@ public sealed class Program
         };
 
         var azureDataManager = new AzureDataManager(cacheDataStore, updatersDictionary);
-        using var cacheManager = new CacheManager(azureDataManager);
+        var authenticationMediator = new AuthenticationMediator();
+        using var cacheManager = new CacheManager(azureDataManager, authenticationMediator);
 
         var contentProvidersDictionary = new Dictionary<Type, IContentDataProvider>
         {
@@ -195,7 +196,6 @@ public sealed class Program
         var resources = new Resources(resourceLoader);
 
         var timeSpanHelper = new TimeSpanHelper(resources);
-        var authenticationMediator = new AuthenticationMediator();
 
         var signInCommand = new SignInCommand(resources, accountProvider, authenticationMediator);
         var signInForm = new SignInForm(authenticationMediator, resources, signInCommand);
@@ -228,7 +228,7 @@ public sealed class Program
             new SearchDataProviderAdapter<IDefinition>(dataProvider));
 
         var addQueryForm = new SaveQueryForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, queryRepository);
-        var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources.GetResource("Message_Query_Saved"), resources.GetResource("Message_Query_Saved_Error"), resources.GetResource("ListItems_AddQuery")), resources);
+        var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources), resources);
         var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedAzureSearchesMediator, queryRepository, searchPageFactory);
 
         var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedAzureSearchesMediator, accountProvider, pullRequestSearchRepository);
@@ -239,9 +239,9 @@ public sealed class Program
         var savePipelineSearchForm = new SavePipelineSearchForm(null, resources, pipelineDefinitionRepository, savedAzureSearchesMediator, accountProvider, azureClientHelpers);
         var savePipelineSearchPage = new SavePipelineSearchPage(resources, savePipelineSearchForm, new StatusMessage());
         var addPipelineSearchListItem = new AddPipelineSearchListItem(savePipelineSearchPage, resources);
-        var savedPipelineSearchesPage = new SavedPipelineSearchesPage(resources, addPipelineSearchListItem, savedAzureSearchesMediator, pipelineDefinitionRepository, accountProvider, searchPageFactory);
+        using var savedPipelineSearchesPage = new SavedPipelineSearchesPage(resources, addPipelineSearchListItem, savedAzureSearchesMediator, pipelineDefinitionRepository, accountProvider, new ContentDataProviderAdapter<IBuild>(dataProvider), searchPageFactory);
 
-        var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator, savedPipelineSearchesPage);
+        using var commandProvider = new AzureExtensionCommandProvider(signInPage, signOutPage, accountProvider, savedQueriesPage, resources, savedPullRequestSearchesPage, searchPageFactory, savedAzureSearchesMediator, authenticationMediator, savedPipelineSearchesPage, dataProvider);
 
         var extensionInstance = new AzureExtension(extensionDisposedEvent, commandProvider);
 

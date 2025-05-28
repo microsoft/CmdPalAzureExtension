@@ -18,12 +18,13 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
         IResources resources,
         ILiveContentDataProvider<IPullRequest> contentDataProvider,
         TimeSpanHelper timeSpanHelper)
-        : base(search, contentDataProvider)
+        : base(search, contentDataProvider, resources)
     {
         _resources = resources;
         _timeSpanHelper = timeSpanHelper;
         Icon = IconLoader.GetIcon("PullRequest");
-        Name = search.Name;
+        Title = search.Name;
+        Name = Title; // Name is for the command, title is for the page
         ShowDetails = true;
     }
 

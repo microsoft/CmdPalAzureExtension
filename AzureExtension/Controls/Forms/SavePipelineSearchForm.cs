@@ -56,7 +56,7 @@ public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
 
         if (definitionInfo.Result != ResultType.Success)
         {
-            throw new InvalidOperationException($"Failed to get query info {definitionInfo.Error}: {definitionInfo.ErrorMessage}");
+            throw new InvalidOperationException($"Failed to get pipeline search info {definitionInfo.Error}: {definitionInfo.ErrorMessage}");
         }
 
         var uri = definitionInfo.AzureUri;

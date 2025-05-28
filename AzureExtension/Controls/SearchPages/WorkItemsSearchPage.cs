@@ -19,12 +19,13 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
         IResources resources,
         ILiveContentDataProvider<IWorkItem> contentDataProvider,
         TimeSpanHelper timeSpanHelper)
-        : base(query, contentDataProvider)
+        : base(query, contentDataProvider, resources)
     {
         _resources = resources;
         _timeSpanHelper = timeSpanHelper;
         Icon = IconLoader.GetIcon("Query");
-        Name = query.Name;
+        Title = query.Name;
+        Name = Title; // Name is for the command, title is for the page
         ShowDetails = true;
     }
 

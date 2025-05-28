@@ -2,6 +2,8 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using AzureExtension.Controls;
+using AzureExtension.Helpers;
 using Serilog;
 
 namespace AzureExtension.DataManager.Cache;
@@ -28,7 +30,10 @@ public sealed class CacheManager : IDisposable, ICacheManager
 
     public CacheManagerState PendingRefreshState { get; private set; }
 
+    public CacheManagerState PendingClearCacheState { get; private set; }
+
     private readonly IDataUpdateService _dataUpdateService;
+    private readonly AuthenticationMediator _authenticationMediator;
 
     private CancellationTokenSource _cancelSource;
 
@@ -48,10 +53,12 @@ public sealed class CacheManager : IDisposable, ICacheManager
 
     public DateTime LastUpdateTime { get; set; } = DateTime.MinValue;
 
-    public CacheManager(IDataUpdateService dataUpdateService)
+    public CacheManager(IDataUpdateService dataUpdateService, AuthenticationMediator authenticationMediator)
     {
         _dataUpdateService = dataUpdateService;
         _dataUpdateService.OnUpdate += HandleDataManagerUpdate;
+        _authenticationMediator = authenticationMediator;
+        _authenticationMediator.SignOutAction += ClearCache;
 
         DataUpdater = new PeriodicDataUpdater(PeriodicUpdate);
         _cancelSource = new CancellationTokenSource();
@@ -62,6 +69,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
         RefreshingState = new RefreshingState(this);
         PeriodicUpdatingState = new PeriodicUpdatingState(this);
         PendingRefreshState = new PendingRefreshState(this);
+        PendingClearCacheState = new PendingClearCacheState(this);
         State = IdleState;
 
         Start();
@@ -108,6 +116,21 @@ public sealed class CacheManager : IDisposable, ICacheManager
         }
     }
 
+    private async void ClearCache(object? sender, SignInStatusChangedEventArgs e)
+    {
+        await SemaphoreWrapper(() =>
+        {
+            _logger.Information("Clearing cache.");
+            State.ClearCache();
+            return Task.CompletedTask;
+        });
+    }
+
+    public void PurgeAllData()
+    {
+        _dataUpdateService.PurgeAllData();
+    }
+
     // This method is called by the pages to request
     // an instant update of its data.
     public async Task Refresh(DataUpdateParameters parameters)
@@ -142,12 +165,12 @@ public sealed class CacheManager : IDisposable, ICacheManager
         return Task.CompletedTask;
     }
 
-    public void SendUpdateEvent(object? source, CacheManagerUpdateKind kind, Exception? ex = null)
+    private void SendUpdateEvent(object? source, CacheManagerUpdateKind kind, DataUpdateParameters dataUpdateParameters, Exception? ex = null)
     {
         if (OnUpdate != null)
         {
             _logger.Debug($"Sending update event. Kind: {kind}.");
-            OnUpdate.Invoke(source, new CacheManagerUpdateEventArgs(kind, ex));
+            OnUpdate.Invoke(source, new CacheManagerUpdateEventArgs(kind, dataUpdateParameters, ex));
         }
     }
 
@@ -163,14 +186,14 @@ public sealed class CacheManager : IDisposable, ICacheManager
         switch (e.Kind)
         {
             case DataManagerUpdateKind.Success:
-                SendUpdateEvent(this, CacheManagerUpdateKind.Updated);
+                SendUpdateEvent(this, CacheManagerUpdateKind.Updated, e.Parameters);
                 LastUpdated = DateTime.UtcNow;
                 break;
             case DataManagerUpdateKind.Cancel:
-                SendUpdateEvent(this, CacheManagerUpdateKind.Cancel);
+                SendUpdateEvent(this, CacheManagerUpdateKind.Cancel, e.Parameters);
                 break;
             case DataManagerUpdateKind.Error:
-                SendUpdateEvent(this, CacheManagerUpdateKind.Error, e.Exception);
+                SendUpdateEvent(this, CacheManagerUpdateKind.Error, e.Parameters, e.Exception);
                 break;
         }
     }
@@ -206,6 +229,7 @@ public sealed class CacheManager : IDisposable, ICacheManager
                 {
                     _logger.Debug("Disposing of all CacheManager resources.");
                     _dataUpdateService.OnUpdate -= HandleDataManagerUpdate;
+                    _authenticationMediator.SignOutAction -= ClearCache;
                     DataUpdater.Dispose();
                     _cancelSource.Dispose();
                     _stateSemaphore.Dispose();
