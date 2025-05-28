@@ -11,7 +11,13 @@ namespace AzureExtension.Telemetry.Events;
 [EventData]
 public class LogInOutTelemetryEvent : TelemetryEventBase
 {
-    internal override PartA_PrivTags PartA_PrivTags => PrivTags.ProductAndServicePerformance;
+#if TELEMETRYEVENTSOURCE_PUBLIC
+    [CLSCompliant(false)]
+    public
+#else
+    internal
+#endif
+    override PartA_PrivTags PartA_PrivTags => PrivTags.ProductAndServicePerformance;
 
     public override void ReplaceSensitiveStrings(Func<string, string> replaceSensitiveStrings)
     {

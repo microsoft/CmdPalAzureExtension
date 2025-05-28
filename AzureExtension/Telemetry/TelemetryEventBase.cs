@@ -21,7 +21,13 @@ public abstract class TelemetryEventBase
     /// <summary>
     /// Gets the privacy datatype tag for the telemetry event.
     /// </summary>
-    internal abstract PartA_PrivTags PartA_PrivTags
+#if TELEMETRYEVENTSOURCE_PUBLIC
+    [CLSCompliant(false)]
+    public
+#else
+    internal
+#endif
+    abstract PartA_PrivTags PartA_PrivTags
     {
         get;
     }
