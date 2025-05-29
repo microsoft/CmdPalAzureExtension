@@ -122,6 +122,8 @@ public sealed class Program
 
         var telemetryLogger = new TelemetryLogger();
 
+        telemetryLogger.Log("HandShake", LogLevel.Critical, new { PartA_PrivTags = PartA_PrivTags.ProductAndServiceUsage });
+
         var authenticationSettings = new AuthenticationSettings();
         authenticationSettings.InitializeSettings();
         var accountProviderInstance = new AccountProvider(authenticationSettings);

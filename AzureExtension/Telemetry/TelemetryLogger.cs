@@ -6,7 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.Text;
 using Microsoft.Diagnostics.Telemetry;
-using Microsoft.Diagnostics.Telemetry.Internal;
 
 namespace AzureExtension.Telemetry;
 
@@ -141,9 +140,9 @@ internal sealed class TelemetryLogger : ITelemetryLogger
             innerException = innerException.InnerException;
         }
 
-        LogInternal(
+        LogError(
             ExceptionThrownEventName,
-            LogLevel.Critical,
+            LogLevel.Measure,
             new
             {
                 action,
@@ -153,10 +152,8 @@ internal sealed class TelemetryLogger : ITelemetryLogger
                 innerMessage,
                 innerStackTrace = innerStackTrace.ToString(),
                 message = ReplaceSensitiveStrings(e.Message),
-                PrivTags = PartA_PrivTags.ProductAndServicePerformance,
             },
-            relatedActivityId,
-            true);
+            relatedActivityId ?? _defaultRelatedActivityId);
     }
 
     /// <summary>
@@ -167,17 +164,15 @@ internal sealed class TelemetryLogger : ITelemetryLogger
     /// <param name="relatedActivityId">Optional relatedActivityId which will allow to correlate this telemetry with other telemetry in the same action/activity or thread and corelate them</param>
     public void LogTimeTaken(string eventName, uint timeTakenMilliseconds, Guid? relatedActivityId = null)
     {
-        LogInternal(
+        Log(
             TimeTakenEventName,
             LogLevel.Critical,
             new
             {
                 eventName,
                 timeTakenMilliseconds,
-                PartA_PrivTags = PartA_PrivTags.ProductAndServicePerformance,
             },
-            relatedActivityId ?? _defaultRelatedActivityId,
-            false);
+            relatedActivityId ?? _defaultRelatedActivityId);
     }
 
     /// <summary>
@@ -188,11 +183,9 @@ internal sealed class TelemetryLogger : ITelemetryLogger
     /// <param name="data">Values to send to the telemetry system.</param>
     /// <param name="relatedActivityId">Optional relatedActivityId which will allow to correlate this telemetry with other telemetry in the same action/activity or thread and corelate them</param>
     /// <typeparam name="T">Anonymous type.</typeparam>
-    public void Log<T>(string eventName, LogLevel level, T data, Guid? relatedActivityId = null)
-        where T : TelemetryEventBase
+    public void Log<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(string eventName, LogLevel level, T data, Guid? relatedActivityId = null)
     {
-        data.ReplaceSensitiveStrings(ReplaceSensitiveStrings);
-        LogInternal(eventName, level, data, relatedActivityId, false);
+        WriteTelemetryEvent(eventName, level, relatedActivityId ?? _defaultRelatedActivityId, false, data);
     }
 
     /// <summary>
@@ -203,16 +196,9 @@ internal sealed class TelemetryLogger : ITelemetryLogger
     /// <param name="data">Values to send to the telemetry system.</param>
     /// <param name="relatedActivityId">Optional Optional relatedActivityId which will allow to correlate this telemetry with other telemetry in the same action/activity or thread and corelate them</param>
     /// <typeparam name="T">Anonymous type.</typeparam>
-    public void LogError<T>(string eventName, LogLevel level, T data, Guid? relatedActivityId = null)
-        where T : TelemetryEventBase
+    public void LogError<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(string eventName, LogLevel level, T data, Guid? relatedActivityId = null)
     {
-        data.ReplaceSensitiveStrings(ReplaceSensitiveStrings);
-        LogInternal(eventName, level, data, relatedActivityId, true);
-    }
-
-    private void LogInternal<T>(string eventName, LogLevel level, T data, Guid? relatedActivityId, bool isError)
-    {
-        this.WriteTelemetryEvent(eventName, level, relatedActivityId ?? _defaultRelatedActivityId, isError, data);
+        WriteTelemetryEvent(eventName, level, relatedActivityId ?? _defaultRelatedActivityId, true, data);
     }
 
     /// <summary>
@@ -264,23 +250,23 @@ internal sealed class TelemetryLogger : ITelemetryLogger
         "ReflectionAnalysis",
         "IL2026:RequiresUnreferencedCode",
         Justification = "The type passed for data is an anonymous type consisting of primitive type properties declared in an assembly that is not marked trimmable.")]
-    private void WriteTelemetryEvent<T>(string eventName, LogLevel level, Guid relatedActivityId, bool isError, T data)
+    private void WriteTelemetryEvent<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(string eventName, LogLevel level, Guid relatedActivityId, bool isError, T data)
     {
         EventSourceOptions telemetryOptions;
         if (IsTelemetryOn)
         {
             telemetryOptions = level switch
             {
-                LogLevel.Critical => isError ? _criticalDataErrorOption : _criticalDataOption,
-                LogLevel.Measure => isError ? _measureErrorOption : _measureOption,
-                LogLevel.Info => isError ? _infoErrorOption : _infoOption,
-                _ => isError ? _localErrorOption : _localOption,
+                LogLevel.Critical => isError ? TelemetryLogger._criticalDataErrorOption : TelemetryLogger._criticalDataOption,
+                LogLevel.Measure => isError ? TelemetryLogger._measureErrorOption : TelemetryLogger._measureOption,
+                LogLevel.Info => isError ? TelemetryLogger._infoErrorOption : TelemetryLogger._infoOption,
+                _ => isError ? TelemetryLogger._localErrorOption : TelemetryLogger._localOption,
             };
         }
         else
         {
             // The telemetry is not turned on, downgrade to local telemetry
-            telemetryOptions = isError ? _localErrorOption : _localOption;
+            telemetryOptions = isError ? TelemetryLogger._localErrorOption : TelemetryLogger._localOption;
         }
 
         _telemetryEventSourceInstance.Write(eventName, ref telemetryOptions, ref _activityId, ref relatedActivityId, ref data);
