@@ -53,15 +53,15 @@ public class AccountProviderTelemetryDecorator : IAccountProvider
     public async Task<bool> LogoutAccount(string username)
     {
         var res = await _accountProvider.LogoutAccount(username);
-        _logger.Log("LogoutAccount", LogLevel.Info, new { PartA_PrivTags = PartA_PrivTags.ProductAndServiceUsage });
+        _logger.Log("LogoutAccount", LogLevel.Critical, new { PartA_PrivTags = PartA_PrivTags.ProductAndServiceUsage });
         return res;
     }
 
     public async Task<IAccount> ShowLogonSession()
     {
-        _logger.Log("ShowLogonSession", LogLevel.Info, new { }, null);
+        _logger.Log("ShowLogonSession", LogLevel.Critical, new { PartA_PrivTags = PartA_PrivTags.ProductAndServiceUsage });
         var account = await _accountProvider.ShowLogonSession();
-        _logger.Log("ShowLogonSessionCompleted", LogLevel.Info, new { PartA_PrivTags = PartA_PrivTags.ProductAndServiceUsage });
+        _logger.Log("ShowLogonSessionCompleted", LogLevel.Critical, new { PartA_PrivTags = PartA_PrivTags.ProductAndServiceUsage });
         return account;
     }
 }
