@@ -429,10 +429,6 @@
     <value>All</value>
     <comment>The option to select all active pull requests in a repository</comment>
   </data>
-  <data name="Commands_Remove_Search" xml:space="preserve">
-    <value>Remove</value>
-    <comment>Title for command to remove a query or pull request search</comment>
-  </data>
   <data name="Pages_WorkItemsSearchPage_CopyWorkItemId" xml:space="preserve">
     <value>Copy work item ID</value>
     <comment>The label for the command to copy the work item ID</comment>
@@ -628,5 +624,21 @@
   <data name="Pages_EditPipelineSearch" xml:space="preserve">
     <value>Edit pipeline</value>
     <comment>Name and title for edit pipeline search page</comment>
+  </data>
+  <data name="Commands_Remove_Query" xml:space="preserve">
+    <value>Remove query</value>
+    <comment>Title for the command to remove a query from Saved queries</comment>
+  </data>
+  <data name="Commands_Remove_PipelineSearch" xml:space="preserve">
+    <value>Remove pipeline</value>
+    <comment>Title for the command to remove a query from Saved pipelines</comment>
+  </data>
+  <data name="Commands_Remove_PullRequestSearch" xml:space="preserve">
+    <value>Remove pull request search</value>
+    <comment>Title for the command to remove a query from Saved pull request searches</comment>
+  </data>
+  <data name="Commands_Remove" xml:space="preserve">
+    <value>Remove search</value>
+    <comment>A fallback title for the command that removes searches</comment>
   </data>
 </root>

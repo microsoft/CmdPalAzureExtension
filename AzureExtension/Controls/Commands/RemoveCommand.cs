@@ -20,7 +20,7 @@ public partial class RemoveCommand : InvokableCommand
         _savedAzureSearchesMediator = savedAzureSearchesMediator;
         _azureSearchRepository = azureSearchRepository;
         _savedAzureSearch = azureSearch;
-        Name = _resources.GetResource("Commands_Remove_Search");
+        Name = GetCommandNameFromSearchType();
         Icon = IconLoader.GetIcon("Remove");
     }
 
@@ -30,5 +30,16 @@ public partial class RemoveCommand : InvokableCommand
         _savedAzureSearchesMediator.Remove(_savedAzureSearch);
 
         return CommandResult.KeepOpen();
+    }
+
+    public string GetCommandNameFromSearchType()
+    {
+        return _savedAzureSearch switch
+        {
+            IQuerySearch => _resources.GetResource("Commands_Remove_Query"),
+            IPullRequestSearch => _resources.GetResource("Commands_Remove_PullRequestSearch"),
+            IPipelineDefinitionSearch => _resources.GetResource("Commands_Remove_PipelineSearch"),
+            _ => _resources.GetResource("Commands_Remove"),
+        };
     }
 }
