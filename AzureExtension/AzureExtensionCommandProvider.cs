@@ -19,7 +19,6 @@ public partial class AzureExtensionCommandProvider : CommandProvider, IDisposabl
     private readonly SignOutPage _signOutPage;
     private readonly SavedQueriesPage _savedQueriesPage;
     private readonly IAccountProvider _accountProvider;
-    private readonly IResources _resources;
     private readonly SavedPullRequestSearchesPage _savedPullRequestSearchesPage;
     private readonly ISearchPageFactory _searchPageFactory;
     private readonly SavedAzureSearchesMediator _savedSearchesMediator;
@@ -32,7 +31,6 @@ public partial class AzureExtensionCommandProvider : CommandProvider, IDisposabl
         SignOutPage signOutPage,
         IAccountProvider accountProvider,
         SavedQueriesPage savedQueriesPage,
-        IResources resources,
         SavedPullRequestSearchesPage savedPullRequestSearchesPage,
         ISearchPageFactory searchPageFactory,
         SavedAzureSearchesMediator mediator,
@@ -44,7 +42,6 @@ public partial class AzureExtensionCommandProvider : CommandProvider, IDisposabl
         _signOutPage = signOutPage;
         _accountProvider = accountProvider;
         _savedQueriesPage = savedQueriesPage;
-        _resources = resources;
         _savedPullRequestSearchesPage = savedPullRequestSearchesPage;
         _searchPageFactory = searchPageFactory;
         _savedSearchesMediator = mediator;
