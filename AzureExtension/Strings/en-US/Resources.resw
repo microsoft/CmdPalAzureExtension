@@ -229,9 +229,9 @@
     <value>Sign out succeeded!</value>
     <comment>Shown in a toast when sign out is succeeded</comment>
   </data>
-  <data name="Pages_Edit" xml:space="preserve">
-    <value>Edit</value>
-    <comment>Name and title for edit search page</comment>
+  <data name="Pages_EditQuery" xml:space="preserve">
+    <value>Edit query</value>
+    <comment>Name and title for edit query page</comment>
   </data>
   <data name="Pages_Error_Body" xml:space="preserve">
     <value>No items found</value>
@@ -620,5 +620,13 @@
   <data name="Pages_Search_NoItemsFound" xml:space="preserve">
     <value>No items found</value>
     <comment>Displayed if no items are returned</comment>
+  </data>
+  <data name="Pages_EditPullRequestSearch" xml:space="preserve">
+    <value>Edit pull request search</value>
+    <comment>Name and title for edit pull request search page</comment>
+  </data>
+  <data name="Pages_EditPipelineSearch" xml:space="preserve">
+    <value>Edit pipeline</value>
+    <comment>Name and title for edit pipeline search page</comment>
   </data>
 </root>

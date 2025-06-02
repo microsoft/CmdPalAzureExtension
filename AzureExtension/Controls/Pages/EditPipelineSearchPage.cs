@@ -37,7 +37,7 @@ internal sealed partial class EditPipelineSearchPage : ContentPage
 
         ExtensionHost.HideStatus(_statusMessage);
 
-        Title = _resources.GetResource("Pages_Edit");
+        Title = _resources.GetResource("Pages_EditPipelineSearch");
         Name = Title; // Title is for the Page, Name is for the Command
         Icon = IconLoader.GetIcon("Edit");
     }
