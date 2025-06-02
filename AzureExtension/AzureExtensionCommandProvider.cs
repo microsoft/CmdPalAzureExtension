@@ -89,10 +89,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider, IDisposabl
         {
             return new ICommandItem[]
             {
-                new CommandItem(_signInPage)
-                {
-                    Subtitle = _resources.GetResource("Forms_SignIn_PageSubtitle"),
-                },
+                new CommandItem(_signInPage),
             };
         }
         else
@@ -103,10 +100,7 @@ public partial class AzureExtensionCommandProvider : CommandProvider, IDisposabl
                 new(_savedQueriesPage),
                 new(_savedPullRequestSearchesPage),
                 new(_savedPipelineSearchesPage),
-                new(_signOutPage)
-                {
-                   Subtitle = _resources.GetResource("Forms_SignOut_PageTitle"),
-                },
+                new(_signOutPage),
             };
 
             topLevelCommands.AddRange(defaultCommands);

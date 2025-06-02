@@ -394,8 +394,12 @@
     <comment>Name of the page that shows user-saved pull request searches</comment>
   </data>
   <data name="Pages_SignIn_Title" xml:space="preserve">
-    <value>Sign in</value>
+    <value>Sign into the Azure extension</value>
     <comment>The title for that page that signs in users</comment>
+  </data>
+  <data name="Pages_SignOut_Title" xml:space="preserve">
+    <value>Sign out of the Azure extension</value>
+    <comment>The title for that page that signs out users</comment>
   </data>
   <data name="Pages_SavedPullRequestSearches_Error" xml:space="preserve">
     <value>Error in fetching pull request searches:</value>
