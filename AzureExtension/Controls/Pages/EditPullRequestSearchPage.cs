@@ -29,7 +29,7 @@ internal sealed partial class EditPullRequestSearchPage : ContentPage
 
         ExtensionHost.HideStatus(_statusMessage);
 
-        Title = _resources.GetResource("Pages_Edit");
+        Title = _resources.GetResource("Pages_EditPullRequestSearch");
         Name = Title; // Title is for the Page, Name is for the Command
         Icon = IconLoader.GetIcon("Edit");
     }

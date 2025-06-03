@@ -29,7 +29,7 @@ internal sealed partial class EditQueryPage : ContentPage
 
         ExtensionHost.HideStatus(_statusMessage);
 
-        Title = _resources.GetResource("Pages_Edit");
+        Title = _resources.GetResource("Pages_EditQuery");
         Name = Title; // Title is for the Page, Name is for the Command
         Icon = IconLoader.GetIcon("Edit");
     }
