@@ -10,7 +10,7 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public partial class SignInPage : ContentPage
+public partial class SignInPage : ContentPage, IDisposable
 {
     private readonly SignInForm _signInForm;
     private readonly IResources _resources;
@@ -49,5 +49,28 @@ public partial class SignInPage : ContentPage
     public override IContent[] GetContent()
     {
         return [_signInForm];
+    }
+
+    // Disposing area
+    private bool _disposed;
+
+    private void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _authenticationMediator.LoadingStateChanged -= OnLoadingStateChanged;
+                _signInForm.PropChanged -= UpdatePage;
+            }
+
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

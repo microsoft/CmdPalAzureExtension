@@ -188,12 +188,12 @@ public sealed class Program
 
         var timeSpanHelper = new TimeSpanHelper(resources);
 
-        var signInCommand = new SignInCommand(resources, accountProvider, authenticationMediator);
-        var signInForm = new SignInForm(authenticationMediator, resources, signInCommand);
-        var signInPage = new SignInPage(signInForm, resources, signInCommand, authenticationMediator);
-        var signOutCommand = new SignOutCommand(resources, accountProvider, authenticationMediator);
-        var signOutForm = new SignOutForm(resources, signOutCommand, authenticationMediator, accountProvider);
-        var signOutPage = new SignOutPage(signOutForm, resources, signOutCommand, authenticationMediator);
+        using var signInCommand = new SignInCommand(resources, accountProvider, authenticationMediator);
+        using var signInForm = new SignInForm(authenticationMediator, resources, signInCommand);
+        using var signInPage = new SignInPage(signInForm, resources, signInCommand, authenticationMediator);
+        using var signOutCommand = new SignOutCommand(resources, accountProvider, authenticationMediator);
+        using var signOutForm = new SignOutForm(resources, signOutCommand, authenticationMediator, accountProvider);
+        using var signOutPage = new SignOutPage(signOutForm, resources, signOutCommand, authenticationMediator);
 
         var savedAzureSearchesMediator = new SavedAzureSearchesMediator();
 
@@ -242,6 +242,8 @@ public sealed class Program
         // This will make the main thread wait until the event is signaled by the extension class.
         // Since we have single instance of the extension object, we exit as soon as it is disposed.
         extensionDisposedEvent.WaitOne();
+        server.Stop();
+        server.UnsafeDispose();
         Log.Information($"Extension is disposed.");
     }
 
