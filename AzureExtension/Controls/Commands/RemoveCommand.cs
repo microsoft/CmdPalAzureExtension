@@ -32,7 +32,7 @@ public partial class RemoveCommand : InvokableCommand
         return CommandResult.KeepOpen();
     }
 
-    public string GetCommandNameFromSearchType()
+    private string GetCommandNameFromSearchType()
     {
         return _savedAzureSearch switch
         {
