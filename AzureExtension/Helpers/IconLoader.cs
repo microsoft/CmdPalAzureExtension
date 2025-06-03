@@ -24,7 +24,6 @@ public class IconLoader
             { "Deliverable", (@"Assets\Deliverable.svg", @"Assets\Deliverable.svg") },
             { "Epic", (@"Assets\Epic.png", @"Assets\Epic.png") },
             { "Feature", (@"Assets\Feature.png", @"Assets\Feature.png") },
-            { "Failure", (@"Assets\Failure.png", @"Assets\Failure.png") },
             { "Impediment", (@"Assets\Impediment.png", @"Assets\Impediment.png") },
             { "Issue", (@"Assets\Issue.png", @"Assets\Issue.png") },
             { "Pipeline", (@"Assets\Pipeline.png", @"Assets\Pipeline.png") },
@@ -36,8 +35,6 @@ public class IconLoader
             { "PipelineWarning", (@"Assets\PipelineWarning.svg", @"Assets\PipelineWarning.svg") },
             { "ProductBacklogItem", (@"Assets\ProductBacklogItem.png", @"Assets\ProductBacklogItem.png") },
             { "PullRequest", (@"Assets\PullRequestLight.svg", @"Assets\PullRequestDark.svg") },
-            { "PullRequestApproved", (@"Assets\PullRequestApproved.png", @"Assets\PullRequestApproved.png") },
-            { "PullRequestRejected", (@"Assets\PullRequestRejected.png", @"Assets\PullRequestRejected.png") },
             { "PullRequestReviewNotStarted", (@"Assets\PullRequestReviewNotStarted.png", @"Assets\PullRequestReviewNotStarted.png") },
             { "PullRequestWaiting", (@"Assets\PullRequestWaiting.png", @"Assets\PullRequestWaiting.png") },
             { "Query", (@"Assets\QueryLight.svg", @"Assets\QueryDark.svg") },
@@ -69,6 +66,9 @@ public class IconLoader
         _iconDictionary.Add("Search", new IconInfo("\uE721"));
         _iconDictionary.Add("OpenLink", new IconInfo("\uE8A7"));
         _iconDictionary.Add("Copy", new IconInfo("\uE8C8"));
+        _iconDictionary.Add("Failure", new IconInfo("\uEB90"));
+        _iconDictionary.Add("PullRequestApproved", new IconInfo("\uEC61"));
+        _iconDictionary.Add("PullRequestRejected", new IconInfo("\uE8C8"));
     }
 
     public static IconInfo GetIcon(string key)
