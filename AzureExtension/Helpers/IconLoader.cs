@@ -27,11 +27,8 @@ public class IconLoader
             { "Impediment", (@"Assets\Impediment.png", @"Assets\Impediment.png") },
             { "Issue", (@"Assets\Issue.png", @"Assets\Issue.png") },
             { "Pipeline", (@"Assets\Pipeline.png", @"Assets\Pipeline.png") },
-            { "PipelineCancelled", (@"Assets\PipelineCancelledLight.svg", @"Assets\PipelineCancelledDark.svg") },
-            { "PipelineFailed", (@"Assets\PipelineFailed.png", @"Assets\PipelineFailed.png") },
             { "PipelineQueued", (@"Assets\PipelineQueued.png", @"Assets\PipelineQueued.png") },
             { "PipelineRunning", (@"Assets\PipelineRunning.png", @"Assets\PipelineRunning.png") },
-            { "PipelineSucceeded", (@"Assets\PipelineSucceeded.png", @"Assets\PipelineSucceeded.png") },
             { "PipelineWarning", (@"Assets\PipelineWarning.svg", @"Assets\PipelineWarning.svg") },
             { "ProductBacklogItem", (@"Assets\ProductBacklogItem.png", @"Assets\ProductBacklogItem.png") },
             { "PullRequest", (@"Assets\PullRequestLight.svg", @"Assets\PullRequestDark.svg") },
@@ -68,7 +65,10 @@ public class IconLoader
         _iconDictionary.Add("Copy", new IconInfo("\uE8C8"));
         _iconDictionary.Add("Failure", new IconInfo("\uEB90"));
         _iconDictionary.Add("PullRequestApproved", new IconInfo("\uEC61"));
-        _iconDictionary.Add("PullRequestRejected", new IconInfo("\uE8C8"));
+        _iconDictionary.Add("PullRequestRejected", new IconInfo("\uEB90"));
+        _iconDictionary.Add("PipelineFailed", new IconInfo("\uEB90"));
+        _iconDictionary.Add("PipelineCancelled", new IconInfo("\uF140"));
+        _iconDictionary.Add("PipelineSucceeded", new IconInfo("\uEC61"));
     }
 
     public static IconInfo GetIcon(string key)
