@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -58,9 +59,19 @@ public partial class BuildSearchPage : SearchPage<IBuild>
         return IconLoader.GetIcon("Pipeline");
     }
 
+    // Manual runs don't have a trigger message, so we provide a default one.
+    private string GetListItemTitle(IBuild item)
+    {
+        var triggerMessage = string.IsNullOrEmpty(item.TriggerMessage)
+            ? string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Pages_BuildSearch_ManualRunTriggerMessageTemplate"), item.Requester?.Name)
+            : item.TriggerMessage;
+
+        return $"{_definition.Name} - #{item.BuildNumber} • {triggerMessage}";
+    }
+
     protected override ListItem GetListItem(IBuild item)
     {
-        var listItemTitle = $"#{item.BuildNumber} • {item.TriggerMessage}";
+        var listItemTitle = GetListItemTitle(item);
 
         return new ListItem(new LinkCommand(item.Url, _resources, null))
         {
