@@ -58,9 +58,19 @@ public partial class BuildSearchPage : SearchPage<IBuild>
         return IconLoader.GetIcon("Pipeline");
     }
 
+    private string GetListItemTitle(IBuild item)
+    {
+        if (string.IsNullOrEmpty(item.TriggerMessage))
+        {
+            return $"{_definition.Name} - #{item.BuildNumber} • {_resources.GetResource("Pages_BuildSearch_ManualRunTriggerMessage")}{item.Requester?.Name ?? "Unknown"}";
+        }
+
+        return $"{_definition.Name} - #{item.BuildNumber} • {item.TriggerMessage}";
+    }
+
     protected override ListItem GetListItem(IBuild item)
     {
-        var listItemTitle = $"#{item.BuildNumber} • {item.TriggerMessage}";
+        var listItemTitle = GetListItemTitle(item);
 
         return new ListItem(new LinkCommand(item.Url, _resources, null))
         {

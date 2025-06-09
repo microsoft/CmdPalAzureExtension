@@ -645,4 +645,8 @@
     <value>Remove search</value>
     <comment>A fallback title for the command that removes searches</comment>
   </data>
+  <data name="Pages_BuildSearch_ManualRunTriggerMessage" xml:space="preserve">
+    <value>Manual run by </value>
+    <comment>The title for a build that does not have a regular title. These are builds that were manually triggered by a user.</comment>
+  </data>
 </root>
