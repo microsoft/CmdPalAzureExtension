@@ -158,7 +158,22 @@ public class AzureDataQueryManager
         var workItems = new List<TFModels.WorkItem>();
         if (workItemIds.Count > 0)
         {
-            workItems = await _liveDataProvider.GetWorkItemsAsync(vssConnection, project.InternalId, workItemIds, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit, cancellationToken);
+            var workItemIdChunks = workItemIds.Chunk(200); // Azure API limit is 200 items per request
+            var chunkedWorkItemsTasks = new List<Task<List<TFModels.WorkItem>>>();
+            foreach (var chunk in workItemIdChunks)
+            {
+                var chunkedWorkItemsTask = _liveDataProvider.GetWorkItemsAsync(vssConnection, project.InternalId, chunk, TFModels.WorkItemExpand.Links, TFModels.WorkItemErrorPolicy.Omit, cancellationToken);
+                chunkedWorkItemsTasks.Add(chunkedWorkItemsTask);
+            }
+
+            foreach (var task in chunkedWorkItemsTasks)
+            {
+                var chunkedWorkItems = await task;
+                if (chunkedWorkItems != null && chunkedWorkItems.Count > 0)
+                {
+                    workItems.AddRange(chunkedWorkItems);
+                }
+            }
         }
 
         var dsQuery = Query.GetOrCreate(_dataStore, azureUri.Query, project.Id, account.Username, query.Name);

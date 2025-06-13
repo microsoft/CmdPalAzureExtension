@@ -22,4 +22,10 @@ public class DataUpdateParameters
     public DataUpdateType UpdateType { get; set; }
 
     public IAzureSearch? UpdateObject { get; set; }
+
+    public override string ToString()
+    {
+        var searchName = UpdateObject != null ? $"{UpdateObject.Name} ({UpdateObject.Url})" : "All";
+        return $"{UpdateType} - {searchName}";
+    }
 }
