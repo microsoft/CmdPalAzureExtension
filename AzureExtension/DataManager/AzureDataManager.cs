@@ -75,7 +75,7 @@ public class AzureDataManager : IDataUpdateService
         {
             tx.Rollback();
             OnUpdate?.Invoke(this, new DataManagerUpdateEventArgs(DataManagerUpdateKind.Cancel, parameters, ex));
-            _log.Information($"Update cancelled: {parameters.ToString()}");
+            _log.Information($"Update cancelled: {parameters}");
             return;
         }
         catch (Exception ex)
@@ -86,7 +86,7 @@ public class AzureDataManager : IDataUpdateService
         }
 
         tx.Commit();
-        _log.Information($"Update complete: {parameters.ToString()}");
+        _log.Information($"Update complete: {parameters}");
         OnUpdate?.Invoke(this, new DataManagerUpdateEventArgs(DataManagerUpdateKind.Success, parameters));
     }
 
