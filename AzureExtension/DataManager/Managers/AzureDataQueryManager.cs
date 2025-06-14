@@ -161,7 +161,6 @@ public class AzureDataQueryManager
         if (workItemIds.Count > 0)
         {
             var workItemIdChunks = workItemIds.Chunk(AzureAPIWorkItemLimit);
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             var chunkedWorkItemsTasks = new List<Task<List<TFModels.WorkItem>>>();
             foreach (var chunk in workItemIdChunks)
             {
@@ -169,9 +168,10 @@ public class AzureDataQueryManager
                 chunkedWorkItemsTasks.Add(chunkedWorkItemsTask);
             }
 
-            foreach (var task in chunkedWorkItemsTasks)
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            var chunkedWorkItemsResults = await Task.WhenAll(chunkedWorkItemsTasks);
+            foreach (var chunkedWorkItems in chunkedWorkItemsResults)
             {
-                var chunkedWorkItems = await task;
                 if (chunkedWorkItems != null && chunkedWorkItems.Count > 0)
                 {
                     workItems.AddRange(chunkedWorkItems);
@@ -179,7 +179,7 @@ public class AzureDataQueryManager
             }
 
             stopwatch.Stop();
-            Log.Information("DURATION: Retrieved {Count} work items in {ElapsedMilliseconds} ms for query {QueryName}.", workItems.Count, stopwatch.ElapsedMilliseconds, query.Name);
+            Log.Information("Retrieved {Count} work items in {ElapsedMilliseconds} ms for query {QueryName}.", workItems.Count, stopwatch.ElapsedMilliseconds, query.Name);
         }
 
         var dsQuery = Query.GetOrCreate(_dataStore, azureUri.Query, project.Id, account.Username, query.Name);
