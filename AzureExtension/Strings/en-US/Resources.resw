@@ -649,4 +649,8 @@
     <value>Manual run by {0}</value>
     <comment>The title for a build that does not have a regular title. These are builds that were manually triggered by a user. The placeholder {0} represents the name of the user who triggered the build.</comment>
   </data>
+  <data name="Forms_SignOut_TemplateAuthButtonTitle_Success" xml:space="preserve">
+    <value>Sign out succeeded!</value>
+    <comment>The button title when the user successfully signs out</comment>
+  </data>
 </root>

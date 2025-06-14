@@ -22,7 +22,7 @@ public sealed partial class SignOutForm : FormContent, IDisposable
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{AuthTitle}}", _resources.GetResource("Forms_SignOut_TemplateAuthTitle") },
-        { "{{AuthButtonTitle}}", $"{_resources.GetResource("Forms_SignOut_TemplateAuthButtonTitle")} {_accountProvider.GetDefaultAccount()?.Username ?? string.Empty}" },
+        { "{{AuthButtonTitle}}", GetAuthButtonTitle() },
         { "{{AuthIcon}}", $"data:image/png;base64,{IconLoader.GetIconAsBase64("Logo")}" },
         { "{{AuthButtonTooltip}}", _resources.GetResource("Forms_SignOut_TemplateAuthButtonTooltip") },
         { "{{ButtonIsEnabled}}", IsButtonEnabled },
@@ -67,6 +67,11 @@ public sealed partial class SignOutForm : FormContent, IDisposable
     public override ICommandResult SubmitForm(string inputs, string data)
     {
        return _signOutCommand.Invoke();
+    }
+
+    private string GetAuthButtonTitle()
+    {
+        return _accountProvider.GetDefaultAccount()?.Username == null ? _resources.GetResource("Forms_SignOut_TemplateAuthButtonTitle_Success") : $"{_resources.GetResource("Forms_SignOut_TemplateAuthButtonTitle")} {_accountProvider.GetDefaultAccount()?.Username}";
     }
 
     // Disposing area
