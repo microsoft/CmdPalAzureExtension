@@ -178,9 +178,9 @@ public class DataManagerTests
     }
 
     [TestMethod]
-    public async Task TestDataQueryManagerUpdateFlow200Items()
+    public async Task TestDataQueryManagerUpdateFlow20000Items()
     {
-        Log.Information("\nStarting TestDataQueryManagerUpdateFlow200Items");
+        Log.Information("\nStarting TestDataQueryManagerUpdateFlow20000Items");
         var dataStore = GetTestDataStore();
         var mockAccountProvider = new Mock<IAccountProvider>();
         var mockLiveDataProvider = new Mock<IAzureLiveDataProvider>();
@@ -213,8 +213,8 @@ public class DataManagerTests
                 Url = "https://dev.azure.com/Org/Project",
             });
 
-        // Generate 200 work item references
-        var workItemRefs = Enumerable.Range(1, 200)
+        // Generate 20000 work item references
+        var workItemRefs = Enumerable.Range(1, 20000)
             .Select(id => new WorkItemReference
             {
                 Id = id,
@@ -229,8 +229,8 @@ public class DataManagerTests
                 WorkItems = workItemRefs,
             });
 
-        // Generate 200 TFModels.WorkItem objects
-        var tfWorkItems = Enumerable.Range(1, 200)
+        // Generate 20000 TFModels.WorkItem objects
+        var tfWorkItems = Enumerable.Range(1, 20000)
             .Select(id => new TFModels.WorkItem
             {
                 Id = id,
@@ -280,11 +280,11 @@ public class DataManagerTests
         Assert.AreEqual("TestUsername", dsQuery.Username);
         Assert.AreEqual("Test Project", dsQuery.Project.Name);
 
-        // Assert that all 200 work items are present and correct
+        // Assert that all 20000 work items are present and correct
         var storedWorkItems = WorkItem.GetForQuery(dataStore, dsQuery).ToList();
-        Assert.AreEqual(200, storedWorkItems.Count);
+        Assert.AreEqual(20000, storedWorkItems.Count);
         Assert.AreEqual("Test Work Item 1", storedWorkItems.First().SystemTitle);
-        Assert.AreEqual("Test Work Item 200", storedWorkItems.Last().SystemTitle);
+        Assert.AreEqual("Test Work Item 20000", storedWorkItems.Last().SystemTitle);
 
         CleanUpDataStore(dataStore);
     }
