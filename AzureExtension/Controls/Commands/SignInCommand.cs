@@ -49,7 +49,7 @@ public class SignInCommand : InvokableCommand, IDisposable
                 await _accountProvider.ShowLogonSession();
                 _authenticationMediator.SetLoadingState(false);
                 _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(true, null));
-                ToastHelper.ShowToast(string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Message_Sign_In_SuccessTemplate"), _accountProvider.GetDefaultAccount().Username), MessageState.Success);
+                ToastHelper.ShowToast(string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Message_Sign_In_SuccessTemplate"), _accountProvider.GetDefaultAccount()?.Username ?? string.Empty), MessageState.Success);
             }
             catch (Exception ex)
             {
