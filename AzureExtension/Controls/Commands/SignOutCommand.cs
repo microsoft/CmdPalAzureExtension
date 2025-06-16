@@ -59,9 +59,7 @@ public class SignOutCommand : InvokableCommand, IDisposable
 
                 _authenticationMediator.SetLoadingState(false);
                 _authenticationMediator.SignOut(new SignInStatusChangedEventArgs(!signOutSucceeded, null));
-                var signedOutAccountString = signedOutAccounts.Count > 1
-                    ? string.Join(", ", signedOutAccounts.Take(signedOutAccounts.Count - 1)) + " and " + signedOutAccounts.Last()
-                    : signedOutAccounts.FirstOrDefault() ?? string.Empty;
+                var signedOutAccountString = signedOutAccounts.FirstOrDefault() ?? string.Empty;
                 ToastHelper.ShowToast(string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Message_Sign_Out_SuccessTemplate"), signedOutAccountString), MessageState.Success);
             }
             catch (Exception ex)
