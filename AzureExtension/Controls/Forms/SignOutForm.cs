@@ -22,7 +22,7 @@ public sealed partial class SignOutForm : FormContent, IDisposable
     public Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{AuthTitle}}", _resources.GetResource("Forms_SignOut_TemplateAuthTitle") },
-        { "{{AuthButtonTitle}}", $"{_resources.GetResource("Forms_SignOut_TemplateAuthButtonTitle")} {_accountProvider.GetDefaultAccount()?.Username ?? string.Empty}" },
+        { "{{AuthButtonTitle}}", AuthButtonTitle },
         { "{{AuthIcon}}", $"data:image/png;base64,{IconLoader.GetIconAsBase64("Logo")}" },
         { "{{AuthButtonTooltip}}", _resources.GetResource("Forms_SignOut_TemplateAuthButtonTooltip") },
         { "{{ButtonIsEnabled}}", IsButtonEnabled },
@@ -30,6 +30,9 @@ public sealed partial class SignOutForm : FormContent, IDisposable
 
     private string IsButtonEnabled =>
         _isButtonEnabled.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture);
+
+    private string AuthButtonTitle =>
+        string.IsNullOrEmpty(_accountProvider.GetDefaultAccount()?.Username) ? _resources.GetResource("Forms_SignOut_TemplateAuthButtonTitle_Success") : $"{_resources.GetResource("Forms_SignOut_TemplateAuthButtonTitle")} {_accountProvider.GetDefaultAccount()?.Username}";
 
     public SignOutForm(IResources resources, SignOutCommand signOutCommand, AuthenticationMediator authenticationMediator, IAccountProvider accountProvider)
     {

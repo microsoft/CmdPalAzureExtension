@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using AzureExtension.Account;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -46,17 +47,20 @@ public class SignOutCommand : InvokableCommand, IDisposable
             try
             {
                 var accounts = await _accountProvider.GetLoggedInAccounts();
+                var signedOutAccounts = new List<string>();
 
                 foreach (var account in accounts)
                 {
                     await _accountProvider.LogoutAccount(account.Username);
+                    signedOutAccounts.Add(account.Username);
                 }
 
                 var signOutSucceeded = !_accountProvider.IsSignedIn();
 
                 _authenticationMediator.SetLoadingState(false);
                 _authenticationMediator.SignOut(new SignInStatusChangedEventArgs(!signOutSucceeded, null));
-                ToastHelper.ShowToast(_resources.GetResource("Message_Sign_Out_Success"), MessageState.Success);
+                var signedOutAccountString = signedOutAccounts.FirstOrDefault() ?? string.Empty;
+                ToastHelper.ShowToast(string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Message_Sign_Out_SuccessTemplate"), signedOutAccountString), MessageState.Success);
             }
             catch (Exception ex)
             {

@@ -217,17 +217,17 @@
     <value>Sign in failed:</value>
     <comment>Message shown in a toast when sign in proccess fails</comment>
   </data>
-  <data name="Message_Sign_In_Success" xml:space="preserve">
-    <value>Sign in succeeded!</value>
+  <data name="Message_Sign_In_SuccessTemplate" xml:space="preserve">
+    <value>Successfully signed in as {0}!</value>
     <comment>Shown in a toast when sign in proccess succeeded</comment>
   </data>
   <data name="Message_Sign_Out_Fail" xml:space="preserve">
     <value>Sign out failed:</value>
     <comment>Shown in a toast when sign out process fails</comment>
   </data>
-  <data name="Message_Sign_Out_Success" xml:space="preserve">
-    <value>Sign out succeeded!</value>
-    <comment>Shown in a toast when sign out is succeeded</comment>
+  <data name="Message_Sign_Out_SuccessTemplate" xml:space="preserve">
+    <value>Successfully signed out {0}!</value>
+    <comment>Shown in a toast when sign out is succeeded. {0} is the username of the account(s) signed out.</comment>
   </data>
   <data name="Pages_EditQuery" xml:space="preserve">
     <value>Edit query</value>
@@ -648,5 +648,9 @@
   <data name="Pages_BuildSearch_ManualRunTriggerMessageTemplate" xml:space="preserve">
     <value>Manual run by {0}</value>
     <comment>The title for a build that does not have a regular title. These are builds that were manually triggered by a user. The placeholder {0} represents the name of the user who triggered the build.</comment>
+  </data>
+  <data name="Forms_SignOut_TemplateAuthButtonTitle_Success" xml:space="preserve">
+    <value>Sign out succeeded!</value>
+    <comment>The button title when the user successfully signs out</comment>
   </data>
 </root>

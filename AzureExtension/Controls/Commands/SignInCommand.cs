@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using AzureExtension.Account;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
@@ -48,7 +49,7 @@ public class SignInCommand : InvokableCommand, IDisposable
                 await _accountProvider.ShowLogonSession();
                 _authenticationMediator.SetLoadingState(false);
                 _authenticationMediator.SignIn(new SignInStatusChangedEventArgs(true, null));
-                ToastHelper.ShowToast(_resources.GetResource("Message_Sign_In_Success"), MessageState.Success);
+                ToastHelper.ShowToast(string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Message_Sign_In_SuccessTemplate"), _accountProvider.GetDefaultAccount()?.Username ?? string.Empty), MessageState.Success);
             }
             catch (Exception ex)
             {
