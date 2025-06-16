@@ -22,7 +22,7 @@ public interface IAzureLiveDataProvider
 
     Task<WorkItemQueryResult> GetWorkItemQueryResultByIdAsync(IVssConnection connection, string projectId, Guid queryId, CancellationToken cancellationToken);
 
-    Task<List<WorkItem>> GetWorkItemsAsync(IVssConnection connection, string projectId, List<int> workItemIds, WorkItemExpand expand, WorkItemErrorPolicy errorPolicy, CancellationToken cancellationToken);
+    Task<List<WorkItem>> GetWorkItemsAsync(IVssConnection connection, string projectId, IEnumerable<int> workItemIds, WorkItemExpand expand, WorkItemErrorPolicy errorPolicy, CancellationToken cancellationToken);
 
     Task<WorkItemType> GetWorkItemTypeAsync(IVssConnection connection, string projectId, string? fieldValue, CancellationToken cancellationToken);
 
