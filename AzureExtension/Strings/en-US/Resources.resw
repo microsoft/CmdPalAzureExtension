@@ -227,7 +227,7 @@
   </data>
   <data name="Message_Sign_Out_SuccessTemplate" xml:space="preserve">
     <value>Successfully signed out {0}!</value>
-    <comment>Shown in a toast when sign out is succeeded</comment>
+    <comment>Shown in a toast when sign out is succeeded. {0} is the username of the account(s) signed out.</comment>
   </data>
   <data name="Pages_EditQuery" xml:space="preserve">
     <value>Edit query</value>
