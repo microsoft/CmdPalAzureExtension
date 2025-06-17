@@ -31,11 +31,11 @@ public partial class RemoveCommand : InvokableCommand
         {
             _azureSearchRepository.Remove(_savedAzureSearch);
             _savedAzureSearchesMediator.Remove(_savedAzureSearch);
-            ToastHelper.ShowSuccessToast(string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Message_RemoveSearch_SuccessTemplate"), _savedAzureSearch));
+            ToastHelper.ShowSuccessToast(string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Message_RemoveSearch_SuccessTemplate"), _savedAzureSearch.Name, _savedAzureSearch.GetSearchType()));
         }
         catch (Exception ex)
         {
-            ToastHelper.ShowErrorToast(string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Message_RemoveSearch_FailureTemplate"), _savedAzureSearch, ex.Message));
+            ToastHelper.ShowErrorToast(string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Message_RemoveSearch_FailureTemplate"), _savedAzureSearch.Name, ex.Message));
         }
 
         return CommandResult.KeepOpen();

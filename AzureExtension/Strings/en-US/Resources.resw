@@ -215,7 +215,7 @@
   </data>
   <data name="Message_Sign_In_Fail" xml:space="preserve">
     <value>Sign in failed:</value>
-    <comment>Message shown in a toast when sign in proccess fails</comment>
+    <comment>Message shown in a toast when sign in process fails</comment>
   </data>
   <data name="Message_Sign_In_SuccessTemplate" xml:space="preserve">
     <value>Successfully signed in as {0}!</value>
@@ -654,11 +654,11 @@
     <comment>The button title when the user successfully signs out</comment>
   </data>
   <data name="Message_RemoveSearch_SuccessTemplate" xml:space="preserve">
-    <value>Failed to remove {0}: {1}</value>
-    <comment>Message shown when search {0} fails to remove because of error message {1}.</comment>
+    <value>{0} {1} removed successfully!</value>
+    <comment>Message shown when search {0} of search type {1} is removed.</comment>
   </data>
   <data name="Message_RemoveSearch_FailureTemplate" xml:space="preserve">
-    <value>{0} removed successfully!</value>
-    <comment>Message shown when search {0} is removed.</comment>
+    <value>Failed to remove {0}: {1}</value>
+    <comment>Message shown when search {0} fails to remove because of error message {1}.</comment>
   </data>
 </root>
