@@ -653,4 +653,12 @@
     <value>Sign out succeeded!</value>
     <comment>The button title when the user successfully signs out</comment>
   </data>
+  <data name="Message_RemoveSearch_SuccessTemplate" xml:space="preserve">
+    <value>Failed to remove {0}: {1}</value>
+    <comment>Message shown when search {0} fails to remove because of error message {1}.</comment>
+  </data>
+  <data name="Message_RemoveSearch_FailureTemplate" xml:space="preserve">
+    <value>{0} removed successfully!</value>
+    <comment>Message shown when search {0} is removed.</comment>
+  </data>
 </root>

@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
@@ -26,8 +27,16 @@ public partial class RemoveCommand : InvokableCommand
 
     public override CommandResult Invoke()
     {
-        _azureSearchRepository.Remove(_savedAzureSearch);
-        _savedAzureSearchesMediator.Remove(_savedAzureSearch);
+        try
+        {
+            _azureSearchRepository.Remove(_savedAzureSearch);
+            _savedAzureSearchesMediator.Remove(_savedAzureSearch);
+            ToastHelper.ShowSuccessToast(string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Message_RemoveSearch_SuccessTemplate"), _savedAzureSearch));
+        }
+        catch (Exception ex)
+        {
+            ToastHelper.ShowErrorToast(string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Message_RemoveSearch_FailureTemplate"), _savedAzureSearch, ex.Message));
+        }
 
         return CommandResult.KeepOpen();
     }
