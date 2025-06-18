@@ -22,6 +22,14 @@
       "placeholder": "https://microsoft.visualstudio.com/project/_queries/query/queryId"
     },
     {
+      "type": "Input.Text",
+      "id": "DisplayName",
+      "label": "{{DisplayNameLabel}}",
+      "isRequired": false,
+      "value": "{{DisplayName}}",
+      "placeholder": "{{DisplayNamePlaceholder}}"
+    },
+    {
       "type": "ColumnSet",
       "columns": [
         {

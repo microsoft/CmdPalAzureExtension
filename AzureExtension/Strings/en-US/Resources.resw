@@ -653,4 +653,12 @@
     <value>Sign out succeeded!</value>
     <comment>The button title when the user successfully signs out</comment>
   </data>
+  <data name="Forms_SaveQuery_DisplayNameLabel" xml:space="preserve">
+    <value>Display name (optional)</value>
+    <comment>If non-empty, the name for the query in the Azure extension</comment>
+  </data>
+  <data name="Forms_SaveQuery_DisplayNamePlaceholder" xml:space="preserve">
+    <value>Defaults to query name in Azure Dev Ops</value>
+    <comment>The placeholder text for the display name on the 'Save Azure Dev Ops query' form</comment>
+  </data>
 </root>
