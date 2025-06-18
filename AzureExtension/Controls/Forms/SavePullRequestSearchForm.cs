@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
@@ -23,6 +24,9 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
         { "{{PullRequestSearchViewAssignedToMeTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAssignedToMeTitle") },
         { "{{PullRequestSearchViewAllTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAllTitle") },
         { "{{PullRequestSearchSelectedView}}", string.IsNullOrEmpty(SavedSearch?.View) ? _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewDefault") : SavedSearch.View },
+        { "{{PullRequestSearchDisplayNameLabel}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplatePullRequestSearchDisplayNameLabel") },
+        { "{{PullRequestSearchDisplayName}}", SavedSearch?.Name ?? string.Empty },
+        { "{{PullRequestSearchDisplayNamePlaceholder}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplatePullRequestSearchDisplayNamePlaceholder") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateIsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SavePullRequestSearchActionTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateSavePullRequestSearchActionTitle") },
@@ -57,12 +61,13 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
     {
         var enteredUrl = jsonNode?["url"]?.ToString() ?? string.Empty;
         var view = jsonNode?["view"]?.ToString() ?? string.Empty;
+        var displayName = jsonNode?["PullRequestSearchDisplayName"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
         var testUri = new AzureUri(enteredUrl);
         var url = CreatePullRequestUrl(testUri, view);
         var searchUri = new AzureUri(url);
-        var name = $"{searchUri.Repository} - {view}";
+        var name = string.IsNullOrWhiteSpace(displayName) ? string.Format(CultureInfo.CurrentCulture, "{0} - {1}", searchUri.Repository, view) : displayName;
 
         return new PullRequestSearchCandidate(searchUri, name, view, isTopLevel);
     }

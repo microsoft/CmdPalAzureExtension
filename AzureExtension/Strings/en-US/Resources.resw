@@ -653,4 +653,12 @@
     <value>Defaults to query name in Azure Dev Ops</value>
     <comment>The placeholder text for the display name on the 'Save Azure Dev Ops query' form</comment>
   </data>
+  <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchDisplayNameLabel" xml:space="preserve">
+    <value>Display name (optional)</value>
+    <comment>The label for the display name on the Save Pull Request search form</comment>
+  </data>
+  <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchDisplayNamePlaceholder" xml:space="preserve">
+    <value>Defaults to Repository Name - View</value>
+    <comment>The placeholder for the SavePullRequestSearchForm's display name label</comment>
+  </data>
 </root>
