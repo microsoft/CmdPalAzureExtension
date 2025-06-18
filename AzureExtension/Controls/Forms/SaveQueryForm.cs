@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
@@ -72,7 +73,7 @@ public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
         if (queryInfo.Result != ResultType.Success)
         {
             var error = queryInfo.Error;
-            throw new InvalidOperationException($"Failed to get query info {queryInfo.Error}: {queryInfo.ErrorMessage}");
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "{0}: {1}", error, queryInfo.ErrorMessage));
         }
 
         var name = string.IsNullOrEmpty(displayName) ? queryInfo.Name : displayName;
