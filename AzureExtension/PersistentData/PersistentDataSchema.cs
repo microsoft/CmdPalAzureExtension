@@ -32,6 +32,7 @@ public sealed class PersistentDataSchema : IDataStoreSchema
     private const string DefinitionSearch =
         @"CREATE TABLE IF NOT EXISTS DefinitionSearch (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Name TEXT NOT NULL,
             InternalId INTEGER NOT NULL,
             Url TEXT NOT NULL,
             IsTopLevel INTEGER NOT NULL CHECK (IsTopLevel IN (0, 1))

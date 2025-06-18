@@ -19,6 +19,8 @@ public class DefinitionSearch : IPipelineDefinitionSearch
 
     public long InternalId { get; set; } = DataStore.NoForeignKey;
 
+    public string Name { get; set; } = string.Empty;
+
     public string Url { get; set; } = string.Empty;
 
     public bool IsTopLevel { get; set; }
@@ -33,9 +35,6 @@ public class DefinitionSearch : IPipelineDefinitionSearch
         }
     }
 
-    [Write(false)]
-    public string Name => InternalId.ToStringInvariant();
-
     public static DefinitionSearch? Get(DataStore dataStore, long internalId, string url)
     {
         var sql = "SELECT * FROM DefinitionSearch WHERE InternalId = @InternalId AND Url = @Url";
@@ -43,12 +42,13 @@ public class DefinitionSearch : IPipelineDefinitionSearch
         return definitionSearch;
     }
 
-    public static DefinitionSearch Add(DataStore dataStore, long internalId, string url)
+    public static DefinitionSearch Add(DataStore dataStore, string name, long internalId, string url)
     {
         var definitionSearch = new DefinitionSearch
         {
             InternalId = internalId,
             Url = url,
+            Name = name,
         };
         dataStore.Connection.Insert(definitionSearch);
         return definitionSearch;
@@ -78,10 +78,10 @@ public class DefinitionSearch : IPipelineDefinitionSearch
         return definitionSearches;
     }
 
-    public static void AddOrUpdate(DataStore dataStore, long internalId, string url, bool isTopLevel)
+    public static void AddOrUpdate(DataStore dataStore, string name, long internalId, string url, bool isTopLevel)
     {
         var definitionSearch = Get(dataStore, internalId, url);
-        definitionSearch ??= Add(dataStore, internalId, url);
+        definitionSearch ??= Add(dataStore, name, internalId, url);
         definitionSearch.IsTopLevel = isTopLevel;
         dataStore.Connection.Update(definitionSearch);
     }
