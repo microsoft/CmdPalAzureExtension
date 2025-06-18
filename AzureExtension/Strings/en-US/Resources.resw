@@ -565,14 +565,6 @@
     <value>Open link to all runs</value>
     <comment>Special name for the OpenLink command for the PipelineSearchPage</comment>
   </data>
-  <data name="Forms_SaveQuery_TemplateNameError" xml:space="preserve">
-    <value>A query name is required</value>
-    <comment>Shown if the user submits the SaveSearchForm without a name</comment>
-  </data>
-  <data name="Forms_SaveQuery_TemplateNameLabel" xml:space="preserve">
-    <value>Name</value>
-    <comment>Shown as the name for the saved query</comment>
-  </data>
   <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchTitlePlaceholder" xml:space="preserve">
     <value>My team's pull requests</value>
     <comment>A sample title for a pull request search</comment>
@@ -653,11 +645,11 @@
     <value>Sign out succeeded!</value>
     <comment>The button title when the user successfully signs out</comment>
   </data>
-  <data name="Forms_SaveQuery_DisplayNameLabel" xml:space="preserve">
+  <data name="Forms_SaveQuery_TemplateQueryDisplayNameLabel" xml:space="preserve">
     <value>Display name (optional)</value>
     <comment>If non-empty, the name for the query in the Azure extension</comment>
   </data>
-  <data name="Forms_SaveQuery_DisplayNamePlaceholder" xml:space="preserve">
+  <data name="Forms_SaveQuery_TemplateQueryDisplayNamePlaceholder" xml:space="preserve">
     <value>Defaults to query name in Azure Dev Ops</value>
     <comment>The placeholder text for the display name on the 'Save Azure Dev Ops query' form</comment>
   </data>

@@ -23,11 +23,11 @@
     },
     {
       "type": "Input.Text",
-      "id": "DisplayName",
-      "label": "{{DisplayNameLabel}}",
+      "id": "QueryDisplayName",
+      "label": "{{QueryDisplayNameLabel}}",
       "isRequired": false,
-      "value": "{{DisplayName}}",
-      "placeholder": "{{DisplayNamePlaceholder}}"
+      "value": "{{QueryDisplayName}}",
+      "placeholder": "{{QueryDisplayNamePlaceholder}}"
     },
     {
       "type": "ColumnSet",

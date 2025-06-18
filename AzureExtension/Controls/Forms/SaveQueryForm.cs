@@ -21,9 +21,9 @@ public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
         { "{{SavedQueryString}}", SavedSearch?.Url ?? string.Empty },
         { "{{EnteredQueryErrorMessage}}", _resources.GetResource("Forms_SaveQuery_TemplateEnteredQueryError") },
         { "{{EnteredQueryLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateEnteredQueryLabel") },
-        { "{{DisplayNameLabel}}", _resources.GetResource("Forms_SaveQuery_DisplayNameLabel") },
-        { "{{DisplayName}}", SavedSearch?.Name ?? string.Empty },
-        { "{{DisplayNamePlaceholder}}", _resources.GetResource("Forms_SaveQuery_DisplayNamePlaceholder") },
+        { "{{QueryDisplayNameLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateQueryDisplayNameLabel") },
+        { "{{QueryDisplayName}}", SavedSearch?.Name ?? string.Empty },
+        { "{{QueryDisplayNamePlaceholder}}", _resources.GetResource("Forms_SaveQuery_TemplateQueryDisplayNamePlaceholder") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveQueryTemplate_IsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SaveQueryActionTitle}}", _resources.GetResource("Forms_SaveQuery_TemplateSaveQueryActionTitle") },
@@ -63,7 +63,7 @@ public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
     protected override IQuerySearch CreateSearchFromJson(JsonNode? jsonNode)
     {
         var queryUrl = jsonNode?["EnteredQuery"]?.ToString() ?? string.Empty;
-        var displayName = jsonNode?["DisplayName"]?.ToString() ?? string.Empty;
+        var displayName = jsonNode?["QueryDisplayName"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
         var account = _accountProvider.GetDefaultAccount();
