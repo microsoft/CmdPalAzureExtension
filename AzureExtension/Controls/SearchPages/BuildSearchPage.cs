@@ -66,7 +66,7 @@ public partial class BuildSearchPage : SearchPage<IBuild>
             ? string.Format(CultureInfo.CurrentCulture, _resources.GetResource("Pages_BuildSearch_ManualRunTriggerMessageTemplate"), item.Requester?.Name)
             : item.TriggerMessage;
 
-        return $"{_definition.Name} - #{item.BuildNumber} • {triggerMessage}";
+        return string.Format(CultureInfo.CurrentCulture, "{0} - #{1} • {2}", _definition.Name, item.BuildNumber, triggerMessage);
     }
 
     protected override ListItem GetListItem(IBuild item)
@@ -83,7 +83,7 @@ public partial class BuildSearchPage : SearchPage<IBuild>
             },
             Details = new Details()
             {
-                Title = $"{_definition.Name} - {listItemTitle}",
+                Title = string.Format(CultureInfo.CurrentCulture, "{0} - {1}", _definition.Name, listItemTitle),
                 Metadata = new[]
                 {
                     new DetailsElement()

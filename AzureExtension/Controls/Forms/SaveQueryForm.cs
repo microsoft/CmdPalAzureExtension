@@ -76,7 +76,7 @@ public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
             throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "{0}: {1}", error, queryInfo.ErrorMessage));
         }
 
-        var name = string.IsNullOrEmpty(displayName) ? queryInfo.Name : displayName;
+        var name = string.IsNullOrWhiteSpace(displayName) ? queryInfo.Name : displayName;
         return new Query(queryInfo.AzureUri, name, queryInfo.Description, isTopLevel);
     }
 }

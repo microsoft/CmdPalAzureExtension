@@ -64,9 +64,7 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
         var displayName = jsonNode?["PullRequestSearchDisplayName"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
-        var testUri = new AzureUri(enteredUrl);
-        var url = CreatePullRequestUrl(testUri, view);
-        var searchUri = new AzureUri(url);
+        var searchUri = new AzureUri(CreatePullRequestUrl(new AzureUri(enteredUrl), view));
         var name = string.IsNullOrWhiteSpace(displayName) ? string.Format(CultureInfo.CurrentCulture, "{0} - {1}", searchUri.Repository, view) : displayName;
 
         return new PullRequestSearchCandidate(searchUri, name, view, isTopLevel);

@@ -24,9 +24,9 @@ public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
         { "{{EnteredPipelineSearchErrorMessage}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchError") },
         { "{{EnteredPipelineSearchLabel}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchLabel") },
         { "{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}", _resources.GetResource("Forms_SavePipelineSearch_URLPlaceholderSuffix") },
-        { "{{PipelineSearchDisplayNameLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateQueryDisplayNameLabel") },
+        { "{{PipelineSearchDisplayNameLabel}}", _resources.GetResource("Forms_SavePipelineSearch_TemplatePipelineSearchDisplayNameLabel") },
         { "{{PipelineSearchDisplayName}}", SavedSearch?.Name ?? string.Empty },
-        { "{{PipelineSearchDisplayNamePlaceholder}}", _resources.GetResource("Forms_SaveQuery_TemplateQueryDisplayNamePlaceholder") },
+        { "{{PipelineSearchDisplayNamePlaceholder}}", _resources.GetResource("Forms_SavePipelineSearch_TemplatePipelineSearchDisplayNamePlaceholder") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateIsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SavePipelineSearchActionTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateSavePipelineSearchActionTitle") },
@@ -70,7 +70,7 @@ public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
             InternalId = definitionId,
             Url = uri.ToString(),
             IsTopLevel = isTopLevel,
-            Name = string.IsNullOrWhiteSpace(displayName) ? string.Format(CultureInfo.CurrentCulture, "{0} #{1}", _resources.GetResource("Pages_BuildSearch_PipelineNameAlternative"), definitionId) : displayName,
+            Name = string.IsNullOrWhiteSpace(displayName) ? definitionInfo.Name : displayName,
         };
     }
 

@@ -661,4 +661,12 @@
     <value>Defaults to Repository Name - View</value>
     <comment>The placeholder for the SavePullRequestSearchForm's display name label</comment>
   </data>
+  <data name="Forms_SavePipelineSearch_TemplatePipelineSearchDisplayNamePlaceholder" xml:space="preserve">
+    <value>Defaults to pipeline name in Azure Dev Ops</value>
+    <comment>The placeholder for the SavePipelineSearch's display name field</comment>
+  </data>
+  <data name="Forms_SavePipelineSearch_TemplatePipelineSearchDisplayNameLabel" xml:space="preserve">
+    <value>Display name (optional)</value>
+    <comment>The label for the display name input field in the SavePipelineSearchForm</comment>
+  </data>
 </root>
