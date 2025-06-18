@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
@@ -23,6 +24,9 @@ public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
         { "{{EnteredPipelineSearchErrorMessage}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchError") },
         { "{{EnteredPipelineSearchLabel}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchLabel") },
         { "{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}", _resources.GetResource("Forms_SavePipelineSearch_URLPlaceholderSuffix") },
+        { "{{PipelineSearchDisplayNameLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateQueryDisplayNameLabel") },
+        { "{{PipelineSearchDisplayName}}", SavedSearch?.Name ?? string.Empty },
+        { "{{PipelineSearchDisplayNamePlaceholder}}", _resources.GetResource("Forms_SaveQuery_TemplateQueryDisplayNamePlaceholder") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateIsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SavePipelineSearchActionTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateSavePipelineSearchActionTitle") },
@@ -48,6 +52,7 @@ public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
     protected override IPipelineDefinitionSearch CreateSearchFromJson(JsonNode jsonNode)
     {
         var definitionUrl = jsonNode?["EnteredPipelineSearch"]?.ToString() ?? string.Empty;
+        var displayName = jsonNode?["PipelineSearchDisplayName"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
         var account = _accountProvider.GetDefaultAccount();
@@ -65,6 +70,7 @@ public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
             InternalId = definitionId,
             Url = uri.ToString(),
             IsTopLevel = isTopLevel,
+            Name = string.IsNullOrWhiteSpace(displayName) ? string.Format(CultureInfo.CurrentCulture, "{0} #{1}", _resources.GetResource("Pages_BuildSearch_PipelineNameAlternative"), definitionId) : displayName,
         };
     }
 

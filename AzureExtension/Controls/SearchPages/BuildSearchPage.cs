@@ -32,7 +32,7 @@ public partial class BuildSearchPage : SearchPage<IBuild>
         _timeSpanHelper = timeSpanHelper;
         _definition = GetDefinitionForPage(_search).Result;
         Icon = GetIcon();
-        Title = _definition.Name ?? $"{_resources.GetResource("Pages_BuildSearch_PipelineNameAlternative")} #{_definition.InternalId}";
+        Title = _search.Name;
         Name = Title; // Title is for the Page, Name is for the Command
         ShowDetails = true;
     }
