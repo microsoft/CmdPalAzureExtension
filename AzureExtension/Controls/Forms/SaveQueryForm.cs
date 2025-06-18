@@ -63,6 +63,7 @@ public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
     protected override IQuerySearch CreateSearchFromJson(JsonNode? jsonNode)
     {
         var queryUrl = jsonNode?["EnteredQuery"]?.ToString() ?? string.Empty;
+        var displayName = jsonNode?["DisplayName"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
         var account = _accountProvider.GetDefaultAccount();
@@ -74,7 +75,7 @@ public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
             throw new InvalidOperationException($"Failed to get query info {queryInfo.Error}: {queryInfo.ErrorMessage}");
         }
 
-        var uri = queryInfo.AzureUri;
-        return new Query(uri, queryInfo.Name, queryInfo.Description, isTopLevel);
+        var name = string.IsNullOrEmpty(displayName) ? queryInfo.Name : displayName;
+        return new Query(queryInfo.AzureUri, name, queryInfo.Description, isTopLevel);
     }
 }
