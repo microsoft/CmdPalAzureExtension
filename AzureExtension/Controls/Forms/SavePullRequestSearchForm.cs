@@ -91,7 +91,7 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
 
         try
         {
-            var baseUrl = $"https://dev.azure.com/{uri.Organization.ToString()}/{uri.Project.ToString()}/_git/{uri.Repository.ToString()}".TrimEnd('/');
+            var baseUrl = $"https://dev.azure.com/{uri.Organization}/{uri.Project}/_git/{uri.Repository}".TrimEnd('/');
 
             return $"{baseUrl}/pullrequests?_a={viewValue}";
         }
