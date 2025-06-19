@@ -63,7 +63,7 @@ extends:
 
                 - task: TouchdownBuildTask@5
                   displayName: Send and Download Localization Files for Artifacts
-                  condition: and(eq(parameters['EnableLocalization'], 'true'), eq(parameters['UpdateLocalization'], 'true'))
+                  condition: and(eq(parameters.EnableLocalization, 'true'), eq(parameters.UpdateLocalization, 'true'))
                   inputs:
                     resourceFilePath: |
                       **\en-US\*.resw
@@ -78,7 +78,7 @@ extends:
 
                 - task: TouchdownBuildTask@5
                   displayName: Download and Use Localization Files
-                  condition: eq(parameters['EnableLocalization'], 'true')
+                  condition: eq(parameters.EnableLocalization, 'true')
                   inputs:
                     resourceFilePath: |
                       **\en-US\*.resw
@@ -92,7 +92,7 @@ extends:
 
                 - task: PowerShell@2
                   displayName: Move Loc files one level up
-                  condition: eq(parameters['EnableLocalization'], 'true')
+                  condition: eq(parameters.EnableLocalization, 'true')
                   inputs:
                     targetType: inline
                     script: >-
@@ -107,7 +107,7 @@ extends:
 
                 - task: PowerShell@2
                   displayName: Archive Loc Output for Submission
-                  condition: and(eq(parameters['EnableLocalization'], 'true'), eq(parameters['UpdateLocalization'], 'true'))
+                  condition: and(eq(parameters.EnableLocalization, 'true'), eq(parameters.UpdateLocalization, 'true'))
                   inputs:
                     PathtoPublish: LocOutput.tar.gz
                     ArtifactName: LocOutput
@@ -206,7 +206,7 @@ extends:
                       artifactName: drop_${{ platform }}_${{ configuration }}
                     - output: pipelineArtifact
                       displayName: 'Publish Artifact: LocOutput'
-                      condition: and(eq(parameters['EnableLocalization'], 'true'), eq(parameters['UpdateLocalization'], 'true'))
+                      condition: and(eq(parameters.EnableLocalization, 'true'), eq(parameters.UpdateLocalization, 'true'))
                       artifactName: LocOutput_${{ platform }}_${{ configuration }}
                       targetPath: LocArchive
                       sbomPackageName: cmdpalazureextension.locoutput
