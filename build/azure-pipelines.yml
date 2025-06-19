@@ -5,9 +5,11 @@ trigger:
 
 parameters:
   - name: EnableLocalization
+    displayName: Enable Localization
     type: boolean
     default: false
   - name: UpdateLocalization
+    displayName: Update Localization
     type: boolean
     default: false
   - name: Platforms
