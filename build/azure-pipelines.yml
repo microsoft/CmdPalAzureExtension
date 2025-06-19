@@ -7,11 +7,11 @@ parameters:
   - name: EnableLocalization
     displayName: Enable Localization
     type: boolean
-    default: false
+    default: true
   - name: UpdateLocalization
     displayName: Update Localization
     type: boolean
-    default: false
+    default: true
   - name: Platforms
     type: object
     default:
