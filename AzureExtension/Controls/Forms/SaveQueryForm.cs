@@ -5,6 +5,7 @@
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 
 namespace AzureExtension.Controls.Forms;
@@ -32,8 +33,9 @@ public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
         SavedAzureSearchesMediator savedQueriesMediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
-        ISavedSearchesUpdater<IQuerySearch> queryRepository)
-        : base(null, queryRepository, savedQueriesMediator, accountProvider)
+        ISavedSearchesUpdater<IQuerySearch> queryRepository,
+        SaveSearchCommand<IQuerySearch> saveSearchCommand)
+        : base(null, queryRepository, savedQueriesMediator, accountProvider, saveSearchCommand)
     {
         _resources = resources;
         _accountProvider = accountProvider;
@@ -48,8 +50,9 @@ public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
         SavedAzureSearchesMediator savedQueriesMediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
-        ISavedSearchesUpdater<IQuerySearch> queryRepository)
-        : base(savedQuery, queryRepository, savedQueriesMediator, accountProvider)
+        ISavedSearchesUpdater<IQuerySearch> queryRepository,
+        SaveSearchCommand<IQuerySearch> saveSearchCommand)
+        : base(savedQuery, queryRepository, savedQueriesMediator, accountProvider, saveSearchCommand)
     {
         _resources = resources;
         _accountProvider = accountProvider;

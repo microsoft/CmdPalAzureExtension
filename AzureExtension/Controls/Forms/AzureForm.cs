@@ -5,6 +5,7 @@
 using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
+using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
@@ -17,6 +18,7 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
 {
     private readonly ISavedSearchesUpdater<TSearch> _savedSearchesUpdater;
     private readonly SavedAzureSearchesMediator _mediator;
+    private readonly SaveSearchCommand<TSearch> _saveSearchCommand;
 
     protected TSearch? SavedSearch { get; set; }
 
@@ -36,21 +38,21 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
         TSearch? search,
         ISavedSearchesUpdater<TSearch> savedSearchesUpdater,
         SavedAzureSearchesMediator mediator,
-        IAccountProvider accountProvider)
+        IAccountProvider accountProvider,
+        SaveSearchCommand<TSearch> saveSearchCommand)
     {
         SavedSearch = search;
         _savedSearchesUpdater = savedSearchesUpdater;
         _mediator = mediator;
+        _saveSearchCommand = saveSearchCommand;
     }
 
     public override ICommandResult SubmitForm(string inputs, string data)
     {
-        Task.Run(() =>
-        {
-            HandleInputs(inputs);
-        });
+        var payloadJson = JsonNode.Parse(inputs) ?? throw new InvalidOperationException("No search found");
+        _saveSearchCommand.SetSearchToSave(CreateSearchFromJson(payloadJson));
 
-        return CommandResult.KeepOpen();
+        return _saveSearchCommand.Invoke();
     }
 
     private Task HandleInputs(string inputs)

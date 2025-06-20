@@ -26,6 +26,9 @@ public class SearchPageFactory : ISearchPageFactory
     private readonly ILiveContentDataProvider<IBuild> _buildProvider;
     private readonly ILiveSearchDataProvider<IDefinition> _definitionProvider;
     private readonly IDictionary<Type, IAzureSearchRepository> _azureSearchRepositories;
+    private readonly SaveSearchCommand<IQuerySearch> _saveQuerySearchCommand;
+    private readonly SaveSearchCommand<IPullRequestSearch> _savePullRequestSearchCommand;
+    private readonly SaveSearchCommand<IPipelineDefinitionSearch> _savePipelineSearchCommand;
 
     public SearchPageFactory(
         IResources resources,
@@ -39,7 +42,10 @@ public class SearchPageFactory : ISearchPageFactory
         ILiveContentDataProvider<IWorkItem> workItemProvider,
         ILiveContentDataProvider<IPullRequest> pullRequestProvider,
         ILiveContentDataProvider<IBuild> buildProvider,
-        ILiveSearchDataProvider<IDefinition> definitionProvider)
+        ILiveSearchDataProvider<IDefinition> definitionProvider,
+        SaveSearchCommand<IQuerySearch> saveQuerySearchCommand,
+        SaveSearchCommand<IPullRequestSearch> savePullRequestSearchCommand,
+        SaveSearchCommand<IPipelineDefinitionSearch> savePipelineSearchCommand)
     {
         _resources = resources;
         _mediator = mediator;
@@ -53,6 +59,9 @@ public class SearchPageFactory : ISearchPageFactory
         _pullRequestProvider = pullRequestProvider;
         _buildProvider = buildProvider;
         _definitionProvider = definitionProvider;
+        _saveQuerySearchCommand = saveQuerySearchCommand;
+        _savePullRequestSearchCommand = savePullRequestSearchCommand;
+        _savePipelineSearchCommand = savePipelineSearchCommand;
     }
 
     public ListPage CreatePageForSearch(IAzureSearch search)
@@ -77,19 +86,19 @@ public class SearchPageFactory : ISearchPageFactory
     {
         if (search is IQuerySearch)
         {
-            var saveQueryForm = new SaveQueryForm((IQuerySearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _queryUpdater);
+            var saveQueryForm = new SaveQueryForm((IQuerySearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _queryUpdater, _saveQuerySearchCommand);
             var statusMessage = new StatusMessage();
             return new EditQueryPage(_resources, saveQueryForm, statusMessage);
         }
         else if (search is IPullRequestSearch)
         {
-            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _savedPullRequestSearchUpdater);
+            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _savedPullRequestSearchUpdater, _savePullRequestSearchCommand);
             var statusMessage = new StatusMessage();
             return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage);
         }
         else if (search is IPipelineDefinitionSearch)
         {
-            var savePipelineSearchForm = new SavePipelineSearchForm((IPipelineDefinitionSearch)search, _resources, _definitionUpdater, _mediator, _accountProvider, _azureClientHelpers);
+            var savePipelineSearchForm = new SavePipelineSearchForm((IPipelineDefinitionSearch)search, _resources, _definitionUpdater, _mediator, _accountProvider, _azureClientHelpers, _savePipelineSearchCommand);
             var statusMessage = new StatusMessage();
             return new EditPipelineSearchPage(_resources, savePipelineSearchForm, statusMessage);
         }

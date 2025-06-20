@@ -5,6 +5,7 @@
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 
 namespace AzureExtension.Controls.Forms;
@@ -38,8 +39,9 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
-        ISavedSearchesUpdater<IPullRequestSearch> pullRequestSearchRepository)
-        : base(null, pullRequestSearchRepository, mediator, accountProvider)
+        ISavedSearchesUpdater<IPullRequestSearch> pullRequestSearchRepository,
+        SaveSearchCommand<IPullRequestSearch> saveSearchCommand)
+        : base(null, pullRequestSearchRepository, mediator, accountProvider, saveSearchCommand)
     {
         _resources = resources;
         TemplateKey = "SavePullRequestSearch";
@@ -54,8 +56,9 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
-        ISavedSearchesUpdater<IPullRequestSearch> pullRequestSearchRepository)
-        : base(savedPullRequestSearch, pullRequestSearchRepository, mediator, accountProvider)
+        ISavedSearchesUpdater<IPullRequestSearch> pullRequestSearchRepository,
+        SaveSearchCommand<IPullRequestSearch> saveSearchCommand)
+        : base(savedPullRequestSearch, pullRequestSearchRepository, mediator, accountProvider, saveSearchCommand)
     {
         _resources = resources;
         TemplateKey = "SavePullRequestSearch";

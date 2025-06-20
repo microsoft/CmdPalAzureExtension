@@ -5,6 +5,7 @@
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.DataTransfer;
 using AzureExtension.Helpers;
 
@@ -34,8 +35,9 @@ public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
         ISavedSearchesUpdater<IPipelineDefinitionSearch> definitionRepository,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
-        AzureClientHelpers azureClientHelpers)
-        : base(definitionSearch, definitionRepository, mediator, accountProvider)
+        AzureClientHelpers azureClientHelpers,
+        SaveSearchCommand<IPipelineDefinitionSearch> saveSearchCommand)
+        : base(definitionSearch, definitionRepository, mediator, accountProvider, saveSearchCommand)
     {
         _resources = resources;
         _azureClientHelpers = azureClientHelpers;
