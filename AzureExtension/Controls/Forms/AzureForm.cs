@@ -17,7 +17,6 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
 {
     private readonly ISavedSearchesUpdater<TSearch> _savedSearchesUpdater;
     private readonly SavedAzureSearchesMediator _mediator;
-    private readonly IAccountProvider _accountProvider;
 
     protected TSearch? SavedSearch { get; set; }
 
@@ -42,20 +41,19 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
         SavedSearch = search;
         _savedSearchesUpdater = savedSearchesUpdater;
         _mediator = mediator;
-        _accountProvider = accountProvider;
     }
 
     public override ICommandResult SubmitForm(string inputs, string data)
     {
-        Task.Run(async () =>
+        Task.Run(() =>
         {
-            await HandleInputs(inputs);
+            HandleInputs(inputs);
         });
 
         return CommandResult.KeepOpen();
     }
 
-    private async Task HandleInputs(string inputs)
+    private Task HandleInputs(string inputs)
     {
         LoadingStateChanged?.Invoke(this, true);
 
@@ -64,8 +62,6 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
             var payloadJson = JsonNode.Parse(inputs) ?? throw new InvalidOperationException("No search found");
 
             var search = CreateSearchFromJson(payloadJson);
-
-            await _savedSearchesUpdater.Validate(search, _accountProvider.GetDefaultAccount());
 
             // if editing the search, delete the old one
             // it is safe to do as the new one is already validated
@@ -92,6 +88,8 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
             _mediator.AddSearch(null, ex);
             FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
         }
+
+        return Task.CompletedTask;
     }
 
     protected abstract TSearch CreateSearchFromJson(JsonNode jsonNode);
