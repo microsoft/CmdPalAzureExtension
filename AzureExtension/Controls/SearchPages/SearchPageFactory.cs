@@ -83,7 +83,7 @@ public class SearchPageFactory : ISearchPageFactory
         }
         else if (search is IPullRequestSearch)
         {
-            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _savedPullRequestSearchUpdater);
+            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _savedPullRequestSearchUpdater);
             var statusMessage = new StatusMessage();
             return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage);
         }

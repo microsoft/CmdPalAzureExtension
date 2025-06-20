@@ -13,6 +13,10 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
 {
     private readonly IResources _resources;
 
+    private readonly IAccountProvider _accountProvider;
+
+    private readonly AzureClientHelpers _azureClientHelpers;
+
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{RepositoryUrlPlaceholder}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateRepositoryUrlPlaceholder") },
@@ -33,11 +37,14 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
         IResources resources,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
+        AzureClientHelpers azureClientHelpers,
         ISavedSearchesUpdater<IPullRequestSearch> pullRequestSearchRepository)
         : base(null, pullRequestSearchRepository, mediator, accountProvider)
     {
         _resources = resources;
         TemplateKey = "SavePullRequestSearch";
+        _accountProvider = accountProvider;
+        _azureClientHelpers = azureClientHelpers;
     }
 
     // for editing an existing pull request search
@@ -46,11 +53,14 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
         IResources resources,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
+        AzureClientHelpers azureClientHelpers,
         ISavedSearchesUpdater<IPullRequestSearch> pullRequestSearchRepository)
         : base(savedPullRequestSearch, pullRequestSearchRepository, mediator, accountProvider)
     {
         _resources = resources;
         TemplateKey = "SavePullRequestSearch";
+        _accountProvider = accountProvider;
+        _azureClientHelpers = azureClientHelpers;
     }
 
     protected override IPullRequestSearch CreateSearchFromJson(JsonNode? jsonNode)
@@ -59,12 +69,18 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
         var view = jsonNode?["view"]?.ToString() ?? string.Empty;
         var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
 
-        var testUri = new AzureUri(enteredUrl);
-        var url = CreatePullRequestUrl(testUri, view);
-        var searchUri = new AzureUri(url);
-        var name = $"{searchUri.Repository} - {view}";
+        var account = _accountProvider.GetDefaultAccount();
+        var repoInfo = _azureClientHelpers.GetInfo(new AzureUri(enteredUrl), account, InfoType.Repository).Result;
 
-        return new PullRequestSearchCandidate(searchUri, name, view, isTopLevel);
+        if (repoInfo.Result != ResultType.Success)
+        {
+            throw new InvalidOperationException($"Failed to get repository info {repoInfo.Error}: {repoInfo.ErrorMessage}");
+        }
+
+        var url = CreatePullRequestUrl(repoInfo.AzureUri, view);
+        var name = $"{repoInfo.Name} - {view}";
+
+        return new PullRequestSearchCandidate(repoInfo.AzureUri, name, view, isTopLevel);
     }
 
     // The form enforces that the URL is not null or empty, so we can assume it is valid
