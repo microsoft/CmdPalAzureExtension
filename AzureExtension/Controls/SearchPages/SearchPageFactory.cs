@@ -92,8 +92,7 @@ public class SearchPageFactory : ISearchPageFactory
         else if (search is IPullRequestSearch)
         {
             var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _savedPullRequestSearchUpdater, _savePullRequestSearchCommand);
-            var statusMessage = new StatusMessage();
-            return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm);
+            return new SavePullRequestSearchPage(savePullRequestSearchForm, _resources, _mediator);
         }
         else if (search is IPipelineDefinitionSearch)
         {

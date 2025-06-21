@@ -48,6 +48,10 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
         _mediator.SetLoadingState(true);
         var payloadJson = JsonNode.Parse(inputs) ?? throw new InvalidOperationException("No search found");
         _saveSearchCommand.SetSearchToSave(CreateSearchFromJson(payloadJson));
+        if (SavedSearch != null)
+        {
+            _saveSearchCommand.SetSavedSearch(SavedSearch);
+        }
 
         return _saveSearchCommand.Invoke();
     }

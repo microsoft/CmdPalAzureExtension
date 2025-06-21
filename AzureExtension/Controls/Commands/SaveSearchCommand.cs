@@ -14,12 +14,12 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
 {
     private readonly ISavedSearchesUpdater<TSearch> _savedSearchesUpdater;
     private readonly SavedAzureSearchesMediator _mediator;
-    private readonly TSearch? _savedSearch;
     private readonly string _saveSuccessMessage = string.Empty;
     private readonly string _saveFailureMessage = string.Empty;
     private readonly string _editSuccessMessage = string.Empty;
     private readonly string _editFailureMessage = string.Empty;
     private TSearch? _searchToSave;
+    private TSearch? _savedSearch;
 
     public SaveSearchCommand(
         ISavedSearchesUpdater<TSearch> savedSearchesUpdater,
@@ -37,6 +37,11 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
         _saveFailureMessage = failureMessage;
         _editSuccessMessage = editSuccessMessage;
         _editFailureMessage = editFailureMessage;
+    }
+
+    public void SetSavedSearch(TSearch savedSearch)
+    {
+        _savedSearch = savedSearch;
     }
 
     public void SetSearchToSave(TSearch search)
