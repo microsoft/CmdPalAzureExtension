@@ -236,7 +236,7 @@ public sealed class Program
         var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedAzureSearchesMediator, pullRequestSearchRepository, searchPageFactory);
 
         var savePipelineSearchForm = new SavePipelineSearchForm(null, resources, pipelineDefinitionRepository, savedAzureSearchesMediator, accountProvider, azureClientHelpers, savePipelineSearchCommand);
-        var savePipelineSearchPage = new SavePipelineSearchPage(resources, savePipelineSearchForm, savedAzureSearchesMediator);
+        var savePipelineSearchPage = new SavePipelineSearchPage(savePipelineSearchForm, resources, savedAzureSearchesMediator);
         var addPipelineSearchListItem = new AddPipelineSearchListItem(savePipelineSearchPage, resources);
         using var savedPipelineSearchesPage = new SavedPipelineSearchesPage(resources, addPipelineSearchListItem, savedAzureSearchesMediator, pipelineDefinitionRepository, accountProvider, new ContentDataProviderAdapter<IBuild>(dataProvider), searchPageFactory);
 
