@@ -7,6 +7,7 @@ using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
+using Serilog;
 
 namespace AzureExtension.Controls.Forms;
 
@@ -56,6 +57,7 @@ public sealed partial class SaveQueryForm : SaveSearchForm<IQuerySearch>
 
     protected override SearchInfoParameters GetSearchInfoParameters()
     {
+        Log.Debug($"SaveQueryForm: GetSearchInfoParameters with URL {_searchUrl}");
         return new DefaultSearchInfoParameters(_searchUrl, InfoType.Query);
     }
 }

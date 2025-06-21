@@ -7,6 +7,7 @@ using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
+using Serilog;
 
 namespace AzureExtension.Controls.Forms;
 
@@ -59,6 +60,7 @@ public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
 
     protected override IPullRequestSearch CreateSearchFromSearchInfo(InfoResult searchInfo)
     {
+        Log.Debug($"SavePullRequestSearchForm: Creating PullRequestSearch with searchInfo: {searchInfo}, {searchInfo.Name}");
         var name = $"{searchInfo.Name} - {_view}";
         var pullRequestsUri = new AzureUri(CreatePullRequestUrl(searchInfo.AzureUri, _view));
 
