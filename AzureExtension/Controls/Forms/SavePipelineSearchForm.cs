@@ -20,8 +20,6 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
 
     private bool _isNewSearchTopLevel;
 
-    private ILogger _logger;
-
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{SavePipelineSearchFormTitle}}", !string.IsNullOrEmpty(SavedSearch?.Url) ? _resources.GetResource("Forms_Edit_PipelineSearch") : _resources.GetResource("Forms_Save_PipelineSearch") },
@@ -48,8 +46,6 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
     {
         _resources = resources;
         TemplateKey = "SavePipelineSearch";
-        _logger = Log.Logger.ForContext("SourceContext", nameof(SavePipelineSearchForm));
-        _logger.Information($"SavePipelineSearchForm: Initialized with saved search: {definitionSearch?.Name ?? "null"} SavedSearch: {SavedSearch}");
     }
 
     protected override void ParseFormSubmission(JsonNode? jsonNode)

@@ -7,7 +7,6 @@ using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
-using Serilog;
 
 namespace AzureExtension.Controls.Forms;
 
@@ -20,8 +19,6 @@ public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
     private string _view = string.Empty;
 
     private bool _isNewSearchTopLevel;
-
-    private ILogger _logger;
 
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
@@ -51,8 +48,6 @@ public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
     {
         _resources = resources;
         TemplateKey = "SavePullRequestSearch";
-        _logger = Log.Logger.ForContext("SourceContext", nameof(SavePullRequestSearchForm));
-        _logger.Debug($"SavePullRequestSearchForm: Initialized with saved query: {savedPullRequestSearch?.Name ?? "null"} SavedSearch: {SavedSearch}");
     }
 
     protected override void ParseFormSubmission(JsonNode? jsonNode)
@@ -64,7 +59,6 @@ public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
 
     protected override IPullRequestSearch CreateSearchFromSearchInfo(InfoResult searchInfo)
     {
-        _logger.Debug($"SavePullRequestSearchForm: Creating PullRequestSearch with searchInfo: {searchInfo}, {searchInfo.Name}");
         var name = $"{searchInfo.Name} - {_view}";
         var pullRequestsUri = new AzureUri(CreatePullRequestUrl(searchInfo.AzureUri, _view));
 

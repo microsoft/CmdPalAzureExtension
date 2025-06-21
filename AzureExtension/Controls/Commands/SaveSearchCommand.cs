@@ -4,6 +4,7 @@
 
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Serilog;
 
 namespace AzureExtension.Controls.Commands;
 
@@ -51,20 +52,25 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
 
     public override CommandResult Invoke()
     {
+        var editing = !string.IsNullOrEmpty(_savedSearch?.Url);
         _mediator.SetLoadingState(true);
 
-        var editing = false;
         try
         {
             // If editing the search, delete the old one
-            if (!string.IsNullOrEmpty(_savedSearch?.Url))
+            if (editing)
             {
-                editing = true;
-                _savedSearchesUpdater.RemoveSavedSearch(_savedSearch);
+                _savedSearchesUpdater.RemoveSavedSearch(_savedSearch!);
             }
 
             _savedSearchesUpdater.AddOrUpdateSearch(_searchToSave!, _searchToSave!.IsTopLevel);
             _mediator.AddSearch(_searchToSave!);
+
+            if (_savedSearch != null)
+            {
+                _savedSearch = _searchToSave;
+            }
+
             _mediator.SetLoadingState(false);
             ToastHelper.ShowSuccessToast(editing ? _editSuccessMessage : _saveSuccessMessage);
 
