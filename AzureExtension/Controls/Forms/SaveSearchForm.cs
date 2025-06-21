@@ -10,6 +10,7 @@ using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Serilog;
 
 namespace AzureExtension.Controls.Forms;
 
@@ -58,13 +59,19 @@ public abstract class SaveSearchForm<TSearch> : FormContent
     {
         _mediator.SetLoadingState(true);
         var payloadJson = JsonNode.Parse(inputs) ?? throw new InvalidOperationException("No search found");
+        Log.Debug($"SaveSearchForm: ParseFormSubmission with payload {payloadJson}");
         ParseFormSubmission(payloadJson);
 
-        var searchInfo = GetSearchInfo(new AzureUri(GetSearchUrl()), GetInfoType());
+        var searchInfoParameters = GetSearchInfoParameters();
+
+        Log.Debug($"SaveSearchForm: GetSearchInfo with URL {searchInfoParameters.Url} and InfoType {searchInfoParameters.InfoType}");
+        var searchInfo = GetSearchInfo(searchInfoParameters);
         if (searchInfo.Result != ResultType.Success)
         {
             _mediator.SetLoadingState(false);
-            ToastHelper.ShowErrorToast(searchInfo.ErrorMessage);
+            var errorMessage = string.Format(CultureInfo.CurrentCulture, "{0}", searchInfo.ErrorMessage);
+            Log.Debug($"SaveSearchForm: Error encountered - {errorMessage}");
+            ToastHelper.ShowErrorToast(errorMessage);
             return CommandResult.KeepOpen();
         }
 
@@ -79,18 +86,22 @@ public abstract class SaveSearchForm<TSearch> : FormContent
         return _saveSearchCommand.Invoke();
     }
 
-    protected abstract InfoType GetInfoType();
+    protected abstract SearchInfoParameters GetSearchInfoParameters();
 
     protected abstract TSearch CreateSearchFromSearchInfo(InfoResult searchInfo);
 
-    protected abstract string GetSearchUrl();
-
     protected abstract void ParseFormSubmission(JsonNode? jsonNode);
 
-    public InfoResult GetSearchInfo(AzureUri uri, InfoType infoType)
+    public InfoResult GetSearchInfo(SearchInfoParameters parameters)
     {
         var account = _accountProvider.GetDefaultAccount();
-        return _azureClientHelpers.GetInfo(uri, account, infoType).Result;
+
+        return parameters switch
+        {
+            DefinitionInfoParameters defParams when defParams.DefinitionId > 0 =>
+                _azureClientHelpers.GetInfo(defParams.Url, account, defParams.InfoType, defParams.DefinitionId).Result,
+                _ => _azureClientHelpers.GetInfo(parameters.Url, account, parameters.InfoType).Result,
+        };
     }
 
     public bool GetIsTopLevel()

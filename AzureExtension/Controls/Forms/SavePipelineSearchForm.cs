@@ -92,13 +92,8 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
         }
     }
 
-    protected override InfoType GetInfoType()
+    protected override SearchInfoParameters GetSearchInfoParameters()
     {
-        return InfoType.Definition;
-    }
-
-    protected override string GetSearchUrl()
-    {
-        return _definitionUrl;
+        return new DefinitionInfoParameters(_definitionUrl, ParseDefinitionIdFromUrl(_definitionUrl));
     }
 }

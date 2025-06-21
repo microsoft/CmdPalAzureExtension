@@ -84,7 +84,7 @@ public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
 
         try
         {
-            var baseUrl = $"https://dev.azure.com/{uri.Organization.ToString()}/{uri.Project.ToString()}/_git/{uri.Repository.ToString()}".TrimEnd('/');
+            var baseUrl = $"https://dev.azure.com/{uri.Organization}/{uri.Project}/_git/{uri.Repository}".TrimEnd('/');
 
             return $"{baseUrl}/pullrequests?_a={viewValue}";
         }
@@ -94,13 +94,9 @@ public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
         }
     }
 
-    protected override InfoType GetInfoType()
+    // In order to validate the pull request URL, we need to use the repository URL
+    protected override SearchInfoParameters GetSearchInfoParameters()
     {
-        return InfoType.Repository;
-    }
-
-    protected override string GetSearchUrl()
-    {
-        return _repoUrl;
+        return new DefaultSearchInfoParameters(_repoUrl, InfoType.Repository);
     }
 }

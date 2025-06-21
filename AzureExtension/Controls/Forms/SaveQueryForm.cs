@@ -54,13 +54,8 @@ public sealed partial class SaveQueryForm : SaveSearchForm<IQuerySearch>
         return new Query(searchInfo.AzureUri, searchInfo.Name, searchInfo.Description, _isNewSearchTopLevel);
     }
 
-    protected override InfoType GetInfoType()
+    protected override SearchInfoParameters GetSearchInfoParameters()
     {
-        return InfoType.Query;
-    }
-
-    protected override string GetSearchUrl()
-    {
-        return _searchUrl;
+        return new DefaultSearchInfoParameters(_searchUrl, InfoType.Query);
     }
 }
