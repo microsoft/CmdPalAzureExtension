@@ -2,8 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Text.Json.Nodes;
-using AzureExtension.Account;
+using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Commands;
@@ -16,18 +15,28 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
     private readonly ISavedSearchesUpdater<TSearch> _savedSearchesUpdater;
     private readonly SavedAzureSearchesMediator _mediator;
     private readonly TSearch? _savedSearch;
+    private readonly string _saveSuccessMessage = string.Empty;
+    private readonly string _saveFailureMessage = string.Empty;
+    private readonly string _editSuccessMessage = string.Empty;
+    private readonly string _editFailureMessage = string.Empty;
     private TSearch? _searchToSave;
-
-    public string Inputs { get; set; } = string.Empty;
 
     public SaveSearchCommand(
         ISavedSearchesUpdater<TSearch> savedSearchesUpdater,
         SavedAzureSearchesMediator mediator,
-        TSearch? savedSearch)
+        TSearch? savedSearch,
+        string successMessage,
+        string failureMessage,
+        string editSuccessMessage,
+        string editFailureMessage)
     {
         _savedSearchesUpdater = savedSearchesUpdater;
         _mediator = mediator;
         _savedSearch = savedSearch;
+        _saveSuccessMessage = successMessage;
+        _saveFailureMessage = failureMessage;
+        _editSuccessMessage = editSuccessMessage;
+        _editFailureMessage = editFailureMessage;
     }
 
     public void SetSearchToSave(TSearch search)
@@ -37,27 +46,31 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
 
     public override CommandResult Invoke()
     {
-        if (_searchToSave == null)
-        {
-            return CommandResult.KeepOpen();
-        }
+        _mediator.SetLoadingState(true);
 
+        var editing = false;
         try
         {
             // If editing the search, delete the old one
             if (!string.IsNullOrEmpty(_savedSearch?.Url))
             {
+                editing = true;
                 _savedSearchesUpdater.RemoveSavedSearch(_savedSearch);
             }
 
             _savedSearchesUpdater.AddOrUpdateSearch(_searchToSave!, _searchToSave!.IsTopLevel);
             _mediator.AddSearch(_searchToSave!);
+            _mediator.SetLoadingState(false);
+            ToastHelper.ShowSuccessToast(editing ? _editSuccessMessage : _saveSuccessMessage);
 
             return CommandResult.KeepOpen();
         }
         catch (Exception ex)
         {
             _mediator.AddSearch(null, ex);
+            _mediator.SetLoadingState(false);
+            var errorMessage = editing ? _editFailureMessage : _saveFailureMessage;
+            ToastHelper.ShowErrorToast($"{errorMessage} {ex.Message}");
             return CommandResult.KeepOpen();
         }
     }

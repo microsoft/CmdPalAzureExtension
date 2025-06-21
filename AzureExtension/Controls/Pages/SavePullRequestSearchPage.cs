@@ -11,28 +11,28 @@ namespace AzureExtension.Controls.Pages;
 
 public class SavePullRequestSearchPage : ContentPage
 {
-    private readonly StatusMessage _statusMessage;
-
     private readonly SavePullRequestSearchForm _savePullRequestSearchForm;
-
     private readonly IResources _resources;
+    private readonly SavedAzureSearchesMediator _mediator;
 
-    public SavePullRequestSearchPage(SavePullRequestSearchForm savePullRequestSearchForm, StatusMessage statusMessage, IResources resources)
+    public SavePullRequestSearchPage(SavePullRequestSearchForm savePullRequestSearchForm, IResources resources, SavedAzureSearchesMediator mediator)
     {
         _resources = resources;
         Title = _resources.GetResource("Pages_SavePullRequestSearch_Title");
         Icon = IconLoader.GetIcon("Add");
         _savePullRequestSearchForm = savePullRequestSearchForm;
-        _statusMessage = statusMessage;
-
-        FormEventHelper.WireFormEvents(_savePullRequestSearchForm, this, _statusMessage, _resources.GetResource("Pages_SavePullRequestSearch_SuccessMessage"), _resources.GetResource("Pages_SavePullRequestSearch_FailureMessage"));
-
-        ExtensionHost.HideStatus(_statusMessage);
+        Name = Title; // Name is for commands, title is for the page
+        _mediator = mediator;
+        _mediator.LoadingStateChanged += OnLoadingStateChanged;
     }
 
     public override IContent[] GetContent()
     {
-        ExtensionHost.HideStatus(_statusMessage);
         return [_savePullRequestSearchForm];
+    }
+
+    private void OnLoadingStateChanged(object? sender, bool isLoading)
+    {
+        IsLoading = isLoading;
     }
 }

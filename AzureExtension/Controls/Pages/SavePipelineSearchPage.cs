@@ -12,33 +12,27 @@ namespace AzureExtension.Controls.Pages;
 public class SavePipelineSearchPage : ContentPage
 {
     private readonly IResources _resources;
-
     private readonly SavePipelineSearchForm _savePipelineSearchForm;
+    private readonly SavedAzureSearchesMediator _mediator;
 
-    private readonly StatusMessage _statusMessage;
-
-    public SavePipelineSearchPage(IResources resources, SavePipelineSearchForm savePipelineSearchForm, StatusMessage statusMessage)
+    public SavePipelineSearchPage(IResources resources, SavePipelineSearchForm savePipelineSearchForm, SavedAzureSearchesMediator mediator)
     {
         _resources = resources;
         _savePipelineSearchForm = savePipelineSearchForm;
-        _statusMessage = statusMessage;
+        _mediator = mediator;
         Title = _resources.GetResource("Pages_SavePipelineSearch_Title");
         Name = Title; // Name is for commands, title is for the page
         Icon = IconLoader.GetIcon("Add");
-
-        FormEventHelper.WireFormEvents(
-            _savePipelineSearchForm,
-            this,
-            _statusMessage,
-            _resources.GetResource("Pages_SavePipelineSearch_SuccessMessage"),
-            _resources.GetResource("Pages_SavePipelineSearch_FailureMessage"));
-
-        ExtensionHost.HideStatus(_statusMessage);
+        _mediator.LoadingStateChanged += OnLoadingStateChanged;
     }
 
     public override IContent[] GetContent()
     {
-        ExtensionHost.HideStatus(_statusMessage);
         return [_savePipelineSearchForm];
+    }
+
+    private void OnLoadingStateChanged(object? sender, bool isLoading)
+    {
+        IsLoading = isLoading;
     }
 }

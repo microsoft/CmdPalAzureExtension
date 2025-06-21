@@ -15,6 +15,9 @@ public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
     private readonly IResources _resources;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly bool editing;
+
+    public bool IsEditing => editing;
 
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
@@ -58,6 +61,7 @@ public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
         TemplateKey = "SaveQuery";
+        editing = true;
     }
 
     protected override IQuerySearch CreateSearchFromJson(JsonNode? jsonNode)

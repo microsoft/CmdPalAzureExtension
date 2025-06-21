@@ -205,9 +205,9 @@ public sealed class Program
         };
 
         // passing null for SavedSearch because there is no standard TSearch type
-        var saveQuerySearchCommand = new SaveSearchCommand<IQuerySearch>(queryRepository, savedAzureSearchesMediator, null);
-        var savePullRequestSearchCommand = new SaveSearchCommand<IPullRequestSearch>(pullRequestSearchRepository, savedAzureSearchesMediator, null);
-        var savePipelineSearchCommand = new SaveSearchCommand<IPipelineDefinitionSearch>(pipelineDefinitionRepository, savedAzureSearchesMediator, null);
+        var saveQuerySearchCommand = new SaveSearchCommand<IQuerySearch>(queryRepository, savedAzureSearchesMediator, null, resources.GetResource("Message_Query_Saved"), resources.GetResource("Message_Query_Saved_Error"), resources.GetResource("Pages_EditQuery_SuccessMessage"), resources.GetResource("Pages_EditQuery_FailureMessage"));
+        var savePullRequestSearchCommand = new SaveSearchCommand<IPullRequestSearch>(pullRequestSearchRepository, savedAzureSearchesMediator, null, resources.GetResource("Pages_SavePullRequestSearch_SuccessMessage"), resources.GetResource("Pages_SavePullRequestSearch_FailureMessage"), resources.GetResource("Pages_EditPullRequestSearch_SuccessMessage"), resources.GetResource("Pages_EditPullRequestSearch_FailureMessage"));
+        var savePipelineSearchCommand = new SaveSearchCommand<IPipelineDefinitionSearch>(pipelineDefinitionRepository, savedAzureSearchesMediator, null, resources.GetResource("Pages_SavePipelineSearch_SuccessMessage"), resources.GetResource("Pages_SavePipelineSearch_FailureMessage"), resources.GetResource("Pages_EditPipelineSearch_SuccessMessage"), resources.GetResource("Pages_EditPipelineSearch_FailureMessage"));
 
         var searchPageFactory = new SearchPageFactory(
             resources,
@@ -227,16 +227,16 @@ public sealed class Program
             savePipelineSearchCommand);
 
         var addQueryForm = new SaveQueryForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, queryRepository, saveQuerySearchCommand);
-        var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, new StatusMessage(), resources), resources);
+        var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, resources, savedAzureSearchesMediator), resources);
         var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedAzureSearchesMediator, queryRepository, searchPageFactory);
 
         var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, pullRequestSearchRepository, savePullRequestSearchCommand);
-        var savePullRequestSearchPage = new SavePullRequestSearchPage(savePullRequestSearchForm, new StatusMessage(), resources);
+        var savePullRequestSearchPage = new SavePullRequestSearchPage(savePullRequestSearchForm, resources, savedAzureSearchesMediator);
         var addPullRequestSearchListItem = new AddPullRequestSearchListItem(savePullRequestSearchPage, resources);
         var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedAzureSearchesMediator, pullRequestSearchRepository, searchPageFactory);
 
         var savePipelineSearchForm = new SavePipelineSearchForm(null, resources, pipelineDefinitionRepository, savedAzureSearchesMediator, accountProvider, azureClientHelpers, savePipelineSearchCommand);
-        var savePipelineSearchPage = new SavePipelineSearchPage(resources, savePipelineSearchForm, new StatusMessage());
+        var savePipelineSearchPage = new SavePipelineSearchPage(resources, savePipelineSearchForm, savedAzureSearchesMediator);
         var addPipelineSearchListItem = new AddPipelineSearchListItem(savePipelineSearchPage, resources);
         using var savedPipelineSearchesPage = new SavedPipelineSearchesPage(resources, addPipelineSearchListItem, savedAzureSearchesMediator, pipelineDefinitionRepository, accountProvider, new ContentDataProviderAdapter<IBuild>(dataProvider), searchPageFactory);
 

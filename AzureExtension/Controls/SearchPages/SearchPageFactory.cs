@@ -87,20 +87,18 @@ public class SearchPageFactory : ISearchPageFactory
         if (search is IQuerySearch)
         {
             var saveQueryForm = new SaveQueryForm((IQuerySearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _queryUpdater, _saveQuerySearchCommand);
-            var statusMessage = new StatusMessage();
-            return new EditQueryPage(_resources, saveQueryForm, statusMessage);
+            return new SaveQueryPage(saveQueryForm, _resources, _mediator);
         }
         else if (search is IPullRequestSearch)
         {
             var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _savedPullRequestSearchUpdater, _savePullRequestSearchCommand);
             var statusMessage = new StatusMessage();
-            return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage);
+            return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm);
         }
         else if (search is IPipelineDefinitionSearch)
         {
             var savePipelineSearchForm = new SavePipelineSearchForm((IPipelineDefinitionSearch)search, _resources, _definitionUpdater, _mediator, _accountProvider, _azureClientHelpers, _savePipelineSearchCommand);
-            var statusMessage = new StatusMessage();
-            return new EditPipelineSearchPage(_resources, savePipelineSearchForm, statusMessage);
+            return new EditPipelineSearchPage(_resources, savePipelineSearchForm);
         }
         else
         {

@@ -17,14 +17,9 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
     where TSearch : IAzureSearch
 {
     private readonly ISavedSearchesUpdater<TSearch> _savedSearchesUpdater;
-    private readonly SavedAzureSearchesMediator _mediator;
     private readonly SaveSearchCommand<TSearch> _saveSearchCommand;
 
     protected TSearch? SavedSearch { get; set; }
-
-    public event EventHandler<bool>? LoadingStateChanged;
-
-    public event EventHandler<FormSubmitEventArgs>? FormSubmitted;
 
     protected string IsTopLevelChecked => GetIsTopLevel().ToString().ToLower(CultureInfo.InvariantCulture);
 
@@ -43,7 +38,6 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
     {
         SavedSearch = search;
         _savedSearchesUpdater = savedSearchesUpdater;
-        _mediator = mediator;
         _saveSearchCommand = saveSearchCommand;
     }
 
@@ -53,45 +47,6 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
         _saveSearchCommand.SetSearchToSave(CreateSearchFromJson(payloadJson));
 
         return _saveSearchCommand.Invoke();
-    }
-
-    private Task HandleInputs(string inputs)
-    {
-        LoadingStateChanged?.Invoke(this, true);
-
-        try
-        {
-            var payloadJson = JsonNode.Parse(inputs) ?? throw new InvalidOperationException("No search found");
-
-            var search = CreateSearchFromJson(payloadJson);
-
-            // if editing the search, delete the old one
-            // it is safe to do as the new one is already validated
-            if (!string.IsNullOrEmpty(SavedSearch?.Url))
-            {
-                // Log.Information($"Removing outdated search {_savedDefinitionSearch!.InternalId}");
-                _savedSearchesUpdater.RemoveSavedSearch(SavedSearch!);
-            }
-
-            LoadingStateChanged?.Invoke(this, false);
-            _savedSearchesUpdater.AddOrUpdateSearch(search, search.IsTopLevel);
-            _mediator.AddSearch(search);
-
-            if (SavedSearch != null)
-            {
-                SavedSearch = search;
-            }
-
-            FormSubmitted?.Invoke(this, new FormSubmitEventArgs(true, null));
-        }
-        catch (Exception ex)
-        {
-            LoadingStateChanged?.Invoke(this, false);
-            _mediator.AddSearch(null, ex);
-            FormSubmitted?.Invoke(this, new FormSubmitEventArgs(false, ex));
-        }
-
-        return Task.CompletedTask;
     }
 
     protected abstract TSearch CreateSearchFromJson(JsonNode jsonNode);
