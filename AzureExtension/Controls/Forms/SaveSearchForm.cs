@@ -24,6 +24,7 @@ public abstract class SaveSearchForm<TSearch> : FormContent
     private readonly IResources _resources;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly ILogger _logger;
 
     protected TSearch? SavedSearch { get; set; }
 
@@ -53,24 +54,25 @@ public abstract class SaveSearchForm<TSearch> : FormContent
         _resources = resources;
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
+        _logger = Log.Logger.ForContext("SourceContext", nameof(SaveSearchForm<TSearch>));
     }
 
     public override ICommandResult SubmitForm(string inputs, string data)
     {
         _mediator.SetLoadingState(true);
         var payloadJson = JsonNode.Parse(inputs) ?? throw new InvalidOperationException("No search found");
-        Log.Debug($"SaveSearchForm: ParseFormSubmission with payload {payloadJson}");
+        _logger.Information($"SaveSearchForm: ParseFormSubmission with payload {payloadJson}");
         ParseFormSubmission(payloadJson);
 
         var searchInfoParameters = GetSearchInfoParameters();
 
-        Log.Debug($"SaveSearchForm: GetSearchInfo with URL {searchInfoParameters.Url} and InfoType {searchInfoParameters.InfoType}");
+        _logger.Information($"SaveSearchForm: GetSearchInfo with URL {searchInfoParameters.Url} and InfoType {searchInfoParameters.InfoType}");
         var searchInfo = GetSearchInfo(searchInfoParameters);
         if (searchInfo.Result != ResultType.Success)
         {
             _mediator.SetLoadingState(false);
             var errorMessage = string.Format(CultureInfo.CurrentCulture, "{0}", searchInfo.ErrorMessage);
-            Log.Debug($"SaveSearchForm: Error encountered - {errorMessage}");
+            _logger.Information($"SaveSearchForm: Error encountered - {errorMessage}");
             ToastHelper.ShowErrorToast(errorMessage);
             return CommandResult.KeepOpen();
         }

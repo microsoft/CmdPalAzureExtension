@@ -8,6 +8,7 @@ using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.DataTransfer;
 using AzureExtension.Helpers;
+using Serilog;
 
 namespace AzureExtension.Controls.Forms;
 
@@ -18,6 +19,8 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
     private string _definitionUrl = string.Empty;
 
     private bool _isNewSearchTopLevel;
+
+    private ILogger _logger;
 
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
@@ -45,6 +48,8 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
     {
         _resources = resources;
         TemplateKey = "SavePipelineSearch";
+        _logger = Log.Logger.ForContext("SourceContext", nameof(SavePipelineSearchForm));
+        _logger.Information($"SavePipelineSearchForm: Initialized with saved search: {definitionSearch?.Name ?? "null"} SavedSearch: {SavedSearch}");
     }
 
     protected override void ParseFormSubmission(JsonNode? jsonNode)

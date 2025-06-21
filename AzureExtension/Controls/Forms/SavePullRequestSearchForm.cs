@@ -21,6 +21,8 @@ public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
 
     private bool _isNewSearchTopLevel;
 
+    private ILogger _logger;
+
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{RepositoryUrlPlaceholder}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateRepositoryUrlPlaceholder") },
@@ -49,6 +51,8 @@ public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
     {
         _resources = resources;
         TemplateKey = "SavePullRequestSearch";
+        _logger = Log.Logger.ForContext("SourceContext", nameof(SavePullRequestSearchForm));
+        _logger.Debug($"SavePullRequestSearchForm: Initialized with saved query: {savedPullRequestSearch?.Name ?? "null"} SavedSearch: {SavedSearch}");
     }
 
     protected override void ParseFormSubmission(JsonNode? jsonNode)
@@ -60,7 +64,7 @@ public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
 
     protected override IPullRequestSearch CreateSearchFromSearchInfo(InfoResult searchInfo)
     {
-        Log.Debug($"SavePullRequestSearchForm: Creating PullRequestSearch with searchInfo: {searchInfo}, {searchInfo.Name}");
+        _logger.Debug($"SavePullRequestSearchForm: Creating PullRequestSearch with searchInfo: {searchInfo}, {searchInfo.Name}");
         var name = $"{searchInfo.Name} - {_view}";
         var pullRequestsUri = new AzureUri(CreatePullRequestUrl(searchInfo.AzureUri, _view));
 

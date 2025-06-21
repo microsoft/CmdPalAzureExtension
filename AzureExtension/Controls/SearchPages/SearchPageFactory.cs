@@ -97,7 +97,7 @@ public class SearchPageFactory : ISearchPageFactory
         else if (search is IPipelineDefinitionSearch)
         {
             var savePipelineSearchForm = new SavePipelineSearchForm((IPipelineDefinitionSearch)search, _resources, _definitionUpdater, _mediator, _accountProvider, _azureClientHelpers, _savePipelineSearchCommand);
-            return new EditPipelineSearchPage(_resources, savePipelineSearchForm);
+            return new SavePipelineSearchPage(savePipelineSearchForm, _resources, _mediator);
         }
         else
         {
