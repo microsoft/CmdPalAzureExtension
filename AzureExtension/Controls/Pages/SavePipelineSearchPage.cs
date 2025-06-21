@@ -9,20 +9,22 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public class SavePipelineSearchPage : ContentPage
+public sealed partial class SavePipelineSearchPage : ContentPage, IDisposable
 {
-    private readonly IResources _resources;
     private readonly SavePipelineSearchForm _savePipelineSearchForm;
+    private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _mediator;
 
-    public SavePipelineSearchPage(IResources resources, SavePipelineSearchForm savePipelineSearchForm, SavedAzureSearchesMediator mediator)
+    public SavePipelineSearchPage(SavePipelineSearchForm savePipelineSearchForm, IResources resources, SavedAzureSearchesMediator mediator)
     {
-        _resources = resources;
         _savePipelineSearchForm = savePipelineSearchForm;
+        _resources = resources;
         _mediator = mediator;
-        Title = _resources.GetResource("Pages_SavePipelineSearch_Title");
+        Icon = _savePipelineSearchForm.IsEditing ? IconLoader.GetIcon("Edit") : IconLoader.GetIcon("Add");
+        Title = _savePipelineSearchForm.IsEditing
+            ? _resources.GetResource("Pages_EditPipelineSearch")
+            : _resources.GetResource("Pages_SavePipelineSearch_Title");
         Name = Title; // Name is for commands, title is for the page
-        Icon = IconLoader.GetIcon("Add");
         _mediator.LoadingStateChanged += OnLoadingStateChanged;
     }
 
@@ -34,5 +36,27 @@ public class SavePipelineSearchPage : ContentPage
     private void OnLoadingStateChanged(object? sender, bool isLoading)
     {
         IsLoading = isLoading;
+    }
+
+    // Disposing area
+    private bool _disposed;
+
+    private void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _mediator.LoadingStateChanged -= OnLoadingStateChanged;
+            }
+
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }
