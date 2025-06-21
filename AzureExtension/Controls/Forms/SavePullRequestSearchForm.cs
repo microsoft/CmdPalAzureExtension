@@ -10,15 +10,15 @@ using AzureExtension.Helpers;
 
 namespace AzureExtension.Controls.Forms;
 
-public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
+public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
 {
     private readonly IResources _resources;
 
-    private readonly IAccountProvider _accountProvider;
+    private string _repoUrl = string.Empty;
 
-    private readonly AzureClientHelpers _azureClientHelpers;
+    private string _view = string.Empty;
 
-    public bool IsEditing => SavedSearch != null;
+    private bool _isNewSearchTopLevel;
 
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
@@ -35,57 +35,34 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
         { "{{SavePullRequestSearchActionTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateSavePullRequestSearchActionTitle") },
     };
 
-    // for saving a new pull request search
-    public SavePullRequestSearchForm(
-        IResources resources,
-        SavedAzureSearchesMediator mediator,
-        IAccountProvider accountProvider,
-        AzureClientHelpers azureClientHelpers,
-        ISavedSearchesUpdater<IPullRequestSearch> pullRequestSearchRepository,
-        SaveSearchCommand<IPullRequestSearch> saveSearchCommand)
-        : base(null, pullRequestSearchRepository, mediator, accountProvider, saveSearchCommand)
-    {
-        _resources = resources;
-        TemplateKey = "SavePullRequestSearch";
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
-    }
-
     // for editing an existing pull request search
     public SavePullRequestSearchForm(
-        IPullRequestSearch savedPullRequestSearch,
+        IPullRequestSearch? savedPullRequestSearch,
         IResources resources,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
         ISavedSearchesUpdater<IPullRequestSearch> pullRequestSearchRepository,
         SaveSearchCommand<IPullRequestSearch> saveSearchCommand)
-        : base(savedPullRequestSearch, pullRequestSearchRepository, mediator, accountProvider, saveSearchCommand)
+        : base(savedPullRequestSearch, pullRequestSearchRepository, mediator, accountProvider, saveSearchCommand, resources, azureClientHelpers)
     {
         _resources = resources;
         TemplateKey = "SavePullRequestSearch";
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
     }
 
-    protected override IPullRequestSearch CreateSearchFromJson(JsonNode? jsonNode)
+    protected override void ParseFormSubmission(JsonNode? jsonNode)
     {
-        var enteredUrl = jsonNode?["url"]?.ToString() ?? string.Empty;
-        var view = jsonNode?["view"]?.ToString() ?? string.Empty;
-        var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
+        _repoUrl = jsonNode?["url"]?.ToString() ?? string.Empty;
+        _view = jsonNode?["view"]?.ToString() ?? string.Empty;
+        _isNewSearchTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
+    }
 
-        var account = _accountProvider.GetDefaultAccount();
-        var repoInfo = _azureClientHelpers.GetInfo(new AzureUri(enteredUrl), account, InfoType.Repository).Result;
+    protected override IPullRequestSearch CreateSearchFromSearchInfo(InfoResult searchInfo)
+    {
+        var name = $"{searchInfo.Name} - {_view}";
+        var pullRequestsUri = new AzureUri(CreatePullRequestUrl(searchInfo.AzureUri, _view));
 
-        if (repoInfo.Result != ResultType.Success)
-        {
-            throw new InvalidOperationException($"Failed to get repository info {repoInfo.Error}: {repoInfo.ErrorMessage}");
-        }
-
-        var url = CreatePullRequestUrl(repoInfo.AzureUri, view);
-        var name = $"{repoInfo.Name} - {view}";
-
-        return new PullRequestSearchCandidate(repoInfo.AzureUri, name, view, isTopLevel);
+        return new PullRequestSearchCandidate(pullRequestsUri, name, _view, _isNewSearchTopLevel);
     }
 
     // The form enforces that the URL is not null or empty, so we can assume it is valid
@@ -115,5 +92,15 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
         {
             throw new FormatException("The provided URL is not valid.", ex);
         }
+    }
+
+    protected override InfoType GetInfoType()
+    {
+        return InfoType.Repository;
+    }
+
+    protected override string GetSearchUrl()
+    {
+        return _repoUrl;
     }
 }

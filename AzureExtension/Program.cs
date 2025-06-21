@@ -226,11 +226,11 @@ public sealed class Program
             savePullRequestSearchCommand,
             savePipelineSearchCommand);
 
-        var addQueryForm = new SaveQueryForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, queryRepository, saveQuerySearchCommand);
+        var addQueryForm = new SaveQueryForm(null, resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, queryRepository, saveQuerySearchCommand);
         var addQueryListItem = new AddQueryListItem(new SaveQueryPage(addQueryForm, resources, savedAzureSearchesMediator), resources);
         var savedQueriesPage = new SavedQueriesPage(resources, addQueryListItem, savedAzureSearchesMediator, queryRepository, searchPageFactory);
 
-        var savePullRequestSearchForm = new SavePullRequestSearchForm(resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, pullRequestSearchRepository, savePullRequestSearchCommand);
+        var savePullRequestSearchForm = new SavePullRequestSearchForm(null, resources, savedAzureSearchesMediator, accountProvider, azureClientHelpers, pullRequestSearchRepository, savePullRequestSearchCommand);
         var savePullRequestSearchPage = new SavePullRequestSearchPage(savePullRequestSearchForm, resources, savedAzureSearchesMediator);
         var addPullRequestSearchListItem = new AddPullRequestSearchListItem(savePullRequestSearchPage, resources);
         var savedPullRequestSearchesPage = new SavedPullRequestSearchesPage(resources, addPullRequestSearchListItem, savedAzureSearchesMediator, pullRequestSearchRepository, searchPageFactory);

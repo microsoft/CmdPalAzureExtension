@@ -10,13 +10,11 @@ using AzureExtension.Helpers;
 
 namespace AzureExtension.Controls.Forms;
 
-public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
+public sealed partial class SaveQueryForm : SaveSearchForm<IQuerySearch>
 {
     private readonly IResources _resources;
-    private readonly IAccountProvider _accountProvider;
-    private readonly AzureClientHelpers _azureClientHelpers;
-
-    public bool IsEditing => SavedSearch != null;
+    private bool _isNewSearchTopLevel;
+    private string _searchUrl = string.Empty;
 
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
@@ -29,54 +27,40 @@ public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
         { "{{SaveQueryActionTitle}}", _resources.GetResource("Forms_SaveQuery_TemplateSaveQueryActionTitle") },
     };
 
-    // for saving a new query
+    // if savedQuery is null, the form will save a new query search
+    // otherwise, it will edit an existing query search
     public SaveQueryForm(
+        IQuerySearch? savedQuery,
         IResources resources,
         SavedAzureSearchesMediator savedQueriesMediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
         ISavedSearchesUpdater<IQuerySearch> queryRepository,
         SaveSearchCommand<IQuerySearch> saveSearchCommand)
-        : base(null, queryRepository, savedQueriesMediator, accountProvider, saveSearchCommand)
+        : base(savedQuery, queryRepository, savedQueriesMediator, accountProvider, saveSearchCommand, resources, azureClientHelpers)
     {
         _resources = resources;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
         TemplateKey = "SaveQuery";
     }
 
-    // for editing an existing query
-    public SaveQueryForm(
-        IQuerySearch savedQuery,
-        IResources resources,
-        SavedAzureSearchesMediator savedQueriesMediator,
-        IAccountProvider accountProvider,
-        AzureClientHelpers azureClientHelpers,
-        ISavedSearchesUpdater<IQuerySearch> queryRepository,
-        SaveSearchCommand<IQuerySearch> saveSearchCommand)
-        : base(savedQuery, queryRepository, savedQueriesMediator, accountProvider, saveSearchCommand)
+    protected override void ParseFormSubmission(JsonNode? jsonNode)
     {
-        _resources = resources;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
-        TemplateKey = "SaveQuery";
+        _searchUrl = jsonNode?["EnteredQuery"]?.ToString() ?? string.Empty;
+        _isNewSearchTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
     }
 
-    protected override IQuerySearch CreateSearchFromJson(JsonNode? jsonNode)
+    protected override IQuerySearch CreateSearchFromSearchInfo(InfoResult searchInfo)
     {
-        var queryUrl = jsonNode?["EnteredQuery"]?.ToString() ?? string.Empty;
-        var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
+        return new Query(searchInfo.AzureUri, searchInfo.Name, searchInfo.Description, _isNewSearchTopLevel);
+    }
 
-        var account = _accountProvider.GetDefaultAccount();
-        var queryInfo = _azureClientHelpers.GetInfo(queryUrl, account, InfoType.Query).Result;
+    protected override InfoType GetInfoType()
+    {
+        return InfoType.Query;
+    }
 
-        if (queryInfo.Result != ResultType.Success)
-        {
-            var error = queryInfo.Error;
-            throw new InvalidOperationException($"Failed to get query info {queryInfo.Error}: {queryInfo.ErrorMessage}");
-        }
-
-        var uri = queryInfo.AzureUri;
-        return new Query(uri, queryInfo.Name, queryInfo.Description, isTopLevel);
+    protected override string GetSearchUrl()
+    {
+        return _searchUrl;
     }
 }
