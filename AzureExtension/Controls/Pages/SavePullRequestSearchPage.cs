@@ -9,7 +9,7 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public class SavePullRequestSearchPage : ContentPage
+public sealed partial class SavePullRequestSearchPage : ContentPage, IDisposable
 {
     private readonly SavePullRequestSearchForm _savePullRequestSearchForm;
     private readonly IResources _resources;
@@ -17,12 +17,16 @@ public class SavePullRequestSearchPage : ContentPage
 
     public SavePullRequestSearchPage(SavePullRequestSearchForm savePullRequestSearchForm, IResources resources, SavedAzureSearchesMediator mediator)
     {
-        _resources = resources;
-        Title = _resources.GetResource("Pages_SavePullRequestSearch_Title");
-        Icon = IconLoader.GetIcon("Add");
         _savePullRequestSearchForm = savePullRequestSearchForm;
-        Name = Title; // Name is for commands, title is for the page
+        _resources = resources;
         _mediator = mediator;
+
+        Title = _savePullRequestSearchForm.IsEditing
+            ? _resources.GetResource("Pages_EditPullRequestSearch")
+            : _resources.GetResource("Pages_SavePullRequestSearch_Title");
+        Icon = IconLoader.GetIcon(_savePullRequestSearchForm.IsEditing ? "Edit" : "Add");
+        Name = Title; // Name is for commands, title is for the page
+
         _mediator.LoadingStateChanged += OnLoadingStateChanged;
     }
 
@@ -34,5 +38,27 @@ public class SavePullRequestSearchPage : ContentPage
     private void OnLoadingStateChanged(object? sender, bool isLoading)
     {
         IsLoading = isLoading;
+    }
+
+    // disposing area
+    private bool _disposed;
+
+    private void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _mediator.LoadingStateChanged -= OnLoadingStateChanged;
+            }
+
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

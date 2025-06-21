@@ -18,6 +18,8 @@ public class SavePullRequestSearchForm : AzureForm<IPullRequestSearch>
 
     private readonly AzureClientHelpers _azureClientHelpers;
 
+    public bool IsEditing => SavedSearch != null;
+
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
         { "{{RepositoryUrlPlaceholder}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateRepositoryUrlPlaceholder") },
