@@ -18,6 +18,7 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
 {
     private readonly ISavedSearchesUpdater<TSearch> _savedSearchesUpdater;
     private readonly SaveSearchCommand<TSearch> _saveSearchCommand;
+    private readonly SavedAzureSearchesMediator _mediator;
 
     protected TSearch? SavedSearch { get; set; }
 
@@ -39,10 +40,12 @@ public abstract class AzureForm<TSearch> : FormContent, IAzureForm
         SavedSearch = search;
         _savedSearchesUpdater = savedSearchesUpdater;
         _saveSearchCommand = saveSearchCommand;
+        _mediator = mediator;
     }
 
     public override ICommandResult SubmitForm(string inputs, string data)
     {
+        _mediator.SetLoadingState(true);
         var payloadJson = JsonNode.Parse(inputs) ?? throw new InvalidOperationException("No search found");
         _saveSearchCommand.SetSearchToSave(CreateSearchFromJson(payloadJson));
 
