@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
@@ -13,8 +14,10 @@ public partial class RemoveCommand : InvokableCommand
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _savedAzureSearchesMediator;
     private readonly IAzureSearchRepository _azureSearchRepository;
+    private readonly string _successMessage;
+    private readonly string _failureMessage;
 
-    public RemoveCommand(IAzureSearch azureSearch, IResources resources, SavedAzureSearchesMediator savedAzureSearchesMediator, IAzureSearchRepository azureSearchRepository)
+    public RemoveCommand(IAzureSearch azureSearch, IResources resources, SavedAzureSearchesMediator savedAzureSearchesMediator, IAzureSearchRepository azureSearchRepository, string successMessage, string failureMessage)
     {
         _resources = resources;
         _savedAzureSearchesMediator = savedAzureSearchesMediator;
@@ -22,12 +25,22 @@ public partial class RemoveCommand : InvokableCommand
         _savedAzureSearch = azureSearch;
         Name = GetCommandNameFromSearchType();
         Icon = IconLoader.GetIcon("Remove");
+        _successMessage = successMessage;
+        _failureMessage = failureMessage;
     }
 
     public override CommandResult Invoke()
     {
-        _azureSearchRepository.Remove(_savedAzureSearch);
-        _savedAzureSearchesMediator.Remove(_savedAzureSearch);
+        try
+        {
+            _azureSearchRepository.Remove(_savedAzureSearch);
+            _savedAzureSearchesMediator.Remove(_savedAzureSearch);
+            ToastHelper.ShowSuccessToast(string.Format(CultureInfo.CurrentCulture, _successMessage, _savedAzureSearch.Name));
+        }
+        catch (Exception ex)
+        {
+            ToastHelper.ShowErrorToast(string.Format(CultureInfo.CurrentCulture, _failureMessage, _savedAzureSearch.Name, ex.Message));
+        }
 
         return CommandResult.KeepOpen();
     }

@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
@@ -54,10 +55,10 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
     public override CommandResult Invoke()
     {
         var editing = !string.IsNullOrEmpty(_savedSearch?.Url);
-        _mediator.SetLoadingState(true, _searchUpdatedType);
-
         try
         {
+            _mediator.SetLoadingState(true, _searchUpdatedType);
+
             // If editing the search, delete the old one
             if (editing)
             {
@@ -72,8 +73,9 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
                 _savedSearch = _searchToSave;
             }
 
+            var successMessage = editing ? _editSuccessMessage : _saveSuccessMessage;
             _mediator.SetLoadingState(false, _searchUpdatedType);
-            ToastHelper.ShowSuccessToast(editing ? _editSuccessMessage : _saveSuccessMessage);
+            ToastHelper.ShowSuccessToast(string.Format(CultureInfo.CurrentCulture, successMessage, _searchToSave.Name));
 
             return CommandResult.KeepOpen();
         }
@@ -82,7 +84,7 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
             _mediator.AddSearch(null, ex);
             _mediator.SetLoadingState(false, _searchUpdatedType);
             var errorMessage = editing ? _editFailureMessage : _saveFailureMessage;
-            ToastHelper.ShowErrorToast($"{errorMessage} {ex.Message}");
+            ToastHelper.ShowErrorToast(string.Format(CultureInfo.CurrentCulture, errorMessage, _searchToSave?.Name, ex.Message));
             return CommandResult.KeepOpen();
         }
     }

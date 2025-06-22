@@ -34,7 +34,7 @@ public class DefinitionSearch : IPipelineDefinitionSearch
     }
 
     [Write(false)]
-    public string Name => InternalId.ToStringInvariant();
+    public string Name { get; set; } = string.Empty;
 
     public static DefinitionSearch? Get(DataStore dataStore, long internalId, string url)
     {
