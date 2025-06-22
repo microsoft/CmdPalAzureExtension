@@ -33,9 +33,9 @@ public sealed partial class SavePipelineSearchPage : ContentPage, IDisposable
         return [_savePipelineSearchForm];
     }
 
-    private void OnLoadingStateChanged(object? sender, bool isLoading)
+    private void OnLoadingStateChanged(object? sender, SearchSetLoadingStateArgs args)
     {
-        IsLoading = isLoading;
+        IsLoading = args.IsLoading && args.SearchType == SearchUpdatedType.Pipeline;
     }
 
     // Disposing area

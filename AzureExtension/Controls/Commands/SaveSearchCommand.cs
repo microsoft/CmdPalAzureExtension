@@ -20,6 +20,7 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
     private readonly string _editFailureMessage = string.Empty;
     private TSearch? _searchToSave;
     private TSearch? _savedSearch;
+    private SearchUpdatedType _searchUpdatedType = SearchUpdatedType.Unknown;
 
     public SaveSearchCommand(
         ISavedSearchesUpdater<TSearch> savedSearchesUpdater,
@@ -37,6 +38,7 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
         _saveFailureMessage = failureMessage;
         _editSuccessMessage = editSuccessMessage;
         _editFailureMessage = editFailureMessage;
+        _searchUpdatedType = SearchHelper.GetSearchUpdatedType<TSearch>();
     }
 
     public void SetSavedSearch(TSearch savedSearch)
@@ -52,7 +54,7 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
     public override CommandResult Invoke()
     {
         var editing = !string.IsNullOrEmpty(_savedSearch?.Url);
-        _mediator.SetLoadingState(true);
+        _mediator.SetLoadingState(true, _searchUpdatedType);
 
         try
         {
@@ -70,7 +72,7 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
                 _savedSearch = _searchToSave;
             }
 
-            _mediator.SetLoadingState(false);
+            _mediator.SetLoadingState(false, _searchUpdatedType);
             ToastHelper.ShowSuccessToast(editing ? _editSuccessMessage : _saveSuccessMessage);
 
             return CommandResult.KeepOpen();
@@ -78,7 +80,7 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
         catch (Exception ex)
         {
             _mediator.AddSearch(null, ex);
-            _mediator.SetLoadingState(false);
+            _mediator.SetLoadingState(false, _searchUpdatedType);
             var errorMessage = editing ? _editFailureMessage : _saveFailureMessage;
             ToastHelper.ShowErrorToast($"{errorMessage} {ex.Message}");
             return CommandResult.KeepOpen();

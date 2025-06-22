@@ -31,9 +31,9 @@ public sealed partial class SaveQueryPage : ContentPage, IDisposable
         return [_saveQueryForm];
     }
 
-    private void OnLoadingStateChanged(object? sender, bool isLoading)
+    private void OnLoadingStateChanged(object? sender, SearchSetLoadingStateArgs args)
     {
-        IsLoading = isLoading;
+        IsLoading = args.IsLoading && args.SearchType == SearchUpdatedType.Query;
     }
 
     // Disposing area

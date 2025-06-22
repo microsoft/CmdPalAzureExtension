@@ -35,9 +35,9 @@ public sealed partial class SavePullRequestSearchPage : ContentPage, IDisposable
         return [_savePullRequestSearchForm];
     }
 
-    private void OnLoadingStateChanged(object? sender, bool isLoading)
+    private void OnLoadingStateChanged(object? sender, SearchSetLoadingStateArgs args)
     {
-        IsLoading = isLoading;
+        IsLoading = args.IsLoading && args.SearchType == SearchUpdatedType.PullRequest;
     }
 
     // disposing area
