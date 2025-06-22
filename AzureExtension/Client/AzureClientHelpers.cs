@@ -94,7 +94,22 @@ public class AzureClientHelpers
 
         if (!azureUri.IsValid)
         {
-            return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.UriInvalidQuery);
+            return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidUri);
+        }
+
+        if (infoType == InfoType.Query && !azureUri.Uri.AbsoluteUri.Contains("_queries/query"))
+        {
+            return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidQueryUri);
+        }
+
+        if (infoType == InfoType.Repository && !azureUri.Uri.AbsoluteUri.Contains("_git/"))
+        {
+            return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidRepositoryUri);
+        }
+
+        if (infoType == InfoType.Definition && !azureUri.Uri.AbsoluteUri.Contains("_build?definitionId=") && definitionId == null)
+        {
+            return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidDefinitionUri);
         }
 
         try

@@ -24,6 +24,7 @@ public abstract class SaveSearchForm<TSearch> : FormContent
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
     private SearchUpdatedType _searchUpdatedType = SearchUpdatedType.Unknown;
+    private InfoType _searchInfoType = InfoType.Unknown;
 
     protected TSearch? SavedSearch { get; set; }
 
@@ -54,34 +55,46 @@ public abstract class SaveSearchForm<TSearch> : FormContent
         _accountProvider = accountProvider;
         _azureClientHelpers = azureClientHelpers;
         _searchUpdatedType = SearchHelper.GetSearchUpdatedType<TSearch>();
+        _searchInfoType = SearchHelper.GetSearchInfoType<TSearch>();
     }
 
     public override ICommandResult SubmitForm(string inputs, string data)
     {
-        _mediator.SetLoadingState(true, _searchUpdatedType);
-        var payloadJson = JsonNode.Parse(inputs) ?? throw new InvalidOperationException("No search found");
-        ParseFormSubmission(payloadJson);
-
-        var searchInfoParameters = GetSearchInfoParameters();
-
-        var searchInfo = GetSearchInfo(searchInfoParameters);
-        if (searchInfo.Result != ResultType.Success)
+        try
         {
+            _mediator.SetLoadingState(true, _searchUpdatedType);
+            var payloadJson = JsonNode.Parse(inputs);
+            ParseFormSubmission(payloadJson);
+
+            var searchInfoParameters = GetSearchInfoParameters();
+
+            var searchInfo = GetSearchInfo(searchInfoParameters);
+            if (searchInfo.Result != ResultType.Success)
+            {
+                _mediator.SetLoadingState(false, _searchUpdatedType);
+                var errorMessage = string.Format(CultureInfo.CurrentCulture, "{0}", searchInfo.ErrorMessage);
+                ToastHelper.ShowErrorToast(errorMessage);
+                return CommandResult.KeepOpen();
+            }
+
+            var search = CreateSearchFromSearchInfo(searchInfo);
+
+            _saveSearchCommand.SetSearchToSave(search);
+            if (SavedSearch != null)
+            {
+                _saveSearchCommand.SetSavedSearch(SavedSearch);
+            }
+
+            return _saveSearchCommand.Invoke();
+        }
+        catch (Exception ex)
+        {
+            _mediator.AddSearch(null, ex);
             _mediator.SetLoadingState(false, _searchUpdatedType);
-            var errorMessage = string.Format(CultureInfo.CurrentCulture, "{0}", searchInfo.ErrorMessage);
+            var errorMessage = string.Format(CultureInfo.CurrentCulture, GetErrorMessageForSearchType(_searchInfoType), ex.Message);
             ToastHelper.ShowErrorToast(errorMessage);
             return CommandResult.KeepOpen();
         }
-
-        var search = CreateSearchFromSearchInfo(searchInfo);
-
-        _saveSearchCommand.SetSearchToSave(search);
-        if (SavedSearch != null)
-        {
-            _saveSearchCommand.SetSavedSearch(SavedSearch);
-        }
-
-        return _saveSearchCommand.Invoke();
     }
 
     protected abstract SearchInfoParameters GetSearchInfoParameters();
@@ -99,6 +112,17 @@ public abstract class SaveSearchForm<TSearch> : FormContent
             DefinitionInfoParameters defParams when defParams.DefinitionId > 0 =>
                 _azureClientHelpers.GetInfo(defParams.Url, account, defParams.InfoType, defParams.DefinitionId).Result,
                 _ => _azureClientHelpers.GetInfo(parameters.Url, account, parameters.InfoType).Result,
+        };
+    }
+
+    private string GetErrorMessageForSearchType(InfoType infoType)
+    {
+        return infoType switch
+        {
+            InfoType.Query => SavedSearch != null ? _resources.GetResource("Pages_Query_Edited_Failed") : _resources.GetResource("Message_Query_Saved_Error"),
+            InfoType.Repository => SavedSearch != null ? _resources.GetResource("Pages_EditPullRequestSearch_FailureMessage") : _resources.GetResource("Pages_SavePullRequestSearch_FailureMessage"),
+            InfoType.Definition => SavedSearch != null ? _resources.GetResource("Pages_EditPipelineSearch_FailureMessage") : _resources.GetResource("Pages_SavePipelineSearch_FailureMessage"),
+            _ => string.Empty,
         };
     }
 

@@ -621,10 +621,6 @@
     <value>"{0}" query edited successfully!</value>
     <comment>Message displayed when a query with name {0} has been successfully edited.</comment>
   </data>
-  <data name="Pages_EditQuery_FailureMessage" xml:space="preserve">
-    <value>Editing query failed:</value>
-    <comment>Message displayed there's a failure in query editing.</comment>
-  </data>
   <data name="Pages_Search_ErrorMessage" xml:space="preserve">
     <value>An error occurred</value>
     <comment>The message displayed if one of the search pages fails to return items</comment>

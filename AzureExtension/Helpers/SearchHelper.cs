@@ -30,6 +30,25 @@ public static class SearchHelper
         return SearchUpdatedType.Unknown;
     }
 
+    public static InfoType GetSearchInfoType<TSearch>()
+        where TSearch : IAzureSearch
+    {
+        if (typeof(TSearch) == typeof(IQuerySearch))
+        {
+            return InfoType.Query;
+        }
+        else if (typeof(TSearch) == typeof(IPullRequestSearch))
+        {
+            return InfoType.Repository;
+        }
+        else if (typeof(TSearch) == typeof(IPipelineDefinitionSearch))
+        {
+            return InfoType.Definition;
+        }
+
+        return InfoType.Unknown;
+    }
+
     public static SearchUpdatedType GetSearchUpdatedType<TSearch>()
     where TSearch : IAzureSearch
     {
