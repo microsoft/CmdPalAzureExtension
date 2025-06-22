@@ -102,24 +102,6 @@ public class SearchPageFactory : ISearchPageFactory
         }
     }
 
-    private Type GetAzureSearchType(IAzureSearch search)
-    {
-        if (search is IQuerySearch)
-        {
-            return typeof(IQuerySearch);
-        }
-        else if (search is IPullRequestSearch)
-        {
-            return typeof(IPullRequestSearch);
-        }
-        else if (search is IPipelineDefinitionSearch)
-        {
-            return typeof(IPipelineDefinitionSearch);
-        }
-
-        throw new NotImplementedException($"No type for search {search.GetType()}");
-    }
-
     public IListItem CreateItemForSearch(IAzureSearch search)
     {
         if (search is IPipelineDefinitionSearch)
@@ -127,7 +109,7 @@ public class SearchPageFactory : ISearchPageFactory
             return CreateItemForDefinitionSearch((IPipelineDefinitionSearch)search);
         }
 
-        IAzureSearchRepository azureSearchRepository = _azureSearchRepositories[GetAzureSearchType(search)];
+        IAzureSearchRepository azureSearchRepository = _azureSearchRepositories[SearchHelper.GetAzureSearchType(search)];
         var removeCommandSuccessMessage = search is IQuerySearch
             ? _resources.GetResource("Message_Query_Removed")
             : search is IPullRequestSearch
@@ -148,7 +130,15 @@ public class SearchPageFactory : ISearchPageFactory
             {
                 new(new LinkCommand(search.Url, _resources, null)),
                 new(CreateEditPageForSearch(search)),
-                new(new RemoveCommand(search, _resources, _mediator, azureSearchRepository, removeCommandSuccessMessage, removeCommandFailureMessage)),
+                new(new RemoveCommand(
+                    search,
+                    _resources,
+                    _mediator,
+                    azureSearchRepository,
+                    removeCommandSuccessMessage,
+                    removeCommandFailureMessage,
+                    _azureClientHelpers,
+                    _accountProvider)),
             },
         };
     }
@@ -168,7 +158,15 @@ public class SearchPageFactory : ISearchPageFactory
                 {
                     new(new LinkCommand(definition.HtmlUrl, _resources, _resources.GetResource("Pages_PipelineSearch_LinkCommandName"))),
                     new(CreateEditPageForSearch(search)),
-                    new(new RemoveCommand(search, _resources, _mediator, azureSearchRepository, _resources.GetResource("Message_RemovePipeline_Success"), _resources.GetResource("Messages_RemovePipeline_Failure"))),
+                    new(new RemoveCommand(
+                        search,
+                        _resources,
+                        _mediator,
+                        azureSearchRepository,
+                        _resources.GetResource("Message_RemovePipeline_Success"),
+                        _resources.GetResource("Messages_RemovePipeline_Failure"),
+                        _azureClientHelpers,
+                        _accountProvider)),
                 },
                 Tags = new ITag[]
                 {
@@ -203,7 +201,15 @@ public class SearchPageFactory : ISearchPageFactory
                 {
                     new(new LinkCommand(definition.HtmlUrl, _resources, _resources.GetResource("Pages_PipelineSearch_LinkCommandName"))),
                     new(CreateEditPageForSearch(search)),
-                    new(new RemoveCommand(search, _resources, _mediator, azureSearchRepository, _resources.GetResource("Message_RemovePipeline_Success"), _resources.GetResource("Messages_RemovePipeline_Failure"))),
+                    new(new RemoveCommand(
+                        search,
+                        _resources,
+                        _mediator,
+                        azureSearchRepository,
+                        _resources.GetResource("Message_RemovePipeline_Success"),
+                        _resources.GetResource("Messages_RemovePipeline_Failure"),
+                        _azureClientHelpers,
+                        _accountProvider)),
                 },
             };
         }

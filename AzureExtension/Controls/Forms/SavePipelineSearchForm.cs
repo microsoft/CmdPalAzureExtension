@@ -63,6 +63,7 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
             InternalId = definitionId,
             Url = uri.ToString(),
             IsTopLevel = _isNewSearchTopLevel,
+            Name = searchInfo.Name,
         };
     }
 

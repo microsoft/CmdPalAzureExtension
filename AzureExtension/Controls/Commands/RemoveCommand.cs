@@ -3,8 +3,11 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
+using AzureExtension.Account;
+using AzureExtension.Client;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Microsoft.Identity.Client;
 
 namespace AzureExtension.Controls.Commands;
 
@@ -14,10 +17,20 @@ public partial class RemoveCommand : InvokableCommand
     private readonly IResources _resources;
     private readonly SavedAzureSearchesMediator _savedAzureSearchesMediator;
     private readonly IAzureSearchRepository _azureSearchRepository;
+    private readonly IAccountProvider _accountProvider;
     private readonly string _successMessage;
     private readonly string _failureMessage;
+    private readonly AzureClientHelpers _azureClientHelpers;
 
-    public RemoveCommand(IAzureSearch azureSearch, IResources resources, SavedAzureSearchesMediator savedAzureSearchesMediator, IAzureSearchRepository azureSearchRepository, string successMessage, string failureMessage)
+    public RemoveCommand(
+        IAzureSearch azureSearch,
+        IResources resources,
+        SavedAzureSearchesMediator savedAzureSearchesMediator,
+        IAzureSearchRepository azureSearchRepository,
+        string successMessage,
+        string failureMessage,
+        AzureClientHelpers azureClientHelpers,
+        IAccountProvider accountProvider)
     {
         _resources = resources;
         _savedAzureSearchesMediator = savedAzureSearchesMediator;
@@ -27,6 +40,8 @@ public partial class RemoveCommand : InvokableCommand
         Icon = IconLoader.GetIcon("Remove");
         _successMessage = successMessage;
         _failureMessage = failureMessage;
+        _azureClientHelpers = azureClientHelpers;
+        _accountProvider = accountProvider;
     }
 
     public override CommandResult Invoke()
@@ -35,7 +50,14 @@ public partial class RemoveCommand : InvokableCommand
         {
             _azureSearchRepository.Remove(_savedAzureSearch);
             _savedAzureSearchesMediator.Remove(_savedAzureSearch);
-            ToastHelper.ShowSuccessToast(string.Format(CultureInfo.CurrentCulture, _successMessage, _savedAzureSearch.Name));
+            var name = string.Empty;
+
+            if (_savedAzureSearch is IPipelineDefinitionSearch pipelineSearch)
+            {
+                name = SearchHelper.GetPipelineSearchName(pipelineSearch, _azureClientHelpers, _accountProvider);
+            }
+
+            ToastHelper.ShowSuccessToast(string.Format(CultureInfo.CurrentCulture, _successMessage, string.IsNullOrWhiteSpace(name) ? _savedAzureSearch.Name : name));
         }
         catch (Exception ex)
         {
