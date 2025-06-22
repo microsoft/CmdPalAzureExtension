@@ -8,7 +8,6 @@ using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.DataTransfer;
 using AzureExtension.Helpers;
-using Serilog;
 
 namespace AzureExtension.Controls.Forms;
 

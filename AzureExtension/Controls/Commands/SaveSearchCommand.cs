@@ -4,7 +4,6 @@
 
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
-using Serilog;
 
 namespace AzureExtension.Controls.Commands;
 

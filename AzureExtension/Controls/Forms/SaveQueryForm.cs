@@ -7,14 +7,12 @@ using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
-using Serilog;
 
 namespace AzureExtension.Controls.Forms;
 
 public sealed partial class SaveQueryForm : SaveSearchForm<IQuerySearch>
 {
     private readonly IResources _resources;
-    private readonly ILogger _logger;
     private bool _isNewSearchTopLevel;
     private string _searchUrl = string.Empty;
 
@@ -43,8 +41,6 @@ public sealed partial class SaveQueryForm : SaveSearchForm<IQuerySearch>
     {
         _resources = resources;
         TemplateKey = "SaveQuery";
-        _logger = Log.Logger.ForContext("SourceContext", nameof(SaveQueryForm));
-        _logger.Information($"SaveQueryForm: Initialized with saved query: {savedQuery?.Name ?? "null"} SavedSearch: {SavedSearch}");
     }
 
     protected override void ParseFormSubmission(JsonNode? jsonNode)
@@ -60,7 +56,6 @@ public sealed partial class SaveQueryForm : SaveSearchForm<IQuerySearch>
 
     protected override SearchInfoParameters GetSearchInfoParameters()
     {
-        _logger.Information($"SaveQueryForm: GetSearchInfoParameters with URL {_searchUrl}");
         return new DefaultSearchInfoParameters(_searchUrl, InfoType.Query);
     }
 }
