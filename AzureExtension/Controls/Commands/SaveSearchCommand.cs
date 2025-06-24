@@ -80,8 +80,9 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
                 _savedSearch = _searchToSave;
             }
 
+            var successMessage = editing ? _editSuccessMessage : _saveSuccessMessage;
             _mediator.SetLoadingState(false, _searchUpdatedType);
-            ToastHelper.ShowSuccessToast(editing ? _editSuccessMessage : _saveSuccessMessage);
+            ToastHelper.ShowSuccessToast(string.Format(CultureInfo.CurrentCulture, successMessage, _searchToSave.Name));
 
             return CommandResult.KeepOpen();
         }
