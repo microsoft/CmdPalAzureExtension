@@ -11,6 +11,7 @@ public enum ErrorType
     InvalidArgument,
     EmptyUri,
     InvalidQueryUri,
+    TemporaryQueryUriNotSupported,
     InvalidRepositoryUri,
     InvalidDefinitionUri,
     InvalidUri,

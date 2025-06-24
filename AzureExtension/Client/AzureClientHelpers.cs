@@ -97,7 +97,12 @@ public class AzureClientHelpers
             return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidUri);
         }
 
-        if (infoType == InfoType.Query && !azureUri.Uri.AbsoluteUri.Contains("_queries/query"))
+        if (infoType == InfoType.Query && azureUri.IsTempQuery)
+        {
+            return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.TemporaryQueryUriNotSupported);
+        }
+
+        if (infoType == InfoType.Query && !azureUri.IsQuery)
         {
             return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidQueryUri);
         }
