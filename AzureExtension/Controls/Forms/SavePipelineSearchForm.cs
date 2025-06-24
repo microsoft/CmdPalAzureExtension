@@ -5,16 +5,19 @@
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.DataTransfer;
 using AzureExtension.Helpers;
 
 namespace AzureExtension.Controls.Forms;
 
-public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
+public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
 {
     private readonly IResources _resources;
-    private readonly AzureClientHelpers _azureClientHelpers;
-    private readonly IAccountProvider _accountProvider;
+
+    private string _definitionUrl = string.Empty;
+
+    private bool _isNewSearchTopLevel;
 
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
@@ -28,43 +31,38 @@ public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
         { "{{SavePipelineSearchActionTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateSavePipelineSearchActionTitle") },
     };
 
+    // Creates a DefinitionSearch based on a URL in the following format
+    // https://dev.azure.com/microsoft/project/_build?definitionId=definitionId
     public SavePipelineSearchForm(
         IPipelineDefinitionSearch? definitionSearch,
         IResources resources,
         ISavedSearchesUpdater<IPipelineDefinitionSearch> definitionRepository,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
-        AzureClientHelpers azureClientHelpers)
-        : base(definitionSearch, definitionRepository, mediator, accountProvider)
+        AzureClientHelpers azureClientHelpers,
+        SaveSearchCommand<IPipelineDefinitionSearch> saveSearchCommand)
+        : base(definitionSearch, definitionRepository, mediator, accountProvider, saveSearchCommand, resources, azureClientHelpers)
     {
         _resources = resources;
-        _azureClientHelpers = azureClientHelpers;
-        _accountProvider = accountProvider;
         TemplateKey = "SavePipelineSearch";
     }
 
-    // Creates a DefinitionSearch based on a URL in the following format
-    // https://dev.azure.com/microsoft/project/_build?definitionId=definitionId
-    protected override IPipelineDefinitionSearch CreateSearchFromJson(JsonNode jsonNode)
+    protected override void ParseFormSubmission(JsonNode? jsonNode)
     {
-        var definitionUrl = jsonNode?["EnteredPipelineSearch"]?.ToString() ?? string.Empty;
-        var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
+        _definitionUrl = jsonNode?["EnteredPipelineSearch"]?.ToString() ?? string.Empty;
+        _isNewSearchTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
+    }
 
-        var account = _accountProvider.GetDefaultAccount();
-        var definitionId = ParseDefinitionIdFromUrl(definitionUrl);
-        var definitionInfo = _azureClientHelpers.GetInfo(new AzureUri(definitionUrl), account, InfoType.Definition, definitionId).Result;
+    protected override IPipelineDefinitionSearch CreateSearchFromSearchInfo(InfoResult searchInfo)
+    {
+        var definitionId = ParseDefinitionIdFromUrl(_definitionUrl);
 
-        if (definitionInfo.Result != ResultType.Success)
-        {
-            throw new InvalidOperationException($"Failed to get pipeline search info {definitionInfo.Error}: {definitionInfo.ErrorMessage}");
-        }
-
-        var uri = definitionInfo.AzureUri;
+        var uri = searchInfo.AzureUri;
         return new PipelineDefinitionSearchCandidate
         {
             InternalId = definitionId,
             Url = uri.ToString(),
-            IsTopLevel = isTopLevel,
+            IsTopLevel = _isNewSearchTopLevel,
         };
     }
 
@@ -92,5 +90,10 @@ public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
         {
             throw new InvalidOperationException("Failed to parse definitionId from the URL.", ex);
         }
+    }
+
+    protected override SearchInfoParameters GetSearchInfoParameters()
+    {
+        return new DefinitionInfoParameters(_definitionUrl, ParseDefinitionIdFromUrl(_definitionUrl));
     }
 }

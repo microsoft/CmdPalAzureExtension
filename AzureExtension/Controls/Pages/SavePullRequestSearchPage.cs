@@ -9,30 +9,56 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public class SavePullRequestSearchPage : ContentPage
+public sealed partial class SavePullRequestSearchPage : ContentPage, IDisposable
 {
-    private readonly StatusMessage _statusMessage;
-
     private readonly SavePullRequestSearchForm _savePullRequestSearchForm;
-
     private readonly IResources _resources;
+    private readonly SavedAzureSearchesMediator _mediator;
 
-    public SavePullRequestSearchPage(SavePullRequestSearchForm savePullRequestSearchForm, StatusMessage statusMessage, IResources resources)
+    public SavePullRequestSearchPage(SavePullRequestSearchForm savePullRequestSearchForm, IResources resources, SavedAzureSearchesMediator mediator)
     {
-        _resources = resources;
-        Title = _resources.GetResource("Pages_SavePullRequestSearch_Title");
-        Icon = IconLoader.GetIcon("Add");
         _savePullRequestSearchForm = savePullRequestSearchForm;
-        _statusMessage = statusMessage;
+        _resources = resources;
+        _mediator = mediator;
 
-        FormEventHelper.WireFormEvents(_savePullRequestSearchForm, this, _statusMessage, _resources.GetResource("Pages_SavePullRequestSearch_SuccessMessage"), _resources.GetResource("Pages_SavePullRequestSearch_FailureMessage"));
+        Title = _savePullRequestSearchForm.IsEditing
+            ? _resources.GetResource("Pages_EditPullRequestSearch")
+            : _resources.GetResource("Pages_SavePullRequestSearch_Title");
+        Icon = IconLoader.GetIcon(_savePullRequestSearchForm.IsEditing ? "Edit" : "Add");
+        Name = Title; // Name is for commands, title is for the page
 
-        ExtensionHost.HideStatus(_statusMessage);
+        _mediator.LoadingStateChanged += OnLoadingStateChanged;
     }
 
     public override IContent[] GetContent()
     {
-        ExtensionHost.HideStatus(_statusMessage);
         return [_savePullRequestSearchForm];
+    }
+
+    private void OnLoadingStateChanged(object? sender, SearchSetLoadingStateArgs args)
+    {
+        IsLoading = args.IsLoading && args.SearchType == SearchUpdatedType.PullRequest;
+    }
+
+    // disposing area
+    private bool _disposed;
+
+    private void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _mediator.LoadingStateChanged -= OnLoadingStateChanged;
+            }
+
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

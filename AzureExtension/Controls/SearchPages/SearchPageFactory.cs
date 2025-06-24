@@ -39,7 +39,10 @@ public class SearchPageFactory : ISearchPageFactory
         ILiveContentDataProvider<IWorkItem> workItemProvider,
         ILiveContentDataProvider<IPullRequest> pullRequestProvider,
         ILiveContentDataProvider<IBuild> buildProvider,
-        ILiveSearchDataProvider<IDefinition> definitionProvider)
+        ILiveSearchDataProvider<IDefinition> definitionProvider,
+        SaveSearchCommand<IQuerySearch> saveQuerySearchCommand,
+        SaveSearchCommand<IPullRequestSearch> savePullRequestSearchCommand,
+        SaveSearchCommand<IPipelineDefinitionSearch> savePipelineSearchCommand)
     {
         _resources = resources;
         _mediator = mediator;
@@ -77,21 +80,21 @@ public class SearchPageFactory : ISearchPageFactory
     {
         if (search is IQuerySearch)
         {
-            var saveQueryForm = new SaveQueryForm((IQuerySearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _queryUpdater);
-            var statusMessage = new StatusMessage();
-            return new EditQueryPage(_resources, saveQueryForm, statusMessage);
+            var saveQuerySearchCommand = new SaveSearchCommand<IQuerySearch>(_queryUpdater, _mediator, (IQuerySearch)search, _resources.GetResource("Message_Query_Saved"), _resources.GetResource("Message_Query_Saved_Error"), _resources.GetResource("Pages_EditQuery_SuccessMessage"), _resources.GetResource("Pages_EditQuery_FailureMessage"));
+            var saveQueryForm = new SaveQueryForm((IQuerySearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _queryUpdater, saveQuerySearchCommand);
+            return new SaveQueryPage(saveQueryForm, _resources, _mediator);
         }
         else if (search is IPullRequestSearch)
         {
-            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _savedPullRequestSearchUpdater);
-            var statusMessage = new StatusMessage();
-            return new EditPullRequestSearchPage(_resources, savePullRequestSearchForm, statusMessage);
+            var savePullRequestSearchCommand = new SaveSearchCommand<IPullRequestSearch>(_savedPullRequestSearchUpdater, _mediator, (IPullRequestSearch)search, _resources.GetResource("Pages_SavePullRequestSearch_SuccessMessage"), _resources.GetResource("Pages_SavePullRequestSearch_FailureMessage"), _resources.GetResource("Pages_EditPullRequestSearch_SuccessMessage"), _resources.GetResource("Pages_EditPullRequestSearch_FailureMessage"));
+            var savePullRequestSearchForm = new SavePullRequestSearchForm((IPullRequestSearch)search, _resources, _mediator, _accountProvider, _azureClientHelpers, _savedPullRequestSearchUpdater, savePullRequestSearchCommand);
+            return new SavePullRequestSearchPage(savePullRequestSearchForm, _resources, _mediator);
         }
         else if (search is IPipelineDefinitionSearch)
         {
-            var savePipelineSearchForm = new SavePipelineSearchForm((IPipelineDefinitionSearch)search, _resources, _definitionUpdater, _mediator, _accountProvider, _azureClientHelpers);
-            var statusMessage = new StatusMessage();
-            return new EditPipelineSearchPage(_resources, savePipelineSearchForm, statusMessage);
+            var savePipelineSearchCommand = new SaveSearchCommand<IPipelineDefinitionSearch>(_definitionUpdater, _mediator, (IPipelineDefinitionSearch)search, _resources.GetResource("Pages_SavePipelineSearch_SuccessMessage"), _resources.GetResource("Pages_SavePipelineSearch_FailureMessage"), _resources.GetResource("Pages_EditPipelineSearch_SuccessMessage"), _resources.GetResource("Pages_EditPipelineSearch_FailureMessage"));
+            var savePipelineSearchForm = new SavePipelineSearchForm((IPipelineDefinitionSearch)search, _resources, _definitionUpdater, _mediator, _accountProvider, _azureClientHelpers, savePipelineSearchCommand);
+            return new SavePipelineSearchPage(savePipelineSearchForm, _resources, _mediator);
         }
         else
         {
