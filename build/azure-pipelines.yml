@@ -125,6 +125,24 @@ extends:
                   inputs:
                     filePath: './build/scripts/SetupBuildInfo.ps1'
                     arguments: -Version $(MSIXVersion) -IsAzurePipelineBuild
+                    
+                - task: DeleteFiles@1
+                  displayName: 'Delete existing stubbed TelemetryEventSources.cs'
+                  inputs:
+                    Contents: '$(System.DefaultWorkingDirectory)\AzureExtension\Telemetry\TelemetryEventSource.cs'
+
+                - task: PkgESGitFetch@10
+                  displayName: 'Fetch TelemetryEventSource.cs from OS repo'
+                  inputs:
+                    repository: 'https://microsoft.visualstudio.com/os/_git/os.2020'
+                    branch: official/main
+                    source: 'minkernel\published\internal\telemetry\TelemetryEventSource.cs'
+                    destination: '$(System.DefaultWorkingDirectory)\AzureExtension\Telemetry\'
+
+                - task: PowerShell@2
+                  displayName: Adding header to TelemetryEventSource.cs
+                  inputs:
+                    filePath: './build/scripts/AddHeaderToTelemetryFile.ps1'
 
                 - task: PowerShell@2
                   displayName: Building MSIX
