@@ -10,6 +10,7 @@ using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Serilog;
 
 namespace AzureExtension.Controls.Forms;
 
@@ -23,6 +24,7 @@ public abstract class SaveSearchForm<TSearch> : FormContent
     private readonly IResources _resources;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly ILogger _logger = Log.Logger.ForContext("SourceContext", nameof(SaveSearchForm<TSearch>));
     private SearchUpdatedType _searchUpdatedType = SearchUpdatedType.Unknown;
     private InfoType _searchInfoType = InfoType.Unknown;
 
@@ -56,6 +58,7 @@ public abstract class SaveSearchForm<TSearch> : FormContent
         _azureClientHelpers = azureClientHelpers;
         _searchUpdatedType = SearchHelper.GetSearchUpdatedType<TSearch>();
         _searchInfoType = SearchHelper.GetSearchInfoType<TSearch>();
+        _logger.Information("SaveSearchForm initialized with search type: {SearchUpdatedType}", _searchUpdatedType);
     }
 
     public override ICommandResult SubmitForm(string inputs, string data)
@@ -67,8 +70,10 @@ public abstract class SaveSearchForm<TSearch> : FormContent
             ParseFormSubmission(payloadJson);
 
             var searchInfoParameters = GetSearchInfoParameters();
+            _logger.Information("Getting search info with parameters: {@SearchInfoParameters}", searchInfoParameters);
 
             var searchInfo = GetSearchInfo(searchInfoParameters);
+            _logger.Information("Search info retrieved: {@SearchInfo}", searchInfo);
             if (searchInfo.Result != ResultType.Success)
             {
                 _mediator.SetLoadingState(false, _searchUpdatedType);
@@ -80,6 +85,7 @@ public abstract class SaveSearchForm<TSearch> : FormContent
             var search = CreateSearchFromSearchInfo(searchInfo);
 
             _saveSearchCommand.SetSearchToSave(search);
+            _logger.Information("Search to save set: {@SearchToSave}", search);
             if (SavedSearch != null)
             {
                 _saveSearchCommand.SetSavedSearch(SavedSearch);

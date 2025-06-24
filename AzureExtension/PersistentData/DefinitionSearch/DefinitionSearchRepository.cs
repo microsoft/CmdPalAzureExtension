@@ -2,12 +2,9 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Account;
-using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataManager;
-using AzureExtension.DataModel;
 using Microsoft.Identity.Client;
 using Serilog;
 
