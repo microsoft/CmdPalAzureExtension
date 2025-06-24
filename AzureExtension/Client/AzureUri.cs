@@ -43,6 +43,8 @@ public class AzureUri
 
     private readonly Lazy<string> _query;
 
+    private readonly Lazy<bool> _isDefinition;
+
     private readonly Lazy<Uri> _connection;
 
     /// <summary>
@@ -99,6 +101,8 @@ public class AzureUri
 
     public Uri OrganizationLink => _organizationLink.Value;
 
+    public bool IsDefinition => _isDefinition.Value;
+
     // If an invalid input or Uri was passed in (null, empty string, etc), the object
     // is still valid, but the Uri will be DefaultUriString, not the original input,
     // so in the event of an invalid input ToString() will show the original input or
@@ -153,6 +157,7 @@ public class AzureUri
         _isQuery = new Lazy<bool>(InitializeIsQuery);
         _isTempQuery = new Lazy<bool>(InitializeIsTempQuery);
         _query = new Lazy<string>(InitializeQuery);
+        _isDefinition = new Lazy<bool>(InitializeIsDefinition);
         _connection = new Lazy<Uri>(InitializeConnection);
         _organizationLink = new Lazy<Uri>(InitializeOrganizationLink);
     }
@@ -514,7 +519,51 @@ public class AzureUri
 
         if (!Guid.TryParse(tempQueryId, out _))
         {
-            _log.Error($"InitializeIsTempQuery called on a Uri with an invalid tempQueryId (needs to be a     private bool InitializeIsTempQuery()\r\n    {{\r\n        if (!IsValid)\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        if (!APISegment.Equals(\"_queries\", StringComparison.OrdinalIgnoreCase))\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        if (string.IsNullOrEmpty(Project))\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        if (Uri.Segments.Length <= APISegmentIndex + 1)\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        var apiSubtype = Uri.Segments[APISegmentIndex + 1].Replace(\"/\", string.Empty);\r\n        if (!apiSubtype.Equals(\"query\", StringComparison.OrdinalIgnoreCase))\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        if (Uri.Segments.Length > APISegmentIndex + 2)\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        // The query string must contain a tempQueryId parameter with a valid GUID\r\n        var queryParams = System.Web.HttpUtility.ParseQueryString(Uri.Query);\r\n        var tempQueryId = queryParams[\"tempQueryId\"];\r\n        if (string.IsNullOrEmpty(tempQueryId))\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        if (!Guid.TryParse(tempQueryId, out _))\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        return true;\r\n    }}GUID): {Uri}");
+            _log.Error($"InitializeIsTempQuery called on a Uri with an invalid tempQueryId {Uri}");
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool InitializeIsDefinition()
+    {
+        if (!IsValid)
+        {
+            return false;
+        }
+
+        if (!Uri.Host.Equals("dev.azure.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(Project))
+        {
+            return false;
+        }
+
+        if (!APISegment.Equals("_build", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        // There should be no additional path segments after _build
+        if (Uri.Segments.Length != APISegmentIndex + 1)
+        {
+            return false;
+        }
+
+        // The query string must contain a definitionId parameter with a valid integer
+        var queryParams = System.Web.HttpUtility.ParseQueryString(Uri.Query);
+        var definitionId = queryParams["definitionId"];
+        if (string.IsNullOrEmpty(definitionId))
+        {
+            return false;
+        }
+
+        if (!int.TryParse(definitionId, out _))
+        {
             return false;
         }
 

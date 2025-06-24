@@ -107,12 +107,12 @@ public class AzureClientHelpers
             return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidQueryUri);
         }
 
-        if (infoType == InfoType.Repository && !azureUri.Uri.AbsoluteUri.Contains("_git/"))
+        if (infoType == InfoType.Repository && !azureUri.IsRepository)
         {
             return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidRepositoryUri);
         }
 
-        if (infoType == InfoType.Definition && !azureUri.Uri.AbsoluteUri.Contains("_build?definitionId=") && definitionId == null)
+        if (infoType == InfoType.Definition && (!azureUri.IsDefinition || definitionId == null))
         {
             return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidDefinitionUri);
         }
