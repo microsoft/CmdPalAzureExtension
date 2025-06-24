@@ -58,6 +58,13 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
 
         try
         {
+            // Validate that the search to save is not null
+            // The forms should ensure this, but this is a safeguard
+            if (_searchToSave == null)
+            {
+                throw new InvalidOperationException("The search to save cannot be null.");
+            }
+
             // If editing the search, delete the old one
             if (editing)
             {
