@@ -42,26 +42,22 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
         _editSuccessMessage = editSuccessMessage;
         _editFailureMessage = editFailureMessage;
         _searchUpdatedType = SearchHelper.GetSearchUpdatedType<TSearch>();
-        _logger.Information("SaveSearchCommand initialized with search type: {SearchUpdatedType}", _searchUpdatedType);
     }
 
     public void SetSavedSearch(TSearch savedSearch)
     {
         _savedSearch = savedSearch;
-        _logger.Information("SetSavedSearch called with search: {SearchName}", savedSearch.Name);
     }
 
     public void SetSearchToSave(TSearch search)
     {
         _searchToSave = search;
-        _logger.Information("SetSearchToSave called with search: {SearchName}", search.Name);
     }
 
     public override CommandResult Invoke()
     {
         var editing = !string.IsNullOrEmpty(_savedSearch?.Url);
         _mediator.SetLoadingState(true, _searchUpdatedType);
-        _logger.Information("Invoke called. Editing: {Editing}, SearchToSave: {SearchToSaveName}", editing, _searchToSave?.Name);
 
         try
         {
@@ -87,7 +83,7 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
             }
 
             var successMessage = editing ? _editSuccessMessage : _saveSuccessMessage;
-            _logger.Information($"successMessage: {successMessage}. _searchToSave.Name: {_searchToSave.Name}");
+            _logger.Information($"SaveSearchCommand succeeded. successMessage: {successMessage}. _searchToSave.Name: {_searchToSave.Name}");
             _mediator.SetLoadingState(false, _searchUpdatedType);
             ToastHelper.ShowSuccessToast(string.Format(CultureInfo.CurrentCulture, successMessage, _searchToSave.Name));
 
