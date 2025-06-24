@@ -5,7 +5,6 @@
 using AzureExtension.Account;
 using AzureExtension.Client;
 using AzureExtension.Controls;
-using AzureExtension.Controls.Forms;
 using Microsoft.Identity.Client;
 
 namespace AzureExtension.Helpers;
