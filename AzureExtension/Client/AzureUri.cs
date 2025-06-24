@@ -39,6 +39,8 @@ public class AzureUri
 
     private readonly Lazy<bool> _isQuery;
 
+    private readonly Lazy<bool> _isTempQuery;
+
     private readonly Lazy<string> _query;
 
     private readonly Lazy<Uri> _connection;
@@ -88,6 +90,8 @@ public class AzureUri
     public string Repository => _repository.Value;
 
     public bool IsQuery => _isQuery.Value;
+
+    public bool IsTempQuery => _isTempQuery.Value;
 
     public string Query => _query.Value;
 
@@ -147,6 +151,7 @@ public class AzureUri
         _isRepository = new Lazy<bool>(InitializeIsRepository);
         _repository = new Lazy<string>(InitializeRepository);
         _isQuery = new Lazy<bool>(InitializeIsQuery);
+        _isTempQuery = new Lazy<bool>(InitializeIsTempQuery);
         _query = new Lazy<string>(InitializeQuery);
         _connection = new Lazy<Uri>(InitializeConnection);
         _organizationLink = new Lazy<Uri>(InitializeOrganizationLink);
@@ -457,6 +462,63 @@ public class AzureUri
             _log.Error(e, $"InitializeQuery failed for Uri: {Uri}");
             return string.Empty;
         }
+    }
+
+    private bool InitializeIsTempQuery()
+    {
+        if (!IsValid)
+        {
+            _log.Error("InitializeIsTempQuery called on an invalid Uri.");
+            return false;
+        }
+
+        if (!APISegment.Equals("_queries", StringComparison.OrdinalIgnoreCase))
+        {
+            _log.Error($"InitializeIsTempQuery called on a Uri that is not a query: {Uri}");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(Project))
+        {
+            _log.Error($"InitializeIsTempQuery called on a Uri with no project: {Uri}");
+            return false;
+        }
+
+        if (Uri.Segments.Length <= APISegmentIndex + 1)
+        {
+            _log.Error($"InitializeIsTempQuery called on a Uri with no API subtype: {Uri}");
+            return false;
+        }
+
+        var apiSubtype = Uri.Segments[APISegmentIndex + 1].Replace("/", string.Empty);
+        if (!apiSubtype.Equals("query", StringComparison.OrdinalIgnoreCase))
+        {
+            _log.Error($"InitializeIsTempQuery called on a Uri with an API subtype that is not 'query': {Uri}");
+            return false;
+        }
+
+        if (Uri.Segments.Length > APISegmentIndex + 2)
+        {
+            // If there are more segments, it is not a temp query.
+            return false;
+        }
+
+        // The query string must contain a tempQueryId parameter with a valid GUID
+        var queryParams = System.Web.HttpUtility.ParseQueryString(Uri.Query);
+        var tempQueryId = queryParams["tempQueryId"];
+        if (string.IsNullOrEmpty(tempQueryId))
+        {
+            _log.Error($"InitializeIsTempQuery called on a Uri with no tempQueryId: {Uri}");
+            return false;
+        }
+
+        if (!Guid.TryParse(tempQueryId, out _))
+        {
+            _log.Error($"InitializeIsTempQuery called on a Uri with an invalid tempQueryId (needs to be a     private bool InitializeIsTempQuery()\r\n    {{\r\n        if (!IsValid)\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        if (!APISegment.Equals(\"_queries\", StringComparison.OrdinalIgnoreCase))\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        if (string.IsNullOrEmpty(Project))\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        if (Uri.Segments.Length <= APISegmentIndex + 1)\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        var apiSubtype = Uri.Segments[APISegmentIndex + 1].Replace(\"/\", string.Empty);\r\n        if (!apiSubtype.Equals(\"query\", StringComparison.OrdinalIgnoreCase))\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        if (Uri.Segments.Length > APISegmentIndex + 2)\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        // The query string must contain a tempQueryId parameter with a valid GUID\r\n        var queryParams = System.Web.HttpUtility.ParseQueryString(Uri.Query);\r\n        var tempQueryId = queryParams[\"tempQueryId\"];\r\n        if (string.IsNullOrEmpty(tempQueryId))\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        if (!Guid.TryParse(tempQueryId, out _))\r\n        {{\r\n            return false;\r\n        }}\r\n\r\n        return true;\r\n    }}GUID): {Uri}");
+            return false;
+        }
+
+        return true;
     }
 
     private Uri InitializeConnection()
