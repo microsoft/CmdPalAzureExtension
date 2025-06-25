@@ -2,12 +2,9 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using AzureExtension.Account;
-using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
 using AzureExtension.DataManager;
-using AzureExtension.DataModel;
 using Microsoft.Identity.Client;
 using Serilog;
 
@@ -69,7 +66,7 @@ public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefini
     {
         ValidateDataStore();
         ValidateDefinitionSearch(definitionSearch, account).Wait();
-        DefinitionSearch.AddOrUpdate(_dataStore, definitionSearch.InternalId, definitionSearch.Url, isTopLevel);
+        DefinitionSearch.AddOrUpdate(_dataStore, definitionSearch.InternalId, definitionSearch.Url, isTopLevel, definitionSearch.Name);
     }
 
     public void RemoveSavedSearch(IPipelineDefinitionSearch dataSearch)
@@ -89,8 +86,9 @@ public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefini
 
     public void AddOrUpdateSearch(IPipelineDefinitionSearch dataSearch, bool isTopLevel)
     {
+        _log.Information($"Adding or updating definition search: {dataSearch.InternalId} - {dataSearch.Url} - {dataSearch.Name!}.");
         ValidateDataStore();
-        DefinitionSearch.AddOrUpdate(_dataStore, dataSearch.InternalId, dataSearch.Url, isTopLevel);
+        DefinitionSearch.AddOrUpdate(_dataStore, dataSearch.InternalId, dataSearch.Url, isTopLevel, dataSearch.Name!);
     }
 
     public IEnumerable<IPipelineDefinitionSearch> GetSavedSearches()

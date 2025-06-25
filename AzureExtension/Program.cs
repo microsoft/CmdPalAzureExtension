@@ -16,7 +16,6 @@ using AzureExtension.DataModel;
 using AzureExtension.Helpers;
 using AzureExtension.PersistentData;
 using Microsoft.CommandPalette.Extensions;
-using Microsoft.CommandPalette.Extensions.Toolkit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Microsoft.Windows.AppLifecycle;
@@ -206,7 +205,7 @@ public sealed class Program
 
         // passing null for SavedSearch because there is no standard TSearch type
         var saveQuerySearchCommand = new SaveSearchCommand<IQuerySearch>(queryRepository, savedAzureSearchesMediator, null, resources.GetResource("Message_Query_Saved"), resources.GetResource("Message_Query_Saved_Error"), resources.GetResource("Pages_EditQuery_SuccessMessage"), resources.GetResource("Pages_EditQuery_FailureMessage"));
-        var savePullRequestSearchCommand = new SaveSearchCommand<IPullRequestSearch>(pullRequestSearchRepository, savedAzureSearchesMediator, null, resources.GetResource("Pages_SavePullRequestSearch_SuccessMessage"), resources.GetResource("Pages_SavePullRequestSearch_FailureMessage"), resources.GetResource("Pages_EditPullRequestSearch_SuccessMessage"), resources.GetResource("Pages_EditPullRequestSearch_FailureMessage"));
+        var savePullRequestSearchCommand = new SaveSearchCommand<IPullRequestSearch>(pullRequestSearchRepository, savedAzureSearchesMediator, null, resources.GetResource("Messages_PullRequestSearch_Saved"), resources.GetResource("Pages_SavePullRequestSearch_FailureMessage"), resources.GetResource("Pages_EditPullRequestSearch_SuccessMessage"), resources.GetResource("Pages_EditPullRequestSearch_FailureMessage"));
         var savePipelineSearchCommand = new SaveSearchCommand<IPipelineDefinitionSearch>(pipelineDefinitionRepository, savedAzureSearchesMediator, null, resources.GetResource("Pages_SavePipelineSearch_SuccessMessage"), resources.GetResource("Pages_SavePipelineSearch_FailureMessage"), resources.GetResource("Pages_EditPipelineSearch_SuccessMessage"), resources.GetResource("Pages_EditPipelineSearch_FailureMessage"));
 
         var searchPageFactory = new SearchPageFactory(

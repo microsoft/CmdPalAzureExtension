@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
@@ -53,9 +54,13 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
         _isNewSearchTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
     }
 
-    protected override IPipelineDefinitionSearch CreateSearchFromSearchInfo(InfoResult searchInfo)
+    protected override IPipelineDefinitionSearch? CreateSearchFromSearchInfo(InfoResult searchInfo)
     {
         var definitionId = ParseDefinitionIdFromUrl(_definitionUrl);
+        if (definitionId <= 0)
+        {
+            return null;
+        }
 
         var uri = searchInfo.AzureUri;
         return new PipelineDefinitionSearchCandidate
@@ -63,6 +68,7 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
             InternalId = definitionId,
             Url = uri.ToString(),
             IsTopLevel = _isNewSearchTopLevel,
+            Name = searchInfo.Name,
         };
     }
 
@@ -81,14 +87,16 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
 
             if (string.IsNullOrEmpty(definitionId) || !long.TryParse(definitionId, out var id))
             {
-                throw new InvalidOperationException("The URL does not contain a valid definitionId.");
+                SendErrorMessage("The URL does not contain a valid definitionId.", InfoType.Definition);
+                return -1;
             }
 
             return id;
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Failed to parse definitionId from the URL.", ex);
+            SendErrorMessage($"Failed to parse definitionId from the URL: {ex.Message}", InfoType.Definition);
+            return -1;
         }
     }
 

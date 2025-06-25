@@ -2,8 +2,10 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using AzureExtension.Helpers;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using Serilog;
 
 namespace AzureExtension.Controls.Commands;
 
@@ -18,6 +20,7 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
     private readonly string _saveFailureMessage = string.Empty;
     private readonly string _editSuccessMessage = string.Empty;
     private readonly string _editFailureMessage = string.Empty;
+    private readonly ILogger _logger = Log.Logger.ForContext("SourceContext", nameof(SaveSearchCommand<TSearch>));
     private TSearch? _searchToSave;
     private TSearch? _savedSearch;
     private SearchUpdatedType _searchUpdatedType = SearchUpdatedType.Unknown;
@@ -79,8 +82,10 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
                 _savedSearch = _searchToSave;
             }
 
+            var successMessage = editing ? _editSuccessMessage : _saveSuccessMessage;
+            _logger.Information($"SaveSearchCommand succeeded. successMessage: {successMessage}. _searchToSave.Name: {_searchToSave.Name}");
             _mediator.SetLoadingState(false, _searchUpdatedType);
-            ToastHelper.ShowSuccessToast(editing ? _editSuccessMessage : _saveSuccessMessage);
+            ToastHelper.ShowSuccessToast(string.Format(CultureInfo.CurrentCulture, successMessage, _searchToSave.Name));
 
             return CommandResult.KeepOpen();
         }
@@ -89,7 +94,8 @@ public class SaveSearchCommand<TSearch> : InvokableCommand
             _mediator.AddSearch(null, ex);
             _mediator.SetLoadingState(false, _searchUpdatedType);
             var errorMessage = editing ? _editFailureMessage : _saveFailureMessage;
-            ToastHelper.ShowErrorToast($"{errorMessage} {ex.Message}");
+            _logger.Error(ex, "Error during saving search: {SearchToSaveName}", _searchToSave?.Name);
+            ToastHelper.ShowErrorToast(string.Format(CultureInfo.CurrentCulture, errorMessage, _searchToSave?.Name, ex.Message));
             return CommandResult.KeepOpen();
         }
     }
