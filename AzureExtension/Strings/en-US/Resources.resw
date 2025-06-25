@@ -693,4 +693,8 @@
     <value>Unknown</value>
     <comment>The name inserted into error messages when the search name is not known</comment>
   </data>
+  <data name="Messages_CopyCommand_Success" xml:space="preserve">
+    <value>Copied!</value>
+    <comment>Message displayed to user when the copy command completes</comment>
+  </data>
 </root>

@@ -39,8 +39,8 @@ public sealed partial class PullRequestSearchPage : SearchPage<IPullRequest>
             Icon = IconLoader.GetIconForPullRequestStatus(item.PolicyStatus),
             MoreCommands = new CommandContextItem[]
             {
-                new(new CopyCommand(item.InternalId.ToStringInvariant(), _resources.GetResource("Pages_PullRequestSearchPage_CopyIdCommand"))),
-                new(new CopyCommand(item.HtmlUrl, _resources.GetResource("Pages_PullRequestSearchPage_CopyURLCommand"))),
+                new(new CopyCommand(item.InternalId.ToStringInvariant(), _resources.GetResource("Pages_PullRequestSearchPage_CopyIdCommand"), _resources)),
+                new(new CopyCommand(item.HtmlUrl, _resources.GetResource("Pages_PullRequestSearchPage_CopyURLCommand"), _resources)),
             },
             Details = new Details()
             {
