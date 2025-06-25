@@ -67,13 +67,10 @@ public abstract class SaveSearchForm<TSearch> : FormContent
             _mediator.SetLoadingState(true, _searchUpdatedType);
             var payloadJson = JsonNode.Parse(inputs);
             ParseFormSubmission(payloadJson);
-            _logger.Debug("Parsed payloadJson: {PayloadJson}", payloadJson);
 
             var searchInfoParameters = GetSearchInfoParameters();
-            _logger.Debug("SearchInfoParameters: {SearchInfoParameters}", searchInfoParameters);
 
             var searchInfo = GetSearchInfo(searchInfoParameters);
-            _logger.Debug("SearchInfo: {SearchInfo}", searchInfo);
             if (searchInfo.Result != ResultType.Success)
             {
                 _mediator.SetLoadingState(false, _searchUpdatedType);
@@ -83,12 +80,10 @@ public abstract class SaveSearchForm<TSearch> : FormContent
             }
 
             var search = CreateSearchFromSearchInfo(searchInfo);
-            _logger.Debug("Created search from search info: {Search}", search);
 
             _saveSearchCommand.SetSearchToSave(search);
             if (SavedSearch != null)
             {
-                _logger.Debug("Setting saved search for SaveSearchCommand: {SavedSearch}", SavedSearch);
                 _saveSearchCommand.SetSavedSearch(SavedSearch);
             }
 
