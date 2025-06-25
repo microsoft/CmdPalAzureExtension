@@ -577,14 +577,6 @@
     <value>Open link to all runs</value>
     <comment>Special name for the OpenLink command for the PipelineSearchPage</comment>
   </data>
-  <data name="Forms_SaveQuery_TemplateNameError" xml:space="preserve">
-    <value>A query name is required</value>
-    <comment>Shown if the user submits the SaveSearchForm without a name</comment>
-  </data>
-  <data name="Forms_SaveQuery_TemplateNameLabel" xml:space="preserve">
-    <value>Name</value>
-    <comment>Shown as the name for the saved query</comment>
-  </data>
   <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchTitlePlaceholder" xml:space="preserve">
     <value>My team's pull requests</value>
     <comment>A sample title for a pull request search</comment>
@@ -696,5 +688,17 @@
   <data name="Messages_CopyCommand_Success" xml:space="preserve">
     <value>Copied!</value>
     <comment>Message displayed to user when the copy command completes</comment>
+  </data>
+  <data name="Forms_SaveQuery_TemplateNameError" xml:space="preserve">
+    <value>A query name is required</value>
+    <comment>Shown if the user submits the SaveSearchForm without a name</comment>
+  </data>
+  <data name="Forms_SaveQuery_TemplateNameLabel" xml:space="preserve">
+    <value>Name</value>
+    <comment>Shown as the name for the saved query</comment>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_WorkItemId" xml:space="preserve">
+    <value>ID</value>
+    <comment>The label for the ID details on the WorkItemsSearchPage</comment>
   </data>
 </root>

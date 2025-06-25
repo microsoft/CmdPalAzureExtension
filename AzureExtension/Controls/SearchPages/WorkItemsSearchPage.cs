@@ -66,6 +66,11 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
                     },
                     new DetailsElement()
                     {
+                        Key = _resources.GetResource("Pages_WorkItemsSearchPage_WorkItemId"),
+                        Data = new DetailsLink() { Text = $"{item.InternalId}" },
+                    },
+                    new DetailsElement()
+                    {
                         Key = _resources.GetResource("Pages_WorkItemsSearchPage_CreatedDate"),
                         Data = new DetailsLink() { Text = $"{new DateTime(item.SystemCreatedDate)}" },
                     },
