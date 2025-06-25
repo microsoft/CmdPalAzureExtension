@@ -673,4 +673,24 @@
     <value>Error in removing query {0}: {1}</value>
     <comment>Error message when query of name {0} doesn't remove. {1} is the error message.</comment>
   </data>
+  <data name="Forms_SavePipelineSearch_PipelineDefinitionIdNullOrEmptyError" xml:space="preserve">
+    <value>A pipeline definition cannot be null or empty</value>
+    <comment>The message shown if the user enters pipeline URL with a null or empty definition ID</comment>
+  </data>
+  <data name="Forms_SavePipelineSearch_PipelineURLNullOrWhiteSpaceError" xml:space="preserve">
+    <value>A pipeline URL cannot be null or whitespace</value>
+    <comment>The error shown when a user enters a null or spaces-only pipeline URL</comment>
+  </data>
+  <data name="Forms_SavePipelineSearch_CannotParseDefinitionIdFromURLError" xml:space="preserve">
+    <value>Cannot parse out definition ID from pipeline URL. Ensure the URL matches the following format: https://dev.azure.com/organization/project/_build?definitionId=######, where # are digits between 0 and 9. </value>
+    <comment>The error message when the definition ID cannot be parsed from the user-entered pipeline URL</comment>
+  </data>
+  <data name="Forms_SavePipelineSearch_InvalidPipelineURLError" xml:space="preserve">
+    <value>An unexpected error occurred while parsing the pipeline URL: {0}</value>
+    <comment>A message shown if an exception is thrown while the SavePipelineSearchForm is parsing the user-entered pipeline search URL. {0} is the exception message.</comment>
+  </data>
+  <data name="Messages_UnknownName" xml:space="preserve">
+    <value>Unknown</value>
+    <comment>The name inserted into error messages when the search name is not known</comment>
+  </data>
 </root>

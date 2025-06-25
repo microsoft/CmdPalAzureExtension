@@ -24,6 +24,7 @@ public abstract class SaveSearchForm<TSearch> : FormContent
     private readonly IResources _resources;
     private readonly IAccountProvider _accountProvider;
     private readonly AzureClientHelpers _azureClientHelpers;
+    private readonly ILogger _logger = Log.Logger.ForContext("SourceContext", nameof(SaveSearchForm<TSearch>));
     private SearchUpdatedType _searchUpdatedType = SearchUpdatedType.Unknown;
     private InfoType _searchInfoType = InfoType.Unknown;
 
@@ -66,23 +67,28 @@ public abstract class SaveSearchForm<TSearch> : FormContent
             _mediator.SetLoadingState(true, _searchUpdatedType);
             var payloadJson = JsonNode.Parse(inputs);
             ParseFormSubmission(payloadJson);
+            _logger.Debug("Parsed payloadJson: {PayloadJson}", payloadJson);
 
             var searchInfoParameters = GetSearchInfoParameters();
+            _logger.Debug("SearchInfoParameters: {SearchInfoParameters}", searchInfoParameters);
 
             var searchInfo = GetSearchInfo(searchInfoParameters);
+            _logger.Debug("SearchInfo: {SearchInfo}", searchInfo);
             if (searchInfo.Result != ResultType.Success)
             {
                 _mediator.SetLoadingState(false, _searchUpdatedType);
-                var errorMessage = string.Format(CultureInfo.CurrentCulture, "{0}", searchInfo.ErrorMessage);
+                var errorMessage = string.Format(CultureInfo.CurrentCulture, GetErrorMessageForSearchType(_searchInfoType), !string.IsNullOrWhiteSpace(searchInfo.Name) ? searchInfo.Name : _resources.GetResource("Messages_UnknownName"), searchInfo.ErrorMessage);
                 ToastHelper.ShowErrorToast(errorMessage);
                 return CommandResult.KeepOpen();
             }
 
             var search = CreateSearchFromSearchInfo(searchInfo);
+            _logger.Debug("Created search from search info: {Search}", search);
 
             _saveSearchCommand.SetSearchToSave(search);
             if (SavedSearch != null)
             {
+                _logger.Debug("Setting saved search for SaveSearchCommand: {SavedSearch}", SavedSearch);
                 _saveSearchCommand.SetSavedSearch(SavedSearch);
             }
 
@@ -92,7 +98,8 @@ public abstract class SaveSearchForm<TSearch> : FormContent
         {
             _mediator.AddSearch(null, ex);
             _mediator.SetLoadingState(false, _searchUpdatedType);
-            var errorMessage = string.Format(CultureInfo.CurrentCulture, GetErrorMessageForSearchType(_searchInfoType), ex.Message);
+            _logger.Error(ex, "Error during form submission: {Message}", ex.Message);
+            var errorMessage = string.Format(CultureInfo.CurrentCulture, GetErrorMessageForSearchType(_searchInfoType), _resources.GetResource("Messages_UnknownName"), ex.Message);
             ToastHelper.ShowErrorToast(errorMessage);
             return CommandResult.KeepOpen();
         }
