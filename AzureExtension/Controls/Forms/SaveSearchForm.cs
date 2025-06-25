@@ -80,6 +80,12 @@ public abstract class SaveSearchForm<TSearch> : FormContent
             }
 
             var search = CreateSearchFromSearchInfo(searchInfo);
+            if (search == null)
+            {
+                // Subclasses handle error messaging
+                _mediator.SetLoadingState(false, _searchUpdatedType);
+                return CommandResult.KeepOpen();
+            }
 
             _saveSearchCommand.SetSearchToSave(search);
             if (SavedSearch != null)
@@ -94,15 +100,14 @@ public abstract class SaveSearchForm<TSearch> : FormContent
             _mediator.AddSearch(null, ex);
             _mediator.SetLoadingState(false, _searchUpdatedType);
             _logger.Error(ex, "Error during form submission: {Message}", ex.Message);
-            var errorMessage = string.Format(CultureInfo.CurrentCulture, GetErrorMessageForSearchType(_searchInfoType), _resources.GetResource("Messages_UnknownName"), ex.Message);
-            ToastHelper.ShowErrorToast(errorMessage);
+            SendErrorMessage(ex.Message);
             return CommandResult.KeepOpen();
         }
     }
 
     protected abstract SearchInfoParameters GetSearchInfoParameters();
 
-    protected abstract TSearch CreateSearchFromSearchInfo(InfoResult searchInfo);
+    protected abstract TSearch? CreateSearchFromSearchInfo(InfoResult searchInfo);
 
     protected abstract void ParseFormSubmission(JsonNode? jsonNode);
 
@@ -118,7 +123,7 @@ public abstract class SaveSearchForm<TSearch> : FormContent
         };
     }
 
-    private string GetErrorMessageForSearchType(InfoType infoType)
+    protected string GetErrorMessageForSearchType(InfoType infoType)
     {
         return infoType switch
         {
@@ -137,5 +142,10 @@ public abstract class SaveSearchForm<TSearch> : FormContent
         }
 
         return _savedSearchesUpdater.IsTopLevel(SavedSearch!);
+    }
+
+    protected void SendErrorMessage(string errorMessage)
+    {
+        ToastHelper.ShowErrorToast(string.Format(CultureInfo.CurrentCulture, GetErrorMessageForSearchType(InfoType.Definition), _resources.GetResource("Messages_UnknownName"), errorMessage));
     }
 }
