@@ -41,8 +41,8 @@ public partial class WorkItemsSearchPage : SearchPage<IWorkItem>
             Tags = new[] { GetStatusTag(item) },
             MoreCommands = new CommandContextItem[]
             {
-                new(new CopyCommand(item.InternalId.ToStringInvariant(), _resources.GetResource("Pages_WorkItemsSearchPage_CopyWorkItemId"))),
-                new(new CopyCommand(item.HtmlUrl, _resources.GetResource("Pages_WorkItemsSearchPage_CopyURLCommand"))),
+                new(new CopyCommand(item.InternalId.ToStringInvariant(), _resources.GetResource("Pages_WorkItemsSearchPage_CopyWorkItemId"), _resources)),
+                new(new CopyCommand(item.HtmlUrl, _resources.GetResource("Pages_WorkItemsSearchPage_CopyURLCommand"), _resources)),
             },
             Details = new Details()
             {
