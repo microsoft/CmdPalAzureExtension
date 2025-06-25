@@ -465,10 +465,11 @@ public partial class AzureUriTests
         azureUri = new AzureUri(missingDefinitionIdUri);
         Assert.IsFalse(azureUri.IsDefinition);
 
-        // Invalid: definitionId is 0
+        // Valid: definitionId is 0
+        // It's a valid definition, even if it doesn't point to an actual definition.
         var zeroDefinitionIdUri = "https://dev.azure.com/organization/project/_build?definitionId=0";
         azureUri = new AzureUri(zeroDefinitionIdUri);
-        Assert.IsFalse(azureUri.IsDefinition);
+        Assert.IsTrue(azureUri.IsDefinition);
 
         // Invalid: definitionId not an integer
         var invalidDefinitionIdUri = "https://dev.azure.com/organization/project/_build?definitionId=abc";
