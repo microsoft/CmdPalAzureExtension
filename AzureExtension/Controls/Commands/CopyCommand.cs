@@ -30,7 +30,7 @@ internal sealed partial class CopyCommand : InvokableCommand
                 _resources.GetResource("Messages_CopyCommand_Success"),
                 _valueToCopy));
 
-        Thread.Sleep(2000); // Pause to allow the toast to show before dismissing the command
+        Thread.Sleep(1500); // Pause to allow the toast to show before dismissing the command
 
         return CommandResult.Dismiss();
     }
