@@ -122,7 +122,12 @@ public static class SearchHelper
 
     public static string GetPipelineSearchName(IPipelineDefinitionSearch search, AzureClientHelpers azureClientHelpers, IAccountProvider accountProvider)
     {
-        var info = GetSearchInfoFromSearch(search, azureClientHelpers, accountProvider.GetDefaultAccount());
-        return info?.Name ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(search.Name))
+        {
+            var info = GetSearchInfoFromSearch(search, azureClientHelpers, accountProvider.GetDefaultAccount());
+            return info?.Name ?? string.Empty;
+        }
+
+        return search.Name;
     }
 }

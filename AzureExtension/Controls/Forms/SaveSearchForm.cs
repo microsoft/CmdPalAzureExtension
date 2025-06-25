@@ -100,7 +100,7 @@ public abstract class SaveSearchForm<TSearch> : FormContent
             _mediator.AddSearch(null, ex);
             _mediator.SetLoadingState(false, _searchUpdatedType);
             _logger.Error(ex, "Error during form submission: {Message}", ex.Message);
-            SendErrorMessage(ex.Message);
+            SendErrorMessage(ex.Message, _searchInfoType);
             return CommandResult.KeepOpen();
         }
     }
@@ -144,8 +144,8 @@ public abstract class SaveSearchForm<TSearch> : FormContent
         return _savedSearchesUpdater.IsTopLevel(SavedSearch!);
     }
 
-    protected void SendErrorMessage(string errorMessage)
+    protected void SendErrorMessage(string errorMessage, InfoType infoType)
     {
-        ToastHelper.ShowErrorToast(string.Format(CultureInfo.CurrentCulture, GetErrorMessageForSearchType(InfoType.Definition), _resources.GetResource("Messages_UnknownName"), errorMessage));
+        ToastHelper.ShowErrorToast(string.Format(CultureInfo.CurrentCulture, GetErrorMessageForSearchType(infoType), _resources.GetResource("Messages_UnknownName"), errorMessage));
     }
 }

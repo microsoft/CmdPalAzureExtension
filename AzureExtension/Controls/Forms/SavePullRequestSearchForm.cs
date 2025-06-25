@@ -90,7 +90,7 @@ public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
         }
         catch (UriFormatException ex)
         {
-            SendErrorMessage($"The provided URL is not valid: {ex}");
+            SendErrorMessage($"The provided URL is not valid: {ex}", InfoType.Repository);
             return string.Empty;
         }
     }

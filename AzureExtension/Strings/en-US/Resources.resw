@@ -158,7 +158,7 @@
     <comment>Shown if the user submits the form without entering a query</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplateEnteredQueryError" xml:space="preserve">
-    <value>Query is required</value>
+    <value>Pull request search is required</value>
     <comment>Shown if the user submits the form without entering a query</comment>
   </data>
   <data name="Forms_SaveQuery_TemplateEnteredQueryLabel" xml:space="preserve">
@@ -670,8 +670,8 @@
     <comment>Error message when pipeline of name {0} doesn't remove. {1} is the error message.</comment>
   </data>
   <data name="Messages_RemovePullRequestSearch_Failure" xml:space="preserve">
-    <value>Error in removing query {0}: {1}</value>
-    <comment>Error message when query of name {0} doesn't remove. {1} is the error message.</comment>
+    <value>Error in removing pull request search {0}: {1}</value>
+    <comment>Error message when pull request search of name {0} doesn't remove. {1} is the error message.</comment>
   </data>
   <data name="Forms_SavePipelineSearch_PipelineDefinitionIdNullOrEmptyError" xml:space="preserve">
     <value>A pipeline definition cannot be null or empty</value>

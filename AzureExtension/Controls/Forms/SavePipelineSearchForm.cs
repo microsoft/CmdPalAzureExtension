@@ -87,7 +87,7 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
 
             if (string.IsNullOrEmpty(definitionId) || !long.TryParse(definitionId, out var id))
             {
-                SendErrorMessage("The URL does not contain a valid definitionId.");
+                SendErrorMessage("The URL does not contain a valid definitionId.", InfoType.Definition);
                 return -1;
             }
 
@@ -95,7 +95,7 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
         }
         catch (Exception ex)
         {
-            SendErrorMessage($"Failed to parse definitionId from the URL: {ex.Message}");
+            SendErrorMessage($"Failed to parse definitionId from the URL: {ex.Message}", InfoType.Definition);
             return -1;
         }
     }
