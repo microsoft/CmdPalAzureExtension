@@ -5,7 +5,6 @@
 using AzureExtension.Client;
 using AzureExtension.Controls;
 using AzureExtension.Data;
-using AzureExtension.Helpers;
 using Dapper;
 using Dapper.Contrib.Extensions;
 
@@ -48,7 +47,7 @@ public class DefinitionSearch : IPipelineDefinitionSearch
         {
             InternalId = internalId,
             Url = url,
-            Name = name,
+            Name = name!,
         };
         dataStore.Connection.Insert(definitionSearch);
         return definitionSearch;
@@ -83,6 +82,7 @@ public class DefinitionSearch : IPipelineDefinitionSearch
         var definitionSearch = Get(dataStore, internalId, url);
         definitionSearch ??= Add(dataStore, name, internalId, url);
         definitionSearch.IsTopLevel = isTopLevel;
+        definitionSearch.Name = name;
         dataStore.Connection.Update(definitionSearch);
     }
 }

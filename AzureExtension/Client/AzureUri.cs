@@ -39,7 +39,11 @@ public class AzureUri
 
     private readonly Lazy<bool> _isQuery;
 
+    private readonly Lazy<bool> _isTempQuery;
+
     private readonly Lazy<string> _query;
+
+    private readonly Lazy<bool> _isDefinition;
 
     private readonly Lazy<Uri> _connection;
 
@@ -89,11 +93,15 @@ public class AzureUri
 
     public bool IsQuery => _isQuery.Value;
 
+    public bool IsTempQuery => _isTempQuery.Value;
+
     public string Query => _query.Value;
 
     public Uri Connection => _connection.Value;
 
     public Uri OrganizationLink => _organizationLink.Value;
+
+    public bool IsDefinition => _isDefinition.Value;
 
     // If an invalid input or Uri was passed in (null, empty string, etc), the object
     // is still valid, but the Uri will be DefaultUriString, not the original input,
@@ -147,7 +155,9 @@ public class AzureUri
         _isRepository = new Lazy<bool>(InitializeIsRepository);
         _repository = new Lazy<string>(InitializeRepository);
         _isQuery = new Lazy<bool>(InitializeIsQuery);
+        _isTempQuery = new Lazy<bool>(InitializeIsTempQuery);
         _query = new Lazy<string>(InitializeQuery);
+        _isDefinition = new Lazy<bool>(InitializeIsDefinition);
         _connection = new Lazy<Uri>(InitializeConnection);
         _organizationLink = new Lazy<Uri>(InitializeOrganizationLink);
     }
@@ -457,6 +467,107 @@ public class AzureUri
             _log.Error(e, $"InitializeQuery failed for Uri: {Uri}");
             return string.Empty;
         }
+    }
+
+    private bool InitializeIsTempQuery()
+    {
+        if (!IsValid)
+        {
+            _log.Error("InitializeIsTempQuery called on an invalid Uri.");
+            return false;
+        }
+
+        if (!APISegment.Equals("_queries", StringComparison.OrdinalIgnoreCase))
+        {
+            _log.Error($"InitializeIsTempQuery called on a Uri that is not a query: {Uri}");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(Project))
+        {
+            _log.Error($"InitializeIsTempQuery called on a Uri with no project: {Uri}");
+            return false;
+        }
+
+        if (Uri.Segments.Length <= APISegmentIndex + 1)
+        {
+            _log.Error($"InitializeIsTempQuery called on a Uri with no API subtype: {Uri}");
+            return false;
+        }
+
+        var apiSubtype = Uri.Segments[APISegmentIndex + 1].Replace("/", string.Empty);
+        if (!apiSubtype.Equals("query", StringComparison.OrdinalIgnoreCase))
+        {
+            _log.Error($"InitializeIsTempQuery called on a Uri with an API subtype that is not 'query': {Uri}");
+            return false;
+        }
+
+        if (Uri.Segments.Length > APISegmentIndex + 2)
+        {
+            // If there are more segments, it is not a temp query.
+            return false;
+        }
+
+        // The query string must contain a tempQueryId parameter with a valid GUID
+        var queryParams = System.Web.HttpUtility.ParseQueryString(Uri.Query);
+        var tempQueryId = queryParams["tempQueryId"];
+        if (string.IsNullOrEmpty(tempQueryId))
+        {
+            _log.Error($"InitializeIsTempQuery called on a Uri with no tempQueryId: {Uri}");
+            return false;
+        }
+
+        if (!Guid.TryParse(tempQueryId, out _))
+        {
+            _log.Error($"InitializeIsTempQuery called on a Uri with an invalid tempQueryId {Uri}");
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool InitializeIsDefinition()
+    {
+        if (!IsValid)
+        {
+            return false;
+        }
+
+        if (!Uri.Host.Equals("dev.azure.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(Project))
+        {
+            return false;
+        }
+
+        if (!APISegment.Equals("_build", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        // There should be no additional path segments after _build
+        if (Uri.Segments.Length != APISegmentIndex + 1)
+        {
+            return false;
+        }
+
+        // The query string must contain a definitionId parameter with a valid integer
+        var queryParams = System.Web.HttpUtility.ParseQueryString(Uri.Query);
+        var definitionId = queryParams["definitionId"];
+        if (string.IsNullOrEmpty(definitionId))
+        {
+            return false;
+        }
+
+        if (!int.TryParse(definitionId, out _))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private Uri InitializeConnection()

@@ -5,15 +5,17 @@
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls.Commands;
 using AzureExtension.Helpers;
 
 namespace AzureExtension.Controls.Forms;
 
-public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
+public sealed partial class SaveQueryForm : SaveSearchForm<IQuerySearch>
 {
     private readonly IResources _resources;
-    private readonly IAccountProvider _accountProvider;
-    private readonly AzureClientHelpers _azureClientHelpers;
+    private bool _isNewSearchTopLevel;
+    private string _searchUrl = string.Empty;
+    private string _displayName = string.Empty;
 
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
@@ -21,57 +23,45 @@ public sealed partial class SaveQueryForm : AzureForm<IQuerySearch>
         { "{{SavedQueryString}}", SavedSearch?.Url ?? string.Empty },
         { "{{EnteredQueryErrorMessage}}", _resources.GetResource("Forms_SaveQuery_TemplateEnteredQueryError") },
         { "{{EnteredQueryLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateEnteredQueryLabel") },
+        { "{{QueryDisplayNameLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateQueryDisplayNameLabel") },
+        { "{{QueryDisplayName}}", SavedSearch?.Name ?? string.Empty },
+        { "{{QueryDisplayNamePlaceholder}}", _resources.GetResource("Forms_SaveQuery_TemplateQueryDisplayNamePlaceholder") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveQueryTemplate_IsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SaveQueryActionTitle}}", _resources.GetResource("Forms_SaveQuery_TemplateSaveQueryActionTitle") },
     };
 
-    // for saving a new query
+    // if savedQuery is null, the form will save a new query search
+    // otherwise, it will edit an existing query search
     public SaveQueryForm(
+        IQuerySearch? savedQuery,
         IResources resources,
         SavedAzureSearchesMediator savedQueriesMediator,
         IAccountProvider accountProvider,
         AzureClientHelpers azureClientHelpers,
-        ISavedSearchesUpdater<IQuerySearch> queryRepository)
-        : base(null, queryRepository, savedQueriesMediator, accountProvider)
+        ISavedSearchesUpdater<IQuerySearch> queryRepository,
+        SaveSearchCommand<IQuerySearch> saveSearchCommand)
+        : base(savedQuery, queryRepository, savedQueriesMediator, accountProvider, saveSearchCommand, resources, azureClientHelpers)
     {
         _resources = resources;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
         TemplateKey = "SaveQuery";
     }
 
-    // for editing an existing query
-    public SaveQueryForm(
-        IQuerySearch savedQuery,
-        IResources resources,
-        SavedAzureSearchesMediator savedQueriesMediator,
-        IAccountProvider accountProvider,
-        AzureClientHelpers azureClientHelpers,
-        ISavedSearchesUpdater<IQuerySearch> queryRepository)
-        : base(savedQuery, queryRepository, savedQueriesMediator, accountProvider)
+    protected override void ParseFormSubmission(JsonNode? jsonNode)
     {
-        _resources = resources;
-        _accountProvider = accountProvider;
-        _azureClientHelpers = azureClientHelpers;
-        TemplateKey = "SaveQuery";
+        _searchUrl = jsonNode?["EnteredQuery"]?.ToString() ?? string.Empty;
+        _displayName = jsonNode?["QueryDisplayName"]?.ToString() ?? string.Empty;
+        _isNewSearchTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
     }
 
-    protected override IQuerySearch CreateSearchFromJson(JsonNode? jsonNode)
+    protected override IQuerySearch CreateSearchFromSearchInfo(InfoResult searchInfo)
     {
-        var queryUrl = jsonNode?["EnteredQuery"]?.ToString() ?? string.Empty;
-        var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
+        var name = !string.IsNullOrEmpty(_displayName) ? _displayName : searchInfo.Name;
+        return new Query(searchInfo.AzureUri, name, searchInfo.Description, _isNewSearchTopLevel);
+    }
 
-        var account = _accountProvider.GetDefaultAccount();
-        var queryInfo = _azureClientHelpers.GetInfo(queryUrl, account, InfoType.Query).Result;
-
-        if (queryInfo.Result != ResultType.Success)
-        {
-            var error = queryInfo.Error;
-            throw new InvalidOperationException($"Failed to get query info {queryInfo.Error}: {queryInfo.ErrorMessage}");
-        }
-
-        var uri = queryInfo.AzureUri;
-        return new Query(uri, queryInfo.Name, queryInfo.Description, isTopLevel);
+    protected override SearchInfoParameters GetSearchInfoParameters()
+    {
+        return new DefaultSearchInfoParameters(_searchUrl, InfoType.Query);
     }
 }

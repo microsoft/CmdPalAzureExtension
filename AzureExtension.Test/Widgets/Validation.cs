@@ -6,7 +6,7 @@ using AzureExtension.Client;
 
 namespace AzureExtension.Test;
 
-public partial class WidgetTests
+public partial class AzureUriTests
 {
     public enum AzureUriType
     {
@@ -403,5 +403,102 @@ public partial class WidgetTests
         Assert.IsFalse(emptyAzureUri.IsQuery);
         Assert.AreEqual(string.Empty, emptyAzureUri.Query);
         Assert.AreEqual(AzureHostType.NotHosted, emptyAzureUri.HostType);
+    }
+
+    [TestMethod]
+    [TestCategory("Unit")]
+    public void AzureUri_IsTempQuery_Validation()
+    {
+        // Valid temp query: _queries/query with tempQueryId GUID in query string, no extra segments
+        var validTempQueryUri = "https://dev.azure.com/organization/project/_queries/query?tempQueryId=12345678-1234-1234-1234-1234567890ab";
+        var azureUri = new AzureUri(validTempQueryUri);
+        Assert.IsTrue(azureUri.IsTempQuery);
+
+        // Invalid: missing tempQueryId
+        var missingTempQueryIdUri = "https://dev.azure.com/organization/project/_queries/query";
+        azureUri = new AzureUri(missingTempQueryIdUri);
+        Assert.IsFalse(azureUri.IsTempQuery);
+
+        // Invalid: tempQueryId not a GUID
+        var invalidTempQueryIdUri = "https://dev.azure.com/organization/project/_queries/query?tempQueryId=not-a-guid";
+        azureUri = new AzureUri(invalidTempQueryIdUri);
+        Assert.IsFalse(azureUri.IsTempQuery);
+
+        // Invalid: extra path segments after 'query'
+        var extraSegmentUri = "https://dev.azure.com/organization/project/_queries/query/extra?tempQueryId=12345678-1234-1234-1234-1234567890ab";
+        azureUri = new AzureUri(extraSegmentUri);
+        Assert.IsFalse(azureUri.IsTempQuery);
+
+        // Invalid: wrong API subtype
+        var wrongApiSubtypeUri = "https://dev.azure.com/organization/project/_queries/query-edit?tempQueryId=12345678-1234-1234-1234-1234567890ab";
+        azureUri = new AzureUri(wrongApiSubtypeUri);
+        Assert.IsFalse(azureUri.IsTempQuery);
+
+        // Invalid: is query but not a temp query
+        var validQueryUri = "https://dev.azure.com/organization/project/_queries/query/12345678-1234-1234-1234-1234567890ab";
+        azureUri = new AzureUri(validQueryUri);
+        Assert.IsFalse(azureUri.IsTempQuery);
+        Assert.IsTrue(azureUri.IsQuery);
+
+        // Invalid: is repository, not a query
+        var validRepositoryUri = "https://dev.azure.com/organization/project/_git/repository";
+        azureUri = new AzureUri(validRepositoryUri);
+        Assert.IsFalse(azureUri.IsTempQuery);
+
+        // Invalid: is definition, not a query
+        var validDefinitionUri = "https://dev.azure.com/organization/project/_build?definitionId=123";
+        azureUri = new AzureUri(validDefinitionUri);
+        Assert.IsFalse(azureUri.IsTempQuery);
+    }
+
+    [TestMethod]
+    [TestCategory("Unit")]
+    public void AzureUri_IsDefinition_Validation()
+    {
+        // Valid definition: host is dev.azure.com, _build segment, definitionId integer in query, no extra segments
+        var validDefinitionUri = "https://dev.azure.com/organization/project/_build?definitionId=123";
+        var azureUri = new AzureUri(validDefinitionUri);
+        Assert.IsTrue(azureUri.IsDefinition);
+
+        // Invalid: missing definitionId
+        var missingDefinitionIdUri = "https://dev.azure.com/organization/project/_build";
+        azureUri = new AzureUri(missingDefinitionIdUri);
+        Assert.IsFalse(azureUri.IsDefinition);
+
+        // Valid: definitionId is 0
+        // It's a valid definition, even if it doesn't point to an actual definition.
+        var zeroDefinitionIdUri = "https://dev.azure.com/organization/project/_build?definitionId=0";
+        azureUri = new AzureUri(zeroDefinitionIdUri);
+        Assert.IsTrue(azureUri.IsDefinition);
+
+        // Invalid: definitionId not an integer
+        var invalidDefinitionIdUri = "https://dev.azure.com/organization/project/_build?definitionId=abc";
+        azureUri = new AzureUri(invalidDefinitionIdUri);
+        Assert.IsFalse(azureUri.IsDefinition);
+
+        // Invalid: wrong host
+        var wrongHostUri = "https://organization.visualstudio.com/project/_build?definitionId=123";
+        azureUri = new AzureUri(wrongHostUri);
+        Assert.IsFalse(azureUri.IsDefinition);
+
+        // Invalid: extra path segments after _build
+        var extraSegmentUri = "https://dev.azure.com/organization/project/_build/extra?definitionId=123";
+        azureUri = new AzureUri(extraSegmentUri);
+        Assert.IsFalse(azureUri.IsDefinition);
+
+        // Invalid: is query, not a definition
+        var validQueryUri = "https://dev.azure.com/organization/project/_queries/query/12345678-1234-1234-1234-1234567890ab";
+        azureUri = new AzureUri(validQueryUri);
+        Assert.IsFalse(azureUri.IsDefinition);
+
+        // Invalid: is repository, not a definition
+        var validRepositoryUri = "https://dev.azure.com/organization/project/_git/repository";
+        azureUri = new AzureUri(validRepositoryUri);
+        Assert.IsFalse(azureUri.IsDefinition);
+
+        // Invalid: is tempQuery, not a definition
+        var validTempQueryUri = "https://dev.azure.com/organization/project/_queries/query?tempQueryId=12345678-1234-1234-1234-1234567890ab";
+        azureUri = new AzureUri(validTempQueryUri);
+        Assert.IsFalse(azureUri.IsDefinition);
     }
 }

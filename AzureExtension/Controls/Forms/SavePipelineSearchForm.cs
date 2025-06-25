@@ -2,19 +2,22 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
+using AzureExtension.Controls.Commands;
 using AzureExtension.Controls.DataTransfer;
 using AzureExtension.Helpers;
 
 namespace AzureExtension.Controls.Forms;
 
-public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
+public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
 {
     private readonly IResources _resources;
-    private readonly AzureClientHelpers _azureClientHelpers;
-    private readonly IAccountProvider _accountProvider;
+    private string _definitionUrl = string.Empty;
+    private string _displayName = string.Empty;
+    private bool _isNewSearchTopLevel;
 
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
@@ -23,48 +26,52 @@ public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
         { "{{EnteredPipelineSearchErrorMessage}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchError") },
         { "{{EnteredPipelineSearchLabel}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchLabel") },
         { "{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}", _resources.GetResource("Forms_SavePipelineSearch_URLPlaceholderSuffix") },
+        { "{{PipelineSearchDisplayNameLabel}}", _resources.GetResource("Forms_SavePipelineSearch_TemplatePipelineSearchDisplayNameLabel") },
+        { "{{PipelineSearchDisplayName}}", SavedSearch?.Name ?? string.Empty },
+        { "{{PipelineSearchDisplayNamePlaceholder}}", _resources.GetResource("Forms_SavePipelineSearch_TemplatePipelineSearchDisplayNamePlaceholder") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateIsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SavePipelineSearchActionTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateSavePipelineSearchActionTitle") },
     };
 
+    // Creates a DefinitionSearch based on a URL in the following format
+    // https://dev.azure.com/microsoft/project/_build?definitionId=definitionId
     public SavePipelineSearchForm(
         IPipelineDefinitionSearch? definitionSearch,
         IResources resources,
         ISavedSearchesUpdater<IPipelineDefinitionSearch> definitionRepository,
         SavedAzureSearchesMediator mediator,
         IAccountProvider accountProvider,
-        AzureClientHelpers azureClientHelpers)
-        : base(definitionSearch, definitionRepository, mediator, accountProvider)
+        AzureClientHelpers azureClientHelpers,
+        SaveSearchCommand<IPipelineDefinitionSearch> saveSearchCommand)
+        : base(definitionSearch, definitionRepository, mediator, accountProvider, saveSearchCommand, resources, azureClientHelpers)
     {
         _resources = resources;
-        _azureClientHelpers = azureClientHelpers;
-        _accountProvider = accountProvider;
         TemplateKey = "SavePipelineSearch";
     }
 
-    // Creates a DefinitionSearch based on a URL in the following format
-    // https://dev.azure.com/microsoft/project/_build?definitionId=definitionId
-    protected override IPipelineDefinitionSearch CreateSearchFromJson(JsonNode jsonNode)
+    protected override void ParseFormSubmission(JsonNode? jsonNode)
     {
-        var definitionUrl = jsonNode?["EnteredPipelineSearch"]?.ToString() ?? string.Empty;
-        var isTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
+        _definitionUrl = jsonNode?["EnteredPipelineSearch"]?.ToString() ?? string.Empty;
+        _displayName = jsonNode?["PipelineSearchDisplayName"]?.ToString() ?? string.Empty;
+        _isNewSearchTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
+    }
 
-        var account = _accountProvider.GetDefaultAccount();
-        var definitionId = ParseDefinitionIdFromUrl(definitionUrl);
-        var definitionInfo = _azureClientHelpers.GetInfo(new AzureUri(definitionUrl), account, InfoType.Definition, definitionId).Result;
-
-        if (definitionInfo.Result != ResultType.Success)
+    protected override IPipelineDefinitionSearch? CreateSearchFromSearchInfo(InfoResult searchInfo)
+    {
+        var definitionId = ParseDefinitionIdFromUrl(_definitionUrl);
+        if (definitionId <= 0)
         {
-            throw new InvalidOperationException($"Failed to get pipeline search info {definitionInfo.Error}: {definitionInfo.ErrorMessage}");
+            return null;
         }
 
-        var uri = definitionInfo.AzureUri;
+        var uri = searchInfo.AzureUri;
         return new PipelineDefinitionSearchCandidate
         {
             InternalId = definitionId,
             Url = uri.ToString(),
-            IsTopLevel = isTopLevel,
+            IsTopLevel = _isNewSearchTopLevel,
+            Name = !string.IsNullOrWhiteSpace(_displayName) ? _displayName : searchInfo.Name,
         };
     }
 
@@ -83,14 +90,21 @@ public class SavePipelineSearchForm : AzureForm<IPipelineDefinitionSearch>
 
             if (string.IsNullOrEmpty(definitionId) || !long.TryParse(definitionId, out var id))
             {
-                throw new InvalidOperationException("The URL does not contain a valid definitionId.");
+                SendErrorMessage("The URL does not contain a valid definitionId.", InfoType.Definition);
+                return -1;
             }
 
             return id;
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Failed to parse definitionId from the URL.", ex);
+            SendErrorMessage($"Failed to parse definitionId from the URL: {ex.Message}", InfoType.Definition);
+            return -1;
         }
+    }
+
+    protected override SearchInfoParameters GetSearchInfoParameters()
+    {
+        return new DefinitionInfoParameters(_definitionUrl, ParseDefinitionIdFromUrl(_definitionUrl));
     }
 }

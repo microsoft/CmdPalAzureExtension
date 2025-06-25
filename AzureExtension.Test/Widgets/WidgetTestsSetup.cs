@@ -5,7 +5,7 @@
 namespace AzureExtension.Test;
 
 [TestClass]
-public partial class WidgetTests
+public partial class AzureUriTests
 {
     public TestContext? TestContext
     {

@@ -8,7 +8,7 @@ namespace AzureExtension.PersistentData;
 
 public sealed class PersistentDataSchema : IDataStoreSchema
 {
-    public long SchemaVersion => 3;
+    public long SchemaVersion => 4;
 
     public List<string> SchemaSqls => _schemaSqlsValue;
 

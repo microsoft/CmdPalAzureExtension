@@ -94,7 +94,27 @@ public class AzureClientHelpers
 
         if (!azureUri.IsValid)
         {
-            return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.UriInvalidQuery);
+            return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidUri);
+        }
+
+        if (infoType == InfoType.Query && azureUri.IsTempQuery)
+        {
+            return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.TemporaryQueryUriNotSupported);
+        }
+
+        if (infoType == InfoType.Query && !azureUri.IsQuery)
+        {
+            return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidQueryUri);
+        }
+
+        if (infoType == InfoType.Repository && !azureUri.IsRepository)
+        {
+            return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidRepositoryUri);
+        }
+
+        if (infoType == InfoType.Definition && (!azureUri.IsDefinition || definitionId == null))
+        {
+            return new InfoResult(azureUri, infoType, ResultType.Failure, ErrorType.InvalidDefinitionUri);
         }
 
         try
