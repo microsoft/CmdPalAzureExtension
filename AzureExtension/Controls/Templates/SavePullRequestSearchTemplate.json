@@ -38,6 +38,14 @@
           "isRequired": true
         },
         {
+          "type": "Input.Text",
+          "id": "PullRequestSearchDisplayName",
+          "label": "{{PullRequestSearchDisplayNameLabel}}",
+          "isRequired": false,
+          "value": "{{PullRequestSearchDisplayName}}",
+          "placeholder": "{{PullRequestSearchDisplayNamePlaceholder}}"
+        },
+        {
           "type": "ColumnSet",
           "columns": [
             {

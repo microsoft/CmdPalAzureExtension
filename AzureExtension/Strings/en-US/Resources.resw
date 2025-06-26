@@ -214,7 +214,7 @@
     <comment>Shown in a toast when query with name {0} is removed</comment>
   </data>
   <data name="Message_Query_Saved_Error" xml:space="preserve">
-    <value>Error saving query {0}: {1} </value>
+    <value>Error saving query "{0}": {1} </value>
     <comment>Shown in a toast when there is an error saving a query with the name {0}. {1} is the error message.</comment>
   </data>
   <data name="Message_Sign_In_Fail" xml:space="preserve">
@@ -298,11 +298,11 @@
     <comment>Shown in a toast when error happens when saving a query</comment>
   </data>
   <data name="Pages_SavedQueries_Failure" xml:space="preserve">
-    <value>Failed to remove query {0}</value>
-    <comment>Shown when failed to remove query with name {0} from saved queries page</comment>
+    <value>Failed to remove query "{0}" : {1}</value>
+    <comment>Shown when failed to remove query with name {0} from saved queries page. {1} is the error message.</comment>
   </data>
   <data name="Pages_Query_Edited_Failed" xml:space="preserve">
-    <value>Error in editing query {0}: {1}</value>
+    <value>Error in editing query "{0}": {1}</value>
     <comment>Shown in a toast when there is an error editing a query with the name {0}. {1} is the error message.</comment>
   </data>
   <data name="Pages_Query_Edited_Success" xml:space="preserve">
@@ -426,7 +426,7 @@
     <comment>Success message when a pull request search with name {0} was removed</comment>
   </data>
   <data name="Pages_SavePullRequestSearch_FailureMessage" xml:space="preserve">
-    <value>Saving pull request search {0} failed: {1}</value>
+    <value>Saving pull request search "{0}" failed: {1}</value>
     <comment>Message shown when the extension fails to save a pull request search with named {0} due to error message {1}.</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplateViewMineTitle" xml:space="preserve">
@@ -538,7 +538,7 @@
     <comment>Message shown when a pipeline search with name {0} saves correctly</comment>
   </data>
   <data name="Pages_SavePipelineSearch_FailureMessage" xml:space="preserve">
-    <value>Saving pipeline {0} failed: {1}</value>
+    <value>Saving pipeline "{0}" failed: {1}</value>
     <comment>Message shown when a pipeline search with name {0} fails to save. {1} is the error message.</comment>
   </data>
   <data name="Pages_SavedPipelineSearches_Title" xml:space="preserve">
@@ -550,7 +550,7 @@
     <comment>The success message when a pipeline search with name {0} is saved</comment>
   </data>
   <data name="Pages_EditPipelineSearch_FailureMessage" xml:space="preserve">
-    <value>Editing pipeline {0} failed: {1}</value>
+    <value>Editing pipeline "{0}" failed: {1}</value>
     <comment>The message shown when editing a pipeline search with name {0} fails. {1} is the error message.</comment>
   </data>
   <data name="PipelineBuild_Requester" xml:space="preserve">
@@ -654,15 +654,15 @@
     <comment>The button title when the user successfully signs out</comment>
   </data>
   <data name="Messages_RemoveQuery_Failure" xml:space="preserve">
-    <value>Error in removing pull request search {0}: {1}</value>
+    <value>Error in removing pull request search "{0}": {1}</value>
     <comment>Error message when pull request of name {0} doesn't remove. {1} is the error message.</comment>
   </data>
   <data name="Messages_RemovePipeline_Failure" xml:space="preserve">
-    <value>Error in removing pipeline {0}: {1}</value>
+    <value>Error in removing pipeline "{0}": {1}</value>
     <comment>Error message when pipeline of name {0} doesn't remove. {1} is the error message.</comment>
   </data>
   <data name="Messages_RemovePullRequestSearch_Failure" xml:space="preserve">
-    <value>Error in removing pull request search {0}: {1}</value>
+    <value>Error in removing pull request search "{0}": {1}</value>
     <comment>Error message when pull request search of name {0} doesn't remove. {1} is the error message.</comment>
   </data>
   <data name="Forms_SavePipelineSearch_PipelineDefinitionIdNullOrEmptyError" xml:space="preserve">
@@ -689,16 +689,32 @@
     <value>Copied!</value>
     <comment>Message displayed to user when the copy command completes</comment>
   </data>
-  <data name="Forms_SaveQuery_TemplateNameError" xml:space="preserve">
-    <value>A query name is required</value>
-    <comment>Shown if the user submits the SaveSearchForm without a name</comment>
-  </data>
-  <data name="Forms_SaveQuery_TemplateNameLabel" xml:space="preserve">
-    <value>Name</value>
-    <comment>Shown as the name for the saved query</comment>
-  </data>
   <data name="Pages_WorkItemsSearchPage_WorkItemId" xml:space="preserve">
     <value>ID</value>
     <comment>The label for the ID details on the WorkItemsSearchPage</comment>
+  </data>
+  <data name="Forms_SaveQuery_TemplateQueryDisplayNameLabel" xml:space="preserve">
+    <value>Display name (optional)</value>
+    <comment>If non-empty, the name for the query in the Azure extension</comment>
+  </data>
+  <data name="Forms_SaveQuery_TemplateQueryDisplayNamePlaceholder" xml:space="preserve">
+    <value>Defaults to query name in Azure Dev Ops</value>
+    <comment>The placeholder text for the display name on the 'Save Azure Dev Ops query' form</comment>
+  </data>
+  <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchDisplayNamePlaceholder" xml:space="preserve">
+    <value>Defaults to Repository Name - View</value>
+    <comment>The placeholder for the SavePipelineSearch's display name field</comment>
+  </data>
+  <data name="Forms_SavePipelineSearch_TemplatePipelineSearchDisplayNameLabel" xml:space="preserve">
+    <value>Display name (optional)</value>
+    <comment>The label for the display name input field in the SavePipelineSearchForm</comment>
+  </data>
+  <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchDisplayNameLabel" xml:space="preserve">
+    <value>Display name (optional)</value>
+    <comment>The label for the display name input control in the SavePullRequestSearch form</comment>
+  </data>
+  <data name="Forms_SavePipelineSearch_TemplatePipelineSearchDisplayNamePlaceholder" xml:space="preserve">
+    <value>Defaults to pipeline name in Azure Dev Ops</value>
+    <comment>The placeholder for the SavePipelineSearch's display name field</comment>
   </data>
 </root>

@@ -66,7 +66,7 @@ public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefini
     {
         ValidateDataStore();
         ValidateDefinitionSearch(definitionSearch, account).Wait();
-        DefinitionSearch.AddOrUpdate(_dataStore, definitionSearch.InternalId, definitionSearch.Url, isTopLevel, definitionSearch.Name);
+        DefinitionSearch.AddOrUpdate(_dataStore, definitionSearch.Name, definitionSearch.InternalId, definitionSearch.Url, isTopLevel);
     }
 
     public void RemoveSavedSearch(IPipelineDefinitionSearch dataSearch)
@@ -88,7 +88,7 @@ public class DefinitionSearchRepository : ISavedSearchesProvider<IPipelineDefini
     {
         _log.Information($"Adding or updating definition search: {dataSearch.InternalId} - {dataSearch.Url} - {dataSearch.Name!}.");
         ValidateDataStore();
-        DefinitionSearch.AddOrUpdate(_dataStore, dataSearch.InternalId, dataSearch.Url, isTopLevel, dataSearch.Name!);
+        DefinitionSearch.AddOrUpdate(_dataStore, dataSearch.Name, dataSearch.InternalId, dataSearch.Url, isTopLevel);
     }
 
     public IEnumerable<IPipelineDefinitionSearch> GetSavedSearches()

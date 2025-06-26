@@ -2,6 +2,7 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using System.Text.Json.Nodes;
 using AzureExtension.Account;
 using AzureExtension.Client;
@@ -13,11 +14,9 @@ namespace AzureExtension.Controls.Forms;
 public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
 {
     private readonly IResources _resources;
-
     private string _repoUrl = string.Empty;
-
     private string _view = string.Empty;
-
+    private string _displayName = string.Empty;
     private bool _isNewSearchTopLevel;
 
     public override Dictionary<string, string> TemplateSubstitutions => new()
@@ -30,6 +29,9 @@ public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
         { "{{PullRequestSearchViewAssignedToMeTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAssignedToMeTitle") },
         { "{{PullRequestSearchViewAllTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewAllTitle") },
         { "{{PullRequestSearchSelectedView}}", string.IsNullOrEmpty(SavedSearch?.View) ? _resources.GetResource("Forms_SavePullRequestSearch_TemplateViewDefault") : SavedSearch.View },
+        { "{{PullRequestSearchDisplayNameLabel}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplatePullRequestSearchDisplayNameLabel") },
+        { "{{PullRequestSearchDisplayName}}", SavedSearch?.Name ?? string.Empty },
+        { "{{PullRequestSearchDisplayNamePlaceholder}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplatePullRequestSearchDisplayNamePlaceholder") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateIsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SavePullRequestSearchActionTitle}}", _resources.GetResource("Forms_SavePullRequestSearch_TemplateSavePullRequestSearchActionTitle") },
@@ -54,12 +56,13 @@ public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
     {
         _repoUrl = jsonNode?["url"]?.ToString() ?? string.Empty;
         _view = jsonNode?["view"]?.ToString() ?? string.Empty;
+        _displayName = jsonNode?["PullRequestSearchDisplayName"]?.ToString() ?? string.Empty;
         _isNewSearchTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
     }
 
     protected override IPullRequestSearch CreateSearchFromSearchInfo(InfoResult searchInfo)
     {
-        var name = $"{searchInfo.Name} - {_view}";
+        var name = !string.IsNullOrWhiteSpace(_displayName) ? _displayName : string.Format(CultureInfo.CurrentCulture, "{0} - {1}", searchInfo.Name, _view);
         var pullRequestsUri = new AzureUri(CreatePullRequestUrl(searchInfo.AzureUri, _view));
 
         return new PullRequestSearchCandidate(pullRequestsUri, name, _view, _isNewSearchTopLevel);

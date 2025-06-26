@@ -15,6 +15,7 @@ public sealed partial class SaveQueryForm : SaveSearchForm<IQuerySearch>
     private readonly IResources _resources;
     private bool _isNewSearchTopLevel;
     private string _searchUrl = string.Empty;
+    private string _displayName = string.Empty;
 
     public override Dictionary<string, string> TemplateSubstitutions => new()
     {
@@ -22,6 +23,9 @@ public sealed partial class SaveQueryForm : SaveSearchForm<IQuerySearch>
         { "{{SavedQueryString}}", SavedSearch?.Url ?? string.Empty },
         { "{{EnteredQueryErrorMessage}}", _resources.GetResource("Forms_SaveQuery_TemplateEnteredQueryError") },
         { "{{EnteredQueryLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateEnteredQueryLabel") },
+        { "{{QueryDisplayNameLabel}}", _resources.GetResource("Forms_SaveQuery_TemplateQueryDisplayNameLabel") },
+        { "{{QueryDisplayName}}", SavedSearch?.Name ?? string.Empty },
+        { "{{QueryDisplayNamePlaceholder}}", _resources.GetResource("Forms_SaveQuery_TemplateQueryDisplayNamePlaceholder") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SaveQueryTemplate_IsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SaveQueryActionTitle}}", _resources.GetResource("Forms_SaveQuery_TemplateSaveQueryActionTitle") },
@@ -46,12 +50,14 @@ public sealed partial class SaveQueryForm : SaveSearchForm<IQuerySearch>
     protected override void ParseFormSubmission(JsonNode? jsonNode)
     {
         _searchUrl = jsonNode?["EnteredQuery"]?.ToString() ?? string.Empty;
+        _displayName = jsonNode?["QueryDisplayName"]?.ToString() ?? string.Empty;
         _isNewSearchTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
     }
 
     protected override IQuerySearch CreateSearchFromSearchInfo(InfoResult searchInfo)
     {
-        return new Query(searchInfo.AzureUri, searchInfo.Name, searchInfo.Description, _isNewSearchTopLevel);
+        var name = !string.IsNullOrEmpty(_displayName) ? _displayName : searchInfo.Name;
+        return new Query(searchInfo.AzureUri, name, searchInfo.Description, _isNewSearchTopLevel);
     }
 
     protected override SearchInfoParameters GetSearchInfoParameters()

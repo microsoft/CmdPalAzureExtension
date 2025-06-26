@@ -15,9 +15,8 @@ namespace AzureExtension.Controls.Forms;
 public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
 {
     private readonly IResources _resources;
-
     private string _definitionUrl = string.Empty;
-
+    private string _displayName = string.Empty;
     private bool _isNewSearchTopLevel;
 
     public override Dictionary<string, string> TemplateSubstitutions => new()
@@ -27,6 +26,9 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
         { "{{EnteredPipelineSearchErrorMessage}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchError") },
         { "{{EnteredPipelineSearchLabel}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateEnteredPipelineSearchLabel") },
         { "{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}", _resources.GetResource("Forms_SavePipelineSearch_URLPlaceholderSuffix") },
+        { "{{PipelineSearchDisplayNameLabel}}", _resources.GetResource("Forms_SavePipelineSearch_TemplatePipelineSearchDisplayNameLabel") },
+        { "{{PipelineSearchDisplayName}}", SavedSearch?.Name ?? string.Empty },
+        { "{{PipelineSearchDisplayNamePlaceholder}}", _resources.GetResource("Forms_SavePipelineSearch_TemplatePipelineSearchDisplayNamePlaceholder") },
         { "{{IsTopLevelTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateIsTopLevelTitle") },
         { "{{IsTopLevel}}", IsTopLevelChecked },
         { "{{SavePipelineSearchActionTitle}}", _resources.GetResource("Forms_SavePipelineSearch_TemplateSavePipelineSearchActionTitle") },
@@ -51,6 +53,7 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
     protected override void ParseFormSubmission(JsonNode? jsonNode)
     {
         _definitionUrl = jsonNode?["EnteredPipelineSearch"]?.ToString() ?? string.Empty;
+        _displayName = jsonNode?["PipelineSearchDisplayName"]?.ToString() ?? string.Empty;
         _isNewSearchTopLevel = jsonNode?["IsTopLevel"]?.ToString() == "true";
     }
 
@@ -68,7 +71,7 @@ public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
             InternalId = definitionId,
             Url = uri.ToString(),
             IsTopLevel = _isNewSearchTopLevel,
-            Name = searchInfo.Name,
+            Name = !string.IsNullOrWhiteSpace(_displayName) ? _displayName : searchInfo.Name,
         };
     }
 
