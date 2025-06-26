@@ -713,4 +713,16 @@
     <value>Defaults to pipeline name in Azure Dev Ops</value>
     <comment>The placeholder for the SavePipelineSearch's display name field</comment>
   </data>
+  <data name="Forms_SaveQuery_TemplateNameError" xml:space="preserve">
+    <value>A query name is required</value>
+    <comment>Shown if the user submits the SaveSearchForm without a name</comment>
+  </data>
+  <data name="Forms_SaveQuery_TemplateNameLabel" xml:space="preserve">
+    <value>Name</value>
+    <comment>Shown as the name for the saved query</comment>
+  </data>
+  <data name="Pages_WorkItemsSearchPage_WorkItemId" xml:space="preserve">
+    <value>ID</value>
+    <comment>The label for the ID details on the WorkItemsSearchPage</comment>
+  </data>
 </root>
