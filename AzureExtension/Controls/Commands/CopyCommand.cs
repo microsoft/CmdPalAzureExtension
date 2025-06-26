@@ -24,11 +24,7 @@ internal sealed partial class CopyCommand : InvokableCommand
     public override CommandResult Invoke()
     {
         ClipboardHelper.SetText(_valueToCopy);
-        ToastHelper.ShowSuccessToast(
-            string.Format(
-                CultureInfo.CurrentCulture,
-                _resources.GetResource("Messages_CopyCommand_Success"),
-                _valueToCopy));
+        ToastHelper.ShowSuccessToast(_resources.GetResource("Messages_CopyCommand_Success"));
 
         Thread.Sleep(1500); // Pause to allow the toast to show before dismissing the command
 

@@ -22,6 +22,14 @@
       "placeholder": "https://dev.azure.com/{{Forms_SavePipelineSearch_URLPlaceholderSuffix}}"
     },
     {
+      "type": "Input.Text",
+      "id": "PipelineSearchDisplayName",
+      "label": "{{PipelineSearchDisplayNameLabel}}",
+      "isRequired": false,
+      "value": "{{PipelineSearchDisplayName}}",
+      "placeholder": "{{PipelineSearchDisplayNamePlaceholder}}"
+    },
+    {
       "type": "ColumnSet",
       "columns": [
         {

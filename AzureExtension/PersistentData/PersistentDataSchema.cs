@@ -8,7 +8,7 @@ namespace AzureExtension.PersistentData;
 
 public sealed class PersistentDataSchema : IDataStoreSchema
 {
-    public long SchemaVersion => 3;
+    public long SchemaVersion => 4;
 
     public List<string> SchemaSqls => _schemaSqlsValue;
 
@@ -32,6 +32,7 @@ public sealed class PersistentDataSchema : IDataStoreSchema
     private const string DefinitionSearch =
         @"CREATE TABLE IF NOT EXISTS DefinitionSearch (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Name TEXT NOT NULL,
             InternalId INTEGER NOT NULL,
             Url TEXT NOT NULL,
             IsTopLevel INTEGER NOT NULL CHECK (IsTopLevel IN (0, 1))
