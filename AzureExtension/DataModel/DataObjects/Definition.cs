@@ -14,7 +14,7 @@ namespace AzureExtension.DataModel;
 [Table("Definition")]
 public class Definition : IDefinition
 {
-    private static readonly long _updateThreshold = TimeSpan.FromHours(4).Ticks;
+    private static readonly long _updateThreshold = TimeSpan.FromMinutes(1).Ticks;
 
     [Key]
     public long Id { get; set; } = DataStore.NoForeignKey;
