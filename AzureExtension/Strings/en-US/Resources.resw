@@ -698,8 +698,8 @@
     <comment>If non-empty, the name for the query in the Azure extension</comment>
   </data>
   <data name="Forms_SaveQuery_TemplateQueryDisplayNamePlaceholder" xml:space="preserve">
-    <value>Defaults to query name in Azure Dev Ops</value>
-    <comment>The placeholder text for the display name on the 'Save Azure Dev Ops query' form</comment>
+    <value>Defaults to query name in Azure DevOps</value>
+    <comment>The placeholder text for the display name on the 'Save Azure DevOps query' form</comment>
   </data>
   <data name="Forms_SavePullRequestSearch_TemplatePullRequestSearchDisplayNamePlaceholder" xml:space="preserve">
     <value>Defaults to Repository Name - View</value>
