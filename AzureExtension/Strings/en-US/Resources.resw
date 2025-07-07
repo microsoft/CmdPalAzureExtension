@@ -714,7 +714,7 @@
     <comment>The label for the display name input control in the SavePullRequestSearch form</comment>
   </data>
   <data name="Forms_SavePipelineSearch_TemplatePipelineSearchDisplayNamePlaceholder" xml:space="preserve">
-    <value>Defaults to pipeline name in Azure Dev Ops</value>
+    <value>Defaults to pipeline name in Azure DevOps</value>
     <comment>The placeholder for the SavePipelineSearch's display name field</comment>
   </data>
 </root>
