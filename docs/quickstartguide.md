@@ -1,14 +1,14 @@
-# Command Palette Azure Extension Quick Start Guide
+# Command Palette Azure Extension (Preview) Quick Start Guide
 
-Welcome to the Command Palette Azure Extension Quick Start Guide! Below are the instructions to get started.
+Welcome to the Command Palette Azure Extension (Preview) Quick Start Guide! Below are the instructions to get started.
 
 ## Signing in
 
-By default, the Command Palette Azure Extension will attempt to log you in automatically with the authenticated Windows account on the device. To determine whether the automatic sign in was successful, open Command Palette (`Windows`+`Alt`+`Space` or your custom keyboard shortcut) and search "azure" in the search bar.
+By default, the Command Palette Azure Extension (Preview) will attempt to log you in automatically with the authenticated Windows account on the device. To determine whether the automatic sign in was successful, open Command Palette (`Windows`+`Alt`+`Space` or your custom keyboard shortcut) and search "azure" in the search bar.
 
 If you were signed in successfully, you'll see the below commands:
 
-![A screenshot of the Command Palette with "azure" in the search bar. Four commands have a blue box around them: Saved Azure DevOps queries, Saved Azure DevOps pull request searches, Saved Azure DevOps pipelines, and Sign out of the Azure extension](assets/logged_in_commands.png)
+![A screenshot of the Command Palette with "azure" in the search bar. Four commands have a blue box around them: "Saved Azure DevOps queries", "Saved Azure DevOps pull request searches", "Saved Azure DevOps pipelines", and "Sign out of the Azure extension"](assets/logged_in_commands.png)
 
 If you were not signed in automatically, you can click the "Sign in" command shown here:
 
