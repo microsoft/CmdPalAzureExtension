@@ -44,9 +44,13 @@ For users who are unable to install the Command Palette Azure Extension from win
 
 ---
 
+## Getting started
+
+Check out our [quick start guide](docs/quickstartguide.md) to start using the Azure extension (Preview).
+
 ## Contributing
 
-We are excited to work alongside you, our amazing community, to build and enhance the Command Palette Azure Extension!
+We are excited to work alongside you, our amazing community, to build and enhance the Command Palette Azure Extension (Preview)!
 
 ## Communicating with the team
 
