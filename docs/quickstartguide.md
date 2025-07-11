@@ -19,19 +19,27 @@ To change the Azure DevOps account the extension uses, sign out of the extension
 
 ## Adding searches
 
-To make your favorite queries, pull request searches, and pipelines accessible in Command Palette, follow these steps:
+To add your favorite queries, pull request searches, and pipelines accessible to Command Palette, follow these steps:
 
 * Select the type of search you want to add (query, pull requests, pipeline)
-* Navigate to the Saved [Search] command, then select "Add a [Search]"
-* Fill out the form in the Add page. Here's an overview of what may be needed:
+* Navigate to the Saved Azure DevOps [Search] command, then select "Add a [Search]"
+
+   ![A screenshot of the Azure Extension (Preview) Saved Azure DevOps queries page. The "Add a query" command is highlighted.](assets/add_a_query.png)
+
+* Fill out the form in the Add page:
+   ![A screenshot of the "Save query" page.](assets/save_query_page.png)
+
+   Here's an overview of what you'll need:
+
    * **URL:** The URL to the search you want to save:
-      * Queries: the query URL in the address bar (see note below)
+      * Queries: the query URL in the address bar
       * Pull request searches: the URL to the repository whose pull requests you want to view
       * Pipelines: the pipeline definition URL (the page with all runs)
       > Note: Temporary queries are currently not supported. To save a query, use the query URL in the address bar of the browser, not the URL from the "Copy query URL" button in Azure DevOps.
-    * **Display name:** The name for the search in Azure DevOps. This may be useful if you have multiple "Assigned to me" queries in different projects. Default display names are shown in the form as well.
-    * **View (pull request searches only):** The kinds of pull requests you'd like to see for the given repository.
-    * **Pin [Search] to the top level:** Select this checkbox if you want to access the item from the top level (the same place you found the "Sign out of the Azure extension" command). If this checkbox is unselected when saving, you can find the saved search in the list under the "Saved Azure DevOps [Search]" command.
+   * **Display name:** The name for the search in Azure DevOps. This may be useful if you have multiple "Assigned to me" queries in different projects. Default display names are shown in the form as well.
+   * **View (pull request searches only):** The kinds of pull requests you'd like to see for the given repository.
+   * **Pin [Search] to the top level:** Select this checkbox if you want to access the item from the top level (the same place you found the "Sign out of the Azure extension" command). If this checkbox is unselected when saving, you can find the saved search in the list under the "Saved Azure DevOps [Search]" command.
+
 * Press Save [Search]
 * You can now find your saved search by navigating back (either by clicking on the back arrow or bringing the cursor back to the search bar and pressing `Esc`)
 
