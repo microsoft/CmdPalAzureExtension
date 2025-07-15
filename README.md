@@ -1,18 +1,18 @@
-# Welcome to the Command Palette (CmdPal) Azure Extension repo
+# Welcome to the Command Palette (CmdPal) Azure Extension (Preview) repo
 
 This repository contains the source code for:
 
-* [Command Palette Azure Extension](https://Azure.com/microsoft/CmdPalAzureExtension)
+* [Command Palette Azure Extension (Preview)](https://github.com/microsoft/CmdPalAzureExtension)
 
 Related repositories include:
 
 * [PowerToys Command Palette utility](https://github.com/microsoft/PowerToys/tree/main/src/modules/cmdpal)
 
-## Installing and running Command Palette Azure Extension
+## Installing and running Command Palette Azure Extension (Preview)
 
 ### Requirements
-The Command Palette Azure Extension requires:
-* PowerToys with Command Palette included
+The Command Palette Azure Extension (Preview) requires:
+* PowerToys with Command Palette included (version 0.90.0 or above)
 * Windows 11
 * An ARM64 or x64 processor
 
@@ -22,11 +22,11 @@ The Command Palette Azure Extension requires:
 * Search for "Command Palette Azure Extension (Preview)".
 * Press enter to download the extension.
 * Navigate back to the main screen. If the extension was able to detect your account automatically, you will see the following commands:
-    * Saved queries
-    * Saved pull request searches
-    * Saved pipeline searches
-    * Sign out
-* Otherwise, you'll see a "Sign in" command. Enter your Azure Dev Ops credentials to get started.
+    * Saved Azure DevOps queries
+    * Saved Azure DevOps pull request searches
+    * Saved Azure DevOps pipeline searches
+    * Sign out of the Azure extension (Preview)
+* Otherwise, you'll see a "Sign in to the Azure extension (Preview)" command. Enter your Azure Dev Ops credentials to get started.
 
 ### WinGet
 
@@ -34,19 +34,23 @@ More instructions coming soon!
 
 ### Microsoft Store
 
-The Command Palette Azure Extension is coming to the Microsoft Store. Stay tuned for updates and instructions.
+The Command Palette Azure Extension (Preview) is coming to the Microsoft Store. Stay tuned for updates and instructions.
 
 ### Other install methods
 
 #### Via GitHub
 
-For users who are unable to install the Command Palette Azure Extension from winget or the Microsoft Store, released builds can be manually downloaded from this repository's [Releases page](https://github.com/microsoft/CmdPalAzureExtension/releases).
+For users who are unable to install the Command Palette Azure Extension (Preview) from winget or the Microsoft Store, released builds can be manually downloaded from this repository's [Releases page](https://github.com/microsoft/CmdPalAzureExtension/releases).
 
 ---
 
+## Getting started
+
+Check out our [quick start guide](docs/quickstartguide.md) to start using the Azure extension (Preview).
+
 ## Contributing
 
-We are excited to work alongside you, our amazing community, to build and enhance the Command Palette Azure Extension!
+We are excited to work alongside you, our amazing community, to build and enhance the Command Palette Azure Extension (Preview)!
 
 ## Communicating with the team
 
@@ -62,7 +66,7 @@ If you would like to ask a question that you feel doesn't warrant an issue (yet)
 ## Building the code
 
 * Clone the repository
-* Uninstall the Command Palette Azure Extension (Command Palette has a hard time choosing which extension to use if two versions exist)
+* Uninstall the Command Palette Azure Extension (Preview) (Command Palette has a hard time choosing which extension to use if two versions exist)
 * Open `AzureExtension.sln` in Visual Studio 2022 or later and build from the IDE, or run `build\scripts\Build.ps1` from a Visual Studio command prompt.
 
 ## Code of Conduct
