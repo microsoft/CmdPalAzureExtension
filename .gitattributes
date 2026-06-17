@@ -1,0 +1,15 @@
+# Normalize line endings.
+# Treat all files as text by default, and check them out with CRLF
+# line endings on every platform. Binary files are auto-detected and
+# left untouched; the explicit rules below are belt-and-suspenders.
+* text=auto eol=crlf
+
+# Known binary assets: never normalize these.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.nupkg binary
+*.snk   binary
+*.pfx   binary
