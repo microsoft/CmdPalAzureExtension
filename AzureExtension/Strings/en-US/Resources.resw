@@ -198,7 +198,7 @@
     <comment>Title for sign out form page</comment>
   </data>
   <data name="Forms_SignOut_TemplateAuthButtonTooltip" xml:space="preserve">
-    <value>Sign out from Azure extension</value>
+    <value>Sign out from Azure extension (Preview)</value>
     <comment>Tooltip for sign out button on sign out form</comment>
   </data>
   <data name="ListItems_AddQuery" xml:space="preserve">
@@ -398,11 +398,11 @@
     <comment>Name of the page that shows user-saved pull request searches</comment>
   </data>
   <data name="Pages_SignIn_Title" xml:space="preserve">
-    <value>Sign into the Azure extension</value>
+    <value>Sign in to the Azure extension (Preview)</value>
     <comment>The title for that page that signs in users</comment>
   </data>
   <data name="Pages_SignOut_Title" xml:space="preserve">
-    <value>Sign out of the Azure extension</value>
+    <value>Sign out of the Azure extension (Preview)</value>
     <comment>The title for that page that signs out users</comment>
   </data>
   <data name="Pages_SavedPullRequestSearches_Error" xml:space="preserve">
