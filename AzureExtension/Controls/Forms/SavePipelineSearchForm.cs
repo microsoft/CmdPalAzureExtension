@@ -12,7 +12,7 @@ using AzureExtension.Helpers;
 
 namespace AzureExtension.Controls.Forms;
 
-public class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
+public partial class SavePipelineSearchForm : SaveSearchForm<IPipelineDefinitionSearch>
 {
     private readonly IResources _resources;
     private string _definitionUrl = string.Empty;

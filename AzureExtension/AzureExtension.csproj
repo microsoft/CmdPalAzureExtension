@@ -18,7 +18,8 @@
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<GenerateAppxPackageOnBuild>True</GenerateAppxPackageOnBuild>
-		<WindowsAppSdkDeploymentManagerInitialize>False</WindowsAppSdkDeploymentManagerInitialize>
+		<WindowsAppSdkDeploymentManagerInitialize>False</WindowsAppSdkDeploymentManagerInitialize>
+
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -35,7 +36,7 @@
         <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
         <PackageReference Include="MessageFormat" Version="6.0.2" />
         <PackageReference Include="Microsoft.CommandPalette.Extensions" Version="0.1.0" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.1" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
         <PackageReference Include="Microsoft.Identity.Client" Version="4.70.1-preview" />
         <PackageReference Include="Microsoft.Identity.Client.Broker" Version="4.61.3" />
@@ -56,8 +57,7 @@
         <PackageReference Include="Shmuelie.WinRTServer" Version="2.1.1" />
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.0-preview.2.25163.2" />
         <PackageReference Include="System.Drawing.Common" Version="9.0.4" />
-        <PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.18" />
-        <PackageReference Include="System.Text.Json" Version="9.0.0" />
+        <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
 	</ItemGroup>
 
     <ItemGroup>

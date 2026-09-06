@@ -11,7 +11,7 @@ using AzureExtension.Helpers;
 
 namespace AzureExtension.Controls.Forms;
 
-public class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
+public partial class SavePullRequestSearchForm : SaveSearchForm<IPullRequestSearch>
 {
     private readonly IResources _resources;
     private string _repoUrl = string.Empty;

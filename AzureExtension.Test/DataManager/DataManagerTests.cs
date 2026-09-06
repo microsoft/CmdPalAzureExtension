@@ -113,14 +113,14 @@ public class DataManagerTests
             .ReturnsAsync(new WorkItemQueryResult
             {
                 QueryType = QueryType.Flat,
-                WorkItems =
-                [
+                WorkItems = new WorkItemReference[]
+                {
                     new WorkItemReference
                     {
                         Id = 1,
                         Url = "https://dev.azure.com/Org/Project/_apis/wit/workitems/1",
                     },
-                ],
+                },
             });
 
         mockLiveDataProvider.Setup(p => p.GetWorkItemsAsync(It.IsAny<IVssConnection>(), It.IsAny<string>(), It.IsAny<IEnumerable<int>>(), It.IsAny<WorkItemExpand>(), It.IsAny<WorkItemErrorPolicy>(), It.IsAny<CancellationToken>()))

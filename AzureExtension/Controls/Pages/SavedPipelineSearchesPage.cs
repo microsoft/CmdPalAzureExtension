@@ -11,7 +11,7 @@ using Microsoft.CommandPalette.Extensions;
 
 namespace AzureExtension.Controls.Pages;
 
-public class SavedPipelineSearchesPage : SavedSearchesPage, IDisposable
+public partial class SavedPipelineSearchesPage : SavedSearchesPage, IDisposable
 {
     private readonly IResources _resources;
     private readonly AddPipelineSearchListItem _addPipelineSearchListItem;
