@@ -85,7 +85,7 @@ public class AzureLiveDataProvider : IAzureLiveDataProvider
     {
         var buildClient = connection.GetClient<BuildHttpClient>();
         var queryOrder = BuildQueryOrder.QueueTimeDescending;
-        return await buildClient.GetBuildsAsync(projectId, [(int)definitionId], queryOrder: queryOrder, cancellationToken: cancellationToken);
+        return await buildClient.GetBuildsAsync(projectId, new int[] { (int)definitionId }, queryOrder: queryOrder, cancellationToken: cancellationToken);
     }
 
     public async Task<BuildDefinition> GetDefinitionAsync(IVssConnection connection, string projectId, long definitionId, CancellationToken cancellationToken)

@@ -7,7 +7,7 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Pages;
 
-public abstract class SavedSearchesPage : ListPage
+public abstract partial class SavedSearchesPage : ListPage
 {
     protected abstract SearchUpdatedType SearchUpdatedType { get; }
 

@@ -10,7 +10,7 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 
 namespace AzureExtension.Controls.Commands;
 
-public class SignOutCommand : InvokableCommand, IDisposable
+public partial class SignOutCommand : InvokableCommand, IDisposable
 {
     private readonly IResources _resources;
     private readonly IAccountProvider _accountProvider;

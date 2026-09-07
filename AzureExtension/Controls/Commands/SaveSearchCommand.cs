@@ -10,7 +10,7 @@ using Serilog;
 namespace AzureExtension.Controls.Commands;
 
 #pragma warning disable SA1649 // File name should match first type name
-public class SaveSearchCommand<TSearch> : InvokableCommand
+public partial class SaveSearchCommand<TSearch> : InvokableCommand
 #pragma warning restore SA1649 // File name should match first type name
     where TSearch : IAzureSearch
 {

@@ -8,7 +8,7 @@ using Microsoft.CommandPalette.Extensions;
 
 namespace AzureExtension.Controls.Pages;
 
-public class SavedPullRequestSearchesPage : SavedSearchesPage
+public partial class SavedPullRequestSearchesPage : SavedSearchesPage
 {
     private readonly IResources _resources;
     private readonly AddPullRequestSearchListItem _addPullRequestSearchListItem;

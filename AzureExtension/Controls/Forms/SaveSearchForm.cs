@@ -15,7 +15,7 @@ using Serilog;
 namespace AzureExtension.Controls.Forms;
 
 #pragma warning disable SA1649 // File name should match first type name
-public abstract class SaveSearchForm<TSearch> : FormContent
+public abstract partial class SaveSearchForm<TSearch> : FormContent
     where TSearch : IAzureSearch
 {
     private readonly ISavedSearchesUpdater<TSearch> _savedSearchesUpdater;
@@ -65,7 +65,7 @@ public abstract class SaveSearchForm<TSearch> : FormContent
         try
         {
             _mediator.SetLoadingState(true, _searchUpdatedType);
-            var payloadJson = JsonNode.Parse(inputs);
+            var payloadJson = string.IsNullOrEmpty(inputs) ? null : JsonNode.Parse(inputs);
             ParseFormSubmission(payloadJson);
 
             var searchInfoParameters = GetSearchInfoParameters();
